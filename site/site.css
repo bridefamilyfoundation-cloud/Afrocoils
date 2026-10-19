@@ -1,15 +1,14 @@
 /*
- * Fonts are the app's, from the same npm packages, served with the page.
- * Latin only, as in src/index.css. Literata adds the 500 italic the hero
+ * Fonts are the app's, from the same npm package, served with the page.
+ * Latin only, as in src/index.css. The site adds the 500 italic the hero
  * sets its second line in.
  */
-@import '@fontsource/literata/latin-500.css';
-@import '@fontsource/literata/latin-500-italic.css';
-@import '@fontsource/literata/latin-600.css';
-@import '@fontsource/literata/latin-700.css';
-@import '@fontsource/be-vietnam-pro/latin-400.css';
-@import '@fontsource/be-vietnam-pro/latin-500.css';
-@import '@fontsource/be-vietnam-pro/latin-600.css';
+@import '@fontsource/plus-jakarta-sans/latin-400.css';
+@import '@fontsource/plus-jakarta-sans/latin-500.css';
+@import '@fontsource/plus-jakarta-sans/latin-500-italic.css';
+@import '@fontsource/plus-jakarta-sans/latin-600.css';
+@import '@fontsource/plus-jakarta-sans/latin-700.css';
+@import '@fontsource/plus-jakarta-sans/latin-800.css';
 
 @tailwind base;
 @tailwind components;

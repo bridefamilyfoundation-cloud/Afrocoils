@@ -306,7 +306,7 @@ export default function LocCareScreen() {
       <section className="mb-2xl grid grid-cols-1 gap-sm sm:grid-cols-2">
         <Link
           to="/calendar"
-          className="flex items-center gap-md rounded-xl border border-outline-variant/30 bg-surface-container-lowest p-lg transition-all active:scale-[0.98]"
+          className="flex items-center gap-md rounded-xl shadow-card bg-surface-container-lowest p-lg transition-all active:scale-[0.98]"
         >
           <Icon name="calendar_month" className="shrink-0 text-primary" />
           <span className="min-w-0 flex-1 font-body-md text-body-md text-on-surface">
@@ -316,7 +316,7 @@ export default function LocCareScreen() {
         </Link>
         <Link
           to="/sos/problem"
-          className="flex items-center gap-md rounded-xl border border-outline-variant/30 bg-surface-container-lowest p-lg transition-all active:scale-[0.98]"
+          className="flex items-center gap-md rounded-xl shadow-card bg-surface-container-lowest p-lg transition-all active:scale-[0.98]"
         >
           <Icon name="warning" className="shrink-0 text-primary" />
           <span className="min-w-0 flex-1 font-body-md text-body-md text-on-surface">

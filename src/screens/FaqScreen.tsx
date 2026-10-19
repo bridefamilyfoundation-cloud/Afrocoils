@@ -63,7 +63,7 @@ export default function FaqScreen() {
             <article
               key={faq.id}
               id={`faq-q-${faq.id}`}
-              className="scroll-mt-24 overflow-hidden rounded-xl border border-outline-variant/30 bg-surface-container-lowest"
+              className="scroll-mt-24 overflow-hidden rounded-xl shadow-card bg-surface-container-lowest"
             >
               <h3>
                 <button

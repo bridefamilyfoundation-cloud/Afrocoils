@@ -302,9 +302,10 @@ With no store configured at all it falls back to a per-instance counter, so
 
 ## Structure
 
-Every launch opens on `/` — the front page: the Hair SOS title, the
-illustration, and a Get Started button, and nothing else on it. Get Started
-goes to `/sos`, the rescue flow.
+Every launch opens on `/` — the front page: a collage of three library
+photos, the Hair SOS title, one line under it and a Get Started button.
+Get Started scrolls to the doors below it on the same screen, which is also
+`/sos`, the rescue flow.
 
 `/home` renders the same screen, because "home" has to mean the front page —
 it used to be an index of the four sections, which was a second table of
@@ -325,7 +326,7 @@ with six options is a menu, and a menu is what this replaced.
 
 | Route | Section | What it does | What lives inside it |
 | --- | --- | --- | --- |
-| `/` `/home` `/sos` | **Hair SOS** | The front page *and* the section, one screen: title, illustration and Get Started fill the first viewport, then *What's your emergency?* — Quick Hairstyle, Hair Care, Hair Problem. Get Started scrolls to the doors. | `/sos/quick`, `/sos/problem`, and the care guides behind them |
+| `/` `/home` `/sos` | **Hair SOS** | The front page *and* the section, one screen: a three-photo collage, the title, one line and Get Started fill the first viewport, then *What's your emergency?* — Quick Hairstyle, Hair Care, Hair Problem. Get Started scrolls to the doors. | `/sos/quick`, `/sos/problem`, and the care guides behind them |
 | `/styles` | **Hair Styles** | The general library: every contributed look, by category and occasion. Carries a button to the recommendations. | `/styles/recommended`, `/styles/:id` — the full entry, four camera angles and the method |
 | `/care` | **Hair Care** | Know your hair, then routine, products and styles — in the order they depend on each other. | The porosity test, the calendar and the product shelf |
 | `/growth` | **Hair Growth** | What is underway, length checks, retention, milestones. | The user's own worn styles and their photos |
@@ -345,7 +346,7 @@ drawer or the tab bar:
 | `/products` | Curated brand shelf, filtered to the profile | Hair Care |
 | `/calendar` | Wash days, treatments, retwists; derives what is next due | Hair Care |
 | `/guide/:slug` | Static care guides from `src/content/guides.ts` | Hair SOS → Hair Problem |
-| `/` | The front page: title, illustration, Get Started | — (every launch) |
+| `/` | The front page: collage, title, Get Started | — (every launch) |
 | `/home` | The front page again — same screen as `/` | — (drawer) |
 | `/faq` | Five questions people actually ask | — (drawer base, footer) |
 | `/styles/submit/thanks` | Thank you, after contributing a style | Styles → Share a style |
@@ -462,7 +463,7 @@ Four deliberate departures from the prototype:
    importer is `import-brand.mjs`, kept with the session scratch.
 2. **Fonts and icons are bundled, not CDN-loaded.** The prototype used
    `<link>` tags to Google Fonts. A Capacitor app runs from local assets and has
-   to render correctly with no network, so Literata, Be Vietnam Pro and Material
+   to render correctly with no network, so Plus Jakarta Sans and Material
    Symbols are npm packages imported in `src/index.css`.
 3. **Safe-area padding.** `pt-safe` / `pb-safe` keep the app bar and bottom nav
    clear of the Android status bar, gesture bar, and display cutouts.

@@ -41,7 +41,7 @@ export default function CareStatus() {
   return (
     <section className="mb-2xl">
       <div className="mb-md flex items-center justify-between gap-md">
-        <h3 className="font-label-md text-label-md uppercase tracking-widest text-primary">
+        <h3 className="font-headline-md text-body-lg font-bold text-on-surface">
           Underway
         </h3>
         <Link
@@ -92,7 +92,7 @@ export default function CareStatus() {
                 className={`flex items-center gap-md rounded-xl p-md transition-all active:scale-[0.98] ${
                   late
                     ? 'bg-primary-container text-on-primary-container'
-                    : 'border border-outline-variant/30 bg-surface-container-lowest text-on-surface'
+                    : 'shadow-card bg-surface-container-lowest text-on-surface'
                 }`}
               >
                 <Icon

@@ -208,7 +208,7 @@ export default function ProfileScreen() {
           profile that can only be corrected field by field quietly goes
           stale. */}
       {completeness >= 1 && (
-        <section className="mb-2xl flex items-center gap-md rounded-2xl border border-outline-variant/30 bg-surface-container-lowest p-lg">
+        <section className="mb-2xl flex items-center gap-md rounded-2xl shadow-card bg-surface-container-lowest p-lg">
           <Icon name="science" className="shrink-0 text-2xl text-primary" />
           <div className="min-w-0 flex-1">
             <h3 className="font-headline-md text-body-lg text-on-surface">
@@ -230,7 +230,7 @@ export default function ProfileScreen() {
       {/* Hair type. First, and visually heavier than the rest, because
           everything below it is conditioned on this answer. */}
       <section className="mb-2xl">
-        <h3 className="mb-xs font-label-md text-label-md uppercase tracking-widest text-primary">
+        <h3 className="mb-xs font-headline-md text-body-lg font-bold text-on-surface">
           Hair Type
         </h3>
         <p className="mb-md font-caption text-caption text-on-surface-variant">
@@ -249,7 +249,7 @@ export default function ProfileScreen() {
                 className={`flex flex-col rounded-2xl p-lg text-left transition-all active:scale-[0.98] ${
                   selected
                     ? 'bg-primary text-on-primary'
-                    : 'border border-outline-variant/30 bg-surface-container-lowest text-on-surface'
+                    : 'shadow-card bg-surface-container-lowest text-on-surface'
                 }`}
               >
                 <div className="mb-sm flex items-center gap-sm">
@@ -273,7 +273,7 @@ export default function ProfileScreen() {
           never have to scroll past questions that do not apply to them. */}
       {locs && (
         <section className="mb-2xl">
-          <h3 className="mb-xs font-label-md text-label-md uppercase tracking-widest text-primary">
+          <h3 className="mb-xs font-headline-md text-body-lg font-bold text-on-surface">
             Your Locs
           </h3>
           <p className="mb-md font-caption text-caption text-on-surface-variant">
@@ -297,7 +297,7 @@ export default function ProfileScreen() {
               onSelect={(v) => setIdentity('locMethod', v)}
             />
 
-            <div className="rounded-xl border border-outline-variant/30 bg-surface-container-lowest p-lg">
+            <div className="rounded-xl shadow-card bg-surface-container-lowest p-lg">
               <div className="mb-md flex items-center gap-sm">
                 <Icon name="calendar_month" className="text-primary" />
                 <p className="flex-1 font-caption text-caption uppercase tracking-widest text-on-surface-variant">
@@ -323,7 +323,7 @@ export default function ProfileScreen() {
               )}
             </div>
 
-            <div className="rounded-xl border border-outline-variant/30 bg-surface-container-lowest p-lg">
+            <div className="rounded-xl shadow-card bg-surface-container-lowest p-lg">
               <div className="mb-sm flex items-center gap-sm">
                 <Icon name="trending_up" className="text-primary" />
                 <p className="flex-1 font-caption text-caption uppercase tracking-widest text-on-surface-variant">
@@ -369,7 +369,7 @@ export default function ProfileScreen() {
       )}
 
       <section className="mb-2xl">
-        <h3 className="mb-md font-label-md text-label-md uppercase tracking-widest text-primary">
+        <h3 className="mb-md font-headline-md text-body-lg font-bold text-on-surface">
           Hair Profile
         </h3>
         <div className="space-y-md">
@@ -390,7 +390,7 @@ export default function ProfileScreen() {
       </section>
 
       <section className="mb-2xl">
-        <h3 className="mb-xs font-label-md text-label-md uppercase tracking-widest text-primary">
+        <h3 className="mb-xs font-headline-md text-body-lg font-bold text-on-surface">
           Care Preferences
         </h3>
         <p className="mb-md font-caption text-caption text-on-surface-variant">
@@ -426,7 +426,7 @@ export default function ProfileScreen() {
 
       <section className="mb-2xl">
         <div className="mb-xs flex items-center justify-between">
-          <h3 className="font-label-md text-label-md uppercase tracking-widest text-primary">
+          <h3 className="font-headline-md text-body-lg font-bold text-on-surface">
             Product Shelf
           </h3>
           <Link
@@ -454,7 +454,7 @@ export default function ProfileScreen() {
             </span>
           </Link>
         ) : (
-          <ul className="divide-y divide-outline-variant/30 overflow-hidden rounded-xl border border-outline-variant/30 bg-surface-container-lowest">
+          <ul className="divide-y divide-outline-variant/30 overflow-hidden rounded-xl shadow-card bg-surface-container-lowest">
             {shelf.map((product) => (
               <li key={product.id}>
                 <button
@@ -466,8 +466,8 @@ export default function ProfileScreen() {
                   <div
                     className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${
                       product.inUse
-                        ? 'bg-secondary-container text-on-secondary-container'
-                        : 'bg-surface-container-high text-on-surface-variant'
+                        ? 'bg-inverse-surface text-inverse-on-surface'
+                        : 'bg-surface-container-lowest text-on-surface shadow-card'
                     }`}
                   >
                     <Icon name={product.inUse ? 'check' : 'schedule'} />
@@ -512,7 +512,7 @@ function ChipField({
   describe?: (value: string) => string
 }) {
   return (
-    <div className="rounded-xl border border-outline-variant/30 bg-surface-container-lowest p-lg">
+    <div className="rounded-xl shadow-card bg-surface-container-lowest p-lg">
       <div className="mb-md flex items-center gap-sm">
         <Icon name={icon} className="text-primary" />
         <p className="flex-1 font-caption text-caption uppercase tracking-widest text-on-surface-variant">
@@ -538,8 +538,8 @@ function ChipField({
               onClick={() => onSelect(option)}
               className={`rounded-full px-lg py-2 font-label-md text-label-md transition-colors active:scale-95 ${
                 selected
-                  ? 'bg-secondary-container text-on-secondary-container'
-                  : 'bg-surface-container-high text-on-surface'
+                  ? 'bg-inverse-surface text-inverse-on-surface'
+                  : 'bg-surface-container-lowest text-on-surface shadow-card'
               }`}
             >
               {describe ? describe(option) : option}

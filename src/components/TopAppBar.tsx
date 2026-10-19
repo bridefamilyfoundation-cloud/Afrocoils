@@ -21,13 +21,13 @@ export default function TopAppBar({ onOpenMenu }: { onOpenMenu: () => void }) {
     //
     // Three columns rather than space-between, so the lockup stays centred
     // with two buttons on the right and one on the left.
-    <header className="app-chrome fixed top-0 left-0 z-50 grid min-h-[4rem] w-full grid-cols-[1fr_auto_1fr] items-center bg-background/80 px-gutter pt-safe backdrop-blur-md">
+    <header className="app-chrome fixed top-0 left-0 z-50 grid min-h-[4rem] w-full grid-cols-[1fr_auto_1fr] items-center bg-surface-container-low/70 px-gutter pt-safe backdrop-blur-md">
       <button
         type="button"
         onClick={onOpenMenu}
         aria-label="Open menu"
         data-tour="menu-button"
-        className="flex h-10 w-10 items-center justify-center justify-self-start rounded-full transition-colors hover:bg-surface-variant/50 active:scale-90"
+        className="flex h-10 w-10 items-center justify-center justify-self-start rounded-full bg-surface-container-lowest shadow-card transition-all active:scale-90"
       >
         <Icon name="menu" className="text-primary" />
       </button>
@@ -39,14 +39,14 @@ export default function TopAppBar({ onOpenMenu }: { onOpenMenu: () => void }) {
         <BrandLockup size="sm" />
       </Link>
 
-      <div className="flex items-center gap-xs justify-self-end">
+      <div className="flex items-center gap-sm justify-self-end">
         {/* Ask, from every screen. It quotes the app rather than writing
             anything, and needs no signal — see screens/AskScreen. */}
         <Link
           to="/ask"
           aria-label="Ask a question"
           data-tour="ask-button"
-          className="flex h-10 w-10 items-center justify-center rounded-full transition-colors hover:bg-surface-variant/50 active:scale-90"
+          className="flex h-10 w-10 items-center justify-center rounded-full bg-surface-container-lowest shadow-card transition-all active:scale-90"
         >
           <Icon name="search" className="text-primary" />
         </Link>

@@ -110,8 +110,8 @@ export default function StyleRecommendationsScreen() {
       </section>
 
       {/* The criteria, and what each one is currently doing. */}
-      <section className="mb-2xl rounded-2xl border border-outline-variant/30 bg-surface-container-lowest p-lg">
-        <h3 className="mb-md font-label-md text-label-md uppercase tracking-widest text-primary">
+      <section className="mb-2xl rounded-2xl shadow-card bg-surface-container-lowest p-lg">
+        <h3 className="mb-md font-headline-md text-body-lg font-bold text-on-surface">
           What this is based on
         </h3>
 
@@ -198,14 +198,14 @@ export default function StyleRecommendationsScreen() {
       {matched.length > 0 ? (
         <section className="mb-2xl">
           <div className="mb-md flex items-baseline justify-between gap-sm">
-            <h3 className="font-label-md text-label-md uppercase tracking-widest text-primary">
+            <h3 className="font-headline-md text-body-lg font-bold text-on-surface">
               Matched your profile
             </h3>
             <span className="font-caption text-caption text-on-surface-variant">
               {matched.length} of {ranked.length}
             </span>
           </div>
-          <div className="grid grid-cols-1 gap-lg sm:grid-cols-2">
+          <div className="grid grid-cols-2 gap-md sm:grid-cols-3">
             {matched.map((r) => (
               <StyleCard
                 key={r.style.id}

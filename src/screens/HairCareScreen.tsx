@@ -138,7 +138,7 @@ export default function HairCareScreen() {
 
       {/* A — know your hair */}
       <section className="mb-2xl">
-        <h3 className="mb-md font-label-md text-label-md uppercase tracking-widest text-primary">
+        <h3 className="mb-md font-headline-md text-body-lg font-bold text-on-surface">
           A · Know your hair
         </h3>
         <div className="space-y-sm">
@@ -146,7 +146,7 @@ export default function HairCareScreen() {
             <Link
               key={trait.label}
               to={trait.to}
-              className="flex items-start gap-md rounded-xl border border-outline-variant/30 bg-surface-container-lowest p-lg transition-all active:scale-[0.98]"
+              className="flex items-start gap-md rounded-xl shadow-card bg-surface-container-lowest p-lg transition-all active:scale-[0.98]"
             >
               <div className="min-w-0 flex-1">
                 <div className="mb-xs flex flex-wrap items-baseline gap-sm">
@@ -194,7 +194,7 @@ export default function HairCareScreen() {
           <Link
             key={route.to}
             to={route.to}
-            className="flex items-center gap-md rounded-xl border border-outline-variant/30 bg-surface-container-lowest p-lg transition-all active:scale-[0.98]"
+            className="flex items-center gap-md rounded-xl shadow-card bg-surface-container-lowest p-lg transition-all active:scale-[0.98]"
           >
             <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-surface-container-high">
               <Icon name={route.icon} className="text-primary" />

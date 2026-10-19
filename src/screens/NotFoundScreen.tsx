@@ -66,7 +66,7 @@ export default function NotFoundScreen() {
           <Link
             key={way.to}
             to={way.to}
-            className="flex items-center gap-md rounded-xl border border-outline-variant/30 bg-surface-container-lowest p-lg transition-all active:scale-[0.98]"
+            className="flex items-center gap-md rounded-xl shadow-card bg-surface-container-lowest p-lg transition-all active:scale-[0.98]"
           >
             <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-surface-container-high">
               <Icon name={way.icon} className="text-primary" />

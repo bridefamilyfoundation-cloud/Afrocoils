@@ -117,7 +117,7 @@ export default function GrowthScreen() {
       {hasData && (
         <>
           <section className="mb-2xl grid grid-cols-3 gap-md">
-            <div className="rounded-xl border border-outline-variant/30 bg-surface-container-lowest p-md text-center">
+            <div className="rounded-xl shadow-card bg-surface-container-lowest p-md text-center">
               <Icon name="straighten" className="mb-xs text-primary" />
               <p className="font-headline-md text-headline-md text-on-surface">
                 {formatLength(stats.latest!.overall, lengthUnit)}
@@ -128,7 +128,7 @@ export default function GrowthScreen() {
               </p>
             </div>
 
-            <div className="rounded-xl border border-outline-variant/30 bg-surface-container-lowest p-md text-center">
+            <div className="rounded-xl shadow-card bg-surface-container-lowest p-md text-center">
               <Icon name="trending_up" className="mb-xs text-primary" />
               <p className="font-headline-md text-headline-md text-on-surface">
                 {stats.deltaInches === undefined
@@ -143,7 +143,7 @@ export default function GrowthScreen() {
               </p>
             </div>
 
-            <div className="rounded-xl border border-outline-variant/30 bg-surface-container-lowest p-md text-center">
+            <div className="rounded-xl shadow-card bg-surface-container-lowest p-md text-center">
               <Icon name="shield" className="mb-xs text-primary" />
               <p className="font-headline-md text-headline-md text-on-surface">
                 {stats.retention === undefined
@@ -157,9 +157,9 @@ export default function GrowthScreen() {
             </div>
           </section>
 
-          <section className="mb-2xl rounded-2xl border border-outline-variant/30 bg-surface-container-lowest p-lg">
+          <section className="mb-2xl rounded-2xl shadow-card bg-surface-container-lowest p-lg">
             <div className="mb-md flex items-center justify-between gap-md">
-              <h3 className="font-label-md text-label-md uppercase tracking-widest text-primary">
+              <h3 className="font-headline-md text-body-lg font-bold text-on-surface">
                 Length over time
               </h3>
               <div className="flex gap-xs" role="group" aria-label="Length unit">
@@ -171,8 +171,8 @@ export default function GrowthScreen() {
                     onClick={() => setUnit(u)}
                     className={`rounded-full px-md py-1 font-label-md text-caption transition-colors active:scale-95 ${
                       lengthUnit === u
-                        ? 'bg-secondary-container text-on-secondary-container'
-                        : 'bg-surface-container-high text-on-surface-variant'
+                        ? 'bg-inverse-surface text-inverse-on-surface'
+                        : 'bg-surface-container-lowest text-on-surface shadow-card'
                     }`}
                   >
                     {u === 'in' ? 'in' : 'cm'}
@@ -204,7 +204,7 @@ export default function GrowthScreen() {
           )}
 
           <section className="mb-2xl">
-            <h3 className="mb-xs font-label-md text-label-md uppercase tracking-widest text-primary">
+            <h3 className="mb-xs font-headline-md text-body-lg font-bold text-on-surface">
               Milestones
             </h3>
             <p className="mb-md font-caption text-caption text-on-surface-variant">
@@ -251,10 +251,10 @@ export default function GrowthScreen() {
           {/* The table view for the chart above: every value readable
               without touching the chart. */}
           <section className="mb-2xl">
-            <h3 className="mb-md font-label-md text-label-md uppercase tracking-widest text-primary">
+            <h3 className="mb-md font-headline-md text-body-lg font-bold text-on-surface">
               Check-in History
             </h3>
-            <ul className="divide-y divide-outline-variant/30 overflow-hidden rounded-xl border border-outline-variant/30 bg-surface-container-lowest">
+            <ul className="divide-y divide-outline-variant/30 overflow-hidden rounded-xl shadow-card bg-surface-container-lowest">
               {history.map((entry) => (
                 <li key={entry.id} className="p-md">
                   <div className="mb-xs flex items-baseline justify-between gap-md">

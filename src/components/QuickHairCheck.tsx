@@ -40,7 +40,7 @@ export default function QuickHairCheck() {
 
   return (
     <section className="mb-2xl">
-      <h3 className="mb-sm font-label-md text-label-md uppercase tracking-widest text-primary">
+      <h3 className="mb-sm font-headline-md text-body-lg font-bold text-on-surface">
         Quick hair check
       </h3>
       <p className="mb-xs font-headline-md text-body-lg text-on-surface">
@@ -64,7 +64,7 @@ export default function QuickHairCheck() {
                 <article
                   key={concern.id}
                   id={`check-row-${concern.id}`}
-                  className="scroll-mt-24 overflow-hidden rounded-xl border border-outline-variant/30 bg-surface-container-lowest"
+                  className="scroll-mt-24 overflow-hidden rounded-xl shadow-card bg-surface-container-lowest"
                 >
                   <h5>
                     <button

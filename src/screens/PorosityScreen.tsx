@@ -141,7 +141,7 @@ export default function PorosityScreen() {
             key={question.id}
             role="group"
             aria-labelledby={`porosity-${question.id}-prompt`}
-            className="rounded-2xl border border-outline-variant/30 bg-surface-container-lowest p-lg"
+            className="rounded-2xl shadow-card bg-surface-container-lowest p-lg"
           >
             <p className="mb-xs font-caption text-caption uppercase tracking-widest text-outline">
               {i + 1} of {questions.length}
@@ -163,8 +163,8 @@ export default function PorosityScreen() {
                     onClick={() => answer(question.id, option.score)}
                     className={`flex w-full items-center gap-sm rounded-xl px-md py-3 text-left font-body-md text-body-md transition-colors active:scale-[0.98] ${
                       selected
-                        ? 'bg-secondary-container text-on-secondary-container'
-                        : 'bg-surface-container text-on-surface'
+                        ? 'bg-inverse-surface text-inverse-on-surface'
+                        : 'bg-surface-container-lowest text-on-surface shadow-card'
                     }`}
                   >
                     <Icon

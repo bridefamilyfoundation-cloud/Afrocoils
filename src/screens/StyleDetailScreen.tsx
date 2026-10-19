@@ -210,7 +210,7 @@ export default function StyleDetailScreen() {
 
       {style.steps && style.steps.length > 0 ? (
         <section className="mb-2xl">
-          <h2 className="mb-md font-label-md text-label-md uppercase tracking-widest text-primary">
+          <h2 className="mb-md font-headline-md text-body-lg font-bold text-on-surface">
             How to do it
           </h2>
           <ol className="space-y-md">

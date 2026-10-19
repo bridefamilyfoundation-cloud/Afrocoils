@@ -76,7 +76,8 @@ const SECTIONS: {
         <ul>
           <li>
             <strong>The tab bar</strong> along the bottom holds four of them, SOS, Styles,
-            Growth and Profile, on every screen.
+            Growth and Profile, on every screen. The one you are in is the orange pill with
+            its name; the other three are icons.
           </li>
           <li>
             <strong>The menu</strong> (top left) lists all six, including Hair Care and Locs
@@ -492,7 +493,7 @@ export default function DocsScreen() {
       </button>
 
       <nav aria-label="Contents" className="mb-2xl rounded-2xl bg-surface-container p-lg">
-        <h2 className="mb-sm font-label-md text-label-md uppercase tracking-widest text-primary">
+        <h2 className="mb-sm font-headline-md text-body-lg font-bold text-on-surface">
           Contents
         </h2>
         <ol className="space-y-xs">

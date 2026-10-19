@@ -65,8 +65,8 @@ function Chip({
       onClick={onClick}
       className={`rounded-full px-lg py-2 font-label-md text-label-md transition-colors active:scale-95 ${
         active
-          ? 'bg-secondary-container text-on-secondary-container'
-          : 'bg-surface-container-high text-on-surface'
+          ? 'bg-inverse-surface text-inverse-on-surface'
+          : 'bg-surface-container-lowest text-on-surface shadow-card'
       }`}
     >
       {children}
@@ -77,7 +77,7 @@ function Chip({
 function Field({ label, hint, children }: { label: string; hint?: string; children: React.ReactNode }) {
   return (
     <div className="mb-xl">
-      <h2 className="mb-xs font-label-md text-label-md uppercase tracking-widest text-primary">
+      <h2 className="mb-xs font-headline-md text-body-lg font-bold text-on-surface">
         {label}
       </h2>
       {hint && <p className="mb-sm font-caption text-caption text-on-surface-variant">{hint}</p>}
@@ -460,7 +460,7 @@ function SubmitStyleForm() {
       </p>
 
       <section className="mb-2xl mt-2xl">
-        <h2 className="mb-md font-label-md text-label-md uppercase tracking-widest text-primary">
+        <h2 className="mb-md font-headline-md text-body-lg font-bold text-on-surface">
           Your submissions
         </h2>
         {submissions.length === 0 ? (
@@ -472,7 +472,7 @@ function SubmitStyleForm() {
             {submissions.map((s) => (
               <li
                 key={s.id}
-                className="rounded-xl border border-outline-variant/30 bg-surface-container-lowest p-md"
+                className="rounded-xl shadow-card bg-surface-container-lowest p-md"
               >
                 <div className="flex items-start gap-md">
                   {s.photos[0] ? (

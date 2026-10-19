@@ -13,8 +13,9 @@ import markUrl from '../assets/brand/afro-mark.webp'
  *
  * Two cuts of the same file, because one does not survive both sizes:
  *
- * - **`hero`** is the whole illustration, orange burst included, for the
- *   front page where it *is* the screen.
+ * - **`hero`** is the whole illustration, orange burst included, for
+ *   anywhere it is the picture rather than a badge. The front page used
+ *   to be this; it is a photo collage now, after the reference mockup.
  * - **`mark`** is cropped to the hair. The burst is nearly half the width
  *   of the full frame, so at the 32px the app bar draws it at, the
  *   uncropped version is an orange smudge with a dot in the middle.

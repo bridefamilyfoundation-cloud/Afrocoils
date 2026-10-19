@@ -50,7 +50,8 @@ export default function AppLayout() {
   }, [pathname, navigationType])
 
   return (
-    <div className="min-h-full bg-background text-on-background">
+    <div className="relative isolate min-h-full text-on-background">
+      <div aria-hidden className="page-wash fixed inset-0 -z-10" />
       <TopAppBar onOpenMenu={() => setMenuOpen(true)} />
       <NavDrawer open={menuOpen} onClose={() => setMenuOpen(false)} />
 

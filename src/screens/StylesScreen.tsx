@@ -53,6 +53,9 @@ const FILTERS: Filter[] = [
  * from the library for the same reason as the categories above:
  * "Gym/Active" is in the vocabulary and in nothing on the shelf.
  */
+/** The library photo on the recommendations banner. Decoration only. */
+const BANNER_STYLE = 'curved-part-afro-bun'
+
 const OCCASION_FILTERS: Occasion[] = OCCASIONS.filter((o) =>
   STYLES.some((s) => s.occasions?.includes(o)),
 )
@@ -145,11 +148,25 @@ export default function StylesScreen() {
 
   return (
     <>
-      <section className="mb-lg text-center">
-        <h2 className="mb-sm font-headline-lg text-headline-lg-mobile text-on-background">
+      {/* The reference mockup's search field. It is a way into Ask, the
+          same screen the app bar's search icon opens — not a filter over
+          this list — so it is a link drawn as a field rather than an
+          input that would have to pretend. */}
+      <Link
+        to="/ask"
+        className="mb-lg flex items-center gap-sm rounded-full bg-surface-container-lowest px-lg py-3.5 shadow-card transition-all active:scale-[0.98]"
+      >
+        <Icon name="search" className="text-on-surface-variant" />
+        <span className="font-body-md text-body-md text-on-surface-variant">
+          Search styles, care and guides
+        </span>
+      </Link>
+
+      <section className="mb-lg">
+        <h2 className="mb-xs font-headline-lg text-headline-lg-mobile text-on-background">
           Hair Styles
         </h2>
-        <p className="mx-auto max-w-md font-body-md text-body-md text-on-surface-variant">
+        <p className="max-w-md font-body-md text-body-md text-on-surface-variant">
           The full technique library — every contributed look, browsable by category and
           occasion.
         </p>
@@ -159,45 +176,55 @@ export default function StylesScreen() {
           the general one. It used to be a shelf halfway down this screen,
           which put "everything" and "for you" on the same scroll and made
           the first four cards read as an unexplained repeat of the list
-          below them. */}
+          below them. Drawn as the mockup's promotion banner, with a
+          library photo on the right. */}
       <Link
         to="/styles/recommended"
         data-tour="styles-recommended"
-        className="mb-2xl flex items-center gap-md rounded-2xl bg-primary-container p-lg text-on-primary-container transition-all active:scale-[0.98]"
+        className="relative mb-2xl flex min-h-[9.5rem] overflow-hidden rounded-3xl bg-primary-container text-on-primary-container shadow-card transition-all active:scale-[0.98]"
       >
-        <Icon name="face_3" className="shrink-0 text-3xl" />
-        <span className="min-w-0 flex-1">
-          <span className="block font-headline-md text-body-lg">Recommended for your hair</span>
+        <span className="relative z-10 flex w-[62%] flex-col justify-center gap-sm p-lg">
+          <span className="block font-headline-md text-headline-md">Recommended for your hair</span>
           <span className="block font-body-md text-caption opacity-90">
             Ranked from your profile, with the criteria it used
           </span>
+          <span className="mt-xs inline-flex w-fit items-center gap-xs rounded-full bg-surface-container-lowest px-md py-1.5 font-label-md text-caption font-bold text-on-surface">
+            See them
+            <Icon name="arrow_forward" className="text-[16px]" />
+          </span>
         </span>
-        <Icon name="arrow_forward" className="shrink-0 opacity-80" />
+        <PrototypeImage
+          slot={styleCover(BANNER_STYLE, '')}
+          seed={BANNER_STYLE}
+          rounded="rounded-none"
+          className="absolute inset-y-0 right-0 h-full w-[45%] object-cover object-top [mask-image:linear-gradient(to_right,transparent,black_35%)]"
+        />
       </Link>
 
       {saved.length > 0 && (
         <section className="mb-2xl">
-          <h3 className="mb-md font-label-md text-label-md uppercase tracking-widest text-primary">
+          <h3 className="mb-md font-headline-md text-body-lg font-bold text-on-surface">
             Saved
           </h3>
-          <div className="flex gap-md overflow-x-auto pb-sm">
+          <div className="-mx-container-padding flex gap-md overflow-x-auto px-container-padding pb-md">
             {saved.map(({ style }) => (
               <Link
                 key={style.id}
                 to={`/styles/${style.id}`}
-                className="w-40 shrink-0 rounded-xl bg-secondary-fixed p-md transition-all active:scale-[0.98]"
+                className="w-40 shrink-0 rounded-2xl bg-surface-container-lowest p-sm shadow-card transition-all active:scale-[0.98]"
               >
                 <PrototypeImage
                   slot={styleCover(style.id, style.name)}
                   seed={style.id}
                   icon={CATEGORY_ICONS[style.category]}
                   ratio={[4, 3]}
-                  className="mb-sm h-24 w-full object-top"
+                  rounded="rounded-xl"
+                  className="mb-sm h-28 w-full object-top"
                 />
-                <p className="font-label-md text-label-md text-on-secondary-fixed">
+                <p className="px-xs font-label-md text-label-md font-bold text-on-surface">
                   {style.name}
                 </p>
-                <p className="font-caption text-caption text-on-secondary-fixed-variant">
+                <p className="px-xs font-caption text-caption text-on-surface-variant">
                   {style.minutes} min
                 </p>
               </Link>
@@ -246,7 +273,7 @@ export default function StylesScreen() {
       {ranked.length > 0 && (
         <section className="mb-lg">
           <div className="mb-md flex items-baseline justify-between gap-sm">
-            <h3 className="font-label-md text-label-md uppercase tracking-widest text-primary">
+            <h3 className="font-headline-md text-body-lg font-bold text-on-surface">
               All styles
             </h3>
             <span className="font-caption text-caption text-on-surface-variant">
@@ -260,17 +287,21 @@ export default function StylesScreen() {
             </p>
           )}
   
-          <div role="group" aria-label="Filter by category" className="flex flex-wrap gap-sm">
+          <div
+            role="group"
+            aria-label="Filter by category"
+            className="-mx-container-padding flex gap-sm overflow-x-auto px-container-padding pb-sm"
+          >
             {FILTERS.map((category) => (
               <button
                 key={category}
                 type="button"
                 aria-pressed={active === category}
                 onClick={() => setActive(category)}
-                className={`rounded-full px-lg py-2 font-label-md text-label-md transition-colors active:scale-95 ${
+                className={`shrink-0 whitespace-nowrap rounded-full px-lg py-2 font-label-md text-label-md transition-colors active:scale-95 ${
                   active === category
-                    ? 'bg-secondary-container text-on-secondary-container'
-                    : 'bg-surface-container-high text-on-surface'
+                    ? 'bg-inverse-surface text-inverse-on-surface'
+                    : 'bg-surface-container-lowest text-on-surface shadow-card'
                 }`}
               >
                 {category}
@@ -308,7 +339,7 @@ export default function StylesScreen() {
       )}
 
       {visible.length > 0 ? (
-        <section className="mb-2xl grid grid-cols-1 gap-lg sm:grid-cols-2">
+        <section className="mb-2xl grid grid-cols-2 gap-md sm:grid-cols-3">
           {visible.map((r) => (
             <StyleCard
               key={r.style.id}

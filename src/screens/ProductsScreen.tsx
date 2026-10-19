@@ -137,7 +137,7 @@ export default function ProductsScreen() {
         </p>
       </section>
 
-      <section className="mb-2xl flex items-start gap-md rounded-xl border border-outline-variant/30 bg-surface-container-lowest p-md">
+      <section className="mb-2xl flex items-start gap-md rounded-xl shadow-card bg-surface-container-lowest p-md">
         <Icon name="info" className="shrink-0 text-primary" />
         <p className="font-body-md text-caption text-on-surface-variant">
           Brands reformulate without renaming the bottle. Treat the silicone and protein notes
@@ -148,7 +148,7 @@ export default function ProductsScreen() {
       {identity.hairType ? (
         recommended.length > 0 && (
           <section className="mb-2xl">
-            <h3 className="mb-xs font-label-md text-label-md uppercase tracking-widest text-primary">
+            <h3 className="mb-xs font-headline-md text-body-lg font-bold text-on-surface">
               For your hair
             </h3>
             <p className="mb-md font-caption text-caption text-on-surface-variant">
@@ -194,7 +194,7 @@ export default function ProductsScreen() {
 
       {saved.length > 0 && (
         <section className="mb-2xl">
-          <h3 className="mb-md font-label-md text-label-md uppercase tracking-widest text-primary">
+          <h3 className="mb-md font-headline-md text-body-lg font-bold text-on-surface">
             Saved
           </h3>
           <div className="grid grid-cols-1 gap-md sm:grid-cols-2">
@@ -222,8 +222,8 @@ export default function ProductsScreen() {
               onClick={() => setActive(category)}
               className={`rounded-full px-lg py-2 font-label-md text-label-md transition-colors active:scale-95 ${
                 active === category
-                  ? 'bg-secondary-container text-on-secondary-container'
-                  : 'bg-surface-container-high text-on-surface'
+                  ? 'bg-inverse-surface text-inverse-on-surface'
+                  : 'bg-surface-container-lowest text-on-surface shadow-card'
               }`}
             >
               {category}
@@ -308,7 +308,7 @@ function ProductCard({
   const { product, reasons } = ranked
 
   return (
-    <article className="flex flex-col rounded-xl border border-outline-variant/30 bg-surface-container-lowest p-md">
+    <article className="flex flex-col rounded-xl shadow-card bg-surface-container-lowest p-md">
       <div className="mb-sm flex items-start gap-md">
         <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-primary-fixed text-on-primary-fixed">
           <Icon name={CATEGORY_ICONS[product.category]} />

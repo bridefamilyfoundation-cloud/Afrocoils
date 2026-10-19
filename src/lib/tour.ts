@@ -42,7 +42,7 @@ export const TOUR_STEPS: TourStep[] = [
     path: '/sos',
     target: 'tab-bar',
     title: 'Four tabs',
-    body: 'SOS, Styles, Growth and Profile are always one tap away along the bottom, on every screen.',
+    body: 'SOS, Styles, Growth and Profile are always one tap away along the bottom, on every screen. The orange pill is where you are.',
   },
   {
     path: '/sos',

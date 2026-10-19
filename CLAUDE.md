@@ -113,8 +113,8 @@ picture; this file is the short version of what to keep in mind when editing.
   profile already holds and link to where it is set.
 
   **Hair SOS is also the front page.** One screen answers to `/`,
-  `/home` and `/sos`: the title and the illustration fill the first
-  viewport with Get Started at its foot, and the three doors are
+  `/home` and `/sos`: a collage of three library photos, the title and
+  one line fill the first viewport with Get Started at its foot, and the three doors are
   directly below, where Get Started scrolls to rather than navigates.
   These were two screens — a wordless cover outside `AppLayout`, then
   the triage — which spent a tap per launch on an app people reach for
@@ -128,9 +128,12 @@ picture; this file is the short version of what to keep in mind when editing.
   - The SOS tab and the drawer's Hair SOS entry carry an `also` list of
     `['/', '/home']`. Without it nothing is selected on the page every
     launch lands on — `NavLink` matches one path.
-  - It stays visually wordless. Copy added above the doors is copy
-    nobody reads: put it where it is relevant instead (About for the
-    data stance, the doors for what the app is for).
+  - It stays nearly wordless: the title and one line under it, after
+    the reference mockup. Copy added above the doors is copy nobody
+    reads: put it where it is relevant instead (About for the data
+    stance, the doors for what the app is for). The collage photos are
+    decoration — hidden from screen readers and not links, so the first
+    screen keeps one target.
 
   All three addresses render rather than redirect, so the address
   someone typed is the address they keep, and all three share one entry
@@ -309,6 +312,14 @@ picture; this file is the short version of what to keep in mind when editing.
 - Use the design tokens (`bg-surface-container`, `text-on-surface-variant`,
   `p-lg`, `font-headline-md`) rather than raw Tailwind scales, so the prototype
   and the app stay visually in sync.
+- **The look follows the reference mockup adopted on 2026-10-19**, drawn
+  in the four brand colours rather than its own: one face (Plus Jakarta
+  Sans, bold for headings), a cream-to-peach wash on a fixed layer behind
+  `AppLayout` (`.page-wash`), white cards that float by `shadow-card`
+  rather than a border, white chips that turn espresso when selected,
+  and the tab bar as a floating espresso pill where only the current tab
+  — an orange pill — shows its label (the others keep it as
+  `aria-label`). White on the orange is 3.6:1, so text on it is bold.
 - Routing is hash-based. Don't switch to `BrowserRouter` — it 404s on reload
   inside the Capacitor WebView.
 - User state goes through `useHairProfile()` from `src/lib/profile-store.tsx`,

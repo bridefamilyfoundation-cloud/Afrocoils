@@ -7,13 +7,11 @@
 /* Latin only. Fontsource ships cyrillic, greek and vietnamese cuts by default;
    the app has no localisations that need them, and they were ~350 KB of dead
    weight in the bundle. Add the relevant cuts back if the app is localised. */
-@import '@fontsource/literata/latin-400.css';
-@import '@fontsource/literata/latin-500.css';
-@import '@fontsource/literata/latin-600.css';
-@import '@fontsource/literata/latin-700.css';
-@import '@fontsource/be-vietnam-pro/latin-400.css';
-@import '@fontsource/be-vietnam-pro/latin-500.css';
-@import '@fontsource/be-vietnam-pro/latin-600.css';
+@import '@fontsource/plus-jakarta-sans/latin-400.css';
+@import '@fontsource/plus-jakarta-sans/latin-500.css';
+@import '@fontsource/plus-jakarta-sans/latin-600.css';
+@import '@fontsource/plus-jakarta-sans/latin-700.css';
+@import '@fontsource/plus-jakarta-sans/latin-800.css';
 
 @tailwind base;
 @tailwind components;
@@ -48,6 +46,10 @@
   body,
   #root {
     height: 100%;
+  }
+
+  body {
+    background-color: theme('colors.background');
   }
 
   body {
@@ -106,6 +108,35 @@
 
   .material-symbols-filled {
     font-family: 'Material Symbols Filled';
+  }
+
+  /*
+   * The page is a wash, not a flat fill: near-white cream at the top
+   * deepening to peach at the foot, after the reference mockup. Every
+   * stop is a token, so it is still the brand's cream and orange.
+   *
+   * Drawn on a fixed layer (AppLayout) rather than as a fixed body
+   * background: Android's WebView treats `background-attachment: fixed`
+   * as `scroll`, which stretched the wash over a long screen so that the
+   * page was a different colour wherever you stopped.
+   */
+  /* Heading faces are bold wherever they are set, at any size. In the
+     components layer so a `font-medium` or `font-semibold` on the element
+     still wins. */
+  .font-headline-md,
+  .font-headline-lg,
+  .font-headline-lg-mobile,
+  .font-display-lg {
+    font-weight: 700;
+  }
+
+  .page-wash {
+    background-image: linear-gradient(
+      180deg,
+      theme('colors.surface-container-low') 0%,
+      theme('colors.surface-container') 45%,
+      theme('colors.secondary-fixed') 100%
+    );
   }
 
   .glass-panel {

@@ -44,7 +44,13 @@ function buildScreen(name: ScreenName): HTMLElement {
   const navSlot = $('[data-nav]', screen)
   const lit = Number(navSlot.dataset.nav)
   const bar = $('[data-navbar]', template).cloneNode(true) as HTMLElement
-  ;[...bar.children].forEach((tab, i) => tab.classList.add(i === lit ? 'text-secondary' : 'text-on-surface-variant'))
+  ;[...bar.firstElementChild!.children].forEach((tab, i) => {
+    if (i === lit) tab.classList.add('bg-secondary', 'px-3', 'text-on-secondary')
+    else {
+      tab.classList.add('w-9', 'text-inverse-on-surface/75')
+      tab.querySelector('[data-label]')?.remove()
+    }
+  })
   navSlot.replaceWith(bar)
 
   screen.querySelectorAll<HTMLImageElement>('img[data-brand]').forEach((img) => {

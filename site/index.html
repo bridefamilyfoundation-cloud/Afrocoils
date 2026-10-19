@@ -39,6 +39,7 @@
       <defs>
         <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" /></symbol>
         <symbol id="i-leaf" viewBox="0 0 24 24"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.5 19 2c1 2 2 4.2 2 8 0 5.5-4.8 10-10 10Z" /><path d="M2 21c0-3 1.9-5.4 5.1-6 2.4-.5 4.9-2 5.9-3" /></symbol>
+        <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6" /></symbol>
         <symbol id="i-down" viewBox="0 0 24 24"><path d="M12 5v14M6 13l6 6 6-6" /></symbol>
         <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5" /><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" /></symbol>
         <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5" /></symbol>
@@ -174,7 +175,7 @@
                   <span class="absolute left-0 top-1 h-full w-[3px] rounded-full bg-outline-variant/40"><span class="step-bar block h-full w-full rounded-full bg-secondary"></span></span>
                   <p class="mb-sm font-label-md text-label-md uppercase tracking-[0.16em] text-on-surface-variant">01 · Hair SOS</p>
                   <h3 class="mb-md font-headline-lg text-[30px] font-semibold leading-tight text-primary">It opens on the rescue.</h3>
-                  <p class="max-w-md font-body-lg text-body-lg text-on-surface-variant">Every launch lands on Hair SOS: the illustration, one button, and the way in right beneath it. People reach for this app mid-problem far more often than they browse it, so it doesn&rsquo;t make you browse.</p>
+                  <p class="max-w-md font-body-lg text-body-lg text-on-surface-variant">Every launch lands on Hair SOS: the title, one button, and the way in right beneath it. People reach for this app mid-problem far more often than they browse it, so it doesn&rsquo;t make you browse.</p>
                   <div class="mt-lg lg:hidden" data-slot="front"></div>
                 </div>
               </li>
@@ -505,10 +506,21 @@
     <template id="screens">
       <div class="screen flex flex-col" data-screen="front">
         <div data-appbar></div>
-        <div class="flex min-h-0 flex-1 flex-col items-center justify-center gap-4 overflow-hidden px-5">
-          <p class="font-headline-lg text-[30px] font-bold tracking-tight text-primary">Hair SOS</p>
-          <img data-brand="hero" class="w-[82%]" alt="" />
-          <span class="mt-2 w-full rounded-full bg-secondary py-3 text-center font-label-md text-[15px] font-semibold text-on-secondary shadow-lg">Get Started</span>
+        <!-- The collage is placeholder tiles, not the app's photos: no style
+             photograph appears on this page (see CLAUDE.md). -->
+        <div class="flex min-h-0 flex-1 flex-col overflow-hidden px-5 pt-2">
+          <div class="relative grid h-[44%] grid-cols-[1.4fr_1fr] grid-rows-2 gap-1.5">
+            <svg class="absolute -left-1.5 -top-1.5 z-10 h-6 w-6 text-tertiary" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c.6 6.4 5.6 11.4 12 12-6.4.6-11.4 5.6-12 12-.6-6.4-5.6-11.4-12-12C6.4 11.4 11.4 6.4 12 0Z" /></svg>
+            <div class="tile row-span-2 rounded-2xl"></div>
+            <div class="tile rounded-xl"></div>
+            <div class="tile rounded-xl"></div>
+          </div>
+          <p class="mt-5 font-display-lg text-[34px] font-extrabold leading-[1.05] tracking-tight text-tertiary">Hair<br /><span class="inline-flex items-center gap-1.5"><span class="text-on-surface-variant">SOS</span><svg class="h-6 w-6" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c.6 6.4 5.6 11.4 12 12-6.4.6-11.4 5.6-12 12-.6-6.4-5.6-11.4-12-12C6.4 11.4 11.4 6.4 12 0Z" /></svg></span></p>
+          <p class="mt-2 max-w-[13rem] text-[12px] leading-snug text-on-surface-variant">Quick styles and real care, for the moment your hair can&rsquo;t wait.</p>
+          <div class="mt-auto flex items-center justify-between pb-3">
+            <span class="flex items-center gap-1"><span class="h-1 w-1 rounded-full bg-outline-variant"></span><span class="h-1 w-1 rounded-full bg-outline-variant"></span><span class="h-1 w-4 rounded-full bg-tertiary"></span></span>
+            <span class="flex items-center gap-2.5 rounded-full bg-inverse-surface py-1 pl-4 pr-1 text-[13px] font-semibold text-inverse-on-surface shadow-float">Get Started<span class="grid h-8 w-8 place-items-center rounded-full bg-secondary text-on-secondary"><svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><use href="#i-arrow" /></svg></span></span>
+          </div>
         </div>
         <div data-nav="0"></div>
       </div>
@@ -616,12 +628,15 @@
         <svg class="h-5 w-5 text-primary" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><use href="#i-search" /></svg>
       </div>
 
-      <!-- The bottom bar: four tabs, the short labels, in AppLayout's order. -->
-      <div class="grid grid-cols-4 border-t border-outline-variant/40 bg-surface-container-low px-2 pb-5 pt-2" data-navbar>
-        <span class="flex flex-col items-center gap-0.5 text-[10px] font-semibold"><svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#i-sos" /></svg>SOS</span>
-        <span class="flex flex-col items-center gap-0.5 text-[10px] font-semibold"><svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#i-styles" /></svg>Styles</span>
-        <span class="flex flex-col items-center gap-0.5 text-[10px] font-semibold"><svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#i-chart" /></svg>Growth</span>
-        <span class="flex flex-col items-center gap-0.5 text-[10px] font-semibold"><svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#i-user" /></svg>Profile</span>
+      <!-- The bottom bar: four tabs in AppLayout's order, as a floating pill.
+           main.ts lights one and drops the other three labels, as the app does. -->
+      <div class="px-3 pb-4 pt-1" data-navbar>
+        <div class="flex items-center justify-between rounded-full bg-inverse-surface p-1 shadow-float">
+        <span class="flex h-9 items-center justify-center gap-1.5 rounded-full text-[11px] font-bold"><svg class="h-[18px] w-[18px]" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#i-sos" /></svg><span data-label>SOS</span></span>
+        <span class="flex h-9 items-center justify-center gap-1.5 rounded-full text-[11px] font-bold"><svg class="h-[18px] w-[18px]" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#i-styles" /></svg><span data-label>Styles</span></span>
+        <span class="flex h-9 items-center justify-center gap-1.5 rounded-full text-[11px] font-bold"><svg class="h-[18px] w-[18px]" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#i-chart" /></svg><span data-label>Growth</span></span>
+        <span class="flex h-9 items-center justify-center gap-1.5 rounded-full text-[11px] font-bold"><svg class="h-[18px] w-[18px]" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#i-user" /></svg><span data-label>Profile</span></span>
+        </div>
       </div>
     </template>
 

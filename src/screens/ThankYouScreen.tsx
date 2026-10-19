@@ -50,7 +50,7 @@ export default function ThankYouScreen() {
       </section>
 
       <section className="mb-2xl space-y-md">
-        <div className="rounded-xl border border-outline-variant/30 bg-surface-container-lowest p-lg">
+        <div className="rounded-xl shadow-card bg-surface-container-lowest p-lg">
           <h3 className="mb-xs font-headline-md text-body-lg text-on-surface">
             What happens next
           </h3>
@@ -62,7 +62,7 @@ export default function ThankYouScreen() {
           </p>
         </div>
 
-        <div className="rounded-xl border border-outline-variant/30 bg-surface-container-lowest p-lg">
+        <div className="rounded-xl shadow-card bg-surface-container-lowest p-lg">
           <h3 className="mb-xs font-headline-md text-body-lg text-on-surface">
             You can change your mind
           </h3>

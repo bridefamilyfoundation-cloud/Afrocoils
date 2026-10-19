@@ -178,7 +178,7 @@ export default function CalendarScreen() {
           already see by looking at their own hair. */}
       <section className="mb-2xl">
         <div className="mb-md flex items-center justify-between">
-          <h3 className="font-label-md text-label-md uppercase tracking-widest text-primary">
+          <h3 className="font-headline-md text-body-lg font-bold text-on-surface">
             Coming up
           </h3>
           <button
@@ -232,7 +232,7 @@ export default function CalendarScreen() {
       </section>
 
       {/* Month grid */}
-      <section className="mb-2xl rounded-2xl border border-outline-variant/30 bg-surface-container-lowest p-md">
+      <section className="mb-2xl rounded-2xl shadow-card bg-surface-container-lowest p-md">
         <div className="mb-md flex items-center justify-between">
           <button
             type="button"
@@ -314,7 +314,7 @@ export default function CalendarScreen() {
         )}
 
         {selectedDay && selectedDay.events.length > 0 ? (
-          <ul className="mb-md divide-y divide-outline-variant/30 overflow-hidden rounded-xl border border-outline-variant/30 bg-surface-container-lowest">
+          <ul className="mb-md divide-y divide-outline-variant/30 overflow-hidden rounded-xl shadow-card bg-surface-container-lowest">
             {selectedDay.events.map((event) => (
               <li key={event.id} className="flex items-center gap-md p-md">
                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-secondary-container text-on-secondary-container">
@@ -563,8 +563,8 @@ function DueRow({
             onClick={() => onPatch({ enabled: !schedule.enabled })}
             className={`rounded-full px-md py-1 font-label-md text-caption active:scale-95 ${
               schedule.enabled
-                ? 'bg-secondary-container text-on-secondary-container'
-                : 'bg-surface-container-high text-on-surface-variant'
+                ? 'bg-inverse-surface text-inverse-on-surface'
+                : 'bg-surface-container-lowest text-on-surface shadow-card'
             }`}
           >
             {schedule.enabled ? 'Tracking' : 'Off'}
@@ -638,8 +638,8 @@ function LogForm({
             onClick={() => setType(option)}
             className={`rounded-full px-md py-1.5 font-label-md text-caption transition-colors active:scale-95 ${
               type === option
-                ? 'bg-secondary-container text-on-secondary-container'
-                : 'bg-surface-container-high text-on-surface'
+                ? 'bg-inverse-surface text-inverse-on-surface'
+                : 'bg-surface-container-lowest text-on-surface shadow-card'
             }`}
           >
             {option}

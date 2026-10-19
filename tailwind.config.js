@@ -104,11 +104,22 @@ export default {
         'error-container': '#FFDAD6',
         'on-error-container': '#93000A',
       },
+      /* Rounder than the prototype's, after the reference design: cards
+         sit at 20-24px, images inside them a step below. */
       borderRadius: {
-        DEFAULT: '0.25rem',
-        lg: '0.5rem',
-        xl: '0.75rem',
+        DEFAULT: '0.375rem',
+        lg: '0.875rem',
+        xl: '1.25rem',
+        '2xl': '1.5rem',
+        '3xl': '2rem',
         full: '9999px',
+      },
+      /* Cards float on the page by shadow rather than by border. Both are
+         the espresso at low alpha, so the shadow is a deeper cream, never
+         grey. */
+      boxShadow: {
+        card: '0 6px 20px -6px rgb(63 23 8 / 0.12)',
+        float: '0 12px 28px -8px rgb(63 23 8 / 0.35)',
       },
       spacing: {
         '2xl': '48px',
@@ -121,25 +132,35 @@ export default {
         sm: '8px',
         xl: '32px',
       },
+      /*
+       * One family, Plus Jakarta Sans, after the reference mockup adopted in
+       * October 2026: a bold geometric sans for headings, the same
+       * family at regular weight for body. The token names are still the
+       * prototype's, so no call site changes when the face does.
+       */
       fontFamily: {
-        'headline-md': ['Literata', 'serif'],
-        'label-md': ['Be Vietnam Pro', 'sans-serif'],
-        'headline-lg': ['Literata', 'serif'],
-        'display-lg': ['Literata', 'serif'],
-        'body-lg': ['Be Vietnam Pro', 'sans-serif'],
-        'body-md': ['Be Vietnam Pro', 'sans-serif'],
-        'headline-lg-mobile': ['Literata', 'serif'],
-        caption: ['Be Vietnam Pro', 'sans-serif'],
+        'headline-md': ['Plus Jakarta Sans', 'sans-serif'],
+        'label-md': ['Plus Jakarta Sans', 'sans-serif'],
+        'headline-lg': ['Plus Jakarta Sans', 'sans-serif'],
+        'display-lg': ['Plus Jakarta Sans', 'sans-serif'],
+        'body-lg': ['Plus Jakarta Sans', 'sans-serif'],
+        'body-md': ['Plus Jakarta Sans', 'sans-serif'],
+        'headline-lg-mobile': ['Plus Jakarta Sans', 'sans-serif'],
+        caption: ['Plus Jakarta Sans', 'sans-serif'],
       },
+      /* The body sizes carry no weight of their own, so a heading face set
+         at a body size (`font-headline-md text-body-lg`, the app's card
+         title) keeps the bold from src/index.css instead of dropping to
+         regular. Body text inherits 400 from the page. */
       fontSize: {
-        'headline-md': ['24px', { lineHeight: '32px', fontWeight: '500' }],
-        'label-md': ['14px', { lineHeight: '20px', letterSpacing: '0.05em', fontWeight: '600' }],
-        'headline-lg': ['32px', { lineHeight: '40px', fontWeight: '600' }],
-        'display-lg': ['40px', { lineHeight: '48px', letterSpacing: '-0.02em', fontWeight: '700' }],
-        'body-lg': ['18px', { lineHeight: '28px', fontWeight: '400' }],
-        'body-md': ['16px', { lineHeight: '24px', fontWeight: '400' }],
-        'headline-lg-mobile': ['28px', { lineHeight: '36px', fontWeight: '600' }],
-        caption: ['12px', { lineHeight: '16px', fontWeight: '400' }],
+        'headline-md': ['22px', { lineHeight: '30px', letterSpacing: '-0.01em', fontWeight: '700' }],
+        'label-md': ['14px', { lineHeight: '20px', letterSpacing: '0.01em', fontWeight: '600' }],
+        'headline-lg': ['32px', { lineHeight: '38px', letterSpacing: '-0.02em', fontWeight: '700' }],
+        'display-lg': ['44px', { lineHeight: '50px', letterSpacing: '-0.03em', fontWeight: '800' }],
+        'body-lg': ['18px', { lineHeight: '28px' }],
+        'body-md': ['16px', { lineHeight: '24px' }],
+        'headline-lg-mobile': ['28px', { lineHeight: '34px', letterSpacing: '-0.02em', fontWeight: '700' }],
+        caption: ['12px', { lineHeight: '16px' }],
       },
     },
   },

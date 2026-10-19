@@ -169,7 +169,7 @@ export default function HairProblemScreen() {
           a search field further up the screen reads as a search of the
           whole app. */}
       <section className="mb-2xl">
-        <h3 className="mb-md font-label-md text-label-md uppercase tracking-widest text-primary">
+        <h3 className="mb-md font-headline-md text-body-lg font-bold text-on-surface">
           All care guides
         </h3>
 
@@ -203,7 +203,7 @@ export default function HairProblemScreen() {
               <Link
                 key={guide.slug}
                 to={`/guide/${guide.slug}`}
-                className="flex items-center gap-md rounded-xl border border-outline-variant/30 bg-surface-container-lowest p-md transition-all active:scale-[0.98]"
+                className="flex items-center gap-md rounded-xl shadow-card bg-surface-container-lowest p-md transition-all active:scale-[0.98]"
               >
                 <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-surface-container-high">
                   <Icon name={guide.icon} className="text-primary" />

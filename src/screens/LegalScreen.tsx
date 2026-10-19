@@ -34,7 +34,7 @@ const OUTSTANDING = [
 function PrivacyPolicy() {
   return (
     <>
-      <section className="mb-2xl rounded-2xl border border-outline-variant/30 bg-surface-container-lowest p-lg">
+      <section className="mb-2xl rounded-2xl shadow-card bg-surface-container-lowest p-lg">
         <h2 className="mb-sm font-headline-md text-body-lg text-on-surface">In short</h2>
         <p className="font-body-md text-body-md text-on-surface-variant">
           Afrocoil has no accounts and no user database. Everything you enter — your hair
@@ -236,7 +236,7 @@ export default function LegalScreen() {
           filled with placeholder legal text &mdash; drafted clauses look finished and tend
           to ship.
         </p>
-        <h2 className="mb-sm font-label-md text-label-md uppercase tracking-widest text-primary">
+        <h2 className="mb-sm font-headline-md text-body-lg font-bold text-on-surface">
           It will need to cover
         </h2>
         <ul className="list-disc space-y-xs pl-5">

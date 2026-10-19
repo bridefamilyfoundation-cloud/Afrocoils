@@ -46,30 +46,46 @@ function isSelected(pathname: string, to: string, also?: string[]): boolean {
   return pathname === to || pathname.startsWith(to + '/')
 }
 
+/**
+ * A floating pill rather than a bar across the foot, after the reference
+ * mockup: espresso, inset from the edges, with the selected tab drawn as
+ * an orange pill that carries its label and the other three as icons.
+ *
+ * The labels the others drop are still there for a screen reader, as
+ * `aria-label` — an icon-only tab that announced nothing would be a tab
+ * nobody using TalkBack could find. White on the orange is 3.6:1, the
+ * brand's own pairing, which is why the one label shown is set bold.
+ */
 export default function BottomNav() {
   const { pathname } = useLocation()
 
   return (
-    <nav data-tour="tab-bar" className="app-chrome fixed bottom-0 left-0 z-50 flex w-full items-center justify-around rounded-t-xl bg-surface px-4 pt-2 pb-safe shadow-[0_-4px_12px_0_rgba(144,76,49,0.08)]">
-      {TABS.map(({ to, icon, label, also }) => {
-        const selected = isSelected(pathname, to, also)
-        return (
-          <Link
-            key={to}
-            to={to}
-            aria-current={selected ? 'page' : undefined}
-            className={[
-              'flex flex-col items-center justify-center rounded-full px-4 py-1.5 duration-200 active:scale-90',
-              selected
-                ? 'bg-secondary-container text-on-secondary-container'
-                : 'text-on-surface-variant transition-all hover:opacity-80',
-            ].join(' ')}
-          >
-            <Icon name={icon} filled={selected} />
-            <span className="font-label-md text-caption">{label}</span>
-          </Link>
-        )
-      })}
+    <nav
+      data-tour="tab-bar"
+      className="app-chrome fixed inset-x-0 bottom-0 z-50 flex justify-center px-gutter pb-[calc(0.75rem+var(--safe-bottom))]"
+    >
+      <div className="flex w-full max-w-md items-center justify-between gap-xs rounded-full bg-inverse-surface p-1.5 shadow-float">
+        {TABS.map(({ to, icon, label, also }) => {
+          const selected = isSelected(pathname, to, also)
+          return (
+            <Link
+              key={to}
+              to={to}
+              aria-label={label}
+              aria-current={selected ? 'page' : undefined}
+              className={[
+                'flex h-12 items-center justify-center gap-sm rounded-full transition-all duration-200 active:scale-90',
+                selected
+                  ? 'bg-secondary px-lg text-on-secondary'
+                  : 'w-12 text-inverse-on-surface/75 hover:text-inverse-on-surface',
+              ].join(' ')}
+            >
+              <Icon name={icon} filled={selected} className="text-[22px]" />
+              {selected && <span className="font-label-md text-label-md font-bold">{label}</span>}
+            </Link>
+          )
+        })}
+      </div>
     </nav>
   )
 }

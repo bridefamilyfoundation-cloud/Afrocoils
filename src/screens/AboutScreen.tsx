@@ -94,14 +94,14 @@ export default function AboutScreen() {
       </section>
 
       <section className="mb-2xl">
-        <h2 className="mb-md font-label-md text-label-md uppercase tracking-widest text-primary">
+        <h2 className="mb-md font-headline-md text-body-lg font-bold text-on-surface">
           Things worth knowing
         </h2>
         <div className="space-y-md">
           {TIPS.map((tip) => (
             <article
               key={tip.title}
-              className="rounded-2xl border border-outline-variant/30 bg-surface-container-lowest p-lg"
+              className="rounded-2xl shadow-card bg-surface-container-lowest p-lg"
             >
               <span className="mb-sm inline-block rounded-full bg-surface-container-high px-3 py-1 font-caption text-caption text-on-surface-variant">
                 {tip.tag}
@@ -202,7 +202,7 @@ function UpdatesSection() {
   })()
 
   return (
-    <section className="mb-2xl rounded-2xl border border-outline-variant/30 bg-surface-container-lowest p-lg">
+    <section className="mb-2xl rounded-2xl shadow-card bg-surface-container-lowest p-lg">
       <div className="mb-sm flex items-center gap-sm">
         <Icon name="system_update" className="text-primary" />
         <h2 className="font-headline-md text-body-lg text-on-surface">Updates</h2>

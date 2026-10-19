@@ -34,7 +34,7 @@ export default function GuideScreen() {
       </section>
 
       <section className="mb-2xl">
-        <h2 className="mb-md font-label-md text-label-md uppercase tracking-widest text-primary">
+        <h2 className="mb-md font-headline-md text-body-lg font-bold text-on-surface">
           What you&rsquo;ll need
         </h2>
         <ul className="flex flex-wrap gap-xs">
@@ -50,7 +50,7 @@ export default function GuideScreen() {
       </section>
 
       <section className="mb-2xl">
-        <h2 className="mb-md font-label-md text-label-md uppercase tracking-widest text-primary">
+        <h2 className="mb-md font-headline-md text-body-lg font-bold text-on-surface">
           Steps
         </h2>
         <ol className="space-y-lg">
@@ -83,7 +83,7 @@ export default function GuideScreen() {
          * still holds, and every guide reads in full with no network.
          */
         <section className="mb-2xl">
-          <h2 className="mb-sm font-label-md text-label-md uppercase tracking-widest text-primary">
+          <h2 className="mb-sm font-headline-md text-body-lg font-bold text-on-surface">
             What this is based on
           </h2>
           <p className="mb-md font-caption text-caption text-on-surface-variant">

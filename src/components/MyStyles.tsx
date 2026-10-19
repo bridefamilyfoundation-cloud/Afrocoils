@@ -91,7 +91,7 @@ export default function MyStyles() {
   return (
     <section className="mb-2xl">
       <div className="mb-xs flex items-center justify-between">
-        <h3 className="font-label-md text-label-md uppercase tracking-widest text-primary">
+        <h3 className="font-headline-md text-body-lg font-bold text-on-surface">
           My Styles
         </h3>
         {!adding && (
@@ -180,7 +180,7 @@ function StyleRow({
   const full = style.photos.length >= MAX_PHOTOS_PER_STYLE
 
   return (
-    <li className="overflow-hidden rounded-xl border border-outline-variant/30 bg-surface-container-lowest">
+    <li className="overflow-hidden rounded-xl shadow-card bg-surface-container-lowest">
       <div className="flex items-center gap-md p-md">
         {style.photos[0] ? (
           <UserPhoto path={style.photos[0]} alt={style.name} className="h-16 w-16 shrink-0" />
@@ -399,8 +399,8 @@ function AddStyleForm({
             onClick={() => setCategory(category === option ? undefined : option)}
             className={`rounded-full px-md py-1.5 font-label-md text-caption transition-colors active:scale-95 ${
               category === option
-                ? 'bg-secondary-container text-on-secondary-container'
-                : 'bg-surface-container-high text-on-surface'
+                ? 'bg-inverse-surface text-inverse-on-surface'
+                : 'bg-surface-container-lowest text-on-surface shadow-card'
             }`}
           >
             {option}

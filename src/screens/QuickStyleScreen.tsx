@@ -88,7 +88,7 @@ export default function QuickStyleScreen() {
               <Link
                 key={style.id}
                 to={`/styles/${style.id}`}
-                className="flex items-center gap-md rounded-xl border border-outline-variant/30 bg-surface-container-lowest p-md transition-all active:scale-[0.98]"
+                className="flex items-center gap-md rounded-xl shadow-card bg-surface-container-lowest p-md transition-all active:scale-[0.98]"
               >
                 <PrototypeImage
                   slot={styleCover(style.id, style.name)}

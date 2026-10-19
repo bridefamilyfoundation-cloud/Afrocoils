@@ -1,7 +1,9 @@
 import { useRef } from 'react'
 import { Link } from 'react-router-dom'
-import { AfroMark } from '../components/BrandMark'
+import { styleCover } from '../assets/imagery'
 import Icon, { type IconName } from '../components/Icon'
+import PrototypeImage from '../components/PrototypeImage'
+import { STYLES } from '../content/styles'
 import { isLocs } from '../lib/locs'
 import { useHairProfile } from '../lib/profile-store'
 
@@ -44,12 +46,32 @@ import { useHairProfile } from '../lib/profile-store'
  *
  * Keep it short either way. A triage screen with six options is a menu,
  * and a menu is the thing this replaced.
+ *
+ * The first screen follows the reference mockup adopted in October 2026:
+ * a collage of three library photos, the title large and left-aligned,
+ * one line under it, and Get Started as a dark pill. The photos are the
+ * generated ones the library already ships (see the images README), and
+ * they are decoration — hidden from screen readers and not links, so the
+ * first screen still has one target.
  */
+
+/** Three library entries whose front shots carry the collage, tall one first. */
+const COLLAGE = ['afro-donut-bun', 'flat-twist-front-afro', 'crossed-twist-crown']
+
+/** The four-point star from the mockup, drawn rather than an icon-font glyph. */
+function Sparkle({ className = '' }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden className={className} fill="currentColor">
+      <path d="M12 0c.6 6.4 5.6 11.4 12 12-6.4.6-11.4 5.6-12 12-.6-6.4-5.6-11.4-12-12C6.4 11.4 11.4 6.4 12 0Z" />
+    </svg>
+  )
+}
 const DOORS: {
   to: string
   icon: IconName
   title: string
   body: string
+  /** The disc behind the icon. The card itself is white for both. */
   theme: string
 }[] = [
   {
@@ -78,27 +100,61 @@ export default function EmergencyScreen() {
       {/* The hero takes the first screen. The height is the viewport less
           the app bar above and the tab bar below, so Get Started lands at
           the foot of what you can see rather than under it. */}
-      <section className="flex min-h-[calc(100svh-15rem)] flex-col items-center justify-center gap-xl">
-        <h1 className="text-center font-display-lg text-display-lg text-primary">Hair SOS</h1>
-        <AfroMark variant="hero" title="Afrocoil" className="w-full max-w-[80vw] sm:max-w-md" />
+      <section className="flex min-h-[calc(100svh-13rem)] flex-col pb-lg">
+        <div aria-hidden className="relative grid h-[42svh] max-h-[26rem] min-h-[15rem] grid-cols-[1.4fr_1fr] grid-rows-2 gap-sm">
+          <Sparkle className="absolute -left-2 -top-2 z-10 h-9 w-9 text-tertiary" />
+          {COLLAGE.map((id, i) => {
+            const style = STYLES.find((s) => s.id === id)
+            return (
+              <PrototypeImage
+                key={id}
+                slot={styleCover(id, style?.name ?? '')}
+                seed={id}
+                rounded={i === 0 ? 'rounded-3xl' : 'rounded-2xl'}
+                className={`h-full w-full object-cover object-top shadow-card ${i === 0 ? 'row-span-2' : ''}`}
+              />
+            )
+          })}
+        </div>
+
+        <div className="mt-xl flex-1">
+          <h1 className="font-display-lg text-display-lg text-tertiary">
+            Hair
+            <br />
+            <span className="inline-flex items-center gap-sm">
+              <span className="text-on-surface-variant">SOS</span>
+              <Sparkle className="h-8 w-8 text-tertiary" />
+            </span>
+          </h1>
+          <p className="mt-md max-w-[16rem] font-body-md text-body-md text-on-surface-variant">
+            Quick styles and real care, for the moment your hair can&rsquo;t wait.
+          </p>
+        </div>
+
+        {/* Scrolls rather than navigates — the doors are on this page.
+            The dots are the mockup's and are only decoration: there is
+            one screen here, not a carousel. */}
+        <div className="mt-xl flex items-center justify-between gap-md">
+          <span aria-hidden className="flex items-center gap-1.5">
+            <span className="h-1.5 w-1.5 rounded-full bg-outline-variant" />
+            <span className="h-1.5 w-1.5 rounded-full bg-outline-variant" />
+            <span className="h-1.5 w-6 rounded-full bg-tertiary" />
+          </span>
+          <button
+            type="button"
+            onClick={() => doors.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
+            className="flex items-center gap-md rounded-full bg-inverse-surface py-1.5 pl-lg pr-1.5 font-label-md text-body-md font-semibold text-inverse-on-surface shadow-float transition-all active:scale-95"
+          >
+            Get Started
+            <span className="flex h-11 w-11 items-center justify-center rounded-full bg-secondary text-on-secondary">
+              <Icon name="arrow_forward" />
+            </span>
+          </button>
+        </div>
       </section>
 
-      {/* Scrolls rather than navigates — the doors are on this page now.
-          The orange is the brand's action colour and this is still the
-          only action up here. White on it is 3.6:1, which is why the
-          label is set large and bold rather than at body weight. */}
-      <div className="mb-2xl mt-lg">
-        <button
-          type="button"
-          onClick={() => doors.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
-          className="mx-auto block w-full max-w-md rounded-full bg-secondary py-4 text-center font-label-md text-body-lg text-on-secondary shadow-lg transition-all active:scale-95"
-        >
-          Get Started
-        </button>
-      </div>
-
       {/* scroll-mt clears the fixed app bar when Get Started lands here. */}
-      <section ref={doors} className="mb-xl scroll-mt-24 text-center">
+      <section ref={doors} className="mb-xl mt-2xl scroll-mt-24 text-center">
         <h2 className="mb-sm font-headline-lg text-headline-lg text-on-background">
           What&rsquo;s Your Emergency?
         </h2>
@@ -113,14 +169,24 @@ export default function EmergencyScreen() {
           <Link
             key={door.to}
             to={door.to}
-            className={`flex items-center gap-lg rounded-2xl p-xl transition-all active:scale-[0.98] ${door.theme}`}
+            className="flex items-center gap-md rounded-2xl bg-surface-container-lowest p-md shadow-card transition-all active:scale-[0.98]"
           >
-            <Icon name={door.icon} className="shrink-0 text-3xl" />
-            <span className="min-w-0 flex-1">
-              <span className="mb-xs block font-headline-md text-headline-md">{door.title}</span>
-              <span className="block font-body-md text-body-md opacity-90">{door.body}</span>
+            <span
+              className={`flex h-16 w-16 shrink-0 items-center justify-center rounded-xl ${door.theme}`}
+            >
+              <Icon name={door.icon} className="text-3xl" />
             </span>
-            <Icon name="arrow_forward" className="shrink-0 opacity-70" />
+            <span className="min-w-0 flex-1 text-left">
+              <span className="mb-xs block font-headline-md text-body-lg font-bold text-on-surface">
+                {door.title}
+              </span>
+              <span className="block font-body-md text-caption text-on-surface-variant">
+                {door.body}
+              </span>
+            </span>
+            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-secondary text-on-secondary">
+              <Icon name="arrow_forward" className="text-[20px]" />
+            </span>
           </Link>
         ))}
       </section>
@@ -137,7 +203,7 @@ export default function EmergencyScreen() {
       {ready && locs && (
         <Link
           to="/locs"
-          className="mb-2xl flex items-center gap-md rounded-xl border border-outline-variant/30 bg-surface-container-lowest p-lg transition-all active:scale-[0.98]"
+          className="mb-2xl flex items-center gap-md rounded-xl shadow-card bg-surface-container-lowest p-lg transition-all active:scale-[0.98]"
         >
           <Icon name="waves" className="shrink-0 text-primary" />
           <span className="min-w-0 flex-1">
@@ -163,7 +229,7 @@ export default function EmergencyScreen() {
           launch lands on; it cannot open on a claim it is about to
           withdraw. */}
       {ready && completeness < 1 && (
-        <section className="rounded-2xl border border-outline-variant/30 bg-surface-container-lowest p-lg text-center">
+        <section className="rounded-2xl shadow-card bg-surface-container-lowest p-lg text-center">
           <p className="mb-md font-body-md text-body-md text-on-surface-variant">
             {completeness === 0
               ? 'Nothing here is personalised until the app knows whether you have loose hair or locs. That one answer changes half of it.'

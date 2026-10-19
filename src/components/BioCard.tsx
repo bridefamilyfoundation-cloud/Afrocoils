@@ -145,7 +145,7 @@ export default function BioCard() {
         )}
       </div>
 
-      <div className="mt-lg rounded-2xl border border-outline-variant/30 bg-surface-container-lowest p-lg">
+      <div className="mt-lg rounded-2xl shadow-card bg-surface-container-lowest p-lg">
         <div className="mb-xs flex items-center gap-sm">
           <Icon name="waves" className="text-primary" />
           <h3 className="flex-1 font-caption text-caption uppercase tracking-widest text-on-surface-variant">
@@ -168,8 +168,8 @@ export default function BioCard() {
                 onClick={() => setClimate(option)}
                 className={`rounded-full px-lg py-2 font-label-md text-label-md transition-colors active:scale-95 ${
                   on
-                    ? 'bg-secondary-container text-on-secondary-container'
-                    : 'bg-surface-container-high text-on-surface-variant'
+                    ? 'bg-inverse-surface text-inverse-on-surface'
+                    : 'bg-surface-container-lowest text-on-surface shadow-card'
                 }`}
               >
                 {option}

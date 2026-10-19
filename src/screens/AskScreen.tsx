@@ -159,7 +159,7 @@ function Suggestions({
 }) {
   return (
     <section className="mb-xl">
-      <h3 className="mb-sm font-label-md text-label-md uppercase tracking-widest text-primary">
+      <h3 className="mb-sm font-headline-md text-body-lg font-bold text-on-surface">
         {title}
       </h3>
       <div className="flex flex-wrap gap-sm">
@@ -298,7 +298,7 @@ function Corrected({ text }: { text: string }) {
 function QuoteCard({ hit, pending }: { hit: AskHit; pending: boolean }) {
   const { doc, quote } = hit
   return (
-    <article className="overflow-hidden rounded-xl border border-outline-variant/30 bg-surface-container-lowest p-lg">
+    <article className="overflow-hidden rounded-xl shadow-card bg-surface-container-lowest p-lg">
       <p className="mb-xs font-label-md text-caption uppercase tracking-widest text-primary">
         {doc.source}
       </p>
@@ -415,7 +415,7 @@ function StyleList({ hits }: { hits: AskHit[] }) {
         <li key={doc.id}>
           <Link
             to={doc.route}
-            className="flex items-center gap-md rounded-xl border border-outline-variant/30 bg-surface-container-lowest p-md transition-all active:scale-[0.98]"
+            className="flex items-center gap-md rounded-xl shadow-card bg-surface-container-lowest p-md transition-all active:scale-[0.98]"
           >
             <span className="min-w-0 flex-1">
               <span className="block font-headline-md text-body-lg text-on-surface">
@@ -445,7 +445,7 @@ function ProductList({ reply }: { reply: Extract<AskReply, { type: 'answer' }> }
       {reply.products.map(({ product }) => (
         <li
           key={product.id}
-          className="rounded-xl border border-outline-variant/30 bg-surface-container-lowest p-md"
+          className="rounded-xl shadow-card bg-surface-container-lowest p-md"
         >
           <p className="font-label-md text-caption uppercase tracking-widest text-primary">
             {product.brand} · {product.price}
@@ -461,10 +461,10 @@ function ProductList({ reply }: { reply: Extract<AskReply, { type: 'answer' }> }
 function Related({ hits }: { hits: AskHit[] }) {
   return (
     <section className="mt-xl">
-      <h3 className="mb-sm font-label-md text-label-md uppercase tracking-widest text-primary">
+      <h3 className="mb-sm font-headline-md text-body-lg font-bold text-on-surface">
         Also in the app
       </h3>
-      <ul className="divide-y divide-outline-variant/30 overflow-hidden rounded-xl border border-outline-variant/30 bg-surface-container-lowest">
+      <ul className="divide-y divide-outline-variant/30 overflow-hidden rounded-xl shadow-card bg-surface-container-lowest">
         {hits.map(({ doc }) => (
           <li key={doc.id}>
             <Link to={doc.route} className="flex items-center gap-md p-md active:bg-surface-container">
