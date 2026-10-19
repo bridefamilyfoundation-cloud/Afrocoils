@@ -1,4 +1,4 @@
-# Afrocoil
+# AfroCoils
 
 Mobile app for type 3 / type 4 natural hair and locs, built as a Capacitor-wrapped
 web app targeting Android.
@@ -145,7 +145,7 @@ inside the APK.
 
 Because the APK is gitignored, the download is a **GitHub Release asset**:
 `site/release.json`'s `url` points at
-`releases/download/v<version>/afrocoil-<version>.apk`. For each release,
+`releases/download/v<version>/AfroCoils-<version>.apk`. For each release,
 create that release on GitHub and attach the APK `site:release` hashed, or
 the button is a dead link. (That only works publicly while the repo is
 public; otherwise host the file somewhere that is and pass its address with
@@ -187,10 +187,10 @@ Then, for every release:
 2. `npm run apk` — raises `appVersionCode`, builds the signed release and
    refuses to finish unless it is signed by **the same key as before** (see
    *The one APK* below).
-3. `npm run site:release -- --url https://github.com/bridefamilyfoundation-cloud/Afrocoils/releases/download/v<version>/afrocoil-<version>.apk --note "What changed"`.
+3. `npm run site:release -- --url https://github.com/bridefamilyfoundation-cloud/Afrocoils/releases/download/v<version>/AfroCoils-<version>.apk --note "What changed"`.
    It refuses a different APK under a build number that is not higher.
    Then attach that same APK (`android/app/build/outputs/apk/release/app-release.apk`)
-   to a GitHub release tagged `v<version>`, renamed `afrocoil-<version>.apk`
+   to a GitHub release tagged `v<version>`, renamed `AfroCoils-<version>.apk`
    so the link resolves.
 4. Commit `site/release.json` and push to `main`; Vercel rebuilds the site
    and `latest.json` (see *Deploying to Vercel* above).
@@ -474,7 +474,7 @@ Four deliberate departures from the prototype:
    | | | |
    | --- | --- | --- |
    | Light Cream | `#E8D5C0` | the page |
-   | Burnt Orange | `#E8560C` | actions, and the panels that carry them |
+   | Burnt Orange | `#E2583E` | actions, and the panels that carry them |
    | Dark Chocolate | `#5A2108` | headings and text |
    | Deep Espresso | `#3F1708` | the hair illustration, and the deepest text |
 

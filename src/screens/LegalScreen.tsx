@@ -25,7 +25,7 @@ import Icon from '../components/Icon'
 
 /** What the owner still has to supply before this is a publishable policy. */
 const OUTSTANDING = [
-  'The legal entity that operates Afrocoil, and its registered address',
+  'The legal entity that operates AfroCoils, and its registered address',
   'A contact address for privacy and data requests',
   'The governing jurisdiction',
   'An effective date, set when it is first published',
@@ -37,7 +37,7 @@ function PrivacyPolicy() {
       <section className="mb-2xl rounded-2xl shadow-card bg-surface-container-lowest p-lg">
         <h2 className="mb-sm font-headline-md text-body-lg text-on-surface">In short</h2>
         <p className="font-body-md text-body-md text-on-surface-variant">
-          Afrocoil has no accounts and no user database. Everything you enter — your hair
+          AfroCoils has no accounts and no user database. Everything you enter — your hair
           profile, length history, calendar, photographs and saved styles — is stored on your
           own device and is never uploaded. The only data that ever leaves your phone is a
           style you deliberately choose to contribute to the community library, and you
@@ -56,7 +56,7 @@ function PrivacyPolicy() {
         </p>
         <p>
           None of it is transmitted anywhere, and none of it is readable by other apps.
-          Uninstalling Afrocoil deletes all of it. There is no copy on a server to ask us
+          Uninstalling AfroCoils deletes all of it. There is no copy on a server to ask us
           to delete, because there is no server holding one.
         </p>
       </Article>
@@ -82,7 +82,7 @@ function PrivacyPolicy() {
       <Article title="Checking for a new version">
         <p>
           When the app opens, and when you come back to it after a few hours, it fetches a
-          small public file from the Afrocoil website that names the newest version. The
+          small public file from the AfroCoils website that names the newest version. The
           request contains nothing from your profile, no identifier and no information about
           how you use the app. Like any request to a website, it reveals your connection&rsquo;s
           IP address to the website&rsquo;s host, which we do not use to identify you.
@@ -128,7 +128,7 @@ function PrivacyPolicy() {
           Our server runs on Vercel, and submissions and their photographs are held in
           Supabase storage until a person has reviewed them. Those providers process that data
           on our behalf and for no other purpose. If you never submit a style, nothing of
-          yours reaches either. The version check goes to whoever hosts the Afrocoil website,
+          yours reaches either. The version check goes to whoever hosts the AfroCoils website,
           and carries nothing of yours.
         </p>
       </Article>
@@ -216,7 +216,7 @@ export default function LegalScreen() {
       <>
         <ScreenHeader
           title="Privacy Policy"
-          subtitle="What Afrocoil stores, what leaves your phone, and what it never collects."
+          subtitle="What AfroCoils stores, what leaves your phone, and what it never collects."
         />
         <PrivacyPolicy />
       </>

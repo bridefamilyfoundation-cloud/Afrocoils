@@ -6,7 +6,7 @@ import type { UpdateManifest } from './types'
 /**
  * Telling an installed copy that a newer one has been posted.
  *
- * Afrocoil is installed from the landing site rather than a store, so
+ * AfroCoils is installed from the landing site rather than a store, so
  * nothing else will ever tell anyone a new build exists. The site's
  * build publishes `latest.json` beside the APK; this reads it, compares
  * its `versionCode` with the installed one, and — when it is newer — the

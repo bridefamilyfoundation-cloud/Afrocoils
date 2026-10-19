@@ -128,7 +128,7 @@ export const CONCEPTS: Record<string, string> = {
   unravel: 'unravel|unravelling|unraveling|coming loose|coming undone|undoing|slipping',
 
   // --- The app ---
-  app: 'app|afrocoil|afro coil|this app|screen|page|button|tab|menu|section|setting|settings',
+  app: 'app|afrocoils|afro coils|afrocoil|afro coil|this app|screen|page|button|tab|menu|section|setting|settings',
   profile: 'profile|my profile|hair profile|my details|personal|my info',
   quiz: 'quiz|hair quiz|what hair type|which hair type|my hair type|hair type|what type of hair|type of hair',
   calendar:
@@ -498,7 +498,7 @@ export const TOPICS: AskTopic[] = [
 
 export const LEADS = {
   answer: [
-    'Here’s what Afrocoil has on that.',
+    'Here’s what AfroCoils has on that.',
     'Good question — this is the part of the app that covers it.',
     'This is the closest answer in the app.',
   ],
@@ -522,10 +522,10 @@ export const LEADS = {
 } as const
 
 export const NOTHING_FOUND =
-  'I couldn’t find that in the app. Everything I can show you is written into Afrocoil, and nothing in it covers that yet.'
+  'I couldn’t find that in the app. Everything I can show you is written into AfroCoils, and nothing in it covers that yet.'
 
 export const NOT_UNDERSTOOD =
-  'I can only answer from what’s in Afrocoil — hair, scalp, styles, products and how the app works. Try describing what you see or feel, like “my scalp is itchy” or “my ends keep breaking”.'
+  'I can only answer from what’s in AfroCoils — hair, scalp, styles, products and how the app works. Try describing what you see or feel, like “my scalp is itchy” or “my ends keep breaking”.'
 
 /** Plain notes, kept beside the answer. */
 export const NOTES = {
@@ -565,7 +565,7 @@ export const SMALL_TALK: { match: string; reply: string }[] = [
     match:
       'who are you|what are you|are you ai|are you an ai|are you a bot|are you a robot|are you human|are you real|are you chatgpt|is this ai|is this chatgpt|what can you do|what do you do|how do you work|help',
     reply:
-      'I’m Ask, the app’s search. I don’t write answers: everything I show you is quoted word for word from guides people wrote for Afrocoil, with a link to the page it came from. It all happens on your phone — nothing you type is saved or sent anywhere.',
+      'I’m Ask, the app’s search. I don’t write answers: everything I show you is quoted word for word from guides people wrote for AfroCoils, with a link to the page it came from. It all happens on your phone — nothing you type is saved or sent anywhere.',
   },
 ]
 

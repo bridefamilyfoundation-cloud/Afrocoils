@@ -160,4 +160,4 @@ writeFileSync(
 )
 
 console.log(`[apk] ${OUT_APK}`)
-console.log(`[apk] Afrocoil ${version} (versionCode ${next}) · signed ${signer.slice(0, 12)}… · sha256 ${sha256.slice(0, 12)}…`)
+console.log(`[apk] AfroCoils ${version} (versionCode ${next}) · signed ${signer.slice(0, 12)}… · sha256 ${sha256.slice(0, 12)}…`)

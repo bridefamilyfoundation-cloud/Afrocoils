@@ -675,7 +675,7 @@ export function ask(query: string, ctx: AskContext): AskReply {
   const normal = normalise(query)
   if (!normal) return { type: 'chat', text: NOT_UNDERSTOOD }
 
-  const greeting = SMALL_TALK_LINES.get(normal.replace(/\s*(afrocoil|ask|please|pls)$/, ''))
+  const greeting = SMALL_TALK_LINES.get(normal.replace(/\s*(afrocoils?|ask|please|pls)$/, ''))
   if (greeting) return { type: 'chat', text: greeting }
 
   const ix = index()

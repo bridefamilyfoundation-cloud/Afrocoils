@@ -29,7 +29,7 @@ export interface TourStep {
 export const TOUR_STEPS: TourStep[] = [
   {
     path: '/sos',
-    title: 'Welcome to Afrocoil',
+    title: 'Welcome to AfroCoils',
     body: 'A minute to show you where everything is. You can skip it, and replay it any time from Documentation in the menu.',
   },
   {

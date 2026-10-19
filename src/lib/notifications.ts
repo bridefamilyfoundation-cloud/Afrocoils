@@ -76,7 +76,7 @@ export async function requestPermission(): Promise<PermissionState> {
 
 /** What a due reminder says. Short — it lands on a lock screen. */
 function bodyFor(type: CareEventType, overdue: boolean): string {
-  if (overdue) return `${type} is overdue. Open Afrocoil to log it or push it back.`
+  if (overdue) return `${type} is overdue. Open AfroCoils to log it or push it back.`
   switch (type) {
     case 'Wash day':
       return 'Wash day today. Set out your leave-in and give yourself the time.'

@@ -2,7 +2,7 @@ import heroUrl from '../assets/brand/afro-hero.webp'
 import markUrl from '../assets/brand/afro-mark.webp'
 
 /**
- * The Afrocoil illustration, and the name beside it.
+ * The AfroCoils illustration, and the name beside it.
  *
  * One drawing, used everywhere the app identifies itself: the front
  * page, the app bar, the drawer, the footer, the favicon and the Android
@@ -78,7 +78,7 @@ export default function BrandLockup({
   return (
     <span className={`flex items-center gap-sm ${className}`}>
       <AfroMark className={`${mark} shrink-0`} />
-      <span className={`${text} tracking-tight text-primary`}>Afrocoil</span>
+      <span className={`${text} tracking-tight text-primary`}>AfroCoils</span>
     </span>
   )
 }

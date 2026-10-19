@@ -3,7 +3,7 @@
  *
  *   npm run android:release   # build it first
  *   npm run site:release      # then this
- *   npm run site:release -- --apk path/to/other.apk --url https://host/afrocoil.apk
+ *   npm run site:release -- --apk path/to/other.apk --url https://host/AfroCoils.apk
  *   npm run site:release -- --note "Faster wash-day calendar" --note "Fixes the quiz"
  *
  * Writes `site/release.json` — every fact the download card states — and
@@ -77,7 +77,7 @@ if (!bytes.includes(Buffer.from('APK Sig Block 42'))) {
 const ANDROID = { 21: '5.0', 22: '5.1', 23: '6.0', 24: '7.0', 25: '7.1', 26: '8.0', 27: '8.1', 28: '9', 29: '10', 30: '11', 31: '12', 32: '12L', 33: '13', 34: '14', 35: '15', 36: '16' }
 if (!ANDROID[minSdk]) fail(`No Android version name recorded for API ${minSdk} — add it to the table in this script.`)
 
-const file = `afrocoil-${version}.apk`
+const file = `AfroCoils-${version}.apk`
 const url = flag('url')
 const mtime = statSync(apkPath).mtime
 // The build's local calendar day, as a YYYY-MM-DD key — not toISOString(),

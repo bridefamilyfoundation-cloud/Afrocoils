@@ -1,4 +1,4 @@
-# Afrocoil
+# AfroCoils
 #
 # The product is an Android app; this host serves the same bundle as a web
 # build plus the one API route it uses. Crawling is welcome — there is

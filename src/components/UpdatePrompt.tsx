@@ -6,7 +6,7 @@ import { useHairProfile } from '../lib/profile-store'
 import { checkForUpdates, formatBytes, updatesConfigured, useUpdateStatus } from '../lib/updates'
 
 /**
- * "A new version of Afrocoil is available."
+ * "A new version of AfroCoils is available."
  *
  * Checks when the app opens and whenever it comes back to the
  * foreground (no more than every six hours — see `checkForUpdates`), and
@@ -97,7 +97,7 @@ export default function UpdatePrompt() {
               A new version is out
             </h2>
             <p className="font-body-md text-caption text-on-surface-variant">
-              Afrocoil {available.version} · {formatBytes(available.bytes)}
+              AfroCoils {available.version} · {formatBytes(available.bytes)}
             </p>
           </div>
         </div>

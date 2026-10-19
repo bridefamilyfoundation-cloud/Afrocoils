@@ -474,7 +474,7 @@ export default function DocsScreen() {
     <>
       <ScreenHeader
         title="Documentation"
-        subtitle="How Afrocoil works, section by section."
+        subtitle="How AfroCoils works, section by section."
       />
 
       <button

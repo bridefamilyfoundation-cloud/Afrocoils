@@ -18,7 +18,7 @@ import { STYLES } from '../content/styles'
  * shared.
  */
 
-const SUFFIX = 'Afrocoil'
+const SUFFIX = 'AfroCoils'
 
 /** Static routes. Dynamic ones are resolved below from their content. */
 const TITLES: Record<string, string> = {

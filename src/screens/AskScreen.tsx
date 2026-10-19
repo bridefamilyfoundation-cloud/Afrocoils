@@ -77,7 +77,7 @@ export default function AskScreen() {
     <>
       <section className="mb-lg">
         <h2 className="mb-xs font-headline-lg text-headline-lg-mobile text-on-background">
-          Ask Afrocoil
+          Ask AfroCoils
         </h2>
         <p className="font-body-md text-body-md text-on-surface-variant">
           Describe what’s going on, or what you want to do. Answers are quoted from the app’s own
@@ -118,7 +118,7 @@ export default function AskScreen() {
           <p className="mb-2xl flex items-start gap-sm rounded-xl bg-surface-container p-md font-body-md text-caption text-on-surface-variant">
             <Icon name="info" className="shrink-0 text-[16px] leading-4 text-primary" />
             <span>
-              Ask doesn’t write advice. It finds the part of Afrocoil that answers you and
+              Ask doesn’t write advice. It finds the part of AfroCoils that answers you and
               quotes it word for word, with a link to the page. Nothing you type is saved or
               sent anywhere, and it works with no signal.
             </span>

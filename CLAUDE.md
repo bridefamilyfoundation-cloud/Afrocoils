@@ -40,7 +40,7 @@ picture; this file is the short version of what to keep in mind when editing.
   cookies, nothing loaded from another origin — its footer says so.
 - **`tailwind.config.js` is the single source of truth for the palette.** The
   token *names* are the prototype's, verbatim; the colour *values* are the
-  brand's four — Light Cream `#E8D5C0` (the page), Burnt Orange `#E8560C`
+  brand's four — Light Cream `#E8D5C0` (the page), Burnt Orange `#E2583E`
   (actions), Dark Chocolate `#5A2108` (headings and text), Deep Espresso
   `#3F1708` (the illustration) — declared as `brand-*` tokens with every M3
   role derived from them. Two rules follow:
@@ -364,7 +364,7 @@ picture; this file is the short version of what to keep in mind when editing.
   the front page) and `mark` (cropped to the hair, for the app bar, drawer
   and footer — uncropped, the orange burst swallows it at 32px).
   `<BrandLockup>` draws the mark beside the name so nothing repeats the
-  words "Afrocoil", which is how the prototype ended up with a footer
+  words "AfroCoils", which is how the prototype ended up with a footer
   that said something else. The favicon in `public/`, the launcher icons
   and the splash screens under `android/app/src/main/res/` are cut from the
   same artwork, with its white field knocked out so it sits on cream. If

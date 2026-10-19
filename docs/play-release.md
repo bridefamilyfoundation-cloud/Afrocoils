@@ -32,7 +32,7 @@ with an upload key that Google verifies and strips.
 cd android
 keytool -genkeypair -v -keystore afro-coily-upload.keystore \
   -alias afro-coily-upload -keyalg RSA -keysize 2048 -validity 10000 \
-  -dname "CN=Afrocoil, O=Afrocoil, C=NG"
+  -dname "CN=AfroCoils, O=AfroCoils, C=NG"
 ```
 
 Then point `android/keystore.properties` at it (copy from

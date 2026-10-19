@@ -80,7 +80,7 @@ const TIPS = [
 export default function AboutScreen() {
   return (
     <>
-      <ScreenHeader title="About" subtitle="What Afrocoil is, and what it does with your data." />
+      <ScreenHeader title="About" subtitle="What AfroCoils is, and what it does with your data." />
 
       <section className="mb-2xl space-y-lg">
         {ABOUT.map((item) => (
@@ -148,7 +148,7 @@ export default function AboutScreen() {
 
       <section className="mb-2xl flex flex-col items-center gap-sm text-center">
         <p className="font-caption text-caption text-on-surface-variant">
-          Afrocoil, version {VERSION}
+          AfroCoils, version {VERSION}
         </p>
         <nav className="flex flex-wrap justify-center gap-lg">
           <Link to="/legal/privacy" className="font-body-md text-body-md text-primary underline">
@@ -215,7 +215,7 @@ function UpdatesSection() {
       {!updatesConfigured ? (
         <p className="font-body-md text-caption text-on-surface-variant">
           {isNative
-            ? 'This build was made without an update address, so it cannot check for new versions. Check the Afrocoil website instead.'
+            ? 'This build was made without an update address, so it cannot check for new versions. Check the AfroCoils website instead.'
             : 'Updates are for the Android app. This is the web version, which is always the latest.'}
         </p>
       ) : (
@@ -273,7 +273,7 @@ function UpdatesSection() {
           </div>
 
           <p className="font-caption text-caption text-on-surface-variant">
-            The check asks the Afrocoil website which version is newest. It sends nothing from
+            The check asks the AfroCoils website which version is newest. It sends nothing from
             your profile and no identifier — the website sees what any website sees, your
             connection&rsquo;s IP address. Nothing downloads unless you tap Download.
           </p>

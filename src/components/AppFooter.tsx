@@ -22,7 +22,7 @@ export default function AppFooter() {
           <BrandLockup size="sm" />
         </Link>
         <p className="font-caption text-caption text-on-surface-variant">
-          © {new Date().getFullYear()} Afrocoil. Celebrating every coil and curl.
+          © {new Date().getFullYear()} AfroCoils. Celebrating every coil and curl.
         </p>
       </div>
 

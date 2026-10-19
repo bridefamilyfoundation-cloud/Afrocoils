@@ -108,7 +108,7 @@ export default function FaqScreen() {
             to="/about"
             className="rounded-full bg-primary px-lg py-2 font-label-md text-label-md text-on-primary active:scale-95"
           >
-            About Afrocoil
+            About AfroCoils
           </Link>
           <Link
             to="/legal/contact"

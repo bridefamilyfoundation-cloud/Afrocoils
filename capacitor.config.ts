@@ -2,7 +2,7 @@ import type { CapacitorConfig } from '@capacitor/cli'
 
 const config: CapacitorConfig = {
   appId: 'com.afrocoilyhair.app',
-  appName: 'Afrocoil',
+  appName: 'AfroCoils',
   webDir: 'dist',
   android: {
     // Light Cream, the brand's page colour — the same value `background`
