@@ -7,7 +7,9 @@
  * else:
  *
  *   Light Cream     #E8D5C0   the page
- *   Burnt Orange    #E8560C   actions and the panels that carry them
+ *   Burnt Orange    #E2583E   actions and the panels that carry them
+ *                             (was #E8560C until 2026-10-19; the peach tints
+ *                             below are mixed from it toward white)
  *   Dark Chocolate  #5A2108   headings and text
  *   Deep Espresso   #3F1708   the hair illustration, and the deepest text
  *
@@ -41,7 +43,7 @@ export default {
       colors: {
         /* The brand palette. Everything below is derived from these four. */
         'brand-cream': '#E8D5C0',
-        'brand-orange': '#E8560C',
+        'brand-orange': '#E2583E',
         'brand-chocolate': '#5A2108',
         'brand-espresso': '#3F1708',
 
@@ -56,7 +58,7 @@ export default {
         'surface-container-high': '#EADAC7',
         'surface-container-highest': '#E2CFB8',
         'surface-variant': '#E2CFB8',
-        'surface-tint': '#E8560C',
+        'surface-tint': '#E2583E',
 
         /* Text and lines. */
         'on-background': '#5A2108',
@@ -68,22 +70,22 @@ export default {
         /* Primary — the chocolate. Heading text, and fills that carry white. */
         primary: '#5A2108',
         'on-primary': '#FFFFFF',
-        'primary-container': '#E8560C',
+        'primary-container': '#E2583E',
         'on-primary-container': '#FFF3EA',
         'primary-fixed': '#F7DFC8',
         'on-primary-fixed': '#3F1708',
         'on-primary-fixed-variant': '#6E4126',
-        'primary-fixed-dim': '#F0B183',
+        'primary-fixed-dim': '#EFA597',
 
         /* Secondary — the burnt orange, always as a fill under cream or white. */
-        secondary: '#E8560C',
+        secondary: '#E2583E',
         'on-secondary': '#FFFFFF',
-        'secondary-container': '#F4B48A',
+        'secondary-container': '#F1B1A5',
         'on-secondary-container': '#5A2108',
-        'secondary-fixed': '#F7CFAE',
+        'secondary-fixed': '#F6C9C1',
         'on-secondary-fixed': '#4A1C07',
         'on-secondary-fixed-variant': '#7A3A16',
-        'secondary-fixed-dim': '#EFA269',
+        'secondary-fixed-dim': '#ED9787',
 
         /* Tertiary — the espresso, for the deepest accents. */
         tertiary: '#3F1708',
@@ -98,7 +100,7 @@ export default {
         /* Inverse, and the one colour that is not from the palette: error. */
         'inverse-surface': '#3F1708',
         'inverse-on-surface': '#F6EBDF',
-        'inverse-primary': '#F0B183',
+        'inverse-primary': '#EFA597',
         error: '#BA1A1A',
         'on-error': '#FFFFFF',
         'error-container': '#FFDAD6',
