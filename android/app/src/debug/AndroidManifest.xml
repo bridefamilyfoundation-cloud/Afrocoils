@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Debug-only overlay. Gradle merges this into debug builds and never into
+    release, which is the whole point of it living in src/debug.
+
+    Android has blocked cleartext HTTP by default since API 28, and a debug
+    APK under test talks to the dev API server over the LAN by IP — there is
+    no certificate to be had for 192.168.x.x, so that traffic is plain http
+    and would otherwise fail with a bare "Cleartext HTTP traffic not
+    permitted" in logcat and a dead SOS screen on the phone.
+
+    Deliberately not scoped to a single address: the laptop's DHCP lease
+    changes, and a config pinned to yesterday's IP fails in a way that looks
+    identical to the server being down. Release builds reach the deployed
+    functions over https and are unaffected by any of this.
+-->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <application android:usesCleartextTraffic="true" />
+</manifest>

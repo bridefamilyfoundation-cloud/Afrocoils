@@ -1,0 +1,80 @@
+{
+  "source": "Locs Images/Generated images",
+  "note": "Each source is a 1536x1024 triptych — front | back | side, split by thin white rules — of the same sitter, top and backdrop as the loose-hair library. `style` is the id in src/content/loc-styles.ts; `look` numbers a second or third set for the same style (1 when omitted). `style: null` holds a sheet back. Assignments confirmed by the owner on 2026-10-19. The five starter-method and statement styles with no sheet (comb-coil, braided, interlocked, mohawk, crown) render placeholders until one is generated.",
+  "sheets": {
+    "Three-View Honey Brown Locs Portrait.png": {
+      "style": "starter-locs",
+      "match": "Shoulder-length locs worn down, honey-brown ends, side part."
+    },
+    "ChatGPT Image Oct 14, 2026, 04_25_54 PM.png": {
+      "style": "two-strand-twist-starter-locs",
+      "match": "Dark shoulder-length twists worn down with a side part."
+    },
+    "ChatGPT Image Oct 14, 2026, 04_30_04 PM.png": {
+      "style": "high-loc-bun",
+      "match": "Auburn locs gathered into a bun at the crown, grid-parted at the back."
+    },
+    "Three-View Textured Bun Hairstyle Showcase.png": {
+      "style": "high-loc-bun",
+      "look": 2,
+      "match": "Black locs in a high bun over a diamond parting."
+    },
+    "Braided Updo_ Front, Back and Profile Views.png": {
+      "style": "low-loc-bun",
+      "match": "Flat-twisted locs running back into a bun at the nape."
+    },
+    "ChatGPT Image Oct 14, 2026, 04_23_32 PM.png": {
+      "style": "half-up-half-down-locs",
+      "match": "Two buns on top, the rest of the locs hanging free."
+    },
+    "ChatGPT Image Oct 14, 2026, 04_35_27 PM.png": {
+      "style": "half-up-half-down-locs",
+      "look": 2,
+      "match": "Top section tied up high, curly-ended locs hanging at the back."
+    },
+    "High Ponytail Locs_ Three-View Style Showcase.png": {
+      "style": "high-loc-ponytail",
+      "match": "Named for it."
+    },
+    "Studio Triptych_ Long Loc Ponytail.png": {
+      "style": "low-loc-ponytail",
+      "match": "Long locs gathered at the nape and cuffed."
+    },
+    "Loc Ponytail Triptych Portrait.png": {
+      "style": "side-swept-locs",
+      "match": "Locs swept up and over to one side; the back view shows the fall to the right."
+    },
+    "Three-View Loc Bun Portrait.png": {
+      "style": "loc-petals",
+      "match": "Coiled loc ends gathered at the crown into a flower-like burst."
+    },
+    "ChatGPT Image Oct 14, 2026, 05_09_11 PM.png": {
+      "style": "barrel-twists",
+      "match": "Brown locs twisted together into ropes and swept up."
+    },
+    "Loc Twist Bun Hairstyle Lookbook.png": {
+      "style": "barrel-twist-bun",
+      "match": "Barrel twists in a herringbone pattern, wrapped into a low bun."
+    },
+    "Triple-View Cornrow Space Buns Portrait.png": {
+      "style": "double-bun-locs",
+      "match": "Two buns at the crown over a parted base."
+    },
+    "Three-View Textured Loc Updo Portrait.png": {
+      "style": "loc-updo",
+      "match": "Locs pinned up into a full crown with two barrel twists framing the face."
+    },
+    "Braided Double Puff Hairstyle Reference.png": {
+      "style": null,
+      "match": "Held back: reads as loose-hair puffs, not locs."
+    },
+    "Braided Double Puff Hairstyle Reference (1).png": {
+      "style": null,
+      "match": "Held back: byte-identical duplicate of the sheet above."
+    },
+    "ChatGPT Image Oct 14, 2026, 04_21_43 PM.png": {
+      "style": null,
+      "match": "Held back: curly double puffs that read as loose hair, not locs."
+    }
+  }
+}

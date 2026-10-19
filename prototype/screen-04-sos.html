@@ -1,0 +1,295 @@
+<!DOCTYPE html><html class="light" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Hair SOS | Crown Sanctuary</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,400;500;600;700&amp;family=Be+Vietnam+Pro:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<!-- Icons -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<!-- Tailwind -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "secondary-container": "#fdc65e",
+                        "on-primary": "#ffffff",
+                        "on-primary-fixed": "#380d00",
+                        "on-tertiary-fixed-variant": "#204e4c",
+                        "background": "#fdf9f6",
+                        "surface-container-lowest": "#ffffff",
+                        "on-primary-fixed-variant": "#72351c",
+                        "surface-container": "#f1edea",
+                        "surface-dim": "#ddd9d6",
+                        "on-error": "#ffffff",
+                        "surface-container-low": "#f7f3f0",
+                        "on-secondary-fixed": "#271900",
+                        "on-error-container": "#93000a",
+                        "surface": "#fdf9f6",
+                        "primary-fixed": "#ffdbce",
+                        "error-container": "#ffdad6",
+                        "secondary-fixed": "#ffdea7",
+                        "surface-tint": "#904c31",
+                        "surface-container-highest": "#e5e2df",
+                        "primary-container": "#a45c40",
+                        "on-tertiary": "#ffffff",
+                        "on-surface-variant": "#53433d",
+                        "surface-variant": "#e5e2df",
+                        "surface-bright": "#fdf9f6",
+                        "on-secondary": "#ffffff",
+                        "on-background": "#1c1b1a",
+                        "inverse-surface": "#31302f",
+                        "tertiary-fixed": "#bcece8",
+                        "on-secondary-container": "#745200",
+                        "surface-container-high": "#ebe7e4",
+                        "on-tertiary-fixed": "#00201f",
+                        "error": "#ba1a1a",
+                        "outline-variant": "#d9c2ba",
+                        "secondary-fixed-dim": "#f4be57",
+                        "tertiary-container": "#4a7775",
+                        "outline": "#86736c",
+                        "tertiary-fixed-dim": "#a1cfcc",
+                        "primary-fixed-dim": "#ffb59a",
+                        "primary": "#86452a",
+                        "on-tertiary-container": "#cdfdfa",
+                        "secondary": "#7c5800",
+                        "on-primary-container": "#fff1ec",
+                        "on-secondary-fixed-variant": "#5e4200",
+                        "inverse-primary": "#ffb59a",
+                        "inverse-on-surface": "#f4f0ed",
+                        "tertiary": "#315e5c",
+                        "on-surface": "#1c1b1a"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "2xl": "48px",
+                        "md": "16px",
+                        "xs": "4px",
+                        "gutter": "16px",
+                        "base": "4px",
+                        "lg": "24px",
+                        "container-padding": "20px",
+                        "sm": "8px",
+                        "xl": "32px"
+                    },
+                    "fontFamily": {
+                        "headline-md": ["Literata", "serif"],
+                        "label-md": ["Be Vietnam Pro", "sans-serif"],
+                        "headline-lg": ["Literata", "serif"],
+                        "display-lg": ["Literata", "serif"],
+                        "body-lg": ["Be Vietnam Pro", "sans-serif"],
+                        "body-md": ["Be Vietnam Pro", "sans-serif"],
+                        "headline-lg-mobile": ["Literata", "serif"],
+                        "caption": ["Be Vietnam Pro", "sans-serif"]
+                    },
+                    "fontSize": {
+                        "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "500"}],
+                        "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                        "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "600"}],
+                        "display-lg": ["40px", {"lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "headline-lg-mobile": ["28px", {"lineHeight": "36px", "fontWeight": "600"}],
+                        "caption": ["12px", {"lineHeight": "16px", "fontWeight": "400"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            line-height: 1;
+            text-transform: none;
+            letter-spacing: normal;
+            word-wrap: normal;
+            white-space: nowrap;
+            direction: ltr;
+        }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #d9c2ba; border-radius: 10px; }
+        .glass-panel {
+            background: rgba(253, 249, 246, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-background text-on-background font-body-md min-h-screen pb-32">
+<!-- TopAppBar -->
+<header class="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-gutter h-16 bg-background/80 backdrop-blur-md">
+<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-variant/50 transition-colors">
+<span class="material-symbols-outlined text-primary">menu</span>
+</button>
+<a class="font-headline-lg-mobile text-headline-lg-mobile text-primary tracking-tight hover:opacity-80 transition-all" href="{{DATA:SCREEN:SCREEN_9}}">Afro Coily Hair</a>
+<div class="w-10 h-10 rounded-full bg-cover bg-center border-2 border-primary-fixed" data-alt="A professional headshot of a person with beautiful, well-maintained type 4C natural hair. The lighting is warm and cinematic, highlighting the intricate texture and health of the coils. They are set against a minimalist earth-toned background, reflecting the high-end editorial aesthetic of a premium hair sanctuary brand."></div>
+</header>
+<main class="pt-24 px-container-padding max-w-5xl mx-auto">
+<!-- Hero Section -->
+<section class="mb-xl text-center"><h2 class="font-headline-lg text-headline-lg text-on-background mb-sm">SOS Styling Assistant</h2><p class="font-body-md text-on-surface-variant max-w-md mx-auto">A signature feature to help you find the perfect hairstyle quickly, tailored to your current needs and hair state.</p></section><section class="mb-2xl">
+<div class="bg-secondary-container rounded-2xl p-xl flex flex-col md:flex-row items-center gap-lg shadow-sm">
+<div class="flex-1">
+<div class="flex items-center gap-sm mb-sm">
+<span class="material-symbols-outlined text-on-secondary-container">auto_awesome</span>
+<h3 class="font-headline-md text-on-secondary-container">Not sure where to start?</h3>
+</div>
+<p class="font-body-md text-on-secondary-container/90 mb-lg">
+        Snap a photo or tell me how your hair feels today, and I'll suggest the best rescue ritual.
+      </p>
+<div class="flex flex-wrap gap-md">
+<button class="bg-on-secondary-container text-secondary-container px-xl py-3 rounded-full font-label-md hover:opacity-90 transition-all flex items-center gap-sm"><span class="material-symbols-outlined text-[18px]">chat</span>Quick Chat with AI</button>
+
+</div>
+</div>
+<div class="hidden md:block w-32 h-32 bg-on-secondary-container/10 rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-6xl text-on-secondary-container/20">psychology</span>
+</div>
+</div>
+</section>
+<!-- Search Bar -->
+<section class="mb-2xl">
+<div class="relative max-w-xl mx-auto">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline">search</span>
+<input class="w-full pl-12 pr-4 py-4 rounded-full border-none bg-surface-container-low focus:ring-2 focus:ring-primary/20 font-body-md text-on-surface placeholder:text-outline shadow-sm transition-all" placeholder="Search for quick fixes (e.g., 'knot in back', 'itchy scalp')..." type="text">
+</div>
+</section>
+<!-- Featured SOS Bento Grid -->
+<section class="mb-2xl bg-surface-container rounded-2xl p-xl border border-outline-variant/30"><div class="grid grid-cols-1 md:grid-cols-2 gap-xl"><div><h3 class="font-headline-md text-primary mb-md">Find Your Quick Fix</h3><div class="space-y-md"><div class="flex flex-col gap-xs"><label class="font-label-md text-on-surface-variant">Available Time</label><div class="flex gap-sm"><button class="px-4 py-2 rounded-full bg-surface-container-high font-label-md hover:bg-secondary-container transition-colors">5 min</button><button class="px-4 py-2 rounded-full bg-surface-container-high font-label-md hover:bg-secondary-container transition-colors">10 min</button><button class="px-4 py-2 rounded-full bg-surface-container-high font-label-md hover:bg-secondary-container transition-colors">15 min</button></div></div><div class="flex flex-col gap-xs"><label class="font-label-md text-on-surface-variant">Occasion</label><select class="w-full rounded-lg border-outline-variant bg-surface-container-low font-body-md"><option>Casual Day</option><option>Work/Professional</option><option>Formal Event</option><option>Gym/Active</option></select></div><div class="flex flex-col gap-xs"><label class="font-label-md text-on-surface-variant">Hair Condition</label><select class="w-full rounded-lg border-outline-variant bg-surface-container-low font-body-md"><option>Freshly Washed</option><option>Day 3+ Curls</option><option>Dry/Tangled</option><option>Protective Style</option></select></div><div class="flex flex-col gap-xs"><label class="font-label-md text-on-surface-variant">Manipulation Level</label><select class="w-full rounded-lg border-outline-variant bg-surface-container-low font-body-md"><option>Low (Gentle)</option><option>Medium</option><option>High (Restyling)</option></select></div><button class="w-full mt-md bg-primary text-on-primary py-4 rounded-full font-label-md hover:opacity-90 transition-all">Generate Recommendations</button></div></div><div class="bg-white/50 rounded-xl p-lg flex flex-col justify-center"><h4 class="font-label-md text-primary uppercase tracking-widest mb-md">What you'll receive:</h4><ul class="space-y-sm"><li class="flex items-center gap-sm font-body-md"><span class="material-symbols-outlined text-primary">check_circle</span> Personalized Hairstyle Recommendations</li><li class="flex items-center gap-sm font-body-md"><span class="material-symbols-outlined text-primary">check_circle</span> Required Tools &amp; Products</li><li class="flex items-center gap-sm font-body-md"><span class="material-symbols-outlined text-primary">check_circle</span> Step-by-Step Visual Guidance</li><li class="flex items-center gap-sm font-body-md"><span class="material-symbols-outlined text-primary">check_circle</span> Estimated Completion Time</li></ul><div class="mt-lg p-md bg-secondary-fixed/30 rounded-lg border border-secondary-fixed"><p class="text-caption italic text-on-secondary-fixed-variant">"The SOS Assistant saved my morning! Found a 5-minute updo that looked like I spent an hour." - Maya R.</p></div></div></div></section><section class="grid grid-cols-1 md:grid-cols-12 gap-lg mb-2xl">
+<!-- Dryness Rescue - Large -->
+<div class="md:col-span-8 bg-[#F2E8DF] rounded-xl p-xl flex flex-col md:flex-row gap-lg items-center overflow-hidden relative group">
+<div class="flex-1 z-10">
+<span class="bg-secondary text-on-secondary px-3 py-1 rounded-full text-caption font-label-md uppercase mb-md inline-block">Urgent Care</span>
+<h3 class="font-headline-md text-headline-md text-primary mb-sm">Dryness Rescue</h3>
+<p class="text-on-surface-variant mb-lg font-body-md">When your coils feel like straw, it's time for the L.O.C. method intensive. Bring back the bounce in 20 minutes.</p>
+<button class="bg-primary text-on-primary px-xl py-3 rounded-full font-label-md hover:scale-105 active:scale-95 transition-all flex items-center gap-sm">
+                        Start Ritual <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+</button>
+</div>
+<div class="w-full md:w-64 h-64 rounded-lg bg-cover bg-center shadow-lg transform group-hover:rotate-2 transition-transform" data-alt="Close up photography of rich, hydrated natural hair curls glistening with moisture."></div>
+</div>
+<!-- Scalp Relief - Tall -->
+<div class="md:col-span-4 bg-tertiary-fixed rounded-xl p-lg flex flex-col justify-between border border-tertiary/10">
+<div>
+<div class="w-12 h-12 rounded-full bg-tertiary text-on-tertiary flex items-center justify-center mb-lg">
+<span class="material-symbols-outlined">spa</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-on-tertiary-fixed mb-sm">Scalp Relief</h3>
+<p class="text-on-tertiary-fixed-variant font-body-md">Soothe irritation and itchiness with our botanical guide to scalp health.</p>
+</div>
+<div class="mt-lg pt-lg border-t border-tertiary/20">
+<a class="font-label-md text-tertiary flex items-center gap-xs" href="#">View Remedies <span class="material-symbols-outlined text-[16px]">open_in_new</span></a>
+</div>
+</div>
+<!-- Detangling Magic -->
+<div class="md:col-span-5 bg-secondary-fixed rounded-xl p-lg flex flex-col justify-between relative overflow-hidden">
+<div class="z-10">
+<h3 class="font-headline-md text-headline-md text-on-secondary-fixed mb-sm">Detangling Magic</h3>
+<p class="text-on-secondary-fixed-variant font-body-md">Don't reach for the scissors. Our slip-intensive guide helps you melt those knots away with patience and the right tools.</p>
+</div>
+<div class="mt-xl z-10">
+<div class="flex -space-x-2 mb-md">
+<div class="w-8 h-8 rounded-full border-2 border-secondary-fixed bg-cover" data-alt="A portrait of a woman with a large, beautiful afro, smiling warmly."></div>
+<div class="w-8 h-8 rounded-full border-2 border-secondary-fixed bg-cover" data-alt="Close up of a person with braided hair looking serene."></div>
+<div class="w-8 h-8 rounded-full border-2 border-secondary-fixed bg-cover" data-alt="A person with short, curly hair laughing."></div>
+</div>
+<p class="text-caption text-on-secondary-fixed-variant italic">Join 1.2k sisters detangling today</p>
+</div>
+<span class="material-symbols-outlined absolute -bottom-4 -right-4 text-9xl text-on-secondary-fixed/5 rotate-12">auto_awesome</span>
+</div>
+<!-- Breakage Alert -->
+<div class="md:col-span-7 bg-surface-container rounded-xl p-lg flex items-center gap-lg">
+<div class="hidden sm:block w-32 h-32 flex-shrink-0 bg-cover bg-center rounded-lg" data-alt="Macro photography of a single hair strand under a microscope showing the cuticle structure."></div>
+<div>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-sm">Stop the Snap</h3>
+<p class="text-on-surface-variant font-body-md mb-md">Noticing more hair on the floor? Let's check your protein-moisture balance.</p>
+<button class="border border-primary text-primary px-lg py-2 rounded-full font-label-md hover:bg-primary/5 transition-colors">Take the Porosity Test</button>
+</div>
+</div>
+</section>
+<!-- Common Concerns Chips -->
+<section class="mb-2xl">
+<h4 class="font-label-md text-on-surface-variant uppercase tracking-widest mb-lg text-center">More Common Concerns</h4>
+<div class="flex flex-wrap justify-center gap-sm">
+<button class="px-lg py-2 bg-surface-container-high rounded-full font-label-md text-on-surface hover:bg-secondary-container transition-colors">Split Ends</button>
+<button class="px-lg py-2 bg-surface-container-high rounded-full font-label-md text-on-surface hover:bg-secondary-container transition-colors">Product Buildup</button>
+<button class="px-lg py-2 bg-surface-container-high rounded-full font-label-md text-on-surface hover:bg-secondary-container transition-colors">Heat Damage</button>
+<button class="px-lg py-2 bg-surface-container-high rounded-full font-label-md text-on-surface hover:bg-secondary-container transition-colors">Edge Care</button>
+<button class="px-lg py-2 bg-surface-container-high rounded-full font-label-md text-on-surface hover:bg-secondary-container transition-colors">Frizz Control</button>
+<button class="px-lg py-2 bg-surface-container-high rounded-full font-label-md text-on-surface hover:bg-secondary-container transition-colors">Dullness</button>
+</div>
+</section>
+<!-- Help Section -->
+<section class="bg-primary-container text-on-primary-container rounded-2xl p-xl text-center relative overflow-hidden">
+<div class="relative z-10">
+<h3 class="font-headline-md text-headline-md mb-md">Still not sure?</h3>
+<p class="font-body-md mb-xl opacity-90">Our hair experts are online and ready to help you navigate your specific hair emergency.</p>
+<div class="flex flex-col sm:flex-row gap-md justify-center">
+<button class="bg-on-primary-container text-primary-container px-2xl py-4 rounded-full font-label-md hover:shadow-lg transition-all">Chat with an Expert</button>
+<button class="bg-transparent border border-on-primary-container/30 px-2xl py-4 rounded-full font-label-md hover:bg-on-primary-container/10 transition-all">Browse Community Tips</button>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="w-full py-xl px-container-padding flex flex-col md:flex-row justify-between items-center gap-md bg-surface-container-highest mt-2xl">
+<div class="flex flex-col items-center md:items-start">
+<span class="font-headline-md text-primary mb-xs">Curly Hair</span>
+<p class="font-caption text-caption text-on-surface-variant">© 2024 Curly Hair. Celebrating every coil and curl.</p>
+</div>
+<div class="flex gap-lg">
+<a class="font-body-md text-on-surface-variant hover:text-primary transition-colors" href="#">Privacy Policy</a>
+<a class="font-body-md text-on-surface-variant hover:text-primary transition-colors" href="#">Terms of Service</a>
+<a class="font-body-md text-on-surface-variant hover:text-primary transition-colors" href="#">Contact Us</a>
+</div>
+</footer>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-safe pt-2 bg-surface rounded-t-xl shadow-[0_-4px_12px_0_rgba(144,76,49,0.08)]">
+<a class="flex flex-col items-center justify-center bg-secondary-container text-on-secondary-container rounded-full px-5 py-1.5 active:scale-90 duration-200" href="{{DATA:SCREEN:SCREEN_4}}">
+<span class="material-symbols-outlined" data-weight="fill">emergency_home</span>
+<span class="font-label-md text-label-md">SOS</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:opacity-80 transition-all" href="{{DATA:SCREEN:SCREEN_12}}">
+<span class="material-symbols-outlined">auto_awesome</span>
+<span class="font-label-md text-label-md">Styles</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:opacity-80 transition-all" href="{{DATA:SCREEN:SCREEN_10}}">
+<span class="material-symbols-outlined">face_3</span>
+<span class="font-label-md text-label-md">Profile</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:opacity-80 transition-all" href="{{DATA:SCREEN:SCREEN_14}}">
+<span class="material-symbols-outlined">show_chart</span>
+<span class="font-label-md text-label-md">Growth</span>
+</a>
+</nav>
+<script>
+        // Micro-interactions
+        document.querySelectorAll('button, a').forEach(el => {
+            el.addEventListener('mousedown', () => { el.style.transform = 'scale(0.96)'; });
+            el.addEventListener('mouseup', () => { el.style.transform = ''; });
+            el.addEventListener('mouseleave', () => { el.style.transform = ''; });
+        });
+
+        // Search highlight simulation
+        const searchInput = document.querySelector('input');
+        searchInput.addEventListener('focus', () => {
+            searchInput.parentElement.classList.add('scale-[1.02]');
+        });
+        searchInput.addEventListener('blur', () => {
+            searchInput.parentElement.classList.remove('scale-[1.02]');
+        });
+    </script>
+<button class="fixed bottom-24 right-6 z-50 bg-primary text-on-primary w-16 h-16 rounded-full shadow-lg flex items-center justify-center hover:scale-110 active:scale-95 transition-all group" aria-label="Ask AI Assistant"><span class="material-symbols-outlined text-2xl">psychology</span><span class="absolute right-full mr-3 bg-inverse-surface text-inverse-on-surface px-3 py-1 rounded text-caption opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">Ask AI</span></button></body></html>

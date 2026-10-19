@@ -1,0 +1,630 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#E8D5C0" />
+    <title>Afrocoil — Hair SOS for coils, curls &amp; locs</title>
+    <meta
+      name="description"
+      content="Afrocoil is a hair app for type 3 and 4 hair, loose or locked. It opens straight into the rescue, works offline, needs no account, and keeps everything on your phone. Download for Android."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Afrocoil — Hair SOS for coils, curls &amp; locs" />
+    <meta
+      property="og:description"
+      content="Say how long you've got and see the styles that fit it. Works offline, no account, no AI advice."
+    />
+    <link rel="icon" type="image/png" sizes="32x32" href="../public/favicon-32.png" />
+    <link rel="apple-touch-icon" href="../public/favicon-180.png" />
+    <link rel="stylesheet" href="./site.css" />
+    <!--
+      The shipped version of prototype/screen-00-landing.html.
+
+      Every percent-delimited placeholder (release.version and the rest) is
+      filled in at build time by vite.site.config.ts, which fails on any it
+      does not know —
+      counts and chapter titles from src/content/, version, size and
+      checksum from site/release.json. Do not replace one with a literal:
+      the point is that this page cannot state a number the app does not.
+    -->
+  </head>
+  <body class="overflow-x-hidden bg-background font-body-md text-on-background">
+    <script>
+      document.documentElement.classList.add('js')
+    </script>
+
+    <!-- Icon sprite: stroke icons, inline so nothing is fetched. -->
+    <svg width="0" height="0" class="absolute" aria-hidden="true">
+      <defs>
+        <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" /></symbol>
+        <symbol id="i-leaf" viewBox="0 0 24 24"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.5 19 2c1 2 2 4.2 2 8 0 5.5-4.8 10-10 10Z" /><path d="M2 21c0-3 1.9-5.4 5.1-6 2.4-.5 4.9-2 5.9-3" /></symbol>
+        <symbol id="i-down" viewBox="0 0 24 24"><path d="M12 5v14M6 13l6 6 6-6" /></symbol>
+        <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5" /><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" /></symbol>
+        <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5" /></symbol>
+        <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12" /></symbol>
+        <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" /></symbol>
+        <symbol id="i-wifi-off" viewBox="0 0 24 24"><path d="M2 2l20 20M8.5 16.5a5 5 0 0 1 7 0M5 12.9a10 10 0 0 1 5.2-2.7M16.9 11.3a10 10 0 0 1 2.2 1.6M2 8.8a15 15 0 0 1 4.2-2.6M10.7 5c4-.4 8.1.9 11.3 3.8M12 20h.01" /></symbol>
+        <symbol id="i-lock" viewBox="0 0 24 24"><rect x="4" y="11" width="16" height="10" rx="2" /><path d="M8 11V7a4 4 0 0 1 8 0v4" /></symbol>
+        <symbol id="i-chart" viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 8-8" /><path d="M15 7h6v6" /></symbol>
+        <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4.5" /><path d="M20 21a8 8 0 0 0-16 0" /></symbol>
+        <symbol id="i-waves" viewBox="0 0 24 24"><path d="M2 6c.6.5 1.2 1 2.5 1C7 7 7 5 9.5 5s2.4 2 5 2 2.5-2 5-2c1.3 0 1.9.5 2.5 1M2 12c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2s2.4 2 5 2 2.5-2 5-2c1.3 0 1.9.5 2.5 1M2 18c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2s2.4 2 5 2 2.5-2 5-2c1.3 0 1.9.5 2.5 1" /></symbol>
+        <symbol id="i-sos" viewBox="0 0 24 24"><path d="M12 3 2.5 20h19L12 3Z" /><path d="M12 10v4M12 17h.01" /></symbol>
+        <symbol id="i-styles" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="5" rx="1.5" /><path d="M5.5 9v10M9 9v8M12.5 9v10M16 9v8M19.5 9v10" /></symbol>
+        <symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="17" rx="2" /><path d="M16 2v4M8 2v4M3 10h18" /></symbol>
+        <symbol id="i-bag" viewBox="0 0 24 24"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z" /><path d="M3 6h18M16 10a4 4 0 0 1-8 0" /></symbol>
+        <symbol id="i-spark" viewBox="0 0 24 24"><path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5 18 18M6 18l2.5-2.5M15.5 8.5 18 6" /></symbol>
+        <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16" /></symbol>
+        <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7" /><path d="m20 20-4-4" /></symbol>
+        <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="13" height="13" rx="2" /><path d="M4 16a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2" /></symbol>
+        <symbol id="i-send" viewBox="0 0 24 24"><path d="m22 2-7 20-4-9-9-4Z" /><path d="M22 2 11 13" /></symbol>
+        <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z" /><circle cx="12" cy="12" r="3" /></symbol>
+        <symbol id="i-phone" viewBox="0 0 24 24"><rect x="6" y="2" width="12" height="20" rx="2.5" /><path d="M11 18h2" /></symbol>
+        <symbol id="i-android" viewBox="0 0 24 24"><path d="M5 16V11a7 7 0 0 1 14 0v5Z" /><path d="M8 5.5 6.5 3M16 5.5 17.5 3" /><circle cx="9.5" cy="11" r=".6" /><circle cx="14.5" cy="11" r=".6" /><path d="M5 19h14" /></symbol>
+        <symbol id="i-heart" viewBox="0 0 24 24"><path d="M19 14c1.5-1.5 3-3.2 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.8 0-3 .5-4.5 2-1.5-1.5-2.7-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4 3 5.5l7 7Z" /></symbol>
+        <symbol id="i-steth" viewBox="0 0 24 24"><path d="M5 3v5a5 5 0 0 0 10 0V3" /><path d="M10 13v2a5 5 0 0 0 10 0v-2" /><circle cx="20" cy="11" r="2" /></symbol>
+      </defs>
+    </svg>
+
+    <a href="#how" class="sr-only focus:not-sr-only focus:fixed focus:left-md focus:top-md focus:z-[60] focus:rounded-full focus:bg-primary focus:px-lg focus:py-sm focus:text-on-primary">Skip to content</a>
+
+    <!-- ============================== NAV ============================== -->
+    <header id="nav" class="fixed inset-x-0 top-0 z-50 transition-all duration-300">
+      <div class="mx-auto flex max-w-6xl items-center justify-between px-container-padding py-md">
+        <a href="#top" class="flex items-center gap-sm" aria-label="Afrocoil, back to top">
+          <img src="../src/assets/brand/afro-mark.webp" alt="" class="h-10 w-10" />
+          <span class="font-headline-lg text-[26px] font-semibold tracking-tight text-primary">Afrocoil</span>
+        </a>
+        <nav class="hidden items-center gap-xl md:flex" aria-label="Sections">
+          <a href="#how" class="font-label-md text-label-md text-on-surface-variant transition-colors hover:text-primary">How it works</a>
+          <a href="#hair" class="font-label-md text-label-md text-on-surface-variant transition-colors hover:text-primary">Loose &amp; locs</a>
+          <a href="#privacy" class="font-label-md text-label-md text-on-surface-variant transition-colors hover:text-primary">Privacy</a>
+          <a href="#faq" class="font-label-md text-label-md text-on-surface-variant transition-colors hover:text-primary">FAQ</a>
+        </nav>
+        <a href="#download" class="inline-flex items-center gap-sm rounded-full bg-secondary px-lg py-2.5 font-label-md text-label-md text-on-secondary shadow-md shadow-brand-orange/25 transition-all hover:-translate-y-0.5 hover:shadow-lg active:scale-95">
+          <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-download" /></svg>
+          Download
+        </a>
+      </div>
+    </header>
+
+    <main id="top">
+      <!-- ============================== HERO ============================== -->
+      <section class="relative overflow-hidden pt-28 md:pt-32">
+        <div class="grain pointer-events-none absolute inset-0"></div>
+        <div class="pointer-events-none absolute -right-40 -top-40 h-[560px] w-[560px] rounded-full bg-primary-fixed-dim/40 blur-3xl"></div>
+        <div class="pointer-events-none absolute -bottom-48 -left-32 h-[420px] w-[420px] rounded-full bg-surface-container-lowest/70 blur-3xl"></div>
+
+        <div class="relative mx-auto grid max-w-6xl items-center gap-2xl px-container-padding pb-2xl md:grid-cols-[1.05fr_1fr] md:pb-24">
+          <div class="text-center md:text-left">
+            <p class="rise mb-lg inline-flex items-center gap-sm rounded-full border border-outline-variant/60 bg-surface-container-lowest/70 px-md py-1.5 font-label-md text-[11px] uppercase tracking-[0.1em] text-on-surface-variant backdrop-blur sm:text-caption sm:tracking-[0.14em]" style="--d: 0ms">
+              <span class="h-2 w-2 rounded-full bg-secondary"></span>
+              Type 3 &amp; 4 hair · loose or locked
+            </p>
+            <h1 class="rise font-headline-lg text-[44px] font-bold leading-[1.02] tracking-[-0.03em] text-primary sm:text-[60px] lg:text-[76px]" style="--d: 90ms">
+              Hair SOS<br /><span class="font-medium italic text-brand-espresso/80">for coils, curls</span><br />&amp; locs.
+            </h1>
+            <p class="rise mx-auto mt-lg max-w-xl font-body-lg text-body-lg text-on-surface-variant md:mx-0" style="--d: 200ms">
+              Afrocoil opens straight into the rescue. Say how long you&rsquo;ve got and see the styles that fit it &mdash; each one written up by the person who wore it, stored on your phone, and there when you have no signal.
+            </p>
+            <div class="rise mt-xl flex flex-col items-center gap-md sm:flex-row sm:justify-center md:justify-start" style="--d: 300ms">
+              <a href="#download" class="btn-shine inline-flex w-full items-center justify-center gap-sm rounded-full bg-secondary px-xl py-4 font-label-md text-body-lg font-semibold text-on-secondary shadow-xl shadow-brand-orange/30 transition-all hover:-translate-y-0.5 active:scale-95 sm:w-auto">
+                <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-android" /></svg>
+                Download for Android
+              </a>
+              <a href="#how" class="group inline-flex items-center gap-sm rounded-full px-lg py-4 font-label-md text-label-md text-primary transition-colors hover:bg-surface-container-lowest/70">
+                See how it works
+                <svg class="h-4 w-4 transition-transform group-hover:translate-y-0.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-down" /></svg>
+              </a>
+            </div>
+            <p class="rise mt-md font-caption text-caption text-on-surface-variant" style="--d: 380ms">
+              Version %release.version% · %release.size% · Android %release.minAndroid% and up · No account needed
+            </p>
+          </div>
+
+          <div class="relative mx-auto w-full max-w-[520px]">
+            <div class="rise relative aspect-square" style="--d: 150ms">
+              <svg class="spin-slow absolute inset-0 h-full w-full text-outline-variant" viewBox="0 0 200 200" aria-hidden="true">
+                <circle cx="100" cy="100" r="97" fill="none" stroke="currentColor" stroke-width=".6" stroke-dasharray="2 5" />
+              </svg>
+              <div class="absolute inset-[8%] rounded-full bg-surface-container-lowest/50"></div>
+              <img src="../src/assets/brand/afro-hero.webp" alt="Illustration of a smiling woman with a full, coily afro on an orange burst" class="float absolute inset-[4%] h-[92%] w-[92%] object-contain drop-shadow-2xl" />
+
+              <div class="bob absolute left-0 top-[14%] flex items-center gap-sm rounded-2xl bg-surface-container-lowest/95 px-md py-sm shadow-lg backdrop-blur" style="--d: 0s">
+                <span class="grid h-8 w-8 place-items-center rounded-full bg-primary text-on-primary"><svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><use href="#i-wifi-off" /></svg></span>
+                <span class="text-left"><span class="block font-label-md text-caption text-on-surface">Works offline</span><span class="block font-caption text-[11px] text-on-surface-variant">Aeroplane mode too</span></span>
+              </div>
+              <div class="bob absolute right-0 top-[48%] flex items-center gap-sm rounded-2xl bg-surface-container-lowest/95 px-md py-sm shadow-lg backdrop-blur" style="--d: 1.4s">
+                <span class="grid h-8 w-8 place-items-center rounded-full bg-secondary text-on-secondary"><svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><use href="#i-clock" /></svg></span>
+                <span class="text-left"><span class="block font-label-md text-caption text-on-surface">%band.first.label%</span><span class="block font-caption text-[11px] text-on-surface-variant">%band.first.count% styles fit</span></span>
+              </div>
+              <div class="bob absolute bottom-[6%] left-[8%] flex items-center gap-sm rounded-2xl bg-surface-container-lowest/95 px-md py-sm shadow-lg backdrop-blur" style="--d: 2.6s">
+                <span class="grid h-8 w-8 place-items-center rounded-full bg-secondary-container text-on-secondary-container"><svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><use href="#i-lock" /></svg></span>
+                <span class="text-left"><span class="block font-label-md text-caption text-on-surface">No sign-in</span><span class="block font-caption text-[11px] text-on-surface-variant">Stays on your phone</span></span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Promises. Each line is a statement the privacy policy and About already make. -->
+        <div class="marquee relative border-y border-outline-variant/50 bg-surface-container-low/70 py-md">
+          <ul class="sr-only">
+            <li>No account</li><li>No ads</li><li>No analytics</li><li>Works in aeroplane mode</li><li>No AI advice</li><li>Your photos stay on your phone</li>
+          </ul>
+          <div class="marquee-track flex w-max gap-2xl whitespace-nowrap font-headline-lg text-[22px] font-medium italic text-primary/80" aria-hidden="true">
+            <span>No account</span><span class="text-secondary">✦</span><span>No ads</span><span class="text-secondary">✦</span><span>No analytics</span><span class="text-secondary">✦</span><span>Works in aeroplane mode</span><span class="text-secondary">✦</span><span>No AI advice</span><span class="text-secondary">✦</span><span>Your photos stay on your phone</span><span class="text-secondary">✦</span>
+            <span>No account</span><span class="text-secondary">✦</span><span>No ads</span><span class="text-secondary">✦</span><span>No analytics</span><span class="text-secondary">✦</span><span>Works in aeroplane mode</span><span class="text-secondary">✦</span><span>No AI advice</span><span class="text-secondary">✦</span><span>Your photos stay on your phone</span><span class="text-secondary">✦</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================== HOW IT WORKS ============================== -->
+      <section id="how" class="relative py-24">
+        <div class="mx-auto max-w-6xl px-container-padding">
+          <div data-reveal class="mx-auto mb-2xl max-w-2xl text-center">
+            <p class="mb-sm font-label-md text-label-md uppercase tracking-[0.18em] text-secondary">How it works</p>
+            <h2 class="font-headline-lg text-[34px] font-semibold leading-tight tracking-tight text-primary sm:text-[44px]">Built for the moment your hair won&rsquo;t cooperate.</h2>
+            <p class="mt-md font-body-lg text-body-lg text-on-surface-variant">Twenty minutes, somewhere to be. No home screen to get past, no menu to read first.</p>
+          </div>
+
+          <div class="grid gap-2xl lg:grid-cols-[1fr_380px] lg:gap-24">
+            <ol class="space-y-2xl lg:space-y-0">
+              <li class="step lg:flex lg:min-h-[72vh] lg:items-center" data-step="front">
+                <div class="relative pl-lg">
+                  <span class="absolute left-0 top-1 h-full w-[3px] rounded-full bg-outline-variant/40"><span class="step-bar block h-full w-full rounded-full bg-secondary"></span></span>
+                  <p class="mb-sm font-label-md text-label-md uppercase tracking-[0.16em] text-on-surface-variant">01 · Hair SOS</p>
+                  <h3 class="mb-md font-headline-lg text-[30px] font-semibold leading-tight text-primary">It opens on the rescue.</h3>
+                  <p class="max-w-md font-body-lg text-body-lg text-on-surface-variant">Every launch lands on Hair SOS: the illustration, one button, and the way in right beneath it. People reach for this app mid-problem far more often than they browse it, so it doesn&rsquo;t make you browse.</p>
+                  <div class="mt-lg lg:hidden" data-slot="front"></div>
+                </div>
+              </li>
+              <li class="step lg:flex lg:min-h-[72vh] lg:items-center" data-step="doors">
+                <div class="relative pl-lg">
+                  <span class="absolute left-0 top-1 h-full w-[3px] rounded-full bg-outline-variant/40"><span class="step-bar block h-full w-full rounded-full bg-secondary"></span></span>
+                  <p class="mb-sm font-label-md text-label-md uppercase tracking-[0.16em] text-on-surface-variant">02 · What&rsquo;s your emergency?</p>
+                  <h3 class="mb-md font-headline-lg text-[30px] font-semibold leading-tight text-primary">Two doors. That&rsquo;s the whole triage.</h3>
+                  <p class="max-w-md font-body-lg text-body-lg text-on-surface-variant"><strong class="font-semibold text-on-surface">Quick Hairstyle</strong> when you have somewhere to be. <strong class="font-semibold text-on-surface">Hair Care</strong> when you want to know what your hair is and what it needs. A short list is what makes it triage rather than a menu.</p>
+                  <div class="mt-lg lg:hidden" data-slot="doors"></div>
+                </div>
+              </li>
+              <li class="step lg:flex lg:min-h-[72vh] lg:items-center" data-step="quick">
+                <div class="relative pl-lg">
+                  <span class="absolute left-0 top-1 h-full w-[3px] rounded-full bg-outline-variant/40"><span class="step-bar block h-full w-full rounded-full bg-secondary"></span></span>
+                  <p class="mb-sm font-label-md text-label-md uppercase tracking-[0.16em] text-on-surface-variant">03 · Quick Hairstyle</p>
+                  <h3 class="mb-md font-headline-lg text-[30px] font-semibold leading-tight text-primary">Say how long you&rsquo;ve got.</h3>
+                  <p class="max-w-md font-body-lg text-body-lg text-on-surface-variant">%bands.labels% minutes. The library narrows to what fits the clock, then ranks against your hair. Every style was contributed by someone who wears it, with their own step-by-step method.</p>
+                  <div class="mt-lg lg:hidden" data-slot="quick"></div>
+                </div>
+              </li>
+              <li class="step lg:flex lg:min-h-[72vh] lg:items-center" data-step="care">
+                <div class="relative pl-lg">
+                  <span class="absolute left-0 top-1 h-full w-[3px] rounded-full bg-outline-variant/40"><span class="step-bar block h-full w-full rounded-full bg-secondary"></span></span>
+                  <p class="mb-sm font-label-md text-label-md uppercase tracking-[0.16em] text-on-surface-variant">04 · Hair Care</p>
+                  <h3 class="mb-md font-headline-lg text-[30px] font-semibold leading-tight text-primary">Know your hair, then look after it.</h3>
+                  <p class="max-w-md font-body-lg text-body-lg text-on-surface-variant">A five-question porosity test, your density, curl pattern and texture. Then a care calendar that works out what&rsquo;s due next, a product shelf filtered to your profile and your water &mdash; and when something&rsquo;s wrong, the Quick Hair Check starts from the symptom.</p>
+                  <div class="mt-lg lg:hidden" data-slot="care"></div>
+                </div>
+              </li>
+              <li class="step lg:flex lg:min-h-[72vh] lg:items-center" data-step="growth">
+                <div class="relative pl-lg">
+                  <span class="absolute left-0 top-1 h-full w-[3px] rounded-full bg-outline-variant/40"><span class="step-bar block h-full w-full rounded-full bg-secondary"></span></span>
+                  <p class="mb-sm font-label-md text-label-md uppercase tracking-[0.16em] text-on-surface-variant">05 · Hair Growth</p>
+                  <h3 class="mb-md font-headline-lg text-[30px] font-semibold leading-tight text-primary">Measure what you keep.</h3>
+                  <p class="max-w-md font-body-lg text-body-lg text-on-surface-variant">Hair grows steadily; the difference is how much survives. Log a length check and see retention against the half-inch-a-month average, plus your next milestone from neck to waist &mdash; dated from your own rate once you have sixty days of checks.</p>
+                  <div class="mt-lg lg:hidden" data-slot="growth"></div>
+                </div>
+              </li>
+              <li class="step lg:flex lg:min-h-[72vh] lg:items-center" data-step="profile">
+                <div class="relative pl-lg">
+                  <span class="absolute left-0 top-1 h-full w-[3px] rounded-full bg-outline-variant/40"><span class="step-bar block h-full w-full rounded-full bg-secondary"></span></span>
+                  <p class="mb-sm font-label-md text-label-md uppercase tracking-[0.16em] text-on-surface-variant">06 · My Hair Profile</p>
+                  <h3 class="mb-md font-headline-lg text-[30px] font-semibold leading-tight text-primary">One quiz, and everything sharpens.</h3>
+                  <p class="max-w-md font-body-lg text-body-lg text-on-surface-variant">The quiz asks about what you can see on your own head, not categories you&rsquo;re meant to know already. The first answer &mdash; loose hair or locs &mdash; changes half the app.</p>
+                  <div class="mt-lg lg:hidden" data-slot="profile"></div>
+                </div>
+              </li>
+            </ol>
+
+            <!-- Sticky phone (desktop). The mockups are decorative: the step text carries the meaning. -->
+            <div class="hidden lg:block">
+              <div class="sticky top-[calc(50vh-330px)]">
+                <div class="relative mx-auto w-[340px]">
+                  <div class="absolute -inset-10 rounded-full bg-primary-fixed-dim/40 blur-3xl"></div>
+                  <div class="relative rounded-[48px] bg-brand-espresso p-[12px] shadow-2xl shadow-brand-espresso/50 ring-1 ring-black/10">
+                    <div class="absolute left-1/2 top-[22px] z-20 h-[22px] w-[22px] -translate-x-1/2 rounded-full bg-black/80"></div>
+                    <div id="phone" class="relative h-[640px] overflow-hidden rounded-[38px] bg-background" aria-hidden="true"></div>
+                  </div>
+                  <div class="mt-lg flex justify-center gap-sm" id="phone-dots" aria-hidden="true"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================== NUMBERS ============================== -->
+      <section class="bg-brand-chocolate py-24 text-inverse-on-surface">
+        <div class="mx-auto max-w-6xl px-container-padding">
+          <div data-reveal class="mb-2xl max-w-2xl">
+            <p class="mb-sm font-label-md text-label-md uppercase tracking-[0.18em] text-primary-fixed-dim">All written by people</p>
+            <h2 class="font-headline-lg text-[34px] font-semibold leading-tight tracking-tight sm:text-[44px]">Nothing on the screen was invented.</h2>
+            <p class="mt-md font-body-lg text-body-lg text-inverse-on-surface/80">There&rsquo;s no chatbot and no model behind any screen. Every guide, style and step ships inside the app; it filters and ranks what it already has against the profile you filled in.</p>
+          </div>
+          <dl class="grid grid-cols-2 gap-px overflow-hidden rounded-3xl bg-white/10 lg:grid-cols-4">
+            <div data-reveal style="--d: 0ms" class="flex flex-col-reverse justify-end bg-brand-chocolate p-lg sm:p-xl">
+              <dt class="mt-sm font-body-md text-body-md text-inverse-on-surface/80">contributed styles, each with its method</dt>
+              <dd class="font-headline-lg text-[52px] font-bold leading-none text-primary-fixed-dim sm:text-[64px]" data-count>%count.styles%</dd>
+            </div>
+            <div data-reveal style="--d: 90ms" class="flex flex-col-reverse justify-end bg-brand-chocolate p-lg sm:p-xl">
+              <dt class="mt-sm font-body-md text-body-md text-inverse-on-surface/80">step-by-step care guides</dt>
+              <dd class="font-headline-lg text-[52px] font-bold leading-none text-primary-fixed-dim sm:text-[64px]" data-count>%count.guides%</dd>
+            </div>
+            <div data-reveal style="--d: 180ms" class="flex flex-col-reverse justify-end bg-brand-chocolate p-lg sm:p-xl">
+              <dt class="mt-sm font-body-md text-body-md text-inverse-on-surface/80">symptoms in the Quick Hair Check</dt>
+              <dd class="font-headline-lg text-[52px] font-bold leading-none text-primary-fixed-dim sm:text-[64px]" data-count>%count.concerns%</dd>
+            </div>
+            <div data-reveal style="--d: 270ms" class="flex flex-col-reverse justify-end bg-brand-chocolate p-lg sm:p-xl">
+              <dt class="mt-sm font-body-md text-body-md text-inverse-on-surface/80">chapters in Locs World</dt>
+              <dd class="font-headline-lg text-[52px] font-bold leading-none text-primary-fixed-dim sm:text-[64px]" data-count>%count.locChapters%</dd>
+            </div>
+          </dl>
+          <div data-reveal class="mt-xl flex flex-col gap-md rounded-3xl border border-white/10 bg-white/5 p-lg sm:flex-row sm:items-center">
+            <span class="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-primary-fixed-dim text-brand-espresso"><svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-steth" /></svg></span>
+            <p class="font-body-md text-body-md text-inverse-on-surface/85"><strong class="font-semibold text-inverse-on-surface">A hair app, not a doctor.</strong> Hair loss, bald patches, a receding hairline and scalp bumps carry a caution in the Quick Hair Check &mdash; most of them <em>instead of</em> a shopping list, because no cosmetic is the answer to those.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================== LOOSE & LOCS ============================== -->
+      <section id="hair" class="relative overflow-hidden py-24">
+        <div class="mx-auto max-w-6xl px-container-padding">
+          <div data-reveal class="mx-auto mb-2xl max-w-2xl text-center">
+            <p class="mb-sm font-label-md text-label-md uppercase tracking-[0.18em] text-secondary">The first question</p>
+            <h2 class="font-headline-lg text-[34px] font-semibold leading-tight tracking-tight text-primary sm:text-[44px]">Loose or locked. Never mixed.</h2>
+            <p class="mt-md font-body-lg text-body-lg text-on-surface-variant">A loc is meant to be matted, so &ldquo;detangle it&rdquo; ruins hair that can&rsquo;t be un-ruined. Afrocoil forks at your first answer, and the two never share a recommendation.</p>
+          </div>
+
+          <div class="grid gap-lg md:grid-cols-2">
+            <article data-reveal style="--d: 0ms" class="group relative overflow-hidden rounded-[32px] bg-surface-container-lowest p-xl shadow-sm ring-1 ring-outline-variant/40 transition-all duration-500 hover:-translate-y-1 hover:shadow-xl">
+              <div class="absolute -right-16 -top-16 h-48 w-48 rounded-full bg-secondary-container/50 transition-transform duration-700 group-hover:scale-125"></div>
+              <span class="relative mb-lg grid h-14 w-14 place-items-center rounded-2xl bg-primary-container text-on-primary-container"><svg class="h-7 w-7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-styles" /></svg></span>
+              <h3 class="relative mb-sm font-headline-lg text-[28px] font-semibold text-primary">Loose natural</h3>
+              <p class="relative mb-lg font-body-md text-body-md text-on-surface-variant">Coils and curls, type 3 through 4. The style library is written for you.</p>
+              <ul class="relative space-y-sm">
+                <li class="flex gap-sm font-body-md text-body-md text-on-surface"><svg class="mt-1 h-4 w-4 shrink-0 text-secondary" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-check" /></svg>%count.styles% contributed styles, by time, category and occasion</li>
+                <li class="flex gap-sm font-body-md text-body-md text-on-surface"><svg class="mt-1 h-4 w-4 shrink-0 text-secondary" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-check" /></svg>Detangling, wash day and night-routine guides</li>
+                <li class="flex gap-sm font-body-md text-body-md text-on-surface"><svg class="mt-1 h-4 w-4 shrink-0 text-secondary" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-check" /></svg>Recommendations that show the criteria they used</li>
+              </ul>
+            </article>
+
+            <article data-reveal style="--d: 120ms" class="group relative overflow-hidden rounded-[32px] bg-brand-espresso p-xl text-inverse-on-surface shadow-sm transition-all duration-500 hover:-translate-y-1 hover:shadow-xl">
+              <svg class="absolute -right-10 bottom-0 h-56 w-56 text-white/5 transition-transform duration-700 group-hover:-translate-x-3" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true"><use href="#i-waves" /></svg>
+              <span class="relative mb-lg grid h-14 w-14 place-items-center rounded-2xl bg-primary-fixed-dim text-brand-espresso"><svg class="h-7 w-7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-waves" /></svg></span>
+              <h3 class="relative mb-sm font-headline-lg text-[28px] font-semibold">Locs World</h3>
+              <p class="relative mb-lg font-body-md text-body-md text-inverse-on-surface/80">Its own section, not a chapter of general care. Your loc stage is estimated from your install date &mdash; labelled as an estimate, and always yours to correct.</p>
+              <ul class="relative flex flex-wrap gap-xs" aria-label="Locs World chapters">%locs.chapters%</ul>
+            </article>
+          </div>
+
+          <!-- The honest gap, said plainly — the same thing the app's FAQ says. -->
+          <div data-reveal class="mx-auto mt-lg flex max-w-3xl flex-col items-center gap-md rounded-3xl border border-dashed border-outline-variant bg-surface-container/60 p-lg text-center sm:flex-row sm:text-left">
+            <span class="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-surface-container-highest text-primary"><svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-heart" /></svg></span>
+            <p class="font-body-md text-body-md text-on-surface-variant"><strong class="font-semibold text-on-surface">No loc styles in the library yet</strong> &mdash; nobody has contributed one, and the app won&rsquo;t pad the shelf with loose-hair technique to hide the gap. Loc wearers get the care guides written for them. The first loc style could be yours.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================== PRIVACY ============================== -->
+      <!-- Taken from /legal/privacy, the FAQ and About in the app. If those change, this changes with them. -->
+      <section id="privacy" class="relative overflow-hidden bg-surface-container-low py-24">
+        <div class="mx-auto grid max-w-6xl gap-2xl px-container-padding lg:grid-cols-2 lg:items-center">
+          <div data-reveal>
+            <p class="mb-sm font-label-md text-label-md uppercase tracking-[0.18em] text-secondary">Privacy</p>
+            <h2 class="font-headline-lg text-[34px] font-semibold leading-tight tracking-tight text-primary sm:text-[44px]">Your hair stays on your phone.</h2>
+            <p class="mt-md font-body-lg text-body-lg text-on-surface-variant">No account, no sign-in, no server holding your history. Your profile, length checks, calendar, photos and saved styles live in one document on your device. Uninstalling the app deletes all of it.</p>
+            <ul class="mt-xl grid gap-sm sm:grid-cols-2">
+              <li class="flex items-center gap-sm rounded-2xl bg-surface-container-lowest px-md py-3 font-body-md text-body-md text-on-surface ring-1 ring-outline-variant/40"><svg class="h-4 w-4 shrink-0 text-secondary" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><use href="#i-x" /></svg>No analytics or tracking</li>
+              <li class="flex items-center gap-sm rounded-2xl bg-surface-container-lowest px-md py-3 font-body-md text-body-md text-on-surface ring-1 ring-outline-variant/40"><svg class="h-4 w-4 shrink-0 text-secondary" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><use href="#i-x" /></svg>No advertising identifiers</li>
+              <li class="flex items-center gap-sm rounded-2xl bg-surface-container-lowest px-md py-3 font-body-md text-body-md text-on-surface ring-1 ring-outline-variant/40"><svg class="h-4 w-4 shrink-0 text-secondary" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><use href="#i-x" /></svg>No crash or telemetry reporting</li>
+              <li class="flex items-center gap-sm rounded-2xl bg-surface-container-lowest px-md py-3 font-body-md text-body-md text-on-surface ring-1 ring-outline-variant/40"><svg class="h-4 w-4 shrink-0 text-secondary" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><use href="#i-x" /></svg>No model calls, ever</li>
+            </ul>
+            <p class="mt-lg font-body-md text-body-md text-on-surface-variant">The app does ask this site whether a newer version is out. That request carries nothing about you, and you can switch it off in the app.</p>
+          </div>
+
+          <!-- The one thing that leaves, drawn as the path it takes. -->
+          <div data-reveal style="--d: 120ms" class="relative rounded-[32px] bg-surface-container-lowest p-lg shadow-xl shadow-brand-chocolate/10 ring-1 ring-outline-variant/40 sm:p-xl">
+            <p class="mb-lg font-label-md text-label-md uppercase tracking-[0.16em] text-on-surface-variant">The one thing that ever leaves</p>
+            <div class="relative">
+              <span class="absolute bottom-6 left-[19px] top-6 w-[2px] bg-outline-variant/50" aria-hidden="true"><span id="flow-fill" class="block h-0 w-full bg-secondary transition-[height] duration-[1.6s] ease-out"></span></span>
+              <ol class="relative space-y-lg">
+                <li class="relative flex gap-md">
+                  <span class="relative z-10 grid h-10 w-10 shrink-0 place-items-center rounded-full bg-primary text-on-primary"><svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-heart" /></svg></span>
+                  <div><p class="font-body-lg text-body-lg font-semibold text-on-surface">You choose to share a style</p><p class="font-body-md text-body-md text-on-surface-variant">Its write-up, its photos, the credit name you pick, and your word that the photos are yours to give.</p></div>
+                </li>
+                <li class="relative flex gap-md">
+                  <span class="relative z-10 grid h-10 w-10 shrink-0 place-items-center rounded-full bg-secondary-container text-on-secondary-container"><svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-phone" /></svg></span>
+                  <div><p class="font-body-lg text-body-lg font-semibold text-on-surface">Saved on your phone first</p><p class="font-body-md text-body-md text-on-surface-variant">Marked <em>Queued</em>. If the send fails it waits and goes later, so a bad connection never costs you the write-up.</p></div>
+                </li>
+                <li class="relative flex gap-md">
+                  <span class="relative z-10 grid h-10 w-10 shrink-0 place-items-center rounded-full bg-secondary text-on-secondary"><svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-send" /></svg></span>
+                  <div><p class="font-body-lg text-body-lg font-semibold text-on-surface">Sent when you tap Share</p><p class="font-body-md text-body-md text-on-surface-variant">Nothing else from your profile goes with it &mdash; not your name, avatar, length history or calendar.</p></div>
+                </li>
+                <li class="relative flex gap-md">
+                  <span class="relative z-10 grid h-10 w-10 shrink-0 place-items-center rounded-full bg-brand-espresso text-inverse-on-surface"><svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-eye" /></svg></span>
+                  <div><p class="font-body-lg text-body-lg font-semibold text-on-surface">A person reads it</p><p class="font-body-md text-body-md text-on-surface-variant">Nothing is published automatically. Withdraw it any time, and its photos are deleted from your phone too.</p></div>
+                </li>
+              </ol>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================== DOWNLOAD ============================== -->
+      <section id="download" class="relative overflow-hidden py-24">
+        <div class="pointer-events-none absolute left-1/2 top-0 h-[600px] w-[900px] -translate-x-1/2 rounded-full bg-primary-fixed-dim/40 blur-3xl"></div>
+        <div class="relative mx-auto max-w-6xl px-container-padding">
+          <div data-reveal class="mx-auto mb-2xl max-w-2xl text-center">
+            <p class="mb-sm font-label-md text-label-md uppercase tracking-[0.18em] text-secondary">Download</p>
+            <h2 class="font-headline-lg text-[34px] font-semibold leading-tight tracking-tight text-primary sm:text-[44px]">Get Afrocoil for Android.</h2>
+            <p class="mt-md font-body-lg text-body-lg text-on-surface-variant">Free to download. No ads, no in-app purchases, no account to make.</p>
+          </div>
+
+          <div data-reveal class="mx-auto grid max-w-5xl overflow-hidden rounded-[36px] bg-surface-container-lowest shadow-2xl shadow-brand-chocolate/15 ring-1 ring-outline-variant/40 md:grid-cols-[1.25fr_1fr]">
+            <div class="p-lg sm:p-2xl">
+              <div class="mb-xl flex items-center gap-md">
+                <img src="../src/assets/brand/afro-mark.webp" alt="" class="h-16 w-16 rounded-2xl bg-background p-1.5" />
+                <div>
+                  <p class="font-headline-lg text-[26px] font-semibold leading-tight text-primary">Afrocoil</p>
+                  <p class="font-body-md text-body-md text-on-surface-variant">Version %release.version% · for Android</p>
+                </div>
+              </div>
+
+              <a href="%release.url%" download="afrocoil-%release.version%.apk" type="application/vnd.android.package-archive" class="btn-shine flex w-full flex-wrap items-center justify-center gap-x-sm rounded-full bg-secondary px-xl py-4 font-label-md text-body-lg font-semibold text-on-secondary shadow-xl shadow-brand-orange/30 transition-all hover:-translate-y-0.5 active:scale-95">
+                <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-download" /></svg>
+                Download the APK
+                <span class="font-body-md text-body-md font-normal opacity-80">%release.size%</span>
+              </a>
+
+              <dl class="mt-xl grid grid-cols-2 gap-x-lg gap-y-md border-t border-outline-variant/40 pt-lg">
+                <div><dt class="font-caption text-caption uppercase tracking-wider text-on-surface-variant">Version</dt><dd class="font-body-md text-body-md text-on-surface">%release.version% (build %release.versionCode%)</dd></div>
+                <div><dt class="font-caption text-caption uppercase tracking-wider text-on-surface-variant">Requires</dt><dd class="font-body-md text-body-md text-on-surface">Android %release.minAndroid% or newer</dd></div>
+                <div><dt class="font-caption text-caption uppercase tracking-wider text-on-surface-variant">Built</dt><dd class="font-body-md text-body-md text-on-surface"><time datetime="%release.releasedKey%">%release.released%</time></dd></div>
+                <div><dt class="font-caption text-caption uppercase tracking-wider text-on-surface-variant">Package</dt><dd class="break-all font-body-md text-body-md text-on-surface">%release.packageId%</dd></div>
+                <div class="col-span-2">
+                  <dt class="font-caption text-caption uppercase tracking-wider text-on-surface-variant">SHA-256</dt>
+                  <dd class="mt-xs flex items-start gap-sm">
+                    <code id="sha" class="min-w-0 flex-1 break-all rounded-lg bg-surface-container px-sm py-1.5 font-mono text-[12px] leading-relaxed text-on-surface-variant">%release.sha256%</code>
+                    <button type="button" id="copy-sha" class="grid h-9 w-9 shrink-0 place-items-center rounded-full text-on-surface-variant transition-colors hover:bg-surface-container active:scale-90" aria-label="Copy checksum">
+                      <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-copy" /></svg>
+                    </button>
+                  </dd>
+                </div>
+              </dl>
+              <p id="copy-status" class="sr-only" aria-live="polite"></p>
+            </div>
+
+            <div class="flex flex-col justify-between gap-xl bg-brand-chocolate p-lg text-inverse-on-surface sm:p-2xl">
+              <!-- Drawn by main.ts from the page's own address, so it works wherever the site is hosted. -->
+              <div id="qr-block" class="hidden">
+                <p class="mb-md font-label-md text-label-md uppercase tracking-[0.16em] text-primary-fixed-dim">On a computer?</p>
+                <div class="inline-block rounded-3xl bg-surface-container-lowest p-md shadow-lg">
+                  <div id="qr" class="h-40 w-40 text-brand-chocolate"></div>
+                </div>
+                <p class="mt-md font-body-md text-body-md text-inverse-on-surface/80">Scan with your phone&rsquo;s camera to open this page there.</p>
+              </div>
+              <ol class="space-y-md">
+                <li class="flex gap-md"><span class="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-primary-fixed-dim font-label-md text-caption text-brand-espresso">1</span><p class="font-body-md text-body-md">Tap <strong>Download the APK</strong> on your Android phone.</p></li>
+                <li class="flex gap-md"><span class="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-primary-fixed-dim font-label-md text-caption text-brand-espresso">2</span><p class="font-body-md text-body-md">Open the file. If Android asks, allow your browser to <strong>install unknown apps</strong>.</p></li>
+                <li class="flex gap-md"><span class="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-primary-fixed-dim font-label-md text-caption text-brand-espresso">3</span><p class="font-body-md text-body-md">Tap <strong>Install</strong>, then open Afrocoil &mdash; it lands on Hair SOS.</p></li>
+              </ol>
+            </div>
+          </div>
+
+          <div data-reveal class="mx-auto mt-lg grid max-w-5xl gap-md sm:grid-cols-2">
+            <div class="flex items-center gap-md rounded-3xl bg-surface-container-lowest/70 p-lg ring-1 ring-outline-variant/40">
+              <span class="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-surface-container-high text-primary"><svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-android" /></svg></span>
+              <p class="font-body-md text-body-md text-on-surface-variant"><strong class="font-semibold text-on-surface">Google Play</strong> &mdash; the listing is on its way. Until then, this download is the way in.</p>
+            </div>
+            <div class="flex items-center gap-md rounded-3xl bg-surface-container-lowest/70 p-lg ring-1 ring-outline-variant/40">
+              <span class="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-surface-container-high text-primary"><svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-phone" /></svg></span>
+              <p class="font-body-md text-body-md text-on-surface-variant"><strong class="font-semibold text-on-surface">iPhone</strong> &mdash; not yet. Afrocoil is Android-only for now.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================== FAQ ============================== -->
+      <!-- The first, second and fifth answers are the app's own FAQ (src/screens/FaqScreen.tsx), shortened. -->
+      <section id="faq" class="py-24">
+        <div class="mx-auto max-w-3xl px-container-padding">
+          <div data-reveal class="mb-2xl text-center">
+            <p class="mb-sm font-label-md text-label-md uppercase tracking-[0.18em] text-secondary">FAQ</p>
+            <h2 class="font-headline-lg text-[34px] font-semibold leading-tight tracking-tight text-primary sm:text-[44px]">Worth knowing first.</h2>
+          </div>
+          <div class="space-y-sm" data-reveal>
+            <details class="rounded-3xl bg-surface-container-lowest ring-1 ring-outline-variant/40" open>
+              <summary class="flex cursor-pointer items-center gap-md p-lg"><span class="flex-1 font-headline-md text-[19px] text-on-surface">Where is my data kept?</span><svg class="faq-icon h-5 w-5 shrink-0 text-outline transition-transform" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><use href="#i-plus" /></svg></summary>
+              <div class="faq-body"><div class="overflow-hidden"><p class="px-lg pb-lg font-body-md text-body-md text-on-surface-variant">On your phone, in one document, and nowhere else. Your hair profile, length history, calendar, photos and saved styles never leave the device &mdash; there&rsquo;s no account, no sign-in and no server holding any of it. Uninstalling the app deletes it. The single exception is a style you deliberately contribute.</p></div></div>
+            </details>
+            <details class="rounded-3xl bg-surface-container-lowest ring-1 ring-outline-variant/40">
+              <summary class="flex cursor-pointer items-center gap-md p-lg"><span class="flex-1 font-headline-md text-[19px] text-on-surface">Is any of this AI-generated?</span><svg class="faq-icon h-5 w-5 shrink-0 text-outline transition-transform" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><use href="#i-plus" /></svg></summary>
+              <div class="faq-body"><div class="overflow-hidden"><p class="px-lg pb-lg font-body-md text-body-md text-on-surface-variant">The words aren&rsquo;t. Every guide, style and step was written by a person and ships inside the app. The style pictures are illustrations generated before release to show each written style front, back and side. There&rsquo;s no chatbot, no generated advice and no model call behind any screen &mdash; which is also why the rescue flow works with the phone in aeroplane mode.</p></div></div>
+            </details>
+            <details class="rounded-3xl bg-surface-container-lowest ring-1 ring-outline-variant/40">
+              <summary class="flex cursor-pointer items-center gap-md p-lg"><span class="flex-1 font-headline-md text-[19px] text-on-surface">Is downloading an APK safe?</span><svg class="faq-icon h-5 w-5 shrink-0 text-outline transition-transform" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><use href="#i-plus" /></svg></summary>
+              <div class="faq-body"><div class="overflow-hidden"><p class="px-lg pb-lg font-body-md text-body-md text-on-surface-variant">Download it only from this page. Android asks before it installs anything from outside an app store, and you can check the file against the SHA-256 checksum above. The app asks for two permissions, each only when you use the feature: the camera or photos when you add a picture, and notifications if you turn on a care reminder.</p></div></div>
+            </details>
+            <details class="rounded-3xl bg-surface-container-lowest ring-1 ring-outline-variant/40">
+              <summary class="flex cursor-pointer items-center gap-md p-lg"><span class="flex-1 font-headline-md text-[19px] text-on-surface">Will it update itself?</span><svg class="faq-icon h-5 w-5 shrink-0 text-outline transition-transform" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><use href="#i-plus" /></svg></summary>
+              <div class="faq-body"><div class="overflow-hidden"><p class="px-lg pb-lg font-body-md text-body-md text-on-surface-variant">It tells you. When a new version is posted here, the app says so the next time you open it, and one tap downloads it. It installs over the old one, so your profile and history stay put &mdash; your phone still asks you to confirm. When Afrocoil reaches Google Play, the Play version will need this one uninstalled first, and because everything lives on your phone, uninstalling clears your profile and history.</p></div></div>
+            </details>
+            <details class="rounded-3xl bg-surface-container-lowest ring-1 ring-outline-variant/40">
+              <summary class="flex cursor-pointer items-center gap-md p-lg"><span class="flex-1 font-headline-md text-[19px] text-on-surface">Why are there no loc styles in the library?</span><svg class="faq-icon h-5 w-5 shrink-0 text-outline transition-transform" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><use href="#i-plus" /></svg></summary>
+              <div class="faq-body"><div class="overflow-hidden"><p class="px-lg pb-lg font-body-md text-body-md text-on-surface-variant">Because nobody has contributed one yet. Every entry was written up by the person who wore it, and the app won&rsquo;t fill the gap with loose-hair technique &mdash; on locs most of it does damage. Loc wearers do get Locs World and the care guides written separately for them.</p></div></div>
+            </details>
+            <details class="rounded-3xl bg-surface-container-lowest ring-1 ring-outline-variant/40">
+              <summary class="flex cursor-pointer items-center gap-md p-lg"><span class="flex-1 font-headline-md text-[19px] text-on-surface">Is it a substitute for a professional?</span><svg class="faq-icon h-5 w-5 shrink-0 text-outline transition-transform" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><use href="#i-plus" /></svg></summary>
+              <div class="faq-body"><div class="overflow-hidden"><p class="px-lg pb-lg font-body-md text-body-md text-on-surface-variant">No. Everything in it is general guidance about hair; it can&rsquo;t see your hair and doesn&rsquo;t know your medical history. Sudden shedding, bald patches, persistent scalp pain or anything getting worse is a question for a dermatologist or a trichologist.</p></div></div>
+            </details>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================== CLOSING CTA ============================== -->
+      <section class="px-container-padding pb-24">
+        <div data-reveal class="relative mx-auto max-w-6xl overflow-hidden rounded-[40px] bg-secondary px-lg py-2xl text-center text-on-secondary sm:px-xl sm:py-24">
+          <img src="../src/assets/brand/afro-mark.webp" alt="" class="float pointer-events-none absolute -bottom-10 -right-10 h-64 w-64 opacity-25 sm:h-80 sm:w-80" />
+          <img src="../src/assets/brand/afro-mark.webp" alt="" class="float pointer-events-none absolute -left-12 -top-12 h-40 w-40 opacity-15 [animation-delay:-3s]" />
+          <h2 class="relative mx-auto max-w-2xl font-headline-lg text-[34px] font-bold leading-tight tracking-tight sm:text-[52px]">Next time your hair won&rsquo;t cooperate, open Afrocoil.</h2>
+          <a href="#download" class="relative mt-xl inline-flex items-center gap-sm rounded-full bg-brand-espresso px-xl py-4 font-label-md text-body-lg font-semibold text-inverse-on-surface shadow-xl transition-all hover:-translate-y-0.5 active:scale-95">
+            <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-download" /></svg>
+            Download for Android
+          </a>
+        </div>
+      </section>
+    </main>
+
+    <footer class="border-t border-outline-variant/50 bg-surface-container-low">
+      <div class="mx-auto flex max-w-6xl flex-col items-center justify-between gap-lg px-container-padding py-xl md:flex-row">
+        <div class="flex items-center gap-sm">
+          <img src="../src/assets/brand/afro-mark.webp" alt="" class="h-8 w-8" />
+          <span class="font-headline-lg text-[20px] font-semibold text-primary">Afrocoil</span>
+          <span class="ml-sm font-caption text-caption text-on-surface-variant">v%release.version%</span>
+        </div>
+        <p class="max-w-md text-center font-caption text-caption text-on-surface-variant md:text-right">This site sets no cookies and loads nothing from anywhere else. General hair-care guidance &mdash; not medical advice.</p>
+      </div>
+    </footer>
+
+    <!-- ============================== PHONE SCREENS ============================== -->
+    <!--
+      Mockups of the real screens, built from their source copy. Images are
+      set by main.ts (data-brand) because Vite does not rewrite URLs inside
+      <template>. The bottom bar is added per screen from [data-navbar];
+      data-nav names the lit tab, -1 for a drawer-only section.
+    -->
+    <template id="screens">
+      <div class="screen flex flex-col" data-screen="front">
+        <div data-appbar></div>
+        <div class="flex min-h-0 flex-1 flex-col items-center justify-center gap-4 overflow-hidden px-5">
+          <p class="font-headline-lg text-[30px] font-bold tracking-tight text-primary">Hair SOS</p>
+          <img data-brand="hero" class="w-[82%]" alt="" />
+          <span class="mt-2 w-full rounded-full bg-secondary py-3 text-center font-label-md text-[15px] font-semibold text-on-secondary shadow-lg">Get Started</span>
+        </div>
+        <div data-nav="0"></div>
+      </div>
+
+      <div class="screen flex flex-col" data-screen="doors">
+        <div data-appbar></div>
+        <div class="min-h-0 flex-1 overflow-hidden px-5 pt-6 text-center">
+          <p class="font-headline-lg text-[24px] font-semibold leading-tight text-primary">What&rsquo;s Your Emergency?</p>
+          <p class="mx-auto mt-2 text-[12.5px] leading-snug text-on-surface-variant">Two ways in. Everything behind them is written down and on this phone, so it works with no signal.</p>
+          <div class="mt-5 space-y-3 text-left">
+            <div class="flex items-center gap-3 rounded-2xl bg-primary-container p-4 text-on-primary-container"><svg class="h-7 w-7 shrink-0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><use href="#i-clock" /></svg><span class="flex-1"><span class="block font-headline-md text-[17px]">Quick Hairstyle</span><span class="block text-[11.5px] leading-snug opacity-90">You have somewhere to be. Pick the time you have and see what fits it.</span></span></div>
+            <div class="flex items-center gap-3 rounded-2xl bg-secondary-container p-4 text-on-secondary-container"><svg class="h-7 w-7 shrink-0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><use href="#i-leaf" /></svg><span class="flex-1"><span class="block font-headline-md text-[17px]">Hair Care</span><span class="block text-[11.5px] leading-snug opacity-90">Know your hair, build a routine, and find the products and styles that suit it.</span></span></div>
+          </div>
+        </div>
+        <div data-nav="0"></div>
+      </div>
+
+      <div class="screen flex flex-col" data-screen="quick">
+        <div class="px-5 pb-2 pt-12"><span class="text-[11px] font-semibold uppercase tracking-wider text-on-surface-variant">‹ Hair SOS</span></div>
+        <div class="min-h-0 flex-1 overflow-hidden px-5">
+          <p class="font-headline-lg text-[24px] font-semibold text-primary">Quick Hairstyle</p>
+          <p class="mt-1 text-[12px] text-on-surface-variant">How long have you got?</p>
+          <div class="mt-3 flex gap-1.5" data-bands></div>
+          <!-- Placeholder tiles, not photographs: see .tile in site.css. -->
+          <div class="mt-4 grid grid-cols-2 gap-2.5" data-band-list></div>
+        </div>
+        <div data-nav="0"></div>
+      </div>
+
+      <div class="screen flex flex-col" data-screen="care">
+        <div data-appbar></div>
+        <div class="min-h-0 flex-1 overflow-hidden px-5">
+          <p class="font-headline-lg text-[24px] font-semibold text-primary">Hair Care</p>
+          <p class="mt-1 text-[12px] leading-snug text-on-surface-variant">What your hair is, what it needs on a schedule, and what to put on it.</p>
+          <p class="mt-3 text-[10px] font-semibold uppercase tracking-widest text-primary">A · Know your hair</p>
+          <div class="mt-2 grid grid-cols-2 gap-2">
+            <div class="rounded-xl bg-surface-container-lowest p-2.5"><p class="text-[10px] text-on-surface-variant">Hair porosity</p><p class="font-headline-md text-[14px] font-semibold text-on-surface">Low</p></div>
+            <div class="rounded-xl bg-surface-container-lowest p-2.5"><p class="text-[10px] text-on-surface-variant">Hair density</p><p class="font-headline-md text-[14px] font-semibold text-on-surface">Medium</p></div>
+            <div class="rounded-xl bg-surface-container-lowest p-2.5"><p class="text-[10px] text-on-surface-variant">Curl pattern</p><p class="font-headline-md text-[14px] font-semibold text-on-surface">4C · Coily</p></div>
+            <div class="rounded-xl bg-surface-container-lowest p-2.5"><p class="text-[10px] text-on-surface-variant">Hair texture</p><p class="font-headline-md text-[14px] font-semibold text-on-surface">Fine</p></div>
+          </div>
+          <div class="mt-3 space-y-2">
+            <div class="flex items-center gap-2.5 rounded-xl bg-surface-container-lowest p-2.5"><span class="grid h-7 w-7 place-items-center rounded-lg bg-secondary-container text-[11px] font-bold text-on-secondary-container">B</span><span class="flex-1 text-[12.5px] font-semibold text-on-surface">Hair routine</span><svg class="h-4 w-4 text-outline" fill="none" stroke="currentColor" stroke-width="2"><use href="#i-calendar" /></svg></div>
+            <div class="flex items-center gap-2.5 rounded-xl bg-surface-container-lowest p-2.5"><span class="grid h-7 w-7 place-items-center rounded-lg bg-secondary-container text-[11px] font-bold text-on-secondary-container">C</span><span class="flex-1 text-[12.5px] font-semibold text-on-surface">Product recommendations</span><svg class="h-4 w-4 text-outline" fill="none" stroke="currentColor" stroke-width="2"><use href="#i-bag" /></svg></div>
+            <div class="flex items-center gap-2.5 rounded-xl bg-surface-container-lowest p-2.5"><span class="grid h-7 w-7 place-items-center rounded-lg bg-secondary-container text-[11px] font-bold text-on-secondary-container">D</span><span class="flex-1 text-[12.5px] font-semibold text-on-surface">Hairstyle recommendations</span><svg class="h-4 w-4 text-outline" fill="none" stroke="currentColor" stroke-width="2"><use href="#i-spark" /></svg></div>
+            <div class="flex items-center gap-2.5 rounded-xl bg-primary-container p-2.5 text-on-primary-container"><span class="grid h-7 w-7 place-items-center rounded-lg bg-white/25 text-[11px] font-bold">E</span><span class="flex-1 text-[12.5px] font-semibold">Something is wrong</span><svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2"><use href="#i-sos" /></svg></div>
+          </div>
+        </div>
+        <div data-nav="-1"></div>
+      </div>
+
+      <div class="screen flex flex-col" data-screen="growth">
+        <div data-appbar></div>
+        <div class="min-h-0 flex-1 overflow-hidden px-5 text-center">
+          <p class="font-headline-lg text-[24px] font-semibold text-primary">Hair Growth</p>
+          <div class="mt-3 grid grid-cols-3 gap-2">
+            <div class="rounded-xl bg-surface-container-lowest p-2"><p class="font-headline-md text-[17px] font-semibold text-on-surface">11.5″</p><p class="text-[9.5px] text-on-surface-variant">Current length</p></div>
+            <div class="rounded-xl bg-surface-container-lowest p-2"><p class="font-headline-md text-[17px] font-semibold text-on-surface">82%</p><p class="text-[9.5px] text-on-surface-variant">Retention</p></div>
+            <div class="rounded-xl bg-surface-container-lowest p-2"><p class="font-headline-md text-[17px] font-semibold text-on-surface">0.4″</p><p class="text-[9.5px] text-on-surface-variant">Per month</p></div>
+          </div>
+          <div class="mt-3 rounded-xl bg-surface-container-lowest p-3">
+            <svg viewBox="0 0 260 110" class="w-full">
+              <path class="text-outline-variant" d="M0 95 H260 M0 65 H260 M0 35 H260" stroke="currentColor" stroke-width=".6" stroke-dasharray="3 4" />
+              <path class="draw text-secondary" d="M8 92 L52 84 L96 78 L140 66 L184 58 L228 44 L252 38" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+              <g class="text-primary" fill="currentColor"><circle cx="8" cy="92" r="3" /><circle cx="52" cy="84" r="3" /><circle cx="96" cy="78" r="3" /><circle cx="140" cy="66" r="3" /><circle cx="184" cy="58" r="3" /><circle cx="228" cy="44" r="3" /><circle cx="252" cy="38" r="3.5" /></g>
+            </svg>
+          </div>
+          <div class="mt-3 space-y-1.5 text-left">
+            <div class="flex items-center gap-2 rounded-lg bg-surface-container-lowest px-3 py-2 text-[12px]"><span class="grid h-5 w-5 place-items-center rounded-full bg-primary text-on-primary"><svg class="h-3 w-3" fill="none" stroke="currentColor" stroke-width="3"><use href="#i-check" /></svg></span><span class="flex-1 font-semibold text-on-surface">Neck length</span><span class="text-on-surface-variant">8″</span></div>
+            <div class="flex items-center gap-2 rounded-lg bg-secondary-container px-3 py-2 text-[12px] text-on-secondary-container"><span class="h-5 w-5 rounded-full border-2 border-secondary"></span><span class="flex-1 font-semibold">Shoulder length</span><span>12″ · est.</span></div>
+            <div class="flex items-center gap-2 rounded-lg bg-surface-container-lowest px-3 py-2 text-[12px]"><span class="h-5 w-5 rounded-full border-2 border-outline-variant"></span><span class="flex-1 text-on-surface">Armpit length</span><span class="text-on-surface-variant">16″</span></div>
+          </div>
+          <p class="mt-2 text-[9.5px] text-outline">Sample figures</p>
+        </div>
+        <div data-nav="2"></div>
+      </div>
+
+      <div class="screen flex flex-col" data-screen="profile">
+        <div data-appbar></div>
+        <div class="min-h-0 flex-1 overflow-hidden px-5">
+          <p class="font-headline-lg text-[24px] font-semibold text-primary">My Hair Profile</p>
+          <div class="mt-3 rounded-xl bg-surface-container-lowest p-3">
+            <div class="flex justify-between text-[11px] font-semibold text-on-surface"><span>Profile</span><span data-meter-label>0%</span></div>
+            <div class="mt-1.5 h-2 overflow-hidden rounded-full bg-surface-container-high"><div class="h-full w-0 rounded-full bg-secondary transition-[width] duration-[1.4s] ease-out" data-meter></div></div>
+          </div>
+          <p class="mt-3 text-[10px] font-semibold uppercase tracking-widest text-primary">Hair type</p>
+          <div class="mt-1.5 grid grid-cols-2 gap-2">
+            <span class="rounded-xl bg-primary py-2.5 text-center text-[12px] font-semibold text-on-primary">Loose Natural</span>
+            <span class="rounded-xl bg-surface-container-lowest py-2.5 text-center text-[12px] font-semibold text-on-surface">Locs</span>
+          </div>
+          <div class="mt-3 space-y-1.5">
+            <div class="flex justify-between rounded-lg bg-surface-container-lowest px-3 py-2 text-[12px]"><span class="text-on-surface-variant">Curl Pattern</span><span class="font-semibold text-on-surface">4C</span></div>
+            <div class="flex justify-between rounded-lg bg-surface-container-lowest px-3 py-2 text-[12px]"><span class="text-on-surface-variant">Porosity</span><span class="font-semibold text-on-surface">Low</span></div>
+            <div class="flex justify-between rounded-lg bg-surface-container-lowest px-3 py-2 text-[12px]"><span class="text-on-surface-variant">Density</span><span class="font-semibold text-on-surface">Medium</span></div>
+            <div class="flex justify-between rounded-lg bg-surface-container-lowest px-3 py-2 text-[12px]"><span class="text-on-surface-variant">Scalp</span><span class="font-semibold text-on-surface">Balanced</span></div>
+          </div>
+          <span class="mt-4 block rounded-full bg-primary py-2.5 text-center text-[12.5px] font-semibold text-on-primary">Take the hair quiz</span>
+        </div>
+        <div data-nav="3"></div>
+      </div>
+
+      <div class="flex items-center justify-between px-5 pb-2 pt-12" data-appbar-source>
+        <svg class="h-5 w-5 text-primary" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><use href="#i-menu" /></svg>
+        <span class="flex items-center gap-1.5"><img data-brand="mark" class="h-6 w-6" alt="" /><span class="font-headline-lg text-[17px] font-semibold text-primary">Afrocoil</span></span>
+        <svg class="h-5 w-5 text-primary" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><use href="#i-search" /></svg>
+      </div>
+
+      <!-- The bottom bar: four tabs, the short labels, in AppLayout's order. -->
+      <div class="grid grid-cols-4 border-t border-outline-variant/40 bg-surface-container-low px-2 pb-5 pt-2" data-navbar>
+        <span class="flex flex-col items-center gap-0.5 text-[10px] font-semibold"><svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#i-sos" /></svg>SOS</span>
+        <span class="flex flex-col items-center gap-0.5 text-[10px] font-semibold"><svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#i-styles" /></svg>Styles</span>
+        <span class="flex flex-col items-center gap-0.5 text-[10px] font-semibold"><svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#i-chart" /></svg>Growth</span>
+        <span class="flex flex-col items-center gap-0.5 text-[10px] font-semibold"><svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#i-user" /></svg>Profile</span>
+      </div>
+    </template>
+
+    <script type="module" src="./main.ts"></script>
+  </body>
+</html>

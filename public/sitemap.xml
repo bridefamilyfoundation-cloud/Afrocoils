@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Hash routing means every screen is served by the same document, so a
+  crawler sees one URL and the rest are fragments it will not follow.
+  That is a deliberate trade: hash routing is what stops the Capacitor
+  WebView 404ing on reload, and the app is the product.
+
+  So this lists the one address that genuinely exists as a document.
+  Adding the fragments would claim pages a crawler cannot fetch.
+-->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://afro-coily-hair.vercel.app/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+</urlset>

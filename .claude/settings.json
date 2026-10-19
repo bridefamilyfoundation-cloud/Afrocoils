@@ -1,0 +1,32 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(./gradlew.bat -q :app:properties)",
+      "Bash(./gradlew.bat -I \"C:/Users/THEOPHILUS-SOLOMON/AppData/Local/Temp/claude/c--Users-THEOPHILUS-SOLOMON-Desktop-AFro-Coily-Hair/73c5fcf8-4cd7-4e80-ac43-943e3c1d7fb4/scratchpad/print-version.gradle\" -q help)",
+      "Bash(mv keystore.properties keystore.properties.bak)",
+      "Bash(./gradlew.bat :app:bundleRelease --dry-run)",
+      "Bash(android/gradlew.bat -p android bundleRelease)",
+      "PowerShell(npm run android:bundle 2>&1)",
+      "PowerShell(\"=== AAB ===\")",
+      "PowerShell(npm run android:build 2>&1)",
+      "Bash(cp \"C:/Users/THEOPHILUS-SOLOMON/AppData/Local/Temp/claude/c--Users-THEOPHILUS-SOLOMON-Desktop-AFro-Coily-Hair/3aea8d0f-d92a-4d50-99ea-b2133936f07b/scratchpad/check-constraints.ts\" ./_check.ts)",
+      "Bash(sed -i \"s|'../../../../../../Desktop/AFro-Coily Hair/api/_shared.ts'|'./api/_shared.ts'|\" ./_check.ts)",
+      "Bash(node --experimental-strip-types ./_check.ts)",
+      "Bash(./node_modules/.bin/rolldown ./_check.ts --format esm --platform node --external @anthropic-ai/sdk -d ./_checkout)",
+      "Bash(node ./_checkout/_check.js)",
+      "Bash(grep -iE \"\\\\.env$|\\\\.env\\\\.|keystore|\\\\.jks$|local\\\\.properties|secret|credential|\\\\.pem$|\\\\.key$\")",
+      "Bash(grep -iE \"\\\\.env$|keystore\\\\.properties$|\\\\.jks$|local\\\\.properties|\\\\.keystore$\")",
+      "Bash(mkdir -p /tmp/apkcheck)",
+      "Bash(rm -rf /tmp/apkcheck/*)",
+      "Bash(unzip -o -q android/app/build/outputs/apk/release/app-release.apk -d /tmp/apkcheck \"assets/public/*\")",
+      "Bash(grep -ohE '\"[^\"]*\\\\/api\\\\/\\(sos|chat\\)\"|`[^`]*\\\\/api\\\\/\\(sos|chat\\)`' /tmp/apkcheck/assets/public/assets/*.js)",
+      "Bash(unzip -l android/app/build/outputs/apk/release/app-release.apk)",
+      "Bash(awk '{print $4}')",
+      "Bash(rm -rf /tmp/apkcheck)",
+      "Bash(unzip -o -q android/app/build/outputs/apk/release/app-release.apk -d /tmp/apkcheck)",
+      "Bash(rm -f apk-output/afro-coily-hair-v0.1.0-*.apk)",
+      "Bash(cp android/app/build/outputs/apk/release/app-release.apk apk-output/afro-coily-hair-0.1.0-release.apk)",
+      "Bash(cp android/app/build/outputs/apk/debug/app-debug.apk apk-output/afro-coily-hair-0.1.0-debug.apk)"
+    ]
+  }
+}

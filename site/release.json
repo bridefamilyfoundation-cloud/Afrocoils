@@ -1,0 +1,12 @@
+{
+  "version": "0.2.0",
+  "versionCode": 2,
+  "packageId": "com.afrocoilyhair.app",
+  "minSdk": 24,
+  "minAndroid": "7.0",
+  "bytes": 7084629,
+  "sha256": "d1fd5231e5a71e167bd62111a8c271c2d453017e3f65e1e8b5d1a3744633083a",
+  "released": "2026-10-04",
+  "url": "https://github.com/bridefamilyfoundation-cloud/Afrocoils/releases/download/v0.2.0/afrocoil-0.2.0.apk",
+  "notes": []
+}

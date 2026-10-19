@@ -1,0 +1,45 @@
+node_modules/
+dist/
+.vercel/
+*.local
+.env
+.env.*
+!.env.example
+
+# Capacitor / Android build output
+android/app/build/
+android/build/
+android/.gradle/
+android/local.properties
+android/app/src/main/assets/public/
+android/capacitor-cordova-android-plugins/
+*.apk
+*.aab
+*.keystore
+
+# Editors / OS
+.vscode/*
+!.vscode/extensions.json
+.idea/
+.DS_Store
+Thumbs.db
+
+# Android signing (key material must never be committed)
+android/keystore.properties
+android/*.keystore
+android/*.jks
+apk-output/
+
+# TypeScript incremental build artifacts
+*.tsbuildinfo
+
+# Landing site build output (the APK under site/public/download is covered by *.apk)
+dist-site/
+
+# Raw source imagery. Large, and much of it is salon/social photography that is
+# not cleared for release (see src/assets/images/README.md). The processed
+# .webp slots under src/assets/images/ are what ships; these stay local.
+/Claude outputs/
+/Locs Hairstyle Library images/
+/Locs Images/
+/Locs PDF images/

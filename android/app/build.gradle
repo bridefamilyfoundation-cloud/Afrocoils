@@ -1,0 +1,121 @@
+import groovy.json.JsonSlurper
+
+apply plugin: 'com.android.application'
+
+// Release signing is driven by android/keystore.properties, which is gitignored
+// so no key material or password is committed. When the file is absent (fresh
+// clone, CI without secrets) the release build still runs and simply produces
+// an unsigned APK rather than failing.
+def keystorePropertiesFile = rootProject.file("keystore.properties")
+def keystoreProperties = new Properties()
+def hasSigningConfig = keystorePropertiesFile.exists()
+if (hasSigningConfig) {
+    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+}
+
+// An unsigned APK is a usable dev artifact, but an unsigned AAB is not — Play
+// rejects it at upload. Fail the bundle early with an actionable message rather
+// than after a full build.
+gradle.taskGraph.whenReady { graph ->
+    if (!hasSigningConfig && graph.allTasks.any { it.name == "bundleRelease" }) {
+        throw new GradleException(
+            "bundleRelease needs a signing key: android/keystore.properties is missing.\n" +
+            "Copy android/keystore.properties.example and point it at your Play upload keystore.\n" +
+            "See docs/play-release.md."
+        )
+    }
+}
+
+// versionName tracks package.json so there is one place to bump the marketing
+// version. versionCode is deliberate and separate: Play requires it to increase
+// on every upload, including re-uploads of an otherwise identical build.
+def appVersionName = new JsonSlurper().parse(rootProject.file("../package.json")).version
+def appVersionCode = Integer.parseInt(project.findProperty("appVersionCode") ?: "1")
+
+android {
+    namespace = "com.afrocoilyhair.app"
+    compileSdk = rootProject.ext.compileSdkVersion
+    defaultConfig {
+        applicationId "com.afrocoilyhair.app"
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+        versionCode appVersionCode
+        versionName appVersionName
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        aaptOptions {
+             // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
+             // Default: https://android.googlesource.com/platform/frameworks/base/+/282e181b58cf72b6ca770dc7ca5f91f135444502/tools/aapt/AaptAssets.cpp#61
+            ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
+        }
+    }
+    signingConfigs {
+        if (hasSigningConfig) {
+            release {
+                storeFile rootProject.file(keystoreProperties['storeFile'])
+                storePassword keystoreProperties['storePassword']
+                keyAlias keystoreProperties['keyAlias']
+                keyPassword keystoreProperties['keyPassword']
+            }
+        }
+    }
+
+    buildTypes {
+        // Debug builds sign with the release key too, when there is one.
+        // Left to Gradle, a debug APK is signed by this machine's
+        // ~/.android/debug.keystore, and Android refuses to install it
+        // over a release build (or the other way round) because the
+        // signatures differ — "App not installed", and the only way past
+        // it is uninstalling, which deletes the user's profile.
+        debug {
+            if (hasSigningConfig) {
+                signingConfig signingConfigs.release
+            }
+        }
+        release {
+            if (hasSigningConfig) {
+                signingConfig signingConfigs.release
+            }
+            // R8 code shrinking + unused-resource removal. Capacitor's own
+            // classes are kept via proguard-rules.pro, since they are reached
+            // reflectively from the WebView bridge and R8 cannot see that.
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    packagingOptions {
+        resources {
+            excludes += ['META-INF/*.kotlin_module', 'META-INF/*.version', 'DebugProbesKt.bin']
+        }
+    }
+}
+
+repositories {
+    flatDir{
+        dirs '../capacitor-cordova-android-plugins/src/main/libs', 'libs'
+    }
+}
+
+dependencies {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation "androidx.appcompat:appcompat:$androidxAppCompatVersion"
+    implementation "androidx.coordinatorlayout:coordinatorlayout:$androidxCoordinatorLayoutVersion"
+    implementation "androidx.core:core-splashscreen:$coreSplashScreenVersion"
+    implementation project(':capacitor-android')
+    testImplementation "junit:junit:$junitVersion"
+    androidTestImplementation "androidx.test.ext:junit:$androidxJunitVersion"
+    androidTestImplementation "androidx.test.espresso:espresso-core:$androidxEspressoCoreVersion"
+    implementation project(':capacitor-cordova-android-plugins')
+}
+
+apply from: 'capacitor.build.gradle'
+
+try {
+    def servicesJSON = file('google-services.json')
+    if (servicesJSON.text) {
+        apply plugin: 'com.google.gms.google-services'
+    }
+} catch(Exception e) {
+    logger.info("google-services.json not found, google-services plugin not applied. Push Notifications won't work")
+}

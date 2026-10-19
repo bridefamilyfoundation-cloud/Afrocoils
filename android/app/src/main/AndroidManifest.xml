@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+
+        <activity
+            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale|smallestScreenSize|screenLayout|uiMode|navigation|density"
+            android:name=".MainActivity"
+            android:label="@string/title_activity_main"
+            android:theme="@style/AppTheme.NoActionBarLaunch"
+            android:launchMode="singleTask"
+            android:exported="true">
+
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+
+        </activity>
+
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths"></meta-data>
+        </provider>
+    </application>
+
+    <!-- Permissions -->
+
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <!--
+        Style photos. Both are requested at runtime, only when the user
+        taps "take photo" or "from gallery" on one of their own styles —
+        never at launch.
+    -->
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+    <!--
+        Superseded by READ_MEDIA_IMAGES on API 33+. Capped so the app does
+        not ask newer devices for broad storage access it does not use —
+        photos are written to the app's own private directory.
+    -->
+    <uses-permission
+        android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32" />
+
+    <!--
+        The camera is optional. Without this the Play Store would treat the
+        app as requiring camera hardware and hide it from devices that have
+        none; picking from the gallery works either way.
+    -->
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
+
+    <!--
+        SCHEDULE_EXACT_ALARM is merged in by @capacitor/local-notifications
+        and removed here deliberately.
+
+        Google Play restricts it to apps whose core function is alarms or
+        calendars, which a hair-care reminder is not — declaring it invites
+        a policy rejection. The plugin's `setExactIfPossible` already checks
+        `canScheduleExactAlarms()` and falls back to an inexact alarm, so
+        removing it costs nothing but a delivery window of a few minutes on
+        a reminder the user chose the hour for.
+
+        RECEIVE_BOOT_COMPLETED and POST_NOTIFICATIONS are left in place:
+        the first restores pending reminders after a reboot, the second is
+        required from Android 13 and is requested at runtime the moment the
+        user switches a reminder on.
+    -->
+    <uses-permission
+        android:name="android.permission.SCHEDULE_EXACT_ALARM"
+        tools:node="remove" />
+</manifest>

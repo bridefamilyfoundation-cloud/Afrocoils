@@ -1,0 +1,235 @@
+/*
+ * Fonts are the app's, from the same npm packages, served with the page.
+ * Latin only, as in src/index.css. Literata adds the 500 italic the hero
+ * sets its second line in.
+ */
+@import '@fontsource/literata/latin-500.css';
+@import '@fontsource/literata/latin-500-italic.css';
+@import '@fontsource/literata/latin-600.css';
+@import '@fontsource/literata/latin-700.css';
+@import '@fontsource/be-vietnam-pro/latin-400.css';
+@import '@fontsource/be-vietnam-pro/latin-500.css';
+@import '@fontsource/be-vietnam-pro/latin-600.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 88px;
+  }
+  body {
+    -webkit-font-smoothing: antialiased;
+  }
+}
+
+@layer components {
+  /*
+   * Reveal on scroll. Hidden only once main.ts has marked the document as
+   * running, so with scripts off the page is fully visible, not blank.
+   */
+  .js [data-reveal] {
+    opacity: 0;
+    transform: translateY(28px);
+    transition:
+      opacity 0.8s cubic-bezier(0.2, 0.7, 0.2, 1),
+      transform 0.8s cubic-bezier(0.2, 0.7, 0.2, 1);
+    transition-delay: var(--d, 0ms);
+  }
+  .js [data-reveal].is-in {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* Hero entrance, staggered by --d. */
+  .js .rise {
+    opacity: 0;
+    transform: translateY(24px);
+    animation: rise 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) forwards;
+    animation-delay: var(--d, 0ms);
+  }
+
+  /* The illustration breathes; the ring behind it turns; the chips bob. */
+  .float {
+    animation: float 7s ease-in-out infinite;
+  }
+  .spin-slow {
+    animation: spin 60s linear infinite;
+  }
+  .bob {
+    animation: bob 5s ease-in-out infinite;
+    animation-delay: var(--d, 0ms);
+  }
+
+  /* The promise strip. Two copies of the track, so -50% is seamless. */
+  .marquee {
+    mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent);
+  }
+  .marquee-track {
+    animation: marquee 38s linear infinite;
+  }
+  .marquee:hover .marquee-track {
+    animation-play-state: paused;
+  }
+
+  /* Phone screens cross-fade and lift as the story advances. */
+  .screen {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transform: translateY(16px) scale(0.985);
+    transition:
+      opacity 0.55s ease,
+      transform 0.55s cubic-bezier(0.2, 0.7, 0.2, 1);
+    pointer-events: none;
+  }
+  .screen.is-active {
+    opacity: 1;
+    transform: none;
+  }
+
+  @media (min-width: 1024px) {
+    .step {
+      opacity: 0.35;
+      transition: opacity 0.4s ease;
+    }
+    .step.is-active {
+      opacity: 1;
+    }
+  }
+  .step-bar {
+    transform-origin: top;
+    transform: scaleY(0);
+    transition: transform 0.5s cubic-bezier(0.2, 0.7, 0.2, 1);
+  }
+  .step.is-active .step-bar,
+  .step-bar.is-in {
+    transform: scaleY(1);
+  }
+
+  /*
+   * Placeholder tiles stand in for style photographs, as the app's own
+   * placeholders do. None of the imported style photos are cleared for
+   * release (src/assets/images/README.md), so none appear here either.
+   */
+  .tile {
+    background: repeating-linear-gradient(
+      135deg,
+      theme('colors.surface-container-high') 0 6px,
+      theme('colors.surface-container-highest') 6px 12px
+    );
+  }
+
+  /* The growth line draws itself when its screen comes forward. */
+  .draw {
+    stroke-dasharray: 400;
+    stroke-dashoffset: 400;
+    transition: stroke-dashoffset 1.6s cubic-bezier(0.2, 0.7, 0.2, 1) 0.2s;
+  }
+  .is-active .draw {
+    stroke-dashoffset: 0;
+  }
+
+  .btn-shine {
+    position: relative;
+    overflow: hidden;
+  }
+  .btn-shine::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(110deg, transparent 30%, rgb(255 255 255 / 0.35) 50%, transparent 70%);
+    transform: translateX(-120%);
+    animation: shine 4.5s ease-in-out infinite 1.6s;
+  }
+
+  .grain {
+    background-image: radial-gradient(theme('colors.brand-chocolate / 6%') 1px, transparent 1px);
+    background-size: 4px 4px;
+  }
+
+  /* FAQ: native <details>, with the body easing open. */
+  details > summary {
+    list-style: none;
+  }
+  details > summary::-webkit-details-marker {
+    display: none;
+  }
+  details[open] .faq-icon {
+    transform: rotate(45deg);
+  }
+  .faq-body {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.35s ease;
+  }
+  details[open] .faq-body {
+    grid-template-rows: 1fr;
+  }
+}
+
+@keyframes rise {
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0) rotate(-1deg);
+  }
+  50% {
+    transform: translateY(-14px) rotate(1deg);
+  }
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+@keyframes marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+@keyframes shine {
+  0%,
+  60% {
+    transform: translateX(-120%);
+  }
+  100% {
+    transform: translateX(120%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+  .js [data-reveal],
+  .js .rise {
+    opacity: 1;
+    transform: none;
+  }
+  .draw {
+    stroke-dashoffset: 0;
+  }
+  html {
+    scroll-behavior: auto;
+  }
+}

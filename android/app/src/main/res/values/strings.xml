@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Afrocoil</string>
+    <string name="title_activity_main">Afrocoil</string>
+    <string name="package_name">com.afrocoilyhair.app</string>
+    <string name="custom_url_scheme">com.afrocoilyhair.app</string>
+</resources>

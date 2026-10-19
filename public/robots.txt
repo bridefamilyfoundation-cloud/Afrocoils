@@ -1,0 +1,15 @@
+# Afrocoil
+#
+# The product is an Android app; this host serves the same bundle as a web
+# build plus the one API route it uses. Crawling is welcome — there is
+# nothing here that is private, and nothing that costs us to serve.
+#
+# /api/ is disallowed because it is a POST-only endpoint that receives
+# community style submissions. There is nothing there to index, and a
+# crawler hitting it only burns the rate limiter's daily allowance.
+
+User-agent: *
+Allow: /
+Disallow: /api/
+
+Sitemap: https://afro-coily-hair.vercel.app/sitemap.xml

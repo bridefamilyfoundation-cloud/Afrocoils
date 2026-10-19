@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en" class="light">
+  <head>
+    <meta charset="UTF-8" />
+    <!-- viewport-fit=cover + the safe-area padding in index.css keeps content
+         clear of the Android gesture bar and any display cutout.
+
+         No user-scalable=no. The app ships a lot of long-form reading —
+         the care guides, the twenty-four-entry hair check, the privacy
+         policy and the terms — and blocking pinch zoom takes the one
+         gesture a low-vision reader uses on all of it. The layout is
+         already fluid to 400px, so it has nothing to lose by allowing
+         zoom. -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#E8D5C0" />
+    <!-- The same illustration the app bar and the front page draw, cut from
+         the one artwork file. See the README before replacing it: every
+         raster has to be regenerated together. -->
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+    <link rel="icon" type="image/png" sizes="512x512" href="/favicon-512.png" />
+    <link rel="apple-touch-icon" href="/favicon-180.png" />
+    <title>Afrocoil</title>
+  </head>
+  <body class="bg-background text-on-background font-body-md">
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
