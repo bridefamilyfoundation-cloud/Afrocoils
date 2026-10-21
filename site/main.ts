@@ -9,6 +9,7 @@
 import QRCode from 'qrcode'
 import heroUrl from '../src/assets/brand/afro-hero.webp'
 import markUrl from '../src/assets/brand/afro-mark.webp'
+import wordmarkUrl from '../src/assets/brand/afro-wordmark.webp'
 import { bands } from 'virtual:site-facts'
 
 const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches
@@ -54,7 +55,8 @@ function buildScreen(name: ScreenName): HTMLElement {
   navSlot.replaceWith(bar)
 
   screen.querySelectorAll<HTMLImageElement>('img[data-brand]').forEach((img) => {
-    img.src = img.dataset.brand === 'hero' ? heroUrl : markUrl
+    const brand = img.dataset.brand
+    img.src = brand === 'hero' ? heroUrl : brand === 'wordmark' ? wordmarkUrl : markUrl
   })
   if (name === 'quick') setupQuick(screen)
   return screen

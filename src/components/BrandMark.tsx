@@ -1,31 +1,32 @@
 import heroUrl from '../assets/brand/afro-hero.webp'
 import markUrl from '../assets/brand/afro-mark.webp'
+import wordmarkUrl from '../assets/brand/afro-wordmark.webp'
 
 /**
- * The AfroCoils illustration, and the name beside it.
+ * The AfroCoils logo, cut three ways.
  *
- * One drawing, used everywhere the app identifies itself: the front
- * page, the app bar, the drawer, the footer, the favicon and the Android
- * launcher icon. It is the supplied artwork rather than something drawn
- * in code — a logo is a fixed thing, and an approximation of it in SVG
- * would be a second, slightly different logo that drifts away from the
- * real one.
+ * One file — `src/assets/brand/afrocoils-logo.png`, the profile
+ * illustration above the "AfroCoils" wordmark — used everywhere the app
+ * identifies itself: the front page, the app bar, the drawer, the
+ * footer, the favicon, the launcher icon and the splash screen. It is the
+ * supplied artwork rather than something drawn in code — a logo is a
+ * fixed thing, and an approximation of it in SVG would be a second,
+ * slightly different logo that drifts away from the real one.
  *
- * Two cuts of the same file, because one does not survive both sizes:
+ * - **`hero`** is the whole logo, wordmark included, for anywhere it is
+ *   the picture rather than a badge: the front page and the splash.
+ * - **`mark`** is the illustration alone. At the 32px the app bar draws
+ *   it at, the wordmark under it would be unreadable, so it is set
+ *   beside it instead — see `BrandLockup`.
+ * - The **wordmark** is the logo's own lettering, so the name in the app
+ *   bar is the name in the logo rather than a retyping of it in the UI
+ *   face.
  *
- * - **`hero`** is the whole illustration, orange burst included, for
- *   anywhere it is the picture rather than a badge. The front page used
- *   to be this; it is a photo collage now, after the reference mockup.
- * - **`mark`** is cropped to the hair. The burst is nearly half the width
- *   of the full frame, so at the 32px the app bar draws it at, the
- *   uncropped version is an orange smudge with a dot in the middle.
- *
- * Both are pre-processed: the artwork's white field is knocked out so
- * the image sits on the cream page rather than in a white tile of its
- * own. If the artwork is ever replaced, every raster cut from it — the
- * favicon, the launcher icons, the splash screens — has to be
- * regenerated in the same pass, or the app ends up with four logos that
- * disagree. See the README.
+ * All three are cut by `npm run brand:import`, which keys the logo's
+ * cream field out so it sits on the page's cream rather than in a tile
+ * of a slightly different one. Replace the artwork by re-running that
+ * script: it regenerates the favicons, the launcher icons and the splash
+ * screens in the same pass, or the app ends up with logos that disagree.
  */
 export function AfroMark({
   className = '',
@@ -68,17 +69,14 @@ export default function BrandLockup({
   className?: string
 }) {
   const mark = size === 'lg' ? 'h-12 w-12' : size === 'md' ? 'h-10 w-10' : 'h-8 w-8'
-  const text =
-    size === 'lg'
-      ? 'font-headline-lg text-headline-lg'
-      : size === 'md'
-        ? 'font-headline-lg-mobile text-headline-lg-mobile'
-        : 'font-headline-md text-headline-md'
+  const word = size === 'lg' ? 'h-9' : size === 'md' ? 'h-8' : 'h-7'
 
   return (
-    <span className={`flex items-center gap-sm ${className}`}>
+    <span className={`flex items-center gap-xs ${className}`}>
       <AfroMark className={`${mark} shrink-0`} />
-      <span className={`${text} tracking-tight text-primary`}>AfroCoils</span>
+      {/* The lettering is a picture of the name; the name itself is
+          here for screen readers and for anything that copies text. */}
+      <img src={wordmarkUrl} alt="AfroCoils" className={`${word} w-auto`} draggable={false} />
     </span>
   )
 }

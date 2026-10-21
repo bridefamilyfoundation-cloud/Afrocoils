@@ -456,17 +456,19 @@ prototype markup drop into TSX almost unchanged.
 
 Four deliberate departures from the prototype:
 
-1. **One illustration, cut many ways.** The supplied artwork lives at
-   `src/assets/brand/` and `BrandMark.tsx` serves two cuts of it: `hero`, the
-   whole thing, which fills the front page, and `mark`, cropped to the hair,
-   for the app bar, drawer and footer — the orange burst is half the frame
-   and at 32px the uncropped version is a smudge. Its white field is knocked
-   out at import time (flooded in from the border, so the teeth and the
-   highlights inside the hair survive) because the page is cream, not white.
-   The favicon, the Android launcher icons and the splash screens are cut
-   from the same file. **Replace the artwork and all of them have to be
-   regenerated in one pass**, or the app ships four logos that disagree; the
-   importer is `import-brand.mjs`, kept with the session scratch.
+1. **One logo, cut many ways.** The supplied logo is
+   `src/assets/brand/afrocoils-logo.png` — the illustration above the
+   "AfroCoils" wordmark — and `BrandMark.tsx` serves three cuts of it:
+   `hero`, the whole logo, beside the title on the front page; `mark`, the
+   illustration alone, for the app bar, drawer and footer; and the wordmark,
+   set beside the mark there so the name is the logo's own lettering rather
+   than a retyping of it. Its cream field is keyed out by colour across the
+   whole image (not flooded from the border, which would leave the letter
+   counters filled) because it is not quite the page's cream. The favicon,
+   the Android launcher icons and the splash screens are cut from the same
+   file. **Replace the artwork with `npm run brand:import [path]`**, which
+   regenerates all of them in one pass, or the app ships logos that
+   disagree. It warns when the source is too small for the splash screens.
 2. **Fonts and icons are bundled, not CDN-loaded.** The prototype used
    `<link>` tags to Google Fonts. A Capacitor app runs from local assets and has
    to render correctly with no network, so Plus Jakarta Sans and Material

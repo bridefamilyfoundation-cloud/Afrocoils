@@ -1,6 +1,7 @@
 import { useRef } from 'react'
 import { Link } from 'react-router-dom'
 import { styleCover } from '../assets/imagery'
+import { AfroMark } from '../components/BrandMark'
 import Icon, { type IconName } from '../components/Icon'
 import PrototypeImage from '../components/PrototypeImage'
 import { STYLES } from '../content/styles'
@@ -117,18 +118,24 @@ export default function EmergencyScreen() {
           })}
         </div>
 
-        <div className="mt-xl flex-1">
-          <h1 className="font-display-lg text-display-lg text-tertiary">
-            Hair
-            <br />
-            <span className="inline-flex items-center gap-sm">
-              <span className="text-on-surface-variant">SOS</span>
-              <Sparkle className="h-8 w-8 text-tertiary" />
-            </span>
-          </h1>
-          <p className="mt-md max-w-[16rem] font-body-md text-body-md text-on-surface-variant">
-            Quick styles and real care, for the moment your hair can&rsquo;t wait.
-          </p>
+        {/* The full logo sits in the space the left-aligned title leaves,
+            so it costs the first screen no height. Decoration, like the
+            collage: the app bar already names the app. */}
+        <div className="mt-xl flex flex-1 items-start justify-between gap-md">
+          <div>
+            <h1 className="font-display-lg text-display-lg text-tertiary">
+              Hair
+              <br />
+              <span className="inline-flex items-center gap-sm">
+                <span className="text-on-surface-variant">SOS</span>
+                <Sparkle className="h-8 w-8 text-tertiary" />
+              </span>
+            </h1>
+            <p className="mt-md max-w-[16rem] font-body-md text-body-md text-on-surface-variant">
+              Quick styles and real care, for the moment your hair can&rsquo;t wait.
+            </p>
+          </div>
+          <AfroMark variant="hero" className="w-[38%] max-w-[10rem] shrink-0" />
         </div>
 
         {/* Scrolls rather than navigates — the doors are on this page.

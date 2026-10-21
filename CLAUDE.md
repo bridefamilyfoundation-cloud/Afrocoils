@@ -378,16 +378,19 @@ picture; this file is the short version of what to keep in mind when editing.
 - New icons must be added to `src/components/icon-codepoints.json` with their
   Material Symbols codepoint — `IconName` is derived from that file, and the
   font subset is built from it, so an unlisted icon is a type error.
-- **The brand illustration is one file, cut many ways.** The artwork is in
-  `src/assets/brand/`; `BrandMark.tsx` serves `hero` (the whole thing, for
-  the front page) and `mark` (cropped to the hair, for the app bar, drawer
-  and footer — uncropped, the orange burst swallows it at 32px).
-  `<BrandLockup>` draws the mark beside the name so nothing repeats the
-  words "AfroCoils", which is how the prototype ended up with a footer
-  that said something else. The favicon in `public/`, the launcher icons
-  and the splash screens under `android/app/src/main/res/` are cut from the
-  same artwork, with its white field knocked out so it sits on cream. If
-  the artwork is replaced, regenerate every one of them in the same pass.
+- **The brand logo is one file, cut many ways.** The artwork is
+  `src/assets/brand/afrocoils-logo.png`; `BrandMark.tsx` serves `hero`
+  (the whole logo, wordmark included, beside the front page's title) and
+  `mark` (the illustration alone, for the app bar, drawer and footer).
+  `<BrandLockup>` draws the mark beside the logo's own wordmark, cut from
+  the same file, so nothing retypes the words "AfroCoils" — which is how
+  the prototype ended up with a footer that said something else. The
+  favicon in `public/`, the launcher icons and the splash screens under
+  `android/app/src/main/res/` are cut from the same artwork, with its
+  cream field keyed out. Replace the artwork with `npm run brand:import`,
+  which regenerates every one of them in the same pass; never edit one by
+  hand. The launcher icon and splash are native, so they reach phones
+  only through `npm run apk`, not a pushed update.
 - Lengths are stored canonically in inches; `lengthUnit` is display only.
   Convert at the edges with `toDisplay`/`fromDisplay` from `src/lib/growth.ts`,
   never by rewriting stored rows.
