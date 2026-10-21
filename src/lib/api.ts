@@ -12,8 +12,10 @@ import type { SubmissionRequest, SubmissionResponse } from './types'
  * phone to mean anything.
  *
  * In the browser `BASE_URL` is empty and the request hits the Vite dev
- * proxy / same origin. In the APK there is no origin to speak of, so
- * VITE_API_BASE_URL must point at the deployed function.
+ * proxy. In the APK there is no origin to speak of, so VITE_API_BASE_URL
+ * must point at the project's Edge Functions —
+ * `https://<ref>.supabase.co/functions/v1` — and `/submissions` is the
+ * function's name under it.
  */
 const BASE_URL = import.meta.env.VITE_API_BASE_URL ?? ''
 
@@ -55,7 +57,7 @@ export async function submitStyle(
   input: SubmissionRequest,
   signal?: AbortSignal,
 ): Promise<SubmissionResponse> {
-  const response = await fetch(`${BASE_URL}/api/submissions`, {
+  const response = await fetch(`${BASE_URL}/submissions`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(input),

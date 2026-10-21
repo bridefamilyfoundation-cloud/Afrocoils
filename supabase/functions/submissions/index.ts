@@ -1,4 +1,4 @@
-import type { SubmissionRequest, SubmissionResponse } from '../src/lib/types'
+import type { SubmissionRequest, SubmissionResponse } from '../../../src/lib/types.ts'
 import {
   HAIR_TYPES,
   MAX_PHOTOS_PER_SUBMISSION,
@@ -6,9 +6,10 @@ import {
   OCCASIONS,
   STYLE_CATEGORIES,
   STYLE_DIFFICULTIES,
-} from '../src/lib/types'
-import { checkLimits, limitResponse } from './_limits'
-import { corsHeaders, jsonResponse } from './_shared'
+} from '../../../src/lib/types.ts'
+import { checkLimits, limitResponse } from '../_shared/limits.ts'
+import { corsHeaders, jsonResponse } from '../_shared/cors.ts'
+import { serve } from '../_shared/env.ts'
 import {
   findSubmissionByClientId,
   photoPath,
@@ -17,14 +18,16 @@ import {
   putSubmission,
   removePhotos,
   storeIsDurable,
-} from './_store'
+} from '../_shared/store.ts'
 
 /**
  * Receiving a style offered to the community library.
  *
  * The library is contributed content and nothing else, so this is the
- * only way anything new gets into it. Two things make this route unlike
- * the other three in `api/`:
+ * only way anything new gets into it. It runs as a Supabase Edge
+ * Function (`npm run backend:deploy`), deployed with JWT verification
+ * off because the app holds no Supabase key of any kind. Two things to
+ * know about it:
  *
  * - **It spends storage, not tokens.** There is no model call, so the
  *   limits here are about abuse and disk rather than a daily bill.
@@ -43,25 +46,26 @@ import {
 const BASE64 = /^[A-Za-z0-9+/]+={0,2}$/
 
 /** One photograph, decoded and checked it came from the app's camera path. */
-function decodePhoto(value: unknown): Buffer | null {
+function decodePhoto(value: unknown): Uint8Array | null {
   if (typeof value !== 'string' || value.length === 0) return null
 
   // A `data:` prefix is a common client-side slip and cheap to forgive.
   const raw = value.includes(',') ? value.slice(value.indexOf(',') + 1) : value
   if (!BASE64.test(raw)) return null
+  // Refused before decoding, so an oversized string is never allocated
+  // twice. Base64 is four characters for every three bytes.
+  if (Math.floor((raw.length * 3) / 4) > MAX_SUBMISSION_PHOTO_BYTES + 2) return null
 
-  let bytes: Buffer
+  let bytes: Uint8Array
   try {
-    bytes = Buffer.from(raw, 'base64')
+    bytes = Uint8Array.from(atob(raw), (c) => c.charCodeAt(0))
   } catch {
     return null
   }
 
   if (bytes.length === 0 || bytes.length > MAX_SUBMISSION_PHOTO_BYTES) return null
-  // JPEG SOI marker: the app's camera path writes nothing else, so
-  // anything without it did not come through `capturePhoto`.
-  // `capturePhoto()` always writes JPEG, so anything else did not come
-  // through the app.
+  // JPEG SOI marker: `capturePhoto()` always writes JPEG, so anything
+  // else did not come through the app.
   if (!(bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff)) return null
 
   return bytes
@@ -69,7 +73,7 @@ function decodePhoto(value: unknown): Buffer | null {
 
 interface ValidSubmission {
   body: Omit<SubmissionRequest, 'photosBase64'>
-  photos: Buffer[]
+  photos: Uint8Array[]
 }
 
 /**
@@ -119,7 +123,7 @@ function validate(body: unknown): ValidSubmission | null {
 
   const rawPhotos = Array.isArray(b.photosBase64) ? b.photosBase64 : []
   if (rawPhotos.length > MAX_PHOTOS_PER_SUBMISSION) return null
-  const photos: Buffer[] = []
+  const photos: Uint8Array[] = []
   for (const each of rawPhotos) {
     const decoded = decodePhoto(each)
     // One bad photo fails the submission rather than being dropped
@@ -158,14 +162,14 @@ function validate(body: unknown): ValidSubmission | null {
   }
 }
 
-export function OPTIONS(req: Request): Response {
+function OPTIONS(req: Request): Response {
   return new Response(null, {
     status: 204,
     headers: corsHeaders(req.headers.get('origin') ?? undefined),
   })
 }
 
-export async function POST(req: Request): Promise<Response> {
+async function POST(req: Request): Promise<Response> {
   const origin = req.headers.get('origin') ?? undefined
 
   const limit = await checkLimits(req, 'submissions')
@@ -182,7 +186,7 @@ export async function POST(req: Request): Promise<Response> {
    */
   if (!storeIsDurable() || !photoStoreConfigured()) {
     console.error(
-      `[api/submissions] refusing: durable store ${storeIsDurable()}, photo store ${photoStoreConfigured()}`,
+      `[submissions] refusing: durable store ${storeIsDurable()}, photo store ${photoStoreConfigured()}`,
     )
     return jsonResponse(
       {
@@ -221,7 +225,7 @@ export async function POST(req: Request): Promise<Response> {
   try {
     const existing = await findSubmissionByClientId(clientId)
     if (existing) {
-      console.log(`[api/submissions] ${existing.id} already held for client ${clientId}`)
+      console.log(`[submissions] ${existing.id} already held for client ${clientId}`)
       return jsonResponse(
         { id: existing.id, clientId, review: existing.review } satisfies SubmissionResponse,
         200,
@@ -233,7 +237,7 @@ export async function POST(req: Request): Promise<Response> {
     // reaches the queue, which a reviewer can merge. Refusing a genuine
     // first submission because the check was unavailable is the worse
     // trade.
-    console.error('[api/submissions] client-id lookup failed, continuing', error)
+    console.error('[submissions] client-id lookup failed, continuing', error)
   }
 
   const id = `sub_${crypto.randomUUID()}`
@@ -259,7 +263,7 @@ export async function POST(req: Request): Promise<Response> {
       photoKeys,
     })
 
-    console.log(`[api/submissions] stored ${id} (${photoKeys.length} photos)`)
+    console.log(`[submissions] stored ${id} (${photoKeys.length} photos)`)
 
     return jsonResponse(
       { id, clientId, review: 'Pending' } satisfies SubmissionResponse,
@@ -267,7 +271,7 @@ export async function POST(req: Request): Promise<Response> {
       origin,
     )
   } catch (error) {
-    console.error('[api/submissions]', error)
+    console.error('[submissions]', error)
 
     /*
      * Take the photographs back out.
@@ -279,7 +283,7 @@ export async function POST(req: Request): Promise<Response> {
      * either way, and the contributor's copy is still `Queued`.
      */
     await removePhotos(photoKeys).catch((cleanupError) => {
-      console.error(`[api/submissions] could not clean up photos for ${id}`, cleanupError)
+      console.error(`[submissions] could not clean up photos for ${id}`, cleanupError)
     })
 
     return jsonResponse(
@@ -292,3 +296,9 @@ export async function POST(req: Request): Promise<Response> {
     )
   }
 }
+
+serve((req) => {
+  if (req.method === 'OPTIONS') return OPTIONS(req)
+  if (req.method === 'POST') return POST(req)
+  return jsonResponse({ error: 'Method not allowed' }, 405, req.headers.get('origin') ?? undefined)
+})

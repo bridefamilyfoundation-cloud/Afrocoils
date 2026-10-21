@@ -31,6 +31,7 @@ import { createHash } from 'node:crypto'
 import { copyFileSync, existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs'
 import { join, resolve, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { MANIFEST_URL } from './lib/release-manifest.mjs'
 
 /**
  * SHA-256 of the signing certificate on every APK shipped so far
@@ -105,6 +106,20 @@ if (!existsSync(at('android/keystore.properties'))) {
   )
 }
 
+/* 1b. The backend and the update manifest are compiled in. An APK built
+   without the manifest URL can never hear of a pushed update — it would
+   need a reinstall to get one, which is the thing pushes exist to avoid. */
+{
+  const env = existsSync(at('.env.production')) ? readFileSync(at('.env.production'), 'utf8') : ''
+  const manifest = /^VITE_UPDATE_MANIFEST_URL=(.*)$/m.exec(env)?.[1]?.trim()
+  if (manifest !== MANIFEST_URL) {
+    fail(`.env.production must set VITE_UPDATE_MANIFEST_URL=${MANIFEST_URL} (found ${manifest || 'nothing'}).`)
+  }
+  if (!/^VITE_API_BASE_URL=https:\/\//m.test(env)) {
+    fail('.env.production must set VITE_API_BASE_URL to the deployed functions URL (https://…/functions/v1).')
+  }
+}
+
 /* 2. The next versionCode: above everything that already exists. */
 const props = readFileSync(GRADLE_PROPS, 'utf8')
 const current = Number(/^appVersionCode=(\d+)/m.exec(props)?.[1] ?? 0)
@@ -156,7 +171,22 @@ const sha256 = createHash('sha256').update(readFileSync(OUT_APK)).digest('hex')
 // gradle.properties was reverted, and so a person can see what the file is.
 writeFileSync(
   join(OUT_DIR, 'afrocoil.json'),
-  JSON.stringify({ version, versionCode: next, sha256, signer, built: new Date().toISOString() }, null, 2) + '\n',
+  JSON.stringify(
+    {
+      version,
+      versionCode: next,
+      // The pushed update baked into this APK (vite.config.ts read it from
+      // site/release.json). site:release refuses the APK if a newer push
+      // has gone out since, because those users would be offered an
+      // older bundle than the one in their APK.
+      bundleCode: Number(JSON.parse(readFileSync(at('site/release.json'), 'utf8')).bundle?.code) || 0,
+      sha256,
+      signer,
+      built: new Date().toISOString(),
+    },
+    null,
+    2,
+  ) + '\n',
 )
 
 console.log(`[apk] ${OUT_APK}`)

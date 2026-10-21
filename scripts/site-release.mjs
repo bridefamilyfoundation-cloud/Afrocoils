@@ -1,33 +1,36 @@
 /**
- * Publishes a release APK to the landing site.
+ * Publishes a release APK: to the `releases` bucket, to latest.json, and
+ * to the landing site's download card.
  *
- *   npm run android:release   # build it first
- *   npm run site:release      # then this
- *   npm run site:release -- --apk path/to/other.apk --url https://host/AfroCoils.apk
+ *   npm run apk            # build it first — the only way to make one
  *   npm run site:release -- --note "Faster wash-day calendar" --note "Fixes the quiz"
+ *   npm run site:release -- --apk path/to/other.apk --url https://host/AfroCoils.apk
  *
- * Writes `site/release.json` — every fact the download card states — and
- * copies the APK to `site/public/download/`, where the site serves it.
+ * Uploads the APK to `releases/apk/`, writes `site/release.json` — every
+ * fact the download card states — and rewrites latest.json, so installed
+ * copies are offered it on their next check. Commit release.json and
+ * redeploy the landing site so its download button follows.
  *
- * Nothing on that card is typed by hand. Version, build number, package id
+ * A new APK is only needed for native changes (a plugin, a permission,
+ * the icon). Screens and content go out with `npm run ota:publish`
+ * instead, which leaves the APK's version alone.
+ *
+ * Nothing on the card is typed by hand. Version, build number, package id
  * and minimum Android are read from the build, and size and SHA-256 from
  * the file itself, because a checksum that was pasted in is a checksum
  * that eventually describes a different file. The script also refuses an
- * APK whose metadata disagrees with package.json, or one that is unsigned:
+ * APK whose metadata disagrees with the project, or one that is unsigned:
  * Android will not install an unsigned APK, so publishing one is a dead
  * download button with a correct-looking checksum beside it.
  *
- * `--url` points the button at a file hosted elsewhere (a GitHub release
- * asset, say) instead of copying it into the site. The APK is still read
- * locally, so the size and checksum are of the file being linked.
+ * `--url` points the button at a file hosted elsewhere instead of
+ * uploading it. The APK is still read locally, so the size and checksum
+ * are of the file being linked.
  */
 import { createHash } from 'node:crypto'
-import { copyFileSync, existsSync, mkdirSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs'
+import { existsSync, readFileSync, statSync } from 'node:fs'
 import { dirname, join, resolve } from 'node:path'
-import { fileURLToPath } from 'node:url'
-
-const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..')
-const at = (...parts) => join(ROOT, ...parts)
+import { at, localDay, publicUrl, publishManifest, readRelease, upload, writeRelease } from './lib/release-manifest.mjs'
 
 const args = process.argv.slice(2)
 const flag = (name) => {
@@ -42,9 +45,8 @@ function fail(message) {
   process.exit(1)
 }
 
-const RELEASE_DIR = at('android/app/build/outputs/apk/release')
-const apkPath = resolve(flag('apk') ?? join(RELEASE_DIR, 'app-release.apk'))
-if (!existsSync(apkPath)) fail(`No APK at ${apkPath}. Run \`npm run android:release\` first.`)
+const apkPath = resolve(flag('apk') ?? at('apk-output/afrocoil.apk'))
+if (!existsSync(apkPath)) fail(`No APK at ${apkPath}. Run \`npm run apk\` first.`)
 
 /* What the build says it is. */
 const { version } = JSON.parse(readFileSync(at('package.json'), 'utf8'))
@@ -53,53 +55,55 @@ const minSdk = Number(/minSdkVersion\s*=\s*(\d+)/.exec(readFileSync(at('android/
 const packageId = /applicationId\s+"([^"]+)"/.exec(readFileSync(at('android/app/build.gradle'), 'utf8'))?.[1]
 if (!versionCode || !minSdk || !packageId) fail('Could not read versionCode, minSdk or applicationId from the Gradle files.')
 
-/* Cross-check against the metadata Gradle wrote beside the APK, when it
-   is the default build output. A stale APK from before a version bump is
-   the likeliest way for this card to lie. */
-if (!flag('apk')) {
-  const meta = JSON.parse(readFileSync(join(RELEASE_DIR, 'output-metadata.json'), 'utf8'))
-  const built = meta.elements?.[0] ?? {}
-  if (meta.applicationId !== packageId || built.versionName !== version || built.versionCode !== versionCode) {
-    fail(
-      `The APK was built as ${meta.applicationId} ${built.versionName} (${built.versionCode}), ` +
-        `but the project is ${packageId} ${version} (${versionCode}). Rebuild with \`npm run android:release\`.`,
-    )
-  }
-}
-
 const bytes = readFileSync(apkPath)
 // v2+ signatures live in the APK Signing Block, whose magic is this string.
 if (!bytes.includes(Buffer.from('APK Sig Block 42'))) {
   fail('The APK is unsigned, and Android will not install it. Check android/keystore.properties.')
+}
+const sha256 = createHash('sha256').update(bytes).digest('hex')
+
+const previous = existsSync(at('site/release.json')) ? readRelease() : undefined
+
+/* `npm run apk` writes what it built beside the file. A stale APK from
+   before a version bump is the likeliest way for this card to lie. */
+const metaPath = join(dirname(apkPath), 'afrocoil.json')
+if (existsSync(metaPath)) {
+  const meta = JSON.parse(readFileSync(metaPath, 'utf8'))
+  if (meta.sha256 === sha256) {
+    if (meta.version !== version || meta.versionCode !== versionCode) {
+      fail(
+        `The APK was built as ${meta.version} (${meta.versionCode}), but the project is ${version} (${versionCode}). ` +
+          'Rebuild with `npm run apk`.',
+      )
+    }
+    /* An APK carries the pushed update that was current when it was
+       built. If a newer one went out since, its users would be offered
+       that update over the APK's own — fine — but an APK built *before*
+       a push and published after it would ship older screens than the
+       phones it replaces. Rebuilding picks the push up. */
+    const pushed = Number(previous?.bundle?.code) || 0
+    if ((Number(meta.bundleCode) || 0) < pushed) {
+      fail(`This APK was built before update ${pushed} was pushed, so it carries older screens. Rebuild with \`npm run apk\`.`)
+    }
+  }
 }
 
 /* Android version names for the API levels this project could target. */
 const ANDROID = { 21: '5.0', 22: '5.1', 23: '6.0', 24: '7.0', 25: '7.1', 26: '8.0', 27: '8.1', 28: '9', 29: '10', 30: '11', 31: '12', 32: '12L', 33: '13', 34: '14', 35: '15', 36: '16' }
 if (!ANDROID[minSdk]) fail(`No Android version name recorded for API ${minSdk} — add it to the table in this script.`)
 
-const file = `AfroCoils-${version}.apk`
-const url = flag('url')
-const mtime = statSync(apkPath).mtime
-// The build's local calendar day, as a YYYY-MM-DD key — not toISOString(),
-// which is the UTC day and is yesterday for an evening build west of Greenwich.
-const released = `${mtime.getFullYear()}-${String(mtime.getMonth() + 1).padStart(2, '0')}-${String(mtime.getDate()).padStart(2, '0')}`
-
-const sha256 = createHash('sha256').update(bytes).digest('hex')
-
 /*
- * Installed apps learn about this release from latest.json (written from
- * this file by the site build), and Android installs a download *over*
- * the existing app only if its versionCode is higher. Publishing a
- * different APK under the same or a lower number would put an update
- * prompt in front of every user for a file their phone then refuses with
- * "App not installed". Re-running for the same file is fine.
+ * Installed apps learn about this release from latest.json, and Android
+ * installs a download *over* the existing app only if its versionCode is
+ * higher. Publishing a different APK under the same or a lower number
+ * would put an update prompt in front of every user for a file their
+ * phone then refuses with "App not installed". Re-running for the same
+ * file is fine.
  */
-const releasePath = at('site/release.json')
-const previous = existsSync(releasePath) ? JSON.parse(readFileSync(releasePath, 'utf8')) : undefined
 if (previous && previous.sha256 !== sha256 && !(versionCode > previous.versionCode)) {
   fail(
     `This APK is build ${versionCode}, but build ${previous.versionCode} is already published. ` +
-      'Bump appVersionCode in android/gradle.properties and rebuild, or installed copies cannot update to it.',
+      'Rebuild with `npm run apk`, which raises it, or installed copies cannot update to it.',
   )
 }
 
@@ -107,6 +111,11 @@ if (previous && previous.sha256 !== sha256 && !(versionCode > previous.versionCo
    same file unless new notes are given. */
 const given = flags('note')
 const notes = given.length > 0 ? given : previous?.sha256 === sha256 ? (previous.notes ?? []) : []
+
+/* Versioned by build, so a published URL always names one file and can
+   be cached for good. */
+const remote = `apk/AfroCoils-${version}-${versionCode}.apk`
+const url = flag('url') ?? publicUrl(remote)
 
 const release = {
   version,
@@ -116,19 +125,25 @@ const release = {
   minAndroid: ANDROID[minSdk],
   bytes: bytes.length,
   sha256,
-  released,
-  url: url ?? `download/${file}`,
+  // The build's local calendar day, from the file's own timestamp.
+  released: localDay(statSync(apkPath).mtime),
+  url,
   notes,
+  // Pushed updates carry on from where they were; the next one is built
+  // against this APK (ota:publish sets minVersionCode from versionCode).
+  ...(previous?.bundle ? { bundle: previous.bundle } : {}),
 }
 
-/* Only the current APK is served; older ones are removed so the folder
-   never holds a file the card does not describe. */
-const downloads = at('site/public/download')
-mkdirSync(downloads, { recursive: true })
-for (const old of readdirSync(downloads)) if (old.endsWith('.apk')) rmSync(join(downloads, old))
-if (!url) copyFileSync(apkPath, join(downloads, file))
+if (!flag('url')) {
+  upload(apkPath, remote, {
+    contentType: 'application/vnd.android.package-archive',
+    cacheControl: 'max-age=31536000, immutable',
+  })
+}
+writeRelease(release)
+publishManifest(release)
 
-writeFileSync(releasePath, `${JSON.stringify(release, null, 2)}\n`)
 console.log(`[site:release] ${packageId} ${version} (${versionCode}) · ${(release.bytes / 1e6).toFixed(1)} MB · Android ${release.minAndroid}+`)
 console.log(`[site:release] sha256 ${release.sha256}`)
-console.log(`[site:release] ${url ? `linked to ${url}` : `copied to site/public/download/${file}`}`)
+console.log(`[site:release] download: ${url}`)
+console.log('[site:release] Commit site/release.json and redeploy the landing site so its button follows.')

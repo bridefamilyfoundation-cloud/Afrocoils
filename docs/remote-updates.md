@@ -3,15 +3,18 @@
 Recommendation for shipping changes to installed devices without users
 downloading a new APK.
 
-> **What is built today** is the step before any of this: an update
-> *notifier*. The APK reads the landing site's `latest.json` on open and,
-> when a higher `versionCode` is posted, offers the new APK for download
-> (`src/lib/updates.ts`, `src/components/UpdatePrompt.tsx`; the release steps
-> are in the README under *Shipping an update*). It needs no new native
-> plugin and no licence decision, and users still install each update. The
-> OTA bundle swap below would remove that step for web-only changes; it is
-> still a recommendation, not a feature. If it is built, keep the notifier —
-> it is the only way a native change (a plugin, a permission) reaches anyone.
+> **Built, 2026-10-21: approach 1 below.** Pushed web-bundle updates use
+> `@capgo/capacitor-updater` (MPL-2.0) in manual, self-hosted mode — no Capgo
+> account, and every Capgo endpoint blanked in `capacitor.config.ts`, because
+> the plugin's defaults report update events and crashes to Capgo and the app
+> promises that nothing leaves the phone. `npm run ota:publish` zips `dist/`
+> into the public `releases` bucket in Supabase Storage and adds it to
+> `latest.json`; the app offers it as *An update is ready*, the updater
+> verifies its SHA-256 against the manifest, and `notifyAppReady()` on the
+> first render lets the plugin roll back a bundle that fails to start. Nothing
+> installs without a tap. The APK notifier is kept beside it — it is still the
+> only way a native change reaches anyone. How to ship either is in the README
+> under *Shipping an update*; the decision record follows.
 
 ## First: what actually needs to ship inside the APK
 

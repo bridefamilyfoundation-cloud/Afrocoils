@@ -43,3 +43,6 @@ dist-site/
 /Locs Hairstyle Library images/
 /Locs Images/
 /Locs PDF images/
+
+# Supabase CLI link state (project ref, CLI version cache)
+supabase/.temp/

@@ -1,40 +1,32 @@
 /**
- * The Supabase connection, for the one route that has a backend.
+ * The Supabase connection, from inside the project's own Edge Function.
  *
- * Supabase is three things this folder needed and had to reach for
- * separately before: a durable record store (was Upstash/Vercel KV), a
- * blob store for the photographs (was an unimplemented Vercel Blob seam)
- * and somewhere to keep the rate-limit counters. One project now serves
- * all three, which is one set of credentials to provision and one
- * dashboard to look at a pending queue in.
+ * Supabase is three things this route needs: a durable record store, a
+ * blob store for the photographs and somewhere to keep the rate-limit
+ * counters. One project serves all three.
  *
- * **No SDK.** `@supabase/supabase-js` is a dependency in every function
- * bundle to save what turns out to be about thirty lines of `fetch`, and
- * this folder already made that call once — `_limits.ts` and `_store.ts`
- * both talk to Upstash over its REST API for the same reason. PostgREST
- * and the Storage API are plain HTTP; the SDK's value is its realtime
- * and auth layers, neither of which this route has any use for.
+ * **No SDK.** PostgREST and the Storage API are plain HTTP, and
+ * `@supabase/supabase-js` would be a dependency in the function bundle to
+ * save about thirty lines of `fetch`. Its value is its realtime and auth
+ * layers, neither of which this route has any use for.
  *
  * ## The key
  *
- * `SUPABASE_SERVICE_ROLE_KEY` bypasses row-level security completely. It
- * is a server credential and nothing else:
- *
- * - It is read from `process.env`, which only exists in the serverless
- *   environment. Vite never sees it.
- * - It must never be given a `VITE_` prefix. Anything so prefixed is
- *   inlined into the bundle and ships inside the APK, where it can be
- *   read out of the package by anyone who downloads it.
- * - `assertKeyIsServerOnly()` below fails loudly if a `VITE_`-prefixed
- *   copy ever appears, because the failure mode otherwise is silent and
- *   total: a public key with RLS bypass is a public write to the whole
- *   database.
- *
- * The client never talks to Supabase at all. It talks to
- * `api/submissions.ts`, which is what keeps the validation, the rate
- * limits and the "nothing auto-publishes" rule in one place that the
+ * The service key bypasses row-level security completely. Running as an
+ * Edge Function is what keeps it a server credential and nothing else:
+ * Supabase injects `SUPABASE_URL` and the service key into the function's
+ * environment itself, so the key is never copied into a dashboard, an env
+ * file or a CI secret, and there is no build step that could inline it
+ * into the APK. The client never talks to Supabase's database or storage
+ * at all — it talks to this function, which is what keeps the validation,
+ * the rate limits and the "nothing auto-publishes" rule in one place the
  * device cannot route around.
+ *
+ * (`vite.config.ts` still refuses to build if a `VITE_`-prefixed Supabase
+ * key ever appears in an env file, because that slip is silent and
+ * unrecoverable once a release ships with it.)
  */
+import { env } from './env.ts'
 
 export interface SupabaseConfig {
   url: string
@@ -42,22 +34,22 @@ export interface SupabaseConfig {
 }
 
 /**
- * Guard against the service key ever being built into the client.
+ * The service key, in whichever form the project provides it.
  *
- * Checked at config time rather than documented and hoped for. A
- * `VITE_SUPABASE_SERVICE_ROLE_KEY` in an env file is a plausible slip
- * — it is what someone reaches for when the client "cannot see" the
- * variable — and it is not recoverable once a release ships with it.
+ * `SUPABASE_SERVICE_ROLE_KEY` is the legacy JWT key. Projects on the newer
+ * API keys also get `SUPABASE_SECRET_KEYS`, a JSON object of named
+ * `sb_secret_…` keys; either authorises as the service role.
  */
-function assertKeyIsServerOnly(): void {
-  const leaked = Object.keys(process.env).filter(
-    (key) => key.startsWith('VITE_') && /SUPABASE.*(KEY|SECRET|TOKEN)/i.test(key),
-  )
-  if (leaked.length > 0) {
-    throw new Error(
-      `${leaked.join(', ')} is VITE_-prefixed, which inlines it into the client bundle and ships it inside the APK. ` +
-        'Supabase keys belong in the serverless environment only — rename it without the prefix.',
-    )
+function serviceKey(): string | undefined {
+  const legacy = env('SUPABASE_SERVICE_ROLE_KEY')
+  if (legacy) return legacy
+  const raw = env('SUPABASE_SECRET_KEYS')
+  if (!raw) return undefined
+  try {
+    const keys = JSON.parse(raw) as Record<string, string>
+    return keys.default ?? Object.values(keys)[0]
+  } catch {
+    return undefined
   }
 }
 
@@ -65,12 +57,9 @@ let cached: SupabaseConfig | null | undefined
 
 export function supabaseConfig(): SupabaseConfig | null {
   if (cached !== undefined) return cached
-
-  assertKeyIsServerOnly()
-
-  const url = process.env.SUPABASE_URL
-  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
-  cached = url && serviceKey ? { url: url.replace(/\/$/, ''), serviceKey } : null
+  const url = env('SUPABASE_URL')
+  const key = serviceKey()
+  cached = url && key ? { url: url.replace(/\/$/, ''), serviceKey: key } : null
   return cached
 }
 
@@ -79,12 +68,13 @@ export function supabaseConfigured(): boolean {
 }
 
 function authHeaders(config: SupabaseConfig): Record<string, string> {
-  return {
-    // PostgREST wants both: `apikey` identifies the project, the bearer
-    // token is what it actually authorises against.
-    apikey: config.serviceKey,
-    Authorization: `Bearer ${config.serviceKey}`,
-  }
+  // `apikey` identifies the project. A legacy JWT key is also sent as the
+  // bearer token, which is what PostgREST authorises against; an
+  // `sb_secret_` key is not a JWT and is rejected as a bearer, so it goes
+  // in `apikey` alone and the gateway mints the service-role token.
+  const headers: Record<string, string> = { apikey: config.serviceKey }
+  if (config.serviceKey.startsWith('eyJ')) headers.Authorization = `Bearer ${config.serviceKey}`
+  return headers
 }
 
 async function failure(response: Response, what: string): Promise<Error> {
@@ -103,9 +93,7 @@ async function failure(response: Response, what: string): Promise<Error> {
  * Insert rows into a table.
  *
  * `Prefer: return=minimal` because nothing here reads the row back — the
- * route already holds everything it returns to the device, and asking
- * PostgREST to serialise the row costs a round trip's worth of body for
- * no reader.
+ * route already holds everything it returns to the device.
  */
 export async function insert(
   config: SupabaseConfig,
@@ -127,9 +115,8 @@ export async function insert(
 /**
  * Select rows, with a raw PostgREST query string.
  *
- * The query is passed through rather than built from an object: the
- * three call sites here each want a different operator, and a query
- * builder for three queries is more code than the three queries.
+ * The query is passed through rather than built from an object: a query
+ * builder for one query is more code than the query.
  */
 export async function select<T>(
   config: SupabaseConfig,
@@ -167,7 +154,7 @@ export async function rpc<T>(
  * ------------------------------------------------------------------ */
 
 /** The bucket photographs go into. Created by the migration, and private. */
-export const PHOTO_BUCKET = process.env.SUPABASE_PHOTO_BUCKET || 'submission-photos'
+export const PHOTO_BUCKET = env('SUPABASE_PHOTO_BUCKET') || 'submission-photos'
 
 /**
  * Upload one object and return the path it can be read back by.
@@ -187,7 +174,7 @@ export const PHOTO_BUCKET = process.env.SUPABASE_PHOTO_BUCKET || 'submission-pho
 export async function uploadObject(
   config: SupabaseConfig,
   path: string,
-  bytes: Buffer,
+  bytes: Uint8Array,
   contentType: string,
 ): Promise<string> {
   const response = await fetch(
@@ -200,7 +187,7 @@ export async function uploadObject(
         'Cache-Control': 'max-age=31536000',
         'x-upsert': 'false',
       },
-      body: new Uint8Array(bytes),
+      body: bytes,
     },
   )
   if (!response.ok) throw await failure(response, `Upload to ${PHOTO_BUCKET}`)

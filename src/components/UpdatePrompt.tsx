@@ -3,27 +3,35 @@ import { App } from '@capacitor/app'
 import Icon from './Icon'
 import { useBackDismiss } from '../lib/back-button'
 import { useHairProfile } from '../lib/profile-store'
-import { checkForUpdates, formatBytes, updatesConfigured, useUpdateStatus } from '../lib/updates'
+import {
+  checkForUpdates,
+  formatBytes,
+  installPushedUpdate,
+  markBundleHealthy,
+  updatesConfigured,
+  useUpdateStatus,
+} from '../lib/updates'
 
 /**
- * "A new version of AfroCoils is available."
+ * "An update is ready" — the app's built-in notice for both kinds.
  *
  * Checks when the app opens and whenever it comes back to the
  * foreground (no more than every six hours — see `checkForUpdates`), and
- * slides up a sheet when the landing site has posted a newer build.
+ * slides up a sheet when something newer has been posted:
  *
- * Two ways out, and they mean different things:
+ * - **A pushed update** — new screens and content for this same APK.
+ *   *Update now* downloads it, has it verified, and restarts the app
+ *   into it a few seconds later. Nothing is reinstalled and Android does
+ *   not need to ask.
+ * - **A new APK** — needed when the native side changed. *Download*
+ *   opens it in the system browser; the new build carries the same
+ *   signature and a higher versionCode, so it installs *over* this one
+ *   and the profile survives. Android asks the user to confirm.
  *
- * - **Download** opens the APK in the system browser. Android takes it
- *   from there — the user still confirms the install — and because the
- *   new build carries the same signature and a higher versionCode, it
- *   installs *over* this one and the profile survives.
- * - **Not now** records that version as declined, so the sheet does not
- *   come back for it on every launch. A later version asks again, and
- *   About keeps showing the update either way.
- *
- * Back and a tap on the scrim only close it for this session, because
- * neither is a decision.
+ * **Not now** records that update as declined, so the sheet does not
+ * come back for it on every launch. A later one asks again, and About
+ * keeps offering it either way. Back and a tap on the scrim only close
+ * it for this session, because neither is a decision.
  *
  * Mounted once, beside the router, so it can appear over any screen. It
  * waits for the profile to load: until then `updates.check` reads as its
@@ -41,6 +49,12 @@ export default function UpdatePrompt() {
   const enabledRef = useRef(enabled)
   enabledRef.current = enabled
 
+  // This component commits with the first screen, so reaching this
+  // effect means the bundle loaded. See markBundleHealthy.
+  useEffect(() => {
+    markBundleHealthy()
+  }, [])
+
   useEffect(() => {
     if (enabled) void checkForUpdates()
   }, [enabled])
@@ -55,16 +69,24 @@ export default function UpdatePrompt() {
     }
   }, [])
 
-  const available = status.kind === 'available' ? status.update : undefined
-  const open =
-    enabled &&
-    !closed &&
-    available !== undefined &&
-    available.versionCode !== profile.updates.dismissedVersionCode
+  const apk = status.kind === 'available' ? status.update : undefined
+  const push =
+    status.kind === 'pushed' || status.kind === 'installing' || status.kind === 'install-failed'
+      ? status.push
+      : undefined
+  const installing = status.kind === 'installing'
 
-  useBackDismiss(open, () => setClosed(true))
+  const declined =
+    (apk !== undefined && apk.versionCode === profile.updates.dismissedVersionCode) ||
+    (push !== undefined && push.code === profile.updates.dismissedBundleCode)
+  const open = enabled && !closed && (apk !== undefined || push !== undefined) && (!declined || installing)
 
-  if (!available) return null
+  // Back cannot interrupt a download that is already verifying.
+  useBackDismiss(open && !installing, () => setClosed(true))
+
+  if (!apk && !push) return null
+
+  const notes = apk?.notes ?? push?.notes ?? []
 
   return (
     <div
@@ -76,7 +98,7 @@ export default function UpdatePrompt() {
       <div
         className="absolute inset-0 bg-inverse-surface/40"
         aria-hidden="true"
-        onClick={() => setClosed(true)}
+        onClick={() => !installing && setClosed(true)}
       />
       <section
         role="dialog"
@@ -94,17 +116,19 @@ export default function UpdatePrompt() {
           </span>
           <div className="min-w-0">
             <h2 id="update-title" className="font-headline-md text-headline-md text-on-surface">
-              A new version is out
+              {apk ? 'A new version is out' : 'An update is ready'}
             </h2>
             <p className="font-body-md text-caption text-on-surface-variant">
-              AfroCoils {available.version} · {formatBytes(available.bytes)}
+              {apk
+                ? `AfroCoils ${apk.version} · ${formatBytes(apk.bytes)}`
+                : `Update ${push!.code} · ${formatBytes(push!.bytes)}`}
             </p>
           </div>
         </div>
 
-        {available.notes.length > 0 && (
+        {notes.length > 0 && (
           <ul className="mb-md space-y-xs rounded-2xl bg-surface-container p-md">
-            {available.notes.map((note) => (
+            {notes.map((note) => (
               <li key={note} className="flex gap-sm font-body-md text-body-md text-on-surface">
                 <Icon name="check" className="mt-0.5 shrink-0 text-[18px] text-secondary" />
                 {note}
@@ -113,31 +137,69 @@ export default function UpdatePrompt() {
           </ul>
         )}
 
-        <p className="mb-lg font-body-md text-body-md text-on-surface-variant">
-          It installs over this one, so your profile, history and photos stay where they are.
-          Your phone will ask you to confirm.
-        </p>
+        {apk ? (
+          <>
+            <p className="mb-lg font-body-md text-body-md text-on-surface-variant">
+              It installs over this one, so your profile, history and photos stay where they are.
+              Your phone will ask you to confirm.
+            </p>
+            {/* A plain anchor: Capacitor sends an external navigation to the
+                system browser, which downloads the APK. */}
+            <a
+              href={apk.downloadUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => setClosed(true)}
+              className="mb-sm flex w-full items-center justify-center gap-sm rounded-full bg-secondary py-4 font-label-md text-body-lg font-bold text-on-secondary shadow-lg transition-all active:scale-95"
+            >
+              <Icon name="download" className="text-[20px]" />
+              Download update
+            </a>
+          </>
+        ) : (
+          <>
+            <p className="mb-lg font-body-md text-body-md text-on-surface-variant" aria-live="polite">
+              {status.kind === 'install-failed'
+                ? 'The update could not be downloaded or did not check out, so nothing was changed. Try again when you have a steadier connection.'
+                : installing
+                  ? `Downloading and checking… ${Math.round(status.percent)}%. The app restarts into the update when it is done.`
+                  : 'It updates this app in place: nothing to reinstall, and your profile, history and photos stay where they are. The app restarts once to finish.'}
+            </p>
+            {installing && (
+              <div className="mb-md h-2 overflow-hidden rounded-full bg-surface-container" aria-hidden="true">
+                <div
+                  className="h-full rounded-full bg-secondary transition-[width] duration-300"
+                  style={{ width: `${Math.max(4, status.percent)}%` }}
+                />
+              </div>
+            )}
+            <button
+              type="button"
+              disabled={installing}
+              onClick={() => void installPushedUpdate(push!)}
+              className="mb-sm flex w-full items-center justify-center gap-sm rounded-full bg-secondary py-4 font-label-md text-body-lg font-bold text-on-secondary shadow-lg transition-all active:scale-95 disabled:opacity-60"
+            >
+              <Icon name="system_update" className="text-[20px]" />
+              {installing ? 'Updating…' : status.kind === 'install-failed' ? 'Try again' : 'Update now'}
+            </button>
+          </>
+        )}
 
-        {/* A plain anchor: Capacitor sends an external navigation to the
-            system browser, which downloads the APK. Same reasoning as the
-            source links on GuideScreen. */}
-        <a
-          href={available.downloadUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          onClick={() => setClosed(true)}
-          className="mb-sm flex w-full items-center justify-center gap-sm rounded-full bg-secondary py-4 font-label-md text-body-lg text-on-secondary shadow-lg transition-all active:scale-95"
-        >
-          <Icon name="download" className="text-[20px]" />
-          Download update
-        </a>
-        <button
-          type="button"
-          onClick={() => update({ updates: { ...profile.updates, dismissedVersionCode: available.versionCode } })}
-          className="w-full rounded-full py-3 font-label-md text-label-md text-on-surface-variant transition-all active:scale-95"
-        >
-          Not now
-        </button>
+        {!installing && (
+          <button
+            type="button"
+            onClick={() =>
+              update({
+                updates: apk
+                  ? { ...profile.updates, dismissedVersionCode: apk.versionCode }
+                  : { ...profile.updates, dismissedBundleCode: push!.code },
+              })
+            }
+            className="w-full rounded-full py-3 font-label-md text-label-md text-on-surface-variant transition-all active:scale-95"
+          >
+            Not now
+          </button>
+        )}
       </section>
     </div>
   )

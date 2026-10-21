@@ -21,6 +21,31 @@ const config: CapacitorConfig = {
     Keyboard: {
       resize: 'native',
     },
+    /*
+     * Pushed updates (src/lib/updates.ts), in manual mode only.
+     *
+     * The plugin's defaults would quietly break the app's privacy promise:
+     * out of the box it checks Capgo's servers for updates and reports
+     * update events, crashes, ANRs and WebView errors to them. Every
+     * endpoint is blanked here, which the native code treats as "send
+     * nothing", and automatic updating is off — the app decides when to
+     * check (its own latest.json) and the user decides when to install.
+     * Do not set any of these URLs without rewriting the privacy policy
+     * first; see CLAUDE.md.
+     */
+    CapacitorUpdater: {
+      autoUpdate: false,
+      updateUrl: '',
+      statsUrl: '',
+      channelUrl: '',
+      // A bundle that does not call notifyAppReady() within this long of
+      // loading is treated as broken and the previous one restored.
+      appReadyTimeout: 15000,
+      autoDeleteFailed: true,
+      autoDeletePrevious: true,
+      // A newer APK carries its own, newer bundle: drop pushed ones.
+      resetWhenUpdate: true,
+    },
   },
 }
 

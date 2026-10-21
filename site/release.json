@@ -1,12 +1,14 @@
 {
   "version": "0.2.0",
-  "versionCode": 2,
+  "versionCode": 6,
   "packageId": "com.afrocoilyhair.app",
   "minSdk": 24,
   "minAndroid": "7.0",
-  "bytes": 7084629,
-  "sha256": "d1fd5231e5a71e167bd62111a8c271c2d453017e3f65e1e8b5d1a3744633083a",
-  "released": "2026-10-04",
-  "url": "https://github.com/bridefamilyfoundation-cloud/Afrocoils/releases/download/v0.2.0/afrocoil-0.2.0.apk",
-  "notes": []
+  "bytes": 9907120,
+  "sha256": "0e7cbd862cf0c8b0f8f9fc6c49a45fed7520be620a559029bbd0f3612458df1e",
+  "released": "2026-10-21",
+  "url": "https://runhkccoeyxfgsfrzezn.supabase.co/storage/v1/object/public/releases/apk/AfroCoils-0.2.0-6.apk",
+  "notes": [
+    "Updates now install in place: no more reinstalling for new styles and guides"
+  ]
 }

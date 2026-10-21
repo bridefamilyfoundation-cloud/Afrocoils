@@ -82,14 +82,19 @@ function PrivacyPolicy() {
       <Article title="Checking for a new version">
         <p>
           When the app opens, and when you come back to it after a few hours, it fetches a
-          small public file from the AfroCoils website that names the newest version. The
-          request contains nothing from your profile, no identifier and no information about
-          how you use the app. Like any request to a website, it reveals your connection&rsquo;s
-          IP address to the website&rsquo;s host, which we do not use to identify you.
+          small public file from our update server (hosted with Supabase) that names the
+          newest version and the newest update. The request contains nothing from your
+          profile, no identifier and no information about how you use the app. Like any
+          request to a website, it reveals your connection&rsquo;s IP address to the
+          server&rsquo;s host, which we do not use to identify you.
         </p>
         <p>
-          If a newer version exists, the app tells you. Nothing downloads or installs unless
-          you tap Download and then confirm the install on your phone. Turn the check off, or
+          If something newer exists, the app tells you. Most updates install in place: when
+          you tap Update now, the app downloads the update from the same server, checks it
+          against the fingerprint in that file, and restarts into it. A change to the app
+          itself comes as a new version to download instead, which your phone asks you to
+          confirm. Nothing downloads or installs unless you tap. The update component reports
+          nothing back to anyone: no statistics, no crash reports. Turn the check off, or
           run it by hand, under{' '}
           <Link to="/about" className="text-primary underline">
             About

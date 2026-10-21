@@ -33,7 +33,7 @@ export const FAQS: Faq[] = [
     a: [
       'On this phone, in one document, and nowhere else. Your hair profile, length history, calendar, photos and saved styles never leave the device — there is no account, no sign-in and no server holding any of it. Uninstalling the app deletes it. The single exception is a style you deliberately contribute, which is covered in the last question and in the ',
       { to: '/legal/privacy', label: 'privacy policy' },
-      '. The app also asks our website whether a newer version is out — a request that carries nothing about you, and that you can switch off under About.',
+      '. The app also asks our update server whether a newer version or update is out — a request that carries nothing about you, and that you can switch off under About.',
     ],
   },
   {

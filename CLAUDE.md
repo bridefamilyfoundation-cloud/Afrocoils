@@ -12,22 +12,40 @@ picture; this file is the short version of what to keep in mind when editing.
   has to work with no signal, and the app's claim that nothing it shows was
   invented is load-bearing.
 - **Never put a secret in client code.** Anything prefixed `VITE_` is inlined
-  into the bundle and ships inside the APK. The submissions route's settings
-  belong only in the serverless environment, read via `process.env` in `api/`.
+  into the bundle and ships inside the APK and every pushed update. The app
+  holds no key of any kind; the service key exists only inside the Edge
+  Function's environment, where Supabase injects it, and `vite.config.ts`
+  refuses to build if a `VITE_` Supabase key appears.
 - **No CDN assets.** The app must render fully offline from local assets. Fonts,
   icons, and images are npm imports or files under `src/assets/`, never
   `<link>` or `<script src="https://...">`.
 - **The update check sends nothing, and must keep sending nothing.**
-  `src/lib/updates.ts` GETs the landing site's `latest.json` on open and on
-  return (six-hourly at most), via `CapacitorHttp` so it does not depend on
-  CORS, and `UpdatePrompt` offers the APK when its `versionCode` is higher.
+  `src/lib/updates.ts` GETs `latest.json` from the public `releases` bucket
+  in Supabase Storage on open and on return (six-hourly at most), via
+  `CapacitorHttp` so it does not depend on CORS. `UpdatePrompt` offers a
+  new APK when its `versionCode` is higher, or else a **pushed update** —
+  a zip of `dist/` — when its `bundle.code` is above the running
+  `__BUNDLE_CODE__` and this APK is at least its `minVersionCode`.
   No profile field, no identifier, no query string — the privacy policy,
   FAQ, About and the landing page all say so. Adding anything to that
   request is data collection: policy first, as below. It never downloads or
-  installs on its own; the user taps Download and Android asks to confirm.
-  `UpdateManifest` in `types.ts` is the contract with `vite.site.config.ts`,
-  and `site:release` refuses an APK whose versionCode is not higher than the
-  one published, because Android would refuse it as an update.
+  installs on its own: the user taps Download (Android confirms) or Update
+  now (the updater verifies the zip's SHA-256 against the manifest, then
+  reloads). `UpdateManifest` in `types.ts` is the contract with
+  `scripts/lib/release-manifest.mjs`, which both `site:release` and
+  `ota:publish` write it through.
+- **Pushed updates keep the APK constant.** Web changes ship with
+  `npm run ota:publish`, which leaves versionCode, package id and
+  signature alone; `npm run apk` is only for native changes (a plugin, a
+  permission, the icon, anything in `android/` or `capacitor.config.ts`),
+  because a bundle cannot carry those. The updater is
+  `@capgo/capacitor-updater` in manual mode, and **every Capgo endpoint is
+  blanked in `capacitor.config.ts`** — its defaults report update events,
+  crashes and WebView errors to Capgo, which would make the privacy policy
+  false. Never set `statsUrl`, `updateUrl` or `channelUrl`, and never turn
+  `autoUpdate` on. `markBundleHealthy()` runs from `UpdatePrompt`'s first
+  effect so a bundle that crashes on load is rolled back; keep it after the
+  first render, not before. A Play build leaves the manifest URL unset.
 - **No analytics, and this was decided rather than overlooked.** Google
   Analytics was considered and declined on 2026-09-11: `gtag.js` is a
   remote script, and more importantly the app tells users in three places
@@ -200,7 +218,8 @@ picture; this file is the short version of what to keep in mind when editing.
   — a new entry opts in to being shown to loc wearers, never out. Loc
   derivations (stage from install date, retwist cadence) live in
   `src/lib/locs.ts`.
-- The request/response contract between the app and `api/` lives in
+- The request/response contract between the app and the submissions
+  function (`supabase/functions/submissions/`) lives in
   `src/lib/types.ts`; both sides import it so a shape change fails typecheck.
 - **`bio` is not `identity`.** `identity` is facts about the hair;
   `bio` is name, photo and climate. None of the profile crosses the wire
@@ -245,7 +264,7 @@ picture; this file is the short version of what to keep in mind when editing.
   steps and kit were removed on request because the long form was not
   getting finished; the reviewer writes up what a library entry needs,
   so "an entry without steps is a draft" still holds for `STYLES`.
-  `api/submissions.ts` accepts a description *or* two steps (older
+  The submissions function accepts a description *or* two steps (older
   queued rows carry steps) and no longer requires a category. Don't add
   fields back without a reason a contributor would accept.
 - The thirty packed-and-parted styles came from the shared Hairstyle
@@ -466,34 +485,47 @@ picture; this file is the short version of what to keep in mind when editing.
 
 ## The one server route
 
-`api/submissions.ts` receives a style offered to the community library, and
-is the only route in `api/` — there is no model client, no prompt and no
-`ANTHROPIC_API_KEY` any more. `_shared.ts` is down to the CORS policy,
-`_limits.ts` to one route's counters, `_store.ts` to the records and the
-photographs, and `_supabase.ts` to the connection all three use.
+`supabase/functions/submissions/` is a Supabase Edge Function that
+receives a style offered to the community library, and it is the only
+server code — there is no model client, no prompt and no
+`ANTHROPIC_API_KEY`. Under `_shared/`: `cors.ts` is the CORS policy,
+`limits.ts` one route's counters, `store.ts` the records and the
+photographs, `supabase.ts` the connection all three use, and `env.ts` the
+two Deno globals, declared so `tsc -b` checks these files with the app.
+Keep them to web APIs (`fetch`, `crypto`, `atob`) — no `Buffer`, no
+`process`. It moved here from a Vercel function on 2026-10-21; Vercel now
+builds only the landing page. Deploy with `npm run backend:deploy` (JWT
+verification off: the app holds no Supabase key to present).
 
-**The backend is one Supabase project**, and the schema that defines it is
-`supabase/migrations/0001_community_submissions.sql`. Three rules there are
-load-bearing:
+**The backend is one Supabase project**, `runhkccoeyxfgsfrzezn`, and the
+migrations under `supabase/migrations/` define it (`npm run db:push`).
+Four rules there are load-bearing:
 
 - **The service role key is server-only, and there is no anon key.** It
-  bypasses row-level security entirely. `VITE_`-prefixing it would inline it
-  into the bundle and ship it inside the APK — `assertKeyIsServerOnly()`
-  throws if it ever finds one, because that failure is silent otherwise. The
-  client has no Supabase import at all; it talks to `api/submissions.ts`,
-  which is what keeps validation, rate limiting and the moderation rule
-  somewhere the device cannot route around. Going direct with an anon key
-  would move all three into RLS policies and make the limiter decorative.
+  bypasses row-level security entirely. Supabase injects it into the
+  function's environment, so it is never copied anywhere; a `VITE_` copy
+  would ship inside the APK, and `vite.config.ts` refuses to build if one
+  appears. The client has no Supabase import at all; it talks to the
+  function, which is what keeps validation, rate limiting and the
+  moderation rule somewhere the device cannot route around. Going direct
+  with an anon key would move all three into RLS policies and make the
+  limiter decorative.
 - **RLS is enabled and forced with no policies**, which is deny for everyone
   but the bypassing service role, and grants are revoked explicitly on top.
   Adding a policy to let the client read directly undoes the paragraph above.
 - **The photo bucket is private.** These are photographs of people's hair
   waiting to be reviewed, rejections included; a public bucket makes each one
   a permanent shareable link. Reviewers read through `signedPhotoUrl()`.
+- **The `releases` bucket is public-read and nothing else.** It holds the
+  APK, the pushed-update zips and `latest.json`. No storage policy, so only
+  the service role writes — and whoever can write a bundle there can put
+  code on every installed phone. Uploads go through the CLI under the
+  developer's own login (`scripts/lib/release-manifest.mjs`), never a key
+  in a file.
 
-No `@supabase/supabase-js`: PostgREST and Storage are plain HTTP, and this
-folder already talks to Upstash the same way. A package in every function
-bundle to save thirty lines of `fetch` is not worth the cold start.
+No `@supabase/supabase-js`: PostgREST and Storage are plain HTTP. A package
+in the function bundle to save thirty lines of `fetch` is not worth the
+cold start.
 
 `client_id` is `unique` and the route checks it before writing anything, so a
 retry after a lost response returns the original id rather than queueing the
@@ -523,6 +555,7 @@ patterns recalled from memory are stale.
 npm run build        # typecheck + production bundle
 npm run ask:eval     # after touching content, the Ask vocabulary or its weights
 npm run android:build # full APK compile — catches native/config breakage
+npm run ota:publish -- --dry-run # builds and zips a pushed update, uploads nothing
 ```
 
 An APK for a phone comes from `npm run apk` and nothing else: one file,
@@ -530,4 +563,9 @@ An APK for a phone comes from `npm run apk` and nothing else: one file,
 build not signed by the pinned certificate in `scripts/build-apk.mjs`,
 because a different key or a lower code is an APK that cannot install
 over the existing app. Do not change that pin, and do not let debug
-builds fall back to the machine's debug keystore.
+builds fall back to the machine's debug keystore. It also refuses to
+build without the production function and manifest URLs in
+`.env.production`, because an APK that cannot read `latest.json` can
+never receive a pushed update. Because every `npm run apk` raises the
+versionCode, do not reach for it to ship screens or content — that is
+`npm run ota:publish`.

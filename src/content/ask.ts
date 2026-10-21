@@ -404,11 +404,11 @@ export const TOPICS: AskTopic[] = [
     id: 'updates',
     title: 'Updating the app',
     answer:
-      'When the app opens it asks our website whether a newer version is out, carrying nothing about you. If there is one, a sheet offers the download; nothing installs on its own. You can switch the check off on About.',
+      'When the app opens it asks our update server whether anything newer is out, carrying nothing about you. Most updates install in place: a sheet says one is ready, you tap Update now and the app restarts into it, with nothing to reinstall. A change to the app itself comes as a new version to download instead. Nothing installs on its own, and you can switch the check off on About.',
     route: '/about',
     cta: 'Open About',
     docs: 'updates',
-    keys: 'update the app|new version|latest version|is there an update|turn off updates|stop update check|apk',
+    keys: 'update the app|new version|latest version|is there an update|update now|update is ready|turn off updates|stop update check|apk',
   },
   {
     id: 'tour',

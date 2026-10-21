@@ -433,13 +433,19 @@ const SECTIONS: {
       <>
         <p>
           When the app opens, and when you come back to it (at most every six hours), it asks
-          our website whether a newer version is out. The request carries no profile data,
-          no identifier and nothing else about you.
+          our update server whether anything newer is out. The request carries no profile
+          data, no identifier and nothing else about you.
         </p>
         <p>
-          If there is one, a sheet offers the download. Nothing installs on its own: you tap
-          Download, Android asks you to confirm, and the new version installs over this one
-          with your profile intact. You can switch the check off on About.
+          Most updates install in place. A sheet says &ldquo;An update is ready&rdquo;; tap
+          Update now and the app downloads it, checks it, and restarts into it. There is
+          nothing to reinstall, and your profile, history and photos stay where they are.
+        </p>
+        <p>
+          A change to the app itself comes as a new version instead. The sheet offers the
+          download, Android asks you to confirm, and it installs over this one with your
+          profile intact. Nothing installs on its own either way, and you can switch the
+          check off on About, which also lists any update you put off.
         </p>
       </>
     ),

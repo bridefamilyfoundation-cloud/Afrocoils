@@ -8,6 +8,8 @@ import {
   checkForUpdates,
   formatBytes,
   installedVersion,
+  installPushedUpdate,
+  RUNNING_BUNDLE,
   updatesConfigured,
   useUpdateStatus,
   type InstalledVersion,
@@ -209,7 +211,8 @@ function UpdatesSection() {
       </div>
       <p className="mb-md font-body-md text-body-md text-on-surface-variant">
         Installed: version {installed?.version ?? VERSION}
-        {installed ? ` (build ${installed.build})` : ''}.
+        {installed ? ` (build ${installed.build})` : ''}
+        {RUNNING_BUNDLE > 0 ? `, update ${RUNNING_BUNDLE}` : ''}.
       </p>
 
       {!updatesConfigured ? (
@@ -220,7 +223,26 @@ function UpdatesSection() {
         </p>
       ) : (
         <>
-          {status.kind === 'available' ? (
+          {status.kind === 'pushed' || status.kind === 'installing' || status.kind === 'install-failed' ? (
+            <div className="mb-md rounded-xl bg-primary-container p-md text-on-primary-container" aria-live="polite">
+              <p className="mb-sm font-label-md text-label-md">
+                {status.kind === 'installing'
+                  ? `Downloading update ${status.push.code}… ${Math.round(status.percent)}%`
+                  : status.kind === 'install-failed'
+                    ? `Update ${status.push.code} did not download or did not check out. Nothing was changed.`
+                    : `Update ${status.push.code} is ready · ${formatBytes(status.push.bytes)}. It installs in place, no reinstall.`}
+              </p>
+              <button
+                type="button"
+                disabled={status.kind === 'installing'}
+                onClick={() => void installPushedUpdate(status.push)}
+                className="inline-flex items-center gap-xs rounded-full bg-surface-container-lowest px-lg py-2 font-label-md text-label-md text-primary transition-all active:scale-95 disabled:opacity-60"
+              >
+                <Icon name="system_update" className="text-[18px]" />
+                {status.kind === 'installing' ? 'Updating…' : status.kind === 'install-failed' ? 'Try again' : 'Update now'}
+              </button>
+            </div>
+          ) : status.kind === 'available' ? (
             <div className="mb-md rounded-xl bg-primary-container p-md text-on-primary-container">
               <p className="mb-sm font-label-md text-label-md">
                 Version {status.update.version} is available · {formatBytes(status.update.bytes)}

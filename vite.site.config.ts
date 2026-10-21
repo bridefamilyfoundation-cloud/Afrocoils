@@ -38,21 +38,11 @@ type Release = Omit<UpdateManifest, 'page'> & { packageId: string }
 function readRelease(): Release {
   const path = site('release.json')
   if (!existsSync(path)) {
-    throw new Error('site/release.json is missing. Run `npm run android:release && npm run site:release`.')
+    throw new Error('site/release.json is missing. Run `npm run apk && npm run site:release`.')
   }
   const release = JSON.parse(readFileSync(path, 'utf8')) as Release
   // Written before release notes existed.
   return { ...release, notes: release.notes ?? [] }
-}
-
-/**
- * `latest.json` — what installed copies of the app read to learn that a
- * newer build is out (src/lib/updates.ts). Served beside index.html, so
- * the relative `url` and `page` resolve against it on any host.
- */
-function updateManifest(): UpdateManifest {
-  const { packageId: _packageId, ...release } = readRelease()
-  return { ...release, page: './#download' }
 }
 
 /** `YYYY-MM-DD` → "12 September 2026", in local time (never Date.parse). */
@@ -121,22 +111,13 @@ function siteFacts(): Plugin {
   }
 }
 
-/** Publishes `latest.json` in the build, and serves it from `site:dev`. */
-function publishUpdateManifest(): Plugin {
-  return {
-    name: 'afrocoil:update-manifest',
-    configureServer(server) {
-      server.middlewares.use('/latest.json', (_req, res) => {
-        res.setHeader('Content-Type', 'application/json')
-        res.setHeader('Cache-Control', 'no-cache')
-        res.end(JSON.stringify(updateManifest(), null, 2))
-      })
-    },
-    generateBundle() {
-      this.emitFile({ type: 'asset', fileName: 'latest.json', source: `${JSON.stringify(updateManifest(), null, 2)}\n` })
-    },
-  }
-}
+/*
+ * The site no longer publishes `latest.json`. Installed copies read it
+ * from the `releases` bucket in Supabase Storage, where `site:release`
+ * and `ota:publish` write it (scripts/lib/release-manifest.mjs) — so a
+ * pushed update reaches phones without redeploying this site, and there
+ * is one manifest rather than two that can disagree.
+ */
 
 /** Fails the build if the download button would point at nothing. */
 function requireReleaseFile(): Plugin {
@@ -149,7 +130,7 @@ function requireReleaseFile(): Plugin {
       if (!existsSync(site(`public/${url}`))) {
         this.error(
           `site/release.json points at ${url}, which is not in site/public/. ` +
-            'Run `npm run android:release && npm run site:release` before building the site.',
+            'Run `npm run apk && npm run site:release` before building the site.',
         )
       }
     },
@@ -159,7 +140,7 @@ function requireReleaseFile(): Plugin {
 export default defineConfig({
   root: site(''),
   base: './',
-  plugins: [siteFacts(), publishUpdateManifest(), requireReleaseFile()],
+  plugins: [siteFacts(), requireReleaseFile()],
   css: {
     postcss: {
       plugins: [tailwindcss({ config: site('tailwind.config.js') }), autoprefixer()],

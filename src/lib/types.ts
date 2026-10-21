@@ -582,9 +582,10 @@ export function defaultSchedules(hairType: HairType | undefined): CareSchedule[]
  * App updates
  *
  * The app is sideloaded from the landing site, so nothing tells an
- * installed copy that a newer one exists. The site's build publishes
- * `latest.json` beside the APK (vite.site.config.ts writes it from
- * site/release.json) and the app reads it on open — see
+ * installed copy that a newer one exists. `latest.json` names the newest
+ * APK and the newest pushed bundle; it is written from site/release.json
+ * and published to the public `releases` bucket in Supabase Storage
+ * (scripts/lib/release-manifest.mjs), and the app reads it on open — see
  * src/lib/updates.ts. Declared here because both sides import it.
  * ------------------------------------------------------------------ */
 
@@ -606,6 +607,38 @@ export interface UpdateManifest {
   page: string
   /** What changed, one line each. Optional: a release may say nothing. */
   notes: string[]
+  /**
+   * The newest pushed update to the app's screens and content — its web
+   * bundle — swapped in without reinstalling. Absent until the first one
+   * is published with `npm run ota:publish`.
+   */
+  bundle?: BundleRelease
+}
+
+/**
+ * One pushed update: a zip of `dist/`, the same HTML, JS and CSS the APK
+ * carries, built from newer source.
+ *
+ * It changes only what the WebView loads. The APK's versionCode, package
+ * id, signature, permissions and plugins stay exactly as installed, which
+ * is why a change to any of those still needs a new APK — and why
+ * `minVersionCode` exists: a bundle is built against the native plugins
+ * of the APK published when it was made, and is never offered to an
+ * older one.
+ */
+export interface BundleRelease {
+  /** Increases by one per push. The running bundle's own code is `__BUNDLE_CODE__`. */
+  code: number
+  /** The oldest APK versionCode this bundle runs on. */
+  minVersionCode: number
+  bytes: number
+  /** Of the zip. Verified by the updater before the bundle is unpacked. */
+  sha256: string
+  /** `YYYY-MM-DD`, local to the machine that published it. */
+  released: string
+  /** The zip. Relative URLs resolve against the manifest's own URL. */
+  url: string
+  notes: string[]
 }
 
 /** The user's side of update checks. Lives on the profile so it survives restarts. */
@@ -614,6 +647,8 @@ export interface UpdateSettings {
   check: boolean
   /** A version the user said "Not now" to, so it does not ask again. */
   dismissedVersionCode?: number
+  /** The same, for a pushed update (`BundleRelease.code`). */
+  dismissedBundleCode?: number
 }
 
 /** The persisted document. Versioned so migrations stay mechanical. */

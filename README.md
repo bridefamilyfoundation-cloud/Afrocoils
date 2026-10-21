@@ -24,7 +24,7 @@ web app targeting Android.
 │   ├── lib/              types.ts (shared contract), api.ts (fetch layer),
 │   │                     locs.ts, calendar.ts, growth.ts, photos.ts
 │   └── native/shell.ts   Capacitor plugin setup (status bar, keyboard, splash)
-├── api/                  One Vercel serverless function: community style submissions
+├── supabase/             The backend: migrations, and the one Edge Function (submissions)
 ├── android/              Generated Capacitor Android project
 ├── prototype/            Original HTML prototypes — the design source of truth
 └── tailwind.config.js    Design tokens: the prototype's names, the brand's colours
@@ -116,99 +116,108 @@ per artifact sent to Play, not per release.
 the APK download. The design record is `prototype/screen-00-landing.html`.
 
 ```bash
-npm run android:release   # build the signed release APK
-npm run site:release      # check it, hash it, copy it to site/public/download/
 npm run site:build        # -> dist-site/  (static: deploy the folder as-is)
 npm run site:dev          # http://localhost:5174
 ```
 
-`site:release` refuses an APK that is unsigned or whose metadata disagrees
-with `package.json`, and writes `site/release.json` (commit it). Every
-figure on the page — version, size, checksum, minimum Android, and the
+Every figure on the page — version, size, checksum, minimum Android, and the
 style, guide, symptom and chapter counts — is filled in at build time from
-that file and from `src/content/`, so none of them is typed by hand.
+`site/release.json` and from `src/content/`, so none of them is typed by
+hand. The download button links to the APK in the `releases` bucket (below).
 
-The APK is gitignored, so a build from a clean checkout fails rather than
-publishing a dead download button. Either deploy `dist-site/` from the
-machine that ran `site:release`, or host the APK elsewhere and run
-`npm run site:release -- --url https://…/afrocoil.apk`. Serve `.apk` as
-`application/vnd.android.package-archive` if the host lets you set it.
+Vercel builds the page from GitHub (`vercel.json` → `npm run site:build` →
+`dist-site/`); every push to `main` redeploys it. It is only the page now:
+the submissions route and the update manifest both live in Supabase.
 
-### Deploying to Vercel
+### The backend: one Supabase project
 
-One Vercel project, built from GitHub, serves both public halves:
-`vercel.json` builds the landing site (`npm run site:build` → `dist-site/`)
-and deploys `api/submissions.ts` beside it. So the page is `/`, the update
-feed is `/latest.json` and the submissions route is `/api/submissions`, all
-on one origin. The app's own `dist/` is not deployed; it only ever ships
-inside the APK.
+| What | Where |
+| --- | --- |
+| Moderation queue, rate-limit counters | Postgres — `supabase/migrations/0001_community_submissions.sql` |
+| Submitted photographs | Storage bucket `submission-photos` — **private** |
+| APK, pushed updates, `latest.json` | Storage bucket `releases` — **public read**, `0002_releases.sql` |
+| `POST /functions/v1/submissions` | Edge Function — `supabase/functions/submissions/` |
 
-Because the APK is gitignored, the download is a **GitHub Release asset**:
-`site/release.json`'s `url` points at
-`releases/download/v<version>/AfroCoils-<version>.apk`. For each release,
-create that release on GitHub and attach the APK `site:release` hashed, or
-the button is a dead link. (That only works publicly while the repo is
-public; otherwise host the file somewhere that is and pass its address with
-`--url`.)
+```bash
+npx supabase login                                   # once per machine
+npx supabase link --project-ref runhkccoeyxfgsfrzezn # once per checkout
+npm run db:push           # apply new migrations
+npm run backend:deploy    # deploy the submissions function
+```
 
-Setup, once:
+Nothing to configure by hand: Supabase injects the project URL and service
+key into the function, so the key is never copied into an env file, a
+dashboard or CI. Every table has RLS forced on with no policies, and
+neither bucket has a storage policy, so only the service role (the function,
+and the CLI under your login) can read or write anything — the public
+bucket is readable by URL and nothing else. See
+[docs/community-backend.md](docs/community-backend.md).
 
-1. Import the repository in Vercel. Leave the framework preset at *Other*;
-   `vercel.json` sets the install, build and output.
-2. Set `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` under *Settings →
-   Environment Variables* (Production). Never give either a `VITE_` prefix.
-   Without them the site still deploys and the route answers 503, which the
-   app treats as "keep it queued".
-3. Put the deployed origin in `.env.production` before the next APK build,
-   so installed copies know where to send submissions and check for updates:
+`.env.production` (gitignored) holds the two public URLs a release build
+needs; `npm run apk` and `npm run ota:publish` refuse to run without them:
 
-   ```bash
-   VITE_API_BASE_URL=https://<your-project>.vercel.app
-   VITE_UPDATE_MANIFEST_URL=https://<your-project>.vercel.app/latest.json
-   ```
-
-Every push to `main` then redeploys. Shipping an update is the four steps
-below, plus the GitHub release, plus committing `site/release.json`.
+```bash
+VITE_API_BASE_URL=https://runhkccoeyxfgsfrzezn.supabase.co/functions/v1
+VITE_UPDATE_MANIFEST_URL=https://runhkccoeyxfgsfrzezn.supabase.co/storage/v1/object/public/releases/latest.json
+```
 
 ### Shipping an update
 
-Installed copies find out about a new build from `latest.json`, which
-`site:build` publishes next to the APK. The APK has to be told where that
-is, once, before it is built:
+There are two kinds, and most changes are the first.
+
+**A pushed update** — anything under `src/`: screens, copy, content,
+styles, images. The APK's version, package id and signature do not change,
+and nobody reinstalls anything.
 
 ```bash
-# .env.production (gitignored) — set before the first release that should check
-VITE_UPDATE_MANIFEST_URL=https://your-landing-site.example/latest.json
+npm run ota:publish -- --note "New loc styles" --note "Fixes the quiz"
 ```
 
-Then, for every release:
+It builds the app, zips `dist/`, uploads `bundles/<n>.zip` and rewrites
+`latest.json`. Commit `site/release.json` afterwards. Within six hours of
+next opening the app (or at once, with **Check now** on About) each phone
+shows *An update is ready*; **Update now** downloads it, the updater checks
+it against the SHA-256 in the manifest, and the app restarts into it with
+the profile untouched. If the new bundle fails to start, the updater puts
+the previous one back by itself. `--dry-run` builds and zips without
+uploading.
+
+**A new APK** — only for native changes: a Capacitor plugin added or
+upgraded, a permission, the icon or splash, anything in `android/` or
+`capacitor.config.ts`. A pushed bundle cannot carry those, and a bundle that
+calls a plugin its APK lacks breaks on that call, so each bundle names the
+oldest APK it runs on and is never offered to an older one.
 
 1. Bump `version` in `package.json` if the release deserves a new name.
 2. `npm run apk` — raises `appVersionCode`, builds the signed release and
    refuses to finish unless it is signed by **the same key as before** (see
-   *The one APK* below).
-3. `npm run site:release -- --url https://github.com/bridefamilyfoundation-cloud/Afrocoils/releases/download/v<version>/AfroCoils-<version>.apk --note "What changed"`.
-   It refuses a different APK under a build number that is not higher.
-   Then attach that same APK (`android/app/build/outputs/apk/release/app-release.apk`)
-   to a GitHub release tagged `v<version>`, renamed `AfroCoils-<version>.apk`
-   so the link resolves.
-4. Commit `site/release.json` and push to `main`; Vercel rebuilds the site
-   and `latest.json` (see *Deploying to Vercel* above).
+   *The one APK* above).
+3. `npm run site:release -- --note "What changed"` — uploads the APK to
+   `releases/apk/`, rewrites `latest.json`, and writes `site/release.json`.
+   It refuses an unsigned APK, one under a build number that is not higher,
+   and one built before the latest push.
+4. Commit `site/release.json` and `gradle.properties`, and push, so the
+   landing page's button follows.
 
-The next time someone opens the app (or returns to it after six hours) it
-shows *A new version is out*, with the notes; **Download update** opens the
-APK in the browser and Android installs it over the old one, profile intact.
-**Not now** silences that version only. About shows the installed build,
-**Check now**, and the switch that turns checking off. Logic in
-`src/lib/updates.ts`, sheet in `src/components/UpdatePrompt.tsx`.
+Phones then show *A new version is out*; **Download update** opens the APK
+in the browser and Android installs it over the old one, profile intact.
 
-Builds made before `VITE_UPDATE_MANIFEST_URL` was set never check, so the
-first build with it has to reach people the old way.
+**Not now** silences that one update only. About shows the installed build
+and update, **Check now**, any update put off, and the switch that turns
+checking off. Logic in `src/lib/updates.ts`, sheet in
+`src/components/UpdatePrompt.tsx`.
+
+Pushes use `@capgo/capacitor-updater` in manual mode, with every Capgo
+endpoint blanked in `capacitor.config.ts`: out of the box it reports
+update events and crashes to Capgo's servers, which would make the privacy
+policy false. Builds older than the first one carrying that plugin and the
+manifest URL cannot receive pushes, so that build has to reach people as a
+download.
 
 ### Remote updates
 
-See [docs/remote-updates.md](docs/remote-updates.md) for how to ship changes to
-installed devices without a new APK, and what can never be updated that way.
+[docs/remote-updates.md](docs/remote-updates.md) records why pushed updates
+were built this way and what can never be updated without an APK.
 
 ## Everything runs on the device
 
@@ -244,16 +253,18 @@ and scored. Add a question there whenever Ask misses one.
 
 ### The one route that remains
 
-**`POST /api/submissions`** receives a style offered to the community library:
-the write-up, the photographs, and the contributor's claim that the images are
-theirs to give. Nothing else of the user's leaves the device, and this only does
-when the user taps Share. Every submission lands as `Pending` for a human to read — see
+**`POST /functions/v1/submissions`** (the Edge Function in
+`supabase/functions/submissions/`) receives a style offered to the community
+library: the write-up, the photographs, and the contributor's claim that the
+images are theirs to give. Nothing else of the user's leaves the device, and
+this only does when the user taps Share. Every submission lands as `Pending`
+for a human to read — see
 [docs/community-backend.md](docs/community-backend.md).
 
 The one other request is the **update check**: on open, and on return after six
-hours, the APK reads the landing site's `latest.json` and offers the download
-if a higher `versionCode` is posted. It sends nothing — see *Shipping an
-update* below.
+hours, the APK reads `latest.json` from the `releases` bucket and offers a
+pushed update or a new APK if one is posted. It sends nothing — see *Shipping
+an update* above.
 
 The device keeps its own copy regardless. A submission is written to the profile
 as `Queued` *before* the request and only becomes `Sent` on a 200, so a refusal,
@@ -261,24 +272,24 @@ an outage or aeroplane mode costs the contributor nothing.
 
 ### Key handling
 
-There are no provider keys any more. What the route does need —
-`KV_REST_API_URL`, `KV_REST_API_TOKEN`, `BLOB_READ_WRITE_TOKEN` — is read from
-the serverless environment only and is **never** prefixed with `VITE_`, because
-anything `VITE_`-prefixed is inlined into the client bundle and would ship inside
-the APK where it can be extracted. That applies to a shared "service key" meant
-to authorise calls just as much as to a provider key — a secret in the bundle is
-not authentication.
+The app holds no key of any kind, Supabase's included. The service key exists
+only inside the Edge Function's environment, where Supabase puts it.
+`vite.config.ts` refuses to build if a `VITE_`-prefixed Supabase key appears in
+any env file, because anything `VITE_`-prefixed is inlined into the bundle —
+and so into the APK and every pushed update — where it can be extracted. That
+applies to a shared "service key" meant to authorise calls just as much as to
+a provider key: a secret in the bundle is not authentication.
 
-The client is told where the function lives via `VITE_API_BASE_URL`. That is
-required for the Android build — the APK has no same-origin server to fall back
-on. Leave it empty for local `npm run dev`; the only thing that stops working is
-the Share button.
+The function is deployed with JWT verification off (`--no-verify-jwt`) for the
+same reason: verifying a JWT would need the app to carry the anon key, which
+authenticates nobody.
 
 ### CORS
 
 The Android WebView loads from `https://localhost` / `capacitor://localhost`, so
-every API call is cross-origin. `api/_shared.ts` allow-lists those two origins
-plus the Vite dev server; add anything else via the `ALLOWED_ORIGINS` env var.
+every API call is cross-origin. `supabase/functions/_shared/cors.ts` allow-lists
+those two origins plus the Vite dev server; add anything else with
+`npx supabase secrets set ALLOWED_ORIGINS=…`.
 
 ### Rate limits
 
@@ -287,18 +298,13 @@ response; a script with curl never asks permission. The submissions route does
 not authenticate its caller either — a shared secret shipped in the APK can be
 extracted, so it would leak the thing it was guarding without protecting it.
 
-What bounds an open upload endpoint is `api/_limits.ts`: a per-IP window and a
-daily cap, counted before anything is parsed or stored. The daily cap is the one
-that matters, since an attacker with many addresses walks straight past a per-IP
-limit.
-
-Those counters need somewhere shared to live — serverless instances share no
-memory, so without a store the limits are per-instance and the daily cap does
-not hold. **Set `KV_REST_API_URL` and `KV_REST_API_TOKEN` before going live.**
-When a store is configured and then becomes unreachable the route fails closed;
-the device keeps the submission queued and sends it later, so nothing is lost.
-With no store configured at all it falls back to a per-instance counter, so
-`npm run dev` is unaffected.
+What bounds an open upload endpoint is `supabase/functions/_shared/limits.ts`:
+a per-IP window and a daily cap, counted before anything is parsed or stored.
+The daily cap is the one that matters, since an attacker with many addresses
+walks straight past a per-IP limit. The counters live in Postgres behind the
+atomic `incr_rate_counter()`, and pg_cron sweeps expired ones nightly. If the
+counter store is unreachable the route fails closed; the device keeps the
+submission queued and sends it later, so nothing is lost.
 
 ## Structure
 

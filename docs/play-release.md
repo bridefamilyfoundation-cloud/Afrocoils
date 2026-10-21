@@ -46,19 +46,17 @@ Then point `android/keystore.properties` at it (copy from
 enrolled in Play App Signing a lost upload key is recoverable via a reset
 request (a few days). Without that enrolment it is terminal.
 
-### 3. Deploy the API
+### 3. Deploy the backend
 
 Optional, and only one screen depends on it. The app makes no model calls and
-every screen works offline; the single route in `api/` receives a style offered
+every screen works offline; the single Edge Function receives a style offered
 to the community library. Skip this and "Share a style" leaves the submission
 queued on the device — which is what it does on a failed send anyway.
 
-1. Deploy, with `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` set in the
-   Vercel project environment (see `.env.example` and the README's
-   *Deploying to Vercel*).
-2. Add the deployment origin to `ALLOWED_ORIGINS` if it isn't already covered
-   by the Capacitor defaults in `api/_shared.ts`.
-3. Record the deployment URL for the next step.
+1. `npm run db:push` and `npm run backend:deploy` against the linked Supabase
+   project (README, *The backend*). There are no secrets to set.
+2. The functions URL for the next step is
+   `https://runhkccoeyxfgsfrzezn.supabase.co/functions/v1`.
 
 ### 4. Point the release build at it
 
@@ -68,7 +66,7 @@ in `.env.production`, which only `vite build` loads:
 
 ```bash
 # .env.production  — gitignored
-VITE_API_BASE_URL=https://your-deployment.vercel.app
+VITE_API_BASE_URL=https://runhkccoeyxfgsfrzezn.supabase.co/functions/v1
 ```
 
 ## Building the artifact
@@ -108,12 +106,16 @@ that.
 and transmitted *only* via that submission flow, and optional. Inconsistency
 between this form and observed network behaviour is the single most common
 rejection — and this app's network behaviour is now easy to describe: one POST,
-only when the user taps Share, plus a GET of the landing site's public
-`latest.json` on open (the update check, `src/lib/updates.ts`). That GET sends
-no user data and no identifier, so it declares nothing — but say so in the
-privacy policy, which it does. A Play build can leave `VITE_UPDATE_MANIFEST_URL`
-unset, since Play delivers its own updates; About then says the build does not
-check.
+only when the user taps Share, plus a GET of the public `latest.json` in the
+Supabase `releases` bucket on open (the update check, `src/lib/updates.ts`).
+That GET sends no user data and no identifier, so it declares nothing — but say
+so in the privacy policy, which it does. **A Play build must leave
+`VITE_UPDATE_MANIFEST_URL` unset.** Play delivers its own updates, and pushing
+web bundles to a Play install from outside Play is exactly what reviewers look
+for under the Device and Network Abuse policy; with the URL unset the app never
+checks, never offers a push, and About says so. The updater plugin is still in
+the build but, with every endpoint blank in `capacitor.config.ts`, makes no
+requests.
 
 **Generative AI policy.** Out of scope. The app generates nothing: every guide,
 style and step ships inside the bundle and was written by a person.
@@ -163,11 +165,11 @@ shippable in a way that a release on another creator's watermark is not. See
 - [ ] Developer account verified
 - [ ] Upload keystore generated **and backed up off-machine**
 - [ ] `android/keystore.properties` points at the upload key
-- [ ] `api/` deployed with `ANTHROPIC_API_KEY` set
+- [ ] Supabase function deployed (`npm run backend:deploy`)
 - [ ] `.env.production` has `VITE_API_BASE_URL`
 - [ ] `appVersionCode` bumped
 - [ ] `npm run android:bundle` succeeds
-- [ ] AAB installs and the AI screens work against the deployed API
+- [ ] AAB installs and "Share a style" reaches the deployed function
 - [ ] Privacy policy live at a public URL
 - [ ] Data safety, content rating, target audience, ads declaration submitted
 - [ ] Listing assets uploaded

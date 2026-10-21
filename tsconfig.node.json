@@ -20,5 +20,5 @@
 
     "types": ["node"]
   },
-  "include": ["vite.config.ts", "tailwind.config.js", "postcss.config.js", "capacitor.config.ts", "api"]
+  "include": ["vite.config.ts", "tailwind.config.js", "postcss.config.js", "capacitor.config.ts", "supabase/functions"]
 }
