@@ -558,6 +558,15 @@ npm run android:build # full APK compile — catches native/config breakage
 npm run ota:publish -- --dry-run # builds and zips a pushed update, uploads nothing
 ```
 
+**After any `npm install` on this Windows machine, check the lockfile
+still has `node_modules/@emnapi/core` and `node_modules/@emnapi/runtime`
+(1.11.3).** npm on Windows drops them, `npm ci` here still passes, and
+Vercel's Linux `npm ci` then refuses the whole build ("Missing:
+@emnapi/runtime@1.11.3 from lock file"), so the landing page silently
+stays on the last good deploy. It has happened twice (`be2ad9b`, and
+again after the Supabase move); restore them from the last commit Vercel
+deployed.
+
 An APK for a phone comes from `npm run apk` and nothing else: one file,
 `apk-output/afrocoil.apk`. It raises `appVersionCode` and refuses any
 build not signed by the pinned certificate in `scripts/build-apk.mjs`,
