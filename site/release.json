@@ -1,14 +1,25 @@
 {
   "version": "0.2.0",
-  "versionCode": 6,
+  "versionCode": 7,
   "packageId": "com.afrocoilyhair.app",
   "minSdk": 24,
   "minAndroid": "7.0",
-  "bytes": 9907120,
-  "sha256": "0e7cbd862cf0c8b0f8f9fc6c49a45fed7520be620a559029bbd0f3612458df1e",
+  "bytes": 9643718,
+  "sha256": "1679653dfa4010bd29741188fe6ea76af477ad7b797a9ca8eb6145cef26eef96",
   "released": "2026-10-21",
-  "url": "https://runhkccoeyxfgsfrzezn.supabase.co/storage/v1/object/public/releases/apk/AfroCoils-0.2.0-6.apk",
+  "url": "https://runhkccoeyxfgsfrzezn.supabase.co/storage/v1/object/public/releases/apk/AfroCoils-0.2.0-7.apk",
   "notes": [
-    "Updates now install in place: no more reinstalling for new styles and guides"
-  ]
+    "The new AfroCoils logo, now on your home screen and the launch screen too"
+  ],
+  "bundle": {
+    "code": 1,
+    "minVersionCode": 6,
+    "bytes": 4808600,
+    "sha256": "9c8f9700dde41d6b1889023b4b9921fcd0c07318c947f22146273426fd04ac5b",
+    "released": "2026-10-21",
+    "url": "https://runhkccoeyxfgsfrzezn.supabase.co/storage/v1/object/public/releases/bundles/1.zip",
+    "notes": [
+      "The new AfroCoils logo"
+    ]
+  }
 }

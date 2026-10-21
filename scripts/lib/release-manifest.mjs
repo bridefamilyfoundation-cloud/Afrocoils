@@ -78,30 +78,31 @@ function fail(message) {
  * hour. Immutable paths (a numbered zip, a versioned APK) cache for a year.
  */
 export function upload(localPath, remotePath, { contentType, cacheControl }) {
-  const windows = process.platform === 'win32'
-  const q = (arg) => (windows && /\s/.test(arg) ? `"${arg}"` : arg)
-  const args = [
-    'supabase',
-    'storage',
+  const ok = storage([
     'cp',
     // Relative, forward slashes: the CLI parses its arguments as URLs,
     // and `C:\…` reads as a URL with the scheme "c".
     relative(ROOT, localPath).split('\\').join('/'),
     `ss:///${BUCKET}/${remotePath}`,
-    '--experimental',
-    '--linked',
     '--content-type',
     contentType,
     '--cache-control',
     cacheControl,
-  ]
-  const result = spawnSync('npx', args.map(q), { cwd: ROOT, stdio: 'inherit', shell: windows })
-  if (result.status !== 0) {
+  ])
+  if (!ok) {
     fail(
       `Upload of ${remotePath} failed. Is the CLI logged in to the account that owns ${PROJECT_REF}? ` +
         '(`npx supabase login`, then `npx supabase link --project-ref ' + PROJECT_REF + '`)',
     )
   }
+}
+
+/** One `supabase storage` command against the linked project; true on success. */
+function storage(args) {
+  const windows = process.platform === 'win32'
+  const q = (arg) => (windows && /\s/.test(arg) ? `"${arg}"` : arg)
+  const all = ['supabase', 'storage', ...args, '--experimental', '--linked']
+  return spawnSync('npx', all.map(q), { cwd: ROOT, stdio: 'inherit', shell: windows }).status === 0
 }
 
 /** Write latest.json from site/release.json and upload it. */
@@ -110,6 +111,11 @@ export function publishManifest(release) {
   mkdirSync(at('apk-output'), { recursive: true })
   const file = at('apk-output', 'latest.json')
   writeFileSync(file, `${JSON.stringify(manifestFrom(release), null, 2)}\n`)
+  // `storage cp` refuses to overwrite ("KeyAlreadyExists") and has no
+  // upsert flag, so the old manifest goes first. Every other upload is to
+  // a new, numbered path. For the second in between, a phone's check
+  // finds no manifest, which it already treats as "no update".
+  storage(['rm', `ss:///${BUCKET}/latest.json`, '--yes'])
   upload(file, 'latest.json', { contentType: 'application/json', cacheControl: 'max-age=60' })
   console.log(`[release] latest.json → ${MANIFEST_URL}`)
 }
