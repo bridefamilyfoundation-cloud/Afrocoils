@@ -1,27 +1,26 @@
 {
   "version": "0.2.0",
-  "versionCode": 8,
+  "versionCode": 9,
   "packageId": "com.afrocoilyhair.app",
   "minSdk": 24,
   "minAndroid": "7.0",
-  "bytes": 9502734,
-  "sha256": "72b62351feb0b09e3b48059ba1853a012ed38b186ed72625993679cdf6d84f61",
+  "bytes": 9336886,
+  "sha256": "72a76ae7a65c7aeed106e62766a3593a5967830120637fe0ad1ba4e4b73cd66b",
   "released": "2026-10-22",
-  "url": "https://runhkccoeyxfgsfrzezn.supabase.co/storage/v1/object/public/releases/apk/AfroCoils-0.2.0-8.apk",
+  "url": "https://runhkccoeyxfgsfrzezn.supabase.co/storage/v1/object/public/releases/apk/AfroCoils-0.2.0-9.apk",
   "notes": [
-    "New home-screen icon: the AfroCoils hair, without the shoulders",
+    "New home-screen icon and launch screen: the logo fades softly below the hair",
     "Hair SOS for your coils, written for type 4 hair"
   ],
   "bundle": {
-    "code": 2,
-    "minVersionCode": 7,
-    "bytes": 4742551,
-    "sha256": "b972af4904e704eb12f9ba59451ecd19d2763ef9d6aeb500256334b87c68aef0",
+    "code": 3,
+    "minVersionCode": 8,
+    "bytes": 4750327,
+    "sha256": "5dbd30d31ed464a859e599577e8a95844bafdfaff3445a16ce044bb701d333ea",
     "released": "2026-10-22",
-    "url": "https://runhkccoeyxfgsfrzezn.supabase.co/storage/v1/object/public/releases/bundles/2.zip",
+    "url": "https://runhkccoeyxfgsfrzezn.supabase.co/storage/v1/object/public/releases/bundles/3.zip",
     "notes": [
-      "New hero copy: Hair SOS for your coils, for type 4 hair",
-      "The logo now shows the hair, not the shoulders"
+      "The logo now fades softly below the hair"
     ]
   }
 }

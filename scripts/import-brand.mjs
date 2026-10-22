@@ -68,6 +68,42 @@ for (let y = Math.floor(H * 0.5); y < H; y++)
   }
 if (split < 0) throw new Error('No empty row between the illustration and the wordmark.')
 
+// The logo is the hair, not the portrait: the illustration's lower part
+// (neck and shoulders) is blurred and faded out rather than cropped, so
+// every cut — mark, hero, splash, favicons, launcher — ends in a soft
+// edge instead of a hard line through the neck. FADE_FROM and FADE_TO are
+// fractions of the illustration's own height.
+const FADE_FROM = 0.6
+const FADE_TO = 0.9
+const BLUR = 6
+{
+  let top = 0
+  while (top < split && rowEmpty(top)) top++
+  let bottom = split
+  while (bottom > top && rowEmpty(bottom - 1)) bottom--
+  const from = Math.round(top + (bottom - top) * FADE_FROM)
+  const to = Math.round(top + (bottom - top) * FADE_TO)
+  // Blur premultiplied colour so transparent pixels do not darken the edge.
+  const pre = Buffer.from(data)
+  for (let i = 0; i < pre.length; i += 4)
+    for (let c = 0; c < 3; c++) pre[i + c] = Math.round((pre[i + c] * pre[i + 3]) / 255)
+  const blurred = await sharp(pre, { raw: { width: W, height: H, channels: 4 } }).blur(BLUR).raw().toBuffer()
+  for (let y = from; y < split; y++) {
+    const t = Math.min(1, (y - from) / (to - from))
+    const s = t * t * (3 - 2 * t) // smoothstep
+    const blurMix = Math.min(1, s * 2.5)
+    for (let x = 0; x < W; x++) {
+      const i = (y * W + x) * 4
+      const a = data[i + 3] * (1 - blurMix) + blurred[i + 3] * blurMix
+      for (let c = 0; c < 3; c++) {
+        const premul = ((data[i + c] * data[i + 3]) / 255) * (1 - blurMix) + blurred[i + c] * blurMix
+        data[i + c] = a > 0 ? Math.min(255, Math.round((premul * 255) / a)) : 0
+      }
+      data[i + 3] = Math.round(a * (1 - s))
+    }
+  }
+}
+
 const keyed = () => sharp(Buffer.from(data), { raw: { width: W, height: H, channels: 4 } })
 /** The art in rows [top, bottom), trimmed to what is not transparent. */
 async function cut(top, bottom) {
@@ -78,23 +114,8 @@ async function cut(top, bottom) {
   return sharp(region).trim({ threshold: 1 }).png().toBuffer()
 }
 const full = await cut(0, H)
+const mark = await cut(0, split)
 const word = await cut(split, H)
-
-// The mark is the hair, not the portrait: the illustration's lower part
-// (neck and shoulders) is cut away so a small badge reads as the afro.
-// The hero and the splash keep the whole logo.
-const MARK_KEEP = 0.76
-const illustration = await cut(0, split)
-const { width: iw, height: ih } = await sharp(illustration).metadata()
-const mark = await sharp(
-  await sharp(illustration)
-    .extract({ left: 0, top: 0, width: iw, height: Math.round(ih * MARK_KEEP) })
-    .png()
-    .toBuffer(),
-)
-  .trim({ threshold: 1 })
-  .png()
-  .toBuffer()
 
 /** `art` contained in a `w`x`h` canvas at `scale` of it, on `background`. */
 async function place(art, w, h, scale, background = { r: 0, g: 0, b: 0, alpha: 0 }) {
