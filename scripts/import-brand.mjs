@@ -78,8 +78,23 @@ async function cut(top, bottom) {
   return sharp(region).trim({ threshold: 1 }).png().toBuffer()
 }
 const full = await cut(0, H)
-const mark = await cut(0, split)
 const word = await cut(split, H)
+
+// The mark is the hair, not the portrait: the illustration's lower part
+// (neck and shoulders) is cut away so a small badge reads as the afro.
+// The hero and the splash keep the whole logo.
+const MARK_KEEP = 0.76
+const illustration = await cut(0, split)
+const { width: iw, height: ih } = await sharp(illustration).metadata()
+const mark = await sharp(
+  await sharp(illustration)
+    .extract({ left: 0, top: 0, width: iw, height: Math.round(ih * MARK_KEEP) })
+    .png()
+    .toBuffer(),
+)
+  .trim({ threshold: 1 })
+  .png()
+  .toBuffer()
 
 /** `art` contained in a `w`x`h` canvas at `scale` of it, on `background`. */
 async function place(art, w, h, scale, background = { r: 0, g: 0, b: 0, alpha: 0 }) {

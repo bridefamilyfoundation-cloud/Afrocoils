@@ -1,6 +1,6 @@
 # AfroCoils
 
-Mobile app for type 3 / type 4 natural hair and locs, built as a Capacitor-wrapped
+Mobile app for type 4 natural hair and locs, built as a Capacitor-wrapped
 web app targeting Android.
 
 ## Stack

@@ -24,9 +24,9 @@ const SUFFIX = 'AfroCoils'
 const TITLES: Record<string, string> = {
   // One screen at three addresses, so one title. Differing titles for
   // the same page is the kind of thing that quietly goes wrong.
-  '/': `${SUFFIX} — Hair SOS for type 3 and type 4 hair`,
-  '/home': `${SUFFIX} — Hair SOS for type 3 and type 4 hair`,
-  '/sos': `${SUFFIX} — Hair SOS for type 3 and type 4 hair`,
+  '/': `${SUFFIX} — Hair SOS for type 4 hair`,
+  '/home': `${SUFFIX} — Hair SOS for type 4 hair`,
+  '/sos': `${SUFFIX} — Hair SOS for type 4 hair`,
   '/sos/quick': `Quick hairstyles by the time you have · ${SUFFIX}`,
   '/sos/problem': `Hair problems and care guides · ${SUFFIX}`,
   '/styles': `Hair Styles · ${SUFFIX}`,

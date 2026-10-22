@@ -36,7 +36,7 @@ const VERSION = version
 const ABOUT: { heading: string; body: string }[] = [
   {
     heading: 'What this is',
-    body: 'A hair app for type 3 and type 4 hair, loose or locked. It opens into Hair SOS rather than a home page, because people reach for it mid-problem far more often than they browse it — hair that will not cooperate, twenty minutes, somewhere to be.',
+    body: 'A hair app for type 4 hair, loose or locked. It opens into Hair SOS rather than a home page, because people reach for it mid-problem far more often than they browse it — hair that will not cooperate, twenty minutes, somewhere to be.',
   },
   {
     heading: 'Who it is for',
