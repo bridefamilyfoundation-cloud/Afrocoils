@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { hasLocLook, slot as imageSlot } from '../assets/imagery'
 import Icon from '../components/Icon'
 import LocsMasthead from '../components/LocsMasthead'
@@ -9,7 +9,7 @@ import { LOC_STYLES } from '../content/loc-styles'
 import { useOpenParam, useScrollToOpened } from '../lib/deep-link'
 import { isLocs, resolveLocStage } from '../lib/locs'
 import { useHairProfile } from '../lib/profile-store'
-import { LOC_STAGES, type HairIdentity } from '../lib/types'
+import { LOC_STAGES, type HairIdentity, type HairType } from '../lib/types'
 
 /**
  * Locs World, at `/locs`. A section of its own, not a chapter of Hair Care.
@@ -81,6 +81,73 @@ function StageStrip({ identity }: { identity: HairIdentity }) {
           : 'Add your start date to see your stage'}
         <Icon name="chevron_right" className="text-[14px]" />
       </Link>
+    </div>
+  )
+}
+
+/**
+ * The first question, asked at the top of Locs World: loose or loc'd.
+ * The copy is the owner's, word for word — nothing else is written above
+ * the lookbook. Choosing writes `identity.hairType` exactly as the
+ * profile's picker does (never cleared by a second tap), so it stays the
+ * same field rather than a third copy of the profile's pickers. Loose
+ * hair is then sent to Hair Care, since Locs World is not written for it.
+ */
+const FIRST_QUESTION: { type: HairType; title: string; body: string; icon: 'waves' | 'grass' }[] = [
+  {
+    type: 'Loose Natural',
+    title: 'Loose Natural Hair',
+    body: 'Personalised care and styling for your natural coils, curls, and kinks.',
+    icon: 'waves',
+  },
+  {
+    type: 'Locs',
+    title: 'Loc’d Hair',
+    body: 'Personalised care and styling for your locs, from starter locs to mature locs.',
+    icon: 'grass',
+  },
+]
+
+function FirstQuestion() {
+  const { profile, update } = useHairProfile()
+  const navigate = useNavigate()
+  const current = profile.identity.hairType
+
+  function choose(type: HairType) {
+    if (current !== type) update({ identity: { ...profile.identity, hairType: type } })
+    if (type === 'Loose Natural') navigate('/care')
+  }
+
+  return (
+    <div className="mt-lg grid grid-cols-1 gap-sm sm:grid-cols-2">
+      {FIRST_QUESTION.map(({ type, title, body, icon }) => {
+        const selected = current === type
+        return (
+          <button
+            key={type}
+            type="button"
+            aria-pressed={selected}
+            onClick={() => choose(type)}
+            className={`flex flex-col rounded-2xl p-md text-left transition-all active:scale-[0.98] ${
+              selected
+                ? 'bg-secondary text-on-secondary'
+                : 'bg-inverse-on-surface/10 text-inverse-on-surface'
+            }`}
+          >
+            <span className="mb-xs flex items-center gap-sm">
+              <Icon name={icon} filled={selected} />
+              <span className="font-headline-md text-body-lg font-bold">{title}</span>
+            </span>
+            <span
+              className={`font-body-md text-caption ${
+                selected ? 'opacity-90' : 'text-inverse-on-surface/80'
+              }`}
+            >
+              {body}
+            </span>
+          </button>
+        )
+      })}
     </div>
   )
 }
@@ -207,11 +274,15 @@ export default function LocCareScreen() {
 
   return (
     <>
-      <LocsMasthead kicker="A world of its own" title="Locs World" tourId="locs-heading">
-        <p className="max-w-[34ch] font-body-md text-body-md text-inverse-on-surface/85">
-          Everything you need to understand, start, maintain and care for your locs.
-          {!locs && ' Including whether they are right for you in the first place.'}
+      <LocsMasthead kicker="The first question" title="Loose or Loc’d?" tourId="locs-heading">
+        <p className="mb-sm font-headline-md text-body-lg text-inverse-on-surface">
+          Your journey, your care.
         </p>
+        <p className="max-w-[40ch] font-body-md text-body-md text-inverse-on-surface/85">
+          Different journeys, different needs. Choose yours to receive hair-care guidance and
+          recommendations tailored to you.
+        </p>
+        <FirstQuestion />
         {locs && <StageStrip identity={profile.identity} />}
       </LocsMasthead>
 

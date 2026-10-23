@@ -119,7 +119,7 @@
               </a>
             </div>
             <p class="rise mt-md font-caption text-caption text-on-surface-variant" style="--d: 380ms">
-              Version %release.version% · %release.size% · Android %release.minAndroid% and up · No account needed
+              Version %release.version%
             </p>
           </div>
 
@@ -281,16 +281,16 @@
         <div class="mx-auto max-w-6xl px-container-padding">
           <div data-reveal class="mx-auto mb-2xl max-w-2xl text-center">
             <p class="mb-sm font-label-md text-label-md uppercase tracking-[0.18em] text-secondary">The first question</p>
-            <h2 class="font-headline-lg text-[34px] font-semibold leading-tight tracking-tight text-primary sm:text-[44px]">Loose or locked. Never mixed.</h2>
-            <p class="mt-md font-body-lg text-body-lg text-on-surface-variant">A loc is meant to be matted, so &ldquo;detangle it&rdquo; ruins hair that can&rsquo;t be un-ruined. AfroCoils forks at your first answer, and the two never share a recommendation.</p>
+            <h2 class="font-headline-lg text-[34px] font-semibold leading-tight tracking-tight text-primary sm:text-[44px]">Loose or Loc&rsquo;d? Your journey, your care.</h2>
+            <p class="mt-md font-body-lg text-body-lg text-on-surface-variant">Different journeys, different needs. Choose yours to receive hair-care guidance and recommendations tailored to you.</p>
           </div>
 
           <div class="grid gap-lg md:grid-cols-2">
             <article data-reveal style="--d: 0ms" class="group relative overflow-hidden rounded-[32px] bg-surface-container-lowest p-xl shadow-sm ring-1 ring-outline-variant/40 transition-all duration-500 hover:-translate-y-1 hover:shadow-xl">
               <div class="absolute -right-16 -top-16 h-48 w-48 rounded-full bg-secondary-container/50 transition-transform duration-700 group-hover:scale-125"></div>
               <span class="relative mb-lg grid h-14 w-14 place-items-center rounded-2xl bg-primary-container text-on-primary-container"><svg class="h-7 w-7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-styles" /></svg></span>
-              <h3 class="relative mb-sm font-headline-lg text-[28px] font-semibold text-primary">Loose natural</h3>
-              <p class="relative mb-lg font-body-md text-body-md text-on-surface-variant">Type 4 coils. The style library is written for you.</p>
+              <h3 class="relative mb-sm font-headline-lg text-[28px] font-semibold text-primary">Loose Natural Hair</h3>
+              <p class="relative mb-lg font-body-md text-body-md text-on-surface-variant">Personalised care and styling for your natural coils, curls, and kinks.</p>
               <ul class="relative space-y-sm">
                 <li class="flex gap-sm font-body-md text-body-md text-on-surface"><svg class="mt-1 h-4 w-4 shrink-0 text-secondary" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-check" /></svg>%count.styles% contributed styles, by time, category and occasion</li>
                 <li class="flex gap-sm font-body-md text-body-md text-on-surface"><svg class="mt-1 h-4 w-4 shrink-0 text-secondary" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-check" /></svg>Detangling, wash day and night-routine guides</li>
@@ -301,8 +301,8 @@
             <article data-reveal style="--d: 120ms" class="group relative overflow-hidden rounded-[32px] bg-brand-espresso p-xl text-inverse-on-surface shadow-sm transition-all duration-500 hover:-translate-y-1 hover:shadow-xl">
               <svg class="absolute -right-10 bottom-0 h-56 w-56 text-white/5 transition-transform duration-700 group-hover:-translate-x-3" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true"><use href="#i-waves" /></svg>
               <span class="relative mb-lg grid h-14 w-14 place-items-center rounded-2xl bg-primary-fixed-dim text-brand-espresso"><svg class="h-7 w-7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-waves" /></svg></span>
-              <h3 class="relative mb-sm font-headline-lg text-[28px] font-semibold">Locs World</h3>
-              <p class="relative mb-lg font-body-md text-body-md text-inverse-on-surface/80">Its own section, not a chapter of general care. Your loc stage is estimated from your install date &mdash; labelled as an estimate, and always yours to correct.</p>
+              <h3 class="relative mb-sm font-headline-lg text-[28px] font-semibold">Loc&rsquo;d Hair</h3>
+              <p class="relative mb-lg font-body-md text-body-md text-inverse-on-surface/80">Personalised care and styling for your locs, from starter locs to mature locs.</p>
               <ul class="relative flex flex-wrap gap-xs" aria-label="Locs World chapters">%locs.chapters%</ul>
             </article>
           </div>
@@ -383,25 +383,8 @@
               <a href="%release.url%" download="AfroCoils-%release.version%.apk" type="application/vnd.android.package-archive" class="btn-shine flex w-full flex-wrap items-center justify-center gap-x-sm rounded-full bg-secondary px-xl py-4 font-label-md text-body-lg font-semibold text-on-secondary shadow-xl shadow-brand-orange/30 transition-all hover:-translate-y-0.5 active:scale-95">
                 <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-download" /></svg>
                 Download the APK
-                <span class="font-body-md text-body-md font-normal opacity-80">%release.size%</span>
               </a>
 
-              <dl class="mt-xl grid grid-cols-2 gap-x-lg gap-y-md border-t border-outline-variant/40 pt-lg">
-                <div><dt class="font-caption text-caption uppercase tracking-wider text-on-surface-variant">Version</dt><dd class="font-body-md text-body-md text-on-surface">%release.version% (build %release.versionCode%)</dd></div>
-                <div><dt class="font-caption text-caption uppercase tracking-wider text-on-surface-variant">Requires</dt><dd class="font-body-md text-body-md text-on-surface">Android %release.minAndroid% or newer</dd></div>
-                <div><dt class="font-caption text-caption uppercase tracking-wider text-on-surface-variant">Built</dt><dd class="font-body-md text-body-md text-on-surface"><time datetime="%release.releasedKey%">%release.released%</time></dd></div>
-                <div><dt class="font-caption text-caption uppercase tracking-wider text-on-surface-variant">Package</dt><dd class="break-all font-body-md text-body-md text-on-surface">%release.packageId%</dd></div>
-                <div class="col-span-2">
-                  <dt class="font-caption text-caption uppercase tracking-wider text-on-surface-variant">SHA-256</dt>
-                  <dd class="mt-xs flex items-start gap-sm">
-                    <code id="sha" class="min-w-0 flex-1 break-all rounded-lg bg-surface-container px-sm py-1.5 font-mono text-[12px] leading-relaxed text-on-surface-variant">%release.sha256%</code>
-                    <button type="button" id="copy-sha" class="grid h-9 w-9 shrink-0 place-items-center rounded-full text-on-surface-variant transition-colors hover:bg-surface-container active:scale-90" aria-label="Copy checksum">
-                      <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-copy" /></svg>
-                    </button>
-                  </dd>
-                </div>
-              </dl>
-              <p id="copy-status" class="sr-only" aria-live="polite"></p>
             </div>
 
             <div class="flex flex-col justify-between gap-xl bg-brand-chocolate p-lg text-inverse-on-surface sm:p-2xl">
@@ -453,7 +436,7 @@
             </details>
             <details class="rounded-3xl bg-surface-container-lowest ring-1 ring-outline-variant/40">
               <summary class="flex cursor-pointer items-center gap-md p-lg"><span class="flex-1 font-headline-md text-[19px] text-on-surface">Is downloading an APK safe?</span><svg class="faq-icon h-5 w-5 shrink-0 text-outline transition-transform" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><use href="#i-plus" /></svg></summary>
-              <div class="faq-body"><div class="overflow-hidden"><p class="px-lg pb-lg font-body-md text-body-md text-on-surface-variant">Download it only from this page. Android asks before it installs anything from outside an app store, and you can check the file against the SHA-256 checksum above. The app asks for two permissions, each only when you use the feature: the camera or photos when you add a picture, and notifications if you turn on a care reminder.</p></div></div>
+              <div class="faq-body"><div class="overflow-hidden"><p class="px-lg pb-lg font-body-md text-body-md text-on-surface-variant">Download it only from this page. Android asks before it installs anything from outside an app store. The app asks for two permissions, each only when you use the feature: the camera or photos when you add a picture, and notifications if you turn on a care reminder.</p></div></div>
             </details>
             <details class="rounded-3xl bg-surface-container-lowest ring-1 ring-outline-variant/40">
               <summary class="flex cursor-pointer items-center gap-md p-lg"><span class="flex-1 font-headline-md text-[19px] text-on-surface">Will it update itself?</span><svg class="faq-icon h-5 w-5 shrink-0 text-outline transition-transform" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><use href="#i-plus" /></svg></summary>

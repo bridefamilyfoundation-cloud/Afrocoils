@@ -127,7 +127,9 @@ picture; this file is the short version of what to keep in mind when editing.
   Hair Care is a hub and must stay one. `identity` is written in exactly
   two places — the quiz and the profile screen — and a third set of
   pickers would be a third thing to keep in step with
-  `identityFieldsFor()`. Its "know your hair" cards show the value the
+  `identityFieldsFor()`. The one exception is `hairType` alone, which
+  Locs World's "Loose or Loc’d?" opening (its owner-supplied copy, the
+  only writeup above the lookbook) sets the way the profile does. Its "know your hair" cards show the value the
   profile already holds and link to where it is set.
 
   **Hair SOS is also the front page.** One screen answers to `/`,
@@ -389,7 +391,9 @@ picture; this file is the short version of what to keep in mind when editing.
   World chapter list and the Quick Hairstyle examples are read from
   `src/content/` by `vite.site.config.ts`; version, size, SHA-256 and
   minimum Android come from `site/release.json`, which
-  `npm run site:release` writes from the APK itself. The HTML uses
+  `npm run site:release` writes from the APK itself. The page shows only
+  the version of those — no size, checksum, package id or Android floor —
+  on request (2026-10-23). The HTML uses
   `%placeholders%` and the build fails on an unknown one — do not replace
   one with a literal. Its phone mockups are copies of real screens: when a
   screen's copy or structure changes (the doors, the tab bar), change the

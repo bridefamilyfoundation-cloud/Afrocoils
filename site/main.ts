@@ -1,9 +1,9 @@
 /**
  * The landing page's behaviour: the scroll story, the phone mockups, the
- * reveal animations, the QR code and the checksum copy button.
+ * reveal animations, and the QR code.
  *
  * Everything here is progressive. With scripts off the page is complete —
- * every section visible, the download link and checksum in the HTML — and
+ * every section visible, the download link in the HTML — and
  * what is lost is motion and the mockups, which are decorative.
  */
 import QRCode from 'qrcode'
@@ -221,19 +221,3 @@ if (/^https?:$/.test(here.protocol) && !['localhost', '127.0.0.1'].includes(here
     })
     .catch(() => {})
 }
-
-/* ------------------------------------------------------------------ *
- * Copy the checksum.
- * ------------------------------------------------------------------ */
-const copyButton = $<HTMLButtonElement>('#copy-sha')
-copyButton.addEventListener('click', async () => {
-  try {
-    await navigator.clipboard.writeText($('#sha').textContent!.trim())
-    $('#copy-status').textContent = 'Checksum copied'
-    copyButton.classList.add('text-secondary')
-    setTimeout(() => copyButton.classList.remove('text-secondary'), 1600)
-  } catch {
-    // Clipboard refused (insecure context, permissions): the text is selectable.
-    getSelection()?.selectAllChildren($('#sha'))
-  }
-})

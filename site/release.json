@@ -13,14 +13,14 @@
     "Hair SOS for your coils, written for type 4 hair"
   ],
   "bundle": {
-    "code": 3,
-    "minVersionCode": 8,
-    "bytes": 4750327,
-    "sha256": "5dbd30d31ed464a859e599577e8a95844bafdfaff3445a16ce044bb701d333ea",
-    "released": "2026-10-22",
-    "url": "https://runhkccoeyxfgsfrzezn.supabase.co/storage/v1/object/public/releases/bundles/3.zip",
+    "code": 4,
+    "minVersionCode": 9,
+    "bytes": 4773061,
+    "sha256": "ca61c2f75d527e93f85f016663fafe64523afd62117f0682fd300cd595f9ffe6",
+    "released": "2026-10-23",
+    "url": "https://runhkccoeyxfgsfrzezn.supabase.co/storage/v1/object/public/releases/bundles/4.zip",
     "notes": [
-      "The logo now fades softly below the hair"
+      "Ask: a button on every screen, answers fitted to your hair"
     ]
   }
 }

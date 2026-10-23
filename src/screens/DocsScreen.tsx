@@ -304,6 +304,11 @@ const SECTIONS: {
         </p>
         <ul>
           <li>
+            <strong>Loose or Loc’d?</strong> opens the page. Choosing one sets your hair type,
+            the same setting as on your profile. Choosing loose natural hair takes you to Hair
+            Care.
+          </li>
+          <li>
             <strong>The Loc Lookbook</strong> shows each loc look front, back and side, from
             starter locs to updos. Tap Front, Back or Side under a picture, or swipe it. If you
             have locs, your stage is lit on the strand at the top of Locs World. A style with no
