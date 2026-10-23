@@ -46,3 +46,6 @@ dist-site/
 
 # Supabase CLI link state (project ref, CLI version cache)
 supabase/.temp/
+
+# Ask study reports: questions people typed. Never commit them.
+ask-study/

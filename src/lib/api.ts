@@ -1,15 +1,17 @@
-import type { SubmissionRequest, SubmissionResponse } from './types'
+import type { AskQuestionRequest, SubmissionRequest, SubmissionResponse } from './types'
 
 /**
- * The app's only network call that carries the user's data.
+ * The app's network calls that carry anything the user wrote.
  *
- * (The other request it makes is the version check in `updates.ts`, a
- * GET of a static file that sends nothing.) Everything else — the style library, the care guides, the quiz, the
- * porosity test, the calendar, the growth maths — is computed on the
- * device from content shipped inside the APK, and keeps working with the
- * radio off. The one exception is offering a style to the community
- * library, because that is by definition something that has to leave the
- * phone to mean anything.
+ * Two of them: offering a style to the community library, and the
+ * question typed into Ask (with sharing on). The third request the app
+ * makes is the version check in `updates.ts`, a GET of a static file
+ * that sends nothing. Everything else — the style library, the care
+ * guides, the quiz, the porosity test, the calendar, the growth maths —
+ * is computed on the device from content shipped inside the APK, and
+ * keeps working with the radio off. Ask itself answers on the phone;
+ * sending the question is what lets the team see what it could not
+ * answer, and it never waits on the reply.
  *
  * In the browser `BASE_URL` is empty and the request hits the Vite dev
  * proxy. In the APK there is no origin to speak of, so VITE_API_BASE_URL
@@ -65,4 +67,28 @@ export async function submitStyle(
   })
   if (!response.ok) throw new ApiError(await readError(response))
   return (await response.json()) as SubmissionResponse
+}
+
+/**
+ * Send one Ask question to the review queue, and forget about it.
+ *
+ * What goes is exactly `AskQuestionRequest`: the words typed, what Ask
+ * answered with, and the update number. Not the profile, not the hair
+ * type, not a device id — two questions from one phone look like two
+ * questions from two phones. The privacy policy says the same, and has
+ * to keep saying it.
+ *
+ * Fire and forget: Ask has already answered, offline or not, so a
+ * failure here is dropped rather than queued or retried. A question lost
+ * to a dead signal costs the study one data point and the person
+ * nothing.
+ */
+export function shareQuestion(input: AskQuestionRequest): void {
+  if (!BASE_URL && import.meta.env.PROD) return
+  void fetch(`${BASE_URL}/questions`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(input),
+    keepalive: true,
+  }).catch(() => undefined)
 }

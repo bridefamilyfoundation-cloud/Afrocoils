@@ -142,7 +142,8 @@ the submissions route and the update manifest both live in Supabase.
 npx supabase login                                   # once per machine
 npx supabase link --project-ref runhkccoeyxfgsfrzezn # once per checkout
 npm run db:push           # apply new migrations
-npm run backend:deploy    # deploy the submissions function
+npm run backend:deploy    # deploy the submissions and questions functions
+npm run ask:study         # what Ask could not answer, from the shared questions
 ```
 
 Nothing to configure by hand: Supabase injects the project URL and service
@@ -238,14 +239,23 @@ conversation sheet, `src/components/AskLauncher.tsx`) or full screen at
 `/ask`, answers a question by **quoting** the app rather than writing anything.
 Common questions have a written answer in `src/content/answers.ts`, with
 ordered steps, a button to the screen where the fix is done, and `forYou`
-lines chosen by the profile (porosity, loc stage, climate and so on). Every
-reply ends with the community: About's tips, sharing a style, and Contact.
+lines chosen by the profile (porosity, loc stage, climate and so on). A reply
+is one card and one button, with a link to the community's tips; a question
+that is not about hair gets one calm line back to hair.
 `src/lib/ask/` indexes those answers and every
 guide, Quick Hair Check concern, Locs World section, style, product, FAQ answer
 and how-to topic, ranks them against the question with BM25F, and shows the
-best passage word for word with a link to its page. It runs on the phone,
-needs no signal, and keeps nothing (the question lives in the URL; the
-"Earlier" list is in memory).
+best passage word for word with a link to its page. It answers on the phone
+and needs no signal.
+
+**Questions are shared, anonymously.** While sharing is on (the default;
+About switches it off), each question is posted to the `questions` function
+with what Ask did with it and the bundle number — nothing from the profile, no
+identifier — and kept twelve months (migration `0004_ask_questions.sql`).
+`npm run ask:study` pulls them, re-runs each through the current Ask and
+writes `ask-study/report-<date>.md` (gitignored): the unanswered backlog, most
+asked first with ready-made `cases.ts` lines, the loose matches, and what has
+been learned since. Writing those answers is how Ask improves.
 
 What makes it feel like it understood is `src/content/ask.ts`: a vocabulary
 that maps how people describe hair ("my hair keeps coming out", "white bits",

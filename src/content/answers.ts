@@ -88,7 +88,7 @@ export const KNOWLEDGE: KnowledgeEntry[] = [
   {
     id: 'always-dry',
     question: 'Why is my hair always dry?',
-    asks: 'my hair is always dry|hair dry no matter what|dry a day after wash day|dry the day after washing|how do i keep my hair moisturised|how to moisturise natural hair|hair feels dry the next day|dry hair fix|moisture does not last|my hair drinks product',
+    asks: 'my hair is giving straw|hair feels like straw|my hair is thirsty|my hair is always dry|hair dry no matter what|dry a day after wash day|dry the day after washing|how do i keep my hair moisturised|how to moisturise natural hair|hair feels dry the next day|dry hair fix|moisture does not last|my hair drinks product',
     answer:
       'Water is the only thing that moisturises hair. Everything else is there to keep the water in. Dryness that comes back the next day almost always means product went on hair that was already dry, or nothing sealed the water in afterwards.',
     steps: [
@@ -531,7 +531,7 @@ export const KNOWLEDGE: KnowledgeEntry[] = [
   {
     id: 'shrinkage',
     question: 'How do I stop shrinkage?',
-    asks: 'how to stop shrinkage|reduce shrinkage|my hair shrinks|stretch my hair|stretch without heat|banding|african threading|my hair looks so short',
+    asks: 'shrinkage stole my length|shrinkage took my length|how to stop shrinkage|reduce shrinkage|my hair shrinks|stretch my hair|stretch without heat|banding|african threading|my hair looks so short',
     answer:
       'Shrinkage is a sign of healthy, elastic hair. Hair that doesn’t shrink is often damaged. You can’t stop it, but you can stretch it without heat when you want length on show.',
     steps: [
@@ -607,7 +607,7 @@ export const KNOWLEDGE: KnowledgeEntry[] = [
   {
     id: 'itchy-scalp',
     question: 'Why is my scalp itchy?',
-    asks: 'why is my scalp itchy|itchy scalp fix|how to stop itchy scalp|scalp itching under braids|scalp itch remedy|scratching my scalp',
+    asks: 'my scalp itches like it pays rent|my scalp will not stop itching|why is my scalp itchy|itchy scalp fix|how to stop itchy scalp|scalp itching under braids|scalp itch remedy|scratching my scalp',
     answer:
       'There are three kinds of itch, and they need opposite things. Large, greasy, yellowish flakes mean buildup or seborrhoeic dermatitis. Small, dry, white flakes with tightness mean dryness. Redness and soreness without flakes means irritation, usually from a product or a style that’s too tight.',
     steps: [
@@ -669,7 +669,7 @@ export const KNOWLEDGE: KnowledgeEntry[] = [
   {
     id: 'edges',
     question: 'How do I grow my edges back?',
-    asks: 'how do i grow my edges back|grow back edges|edges thinning|edges gone|regrow hairline|my edges are thin|edges falling out|save my edges',
+    asks: 'my edges left the group chat|my edges left|my edges are gone|my edges disappeared|how do i grow my edges back|grow back edges|edges thinning|edges gone|regrow hairline|my edges are thin|edges falling out|save my edges',
     answer:
       'Caught early, edges usually grow back once the pulling stops. The most common cause is traction: tight styles, heavy extensions, slicked-back ponytails and tight bonnet elastics. Removing the tension does far more than any oil or serum.',
     steps: [
@@ -981,7 +981,7 @@ export const KNOWLEDGE: KnowledgeEntry[] = [
   {
     id: 'retwist-often',
     question: 'How often should I retwist my locs?',
-    asks: 'how often should i retwist|retwist frequency|how often retwist locs|is retwisting every two weeks bad|retwist schedule|when to retwist|over retwisting',
+    asks: 'my roots are a fuzzy mess|fuzzy roots|messy roots|how often should i retwist|retwist frequency|how often retwist locs|is retwisting every two weeks bad|retwist schedule|when to retwist|over retwisting',
     answer:
       'Every four to six weeks at the most, and eight is better. Every retwist puts tension on the same follicle in the same direction. Thin roots and loc-shaped gaps at the hairline almost always come from too much maintenance, not too little.',
     steps: [
@@ -1009,7 +1009,7 @@ export const KNOWLEDGE: KnowledgeEntry[] = [
   {
     id: 'loc-smell',
     question: 'Why do my locs smell?',
-    asks: 'why do my locs smell|locs smell musty|mildew locs|loc odour|locs smell after washing|locs stink|damp smell locs',
+    asks: 'my locs smell like a wet towel|locs smell like wet towel|why do my locs smell|locs smell musty|mildew locs|loc odour|locs smell after washing|locs stink|damp smell locs',
     answer:
       'Almost always it’s water left inside the loc. Locs that stay damp in the middle grow mildew, and that smell doesn’t wash out. It has to be cleared out with a clarify, and then you need to change how you dry.',
     steps: [
@@ -1124,7 +1124,7 @@ export const KNOWLEDGE: KnowledgeEntry[] = [
   {
     id: 'loc-ugly-stage',
     question: 'Why do my locs look so messy?',
-    asks: 'why do my locs look messy|locs look frizzy|ugly stage locs|budding stage|locs look bad|loc frizz|when will my locs look neat',
+    asks: 'my locs are in their awkward phase|awkward phase locs|awkward stage|why do my locs look messy|locs look frizzy|ugly stage locs|budding stage|locs look bad|loc frizz|when will my locs look neat',
     answer:
       'Somewhere between month three and month eight, locs look their worst. That’s the budding stage doing exactly what it should: the hair is matting from the inside, and the frizz is part of it. Retwisting it away only slows it down.',
     steps: [

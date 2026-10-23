@@ -97,17 +97,28 @@ for sideloading, and works unsigned.
 Most rejections happen here, not in the build.
 
 **Privacy policy URL — mandatory, must be live before the listing is.** The
-hair profile, photos, growth history and calendar stay on the device. The one
-thing that leaves it is a community style submission, which the user starts
-deliberately and which carries the photographs and text they wrote. Say exactly
-that.
+hair profile, photos, growth history and calendar stay on the device. Two
+things leave it: the questions typed into Ask, sent anonymously while sharing
+is on (on by default, off under About), and a community style submission, which
+the user starts deliberately and which carries the photographs and text they
+wrote. Say exactly that.
 
-**Data safety form.** Declare photos and user-generated content as collected
-and transmitted *only* via that submission flow, and optional. Inconsistency
-between this form and observed network behaviour is the single most common
-rejection — and this app's network behaviour is now easy to describe: one POST,
-only when the user taps Share, plus a GET of the public `latest.json` in the
-Supabase `releases` bucket on open (the update check, `src/lib/updates.ts`).
+**Data safety form.** Declare two collections, both optional:
+
+- **App activity → Other user-generated content** (and **In-app search
+  history**): the Ask question text, collected, not shared with third parties,
+  processed for *App functionality* and *Analytics* (studying unanswered
+  questions), not linked to the user, deleted after 12 months, optional because
+  the user can switch it off under About. Data is encrypted in transit (HTTPS).
+- **Photos and user-generated content** via the style submission flow, only
+  when the user taps Share.
+
+Inconsistency between this form and observed network behaviour is the single
+most common rejection — and this app's network behaviour is easy to describe:
+a POST to `questions` each time a question is asked in Ask (while sharing is
+on), a POST to `submissions` only when the user taps Share, plus a GET of the
+public `latest.json` in the Supabase `releases` bucket on open (the update
+check, `src/lib/updates.ts`).
 That GET sends no user data and no identifier, so it declares nothing — but say
 so in the privacy policy, which it does. **A Play build must leave
 `VITE_UPDATE_MANIFEST_URL` unset.** Play delivers its own updates, and pushing

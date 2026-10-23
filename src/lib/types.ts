@@ -652,7 +652,7 @@ export interface UpdateSettings {
 }
 
 /** The persisted document. Versioned so migrations stay mechanical. */
-export const PROFILE_VERSION = 9
+export const PROFILE_VERSION = 10
 
 export interface HairProfile {
   version: number
@@ -680,6 +680,13 @@ export interface HairProfile {
   /** Whether to check for a newer APK, and which one was declined. */
   updates: UpdateSettings
   /**
+   * Whether questions typed into Ask are sent, anonymously, to the
+   * review queue the team writes new answers from. On by default and
+   * switched off on About. See `shareQuestion` in lib/api.ts for exactly
+   * what goes.
+   */
+  askSharing: boolean
+  /**
    * When the welcome tour was finished or declined. Absent means it has
    * never been offered, which is the only state that offers it on launch;
    * replaying it from the menu or the documentation page leaves this alone.
@@ -704,6 +711,46 @@ export interface HairProfile {
  * `status` and `id` do not cross at all: the device's copy is its own
  * bookkeeping, and the server issues its own id.
  * ------------------------------------------------------------------ */
+
+/* ------------------------------------------------------------------ *
+ * Ask questions
+ *
+ * The wire contract for the one thing Ask sends: the question as typed,
+ * and what Ask did with it. Nothing from the profile, no device id, no
+ * account — the server cannot tell two questions from the same phone
+ * apart, and it is not meant to. Imported by supabase/functions/questions.
+ * ------------------------------------------------------------------ */
+
+/** What Ask did with a question, which is what makes it worth studying. */
+export const ASK_OUTCOMES = [
+  /** A written answer from the answer bank. */
+  'answer',
+  /** A passage quoted from a guide, check, FAQ or how-to topic. */
+  'quote',
+  'styles',
+  'products',
+  /** A Locs World topic that is not written yet. */
+  'pending',
+  /** About hair, but nothing in the app answers it — the backlog. */
+  'none',
+  /** Not about hair at all. */
+  'off-topic',
+  /** Small talk: hello, thanks. */
+  'chat',
+] as const
+export type AskOutcome = (typeof ASK_OUTCOMES)[number]
+
+/** The same cap as the input boxes. */
+export const MAX_ASK_QUESTION_CHARS = 160
+
+export interface AskQuestionRequest {
+  question: string
+  outcome: AskOutcome
+  /** The record Ask answered with (`answer:always-dry`, `guide:wash-day`), if any. */
+  matched?: string
+  /** The pushed update the app was running, so a study can tell old misses from new. */
+  bundle?: number
+}
 
 export interface SubmissionRequest {
   name: string

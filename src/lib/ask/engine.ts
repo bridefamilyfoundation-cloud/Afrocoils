@@ -9,6 +9,7 @@ import {
   NOTHING_FOUND,
   NOT_UNDERSTOOD,
   OCCASION_WORDS,
+  OFF_TOPIC,
   PRODUCT_CONCEPTS,
   QUICK_MAX_MINUTES,
   RED_FLAGS,
@@ -20,6 +21,7 @@ import { PRODUCTS, rankProducts, type RankedProduct } from '../../content/produc
 import { styleExclusion } from '../../content/styles'
 import {
   PREFERENCE_LABELS,
+  type AskOutcome,
   type CarePreferences,
   type HairBio,
   type HairIdentity,
@@ -35,8 +37,9 @@ import { editDistance, isStopword, normalise, stem, words } from './text'
  *
  * Retrieval, not generation. Every word the answer card shows is either
  * quoted from a content file or one of the fixed lines in content/ask.ts.
- * Nothing is composed, nothing leaves the phone, and nothing is kept
- * after the screen closes.
+ * Nothing is composed and the answer is worked out on the phone. The
+ * question itself is shared anonymously afterwards (lib/ask/share.ts),
+ * outside this file, so the team can study what Ask could not answer.
  *
  * The pipeline, in the order it runs:
  *
@@ -127,6 +130,7 @@ const OCCASION_TAGS = compile(
   Object.fromEntries(Object.entries(OCCASION_WORDS).map(([o, list]) => [`occasion:${o}`, list])),
 )
 const FLAG_PHRASES = compile({ distress: DISTRESS, medical: RED_FLAGS })
+const OFF_TOPIC_WORDS = new Set(OFF_TOPIC.split('|'))
 const SMALL_TALK_LINES = new Map<string, string>(
   SMALL_TALK.flatMap(({ match, reply }) =>
     match.split('|').map((m) => [normalise(m), reply] as const),
@@ -346,6 +350,8 @@ interface Reading {
   worried: boolean
   medical: boolean
   known: boolean
+  /** Names something that is not hair (OFF_TOPIC). Decisive only when no hair idea is present. */
+  elsewhere: boolean
 }
 
 function read(query: string, ix: Index): Reading {
@@ -353,10 +359,12 @@ function read(query: string, ix: Index): Reading {
   const raw = normal.split(' ').filter(Boolean)
 
   // Typos, fixed against words the app actually uses. Short words are
-  // left alone: at three letters nearly everything is one edit away.
+  // left alone: at three letters nearly everything is one edit away —
+  // and that is measured after stemming, because "rice" stems to "ric",
+  // one edit from "rid", and "rice water" became a dandruff question.
   let changed = false
   const fixed = raw.map((w) => {
-    if (w.length < 4 || isStopword(w) || /\d/.test(w) || ix.vocab.has(stem(w))) return w
+    if (w.length < 4 || stem(w).length < 4 || isStopword(w) || /\d/.test(w) || OFF_TOPIC_WORDS.has(w) || ix.vocab.has(stem(w))) return w
     const max = w.length >= 7 ? 2 : 1
     const s = stem(w)
     let best: { surface: string; d: number; df: number } | undefined
@@ -467,6 +475,7 @@ function read(query: string, ix: Index): Reading {
     intent,
     worried: flags.has('distress') || flags.has('medical'),
     medical: flags.has('medical'),
+    elsewhere: raw.some((w) => OFF_TOPIC_WORDS.has(w)),
     // An occasion alone ("who won the football") is not a hair question.
     known:
       tags.size > 0 ||
@@ -614,7 +623,13 @@ export interface AskNote {
 
 export type AskReply =
   | { type: 'chat'; text: string }
-  | { type: 'none'; text: string; corrected?: string }
+  | {
+      type: 'none'
+      text: string
+      corrected?: string
+      /** Not about hair at all, as opposed to about hair with no written answer. */
+      offTopic: boolean
+    }
   | {
       type: 'answer'
       lead: string
@@ -665,8 +680,8 @@ function describe(when: ForYouWhen): string {
   return parts.join(', ')
 }
 
-/** At most two, so the answer stays the answer. */
-const MAX_FOR_YOU = 2
+/** One — the first that fits — so the answer stays the answer. */
+const MAX_FOR_YOU = 1
 
 /** The `forYou` lines whose every condition the profile meets. */
 function forYouFor(
@@ -756,7 +771,13 @@ export function ask(query: string, ctx: AskContext): AskReply {
 
   const ix = index()
   const r = read(query, ix)
-  if (!r.known) return { type: 'none', text: NOT_UNDERSTOOD, corrected: r.corrected }
+  // Saying "hair" makes it a hair question even when nothing else in
+  // it is a word Ask knows: "can I use rice water on my hair" deserves
+  // "not written yet" (and a place in the backlog), not "outside my lane".
+  const aboutHair = [...r.tags].some((t) => !META.has(t)) || r.tokens.includes('hair')
+  if (!r.known || (r.elsewhere && !aboutHair)) {
+    return { type: 'none', text: NOT_UNDERSTOOD, offTopic: true }
+  }
 
   const hairType = r.hairType ?? ctx.identity.hairType
   const allowedProducts = new Set(
@@ -794,7 +815,11 @@ export function ask(query: string, ctx: AskContext): AskReply {
     top.score < MIN_SCORE * (bare ? 2 : 1) ||
     coverage(ix, top.d, r) < (bare ? 0.75 : MIN_COVERAGE)
   ) {
-    return { type: 'none', text: NOTHING_FOUND, corrected: r.corrected }
+    // With no hair idea in it at all, a weak match is a question about
+    // something else that happened to share a word with a guide.
+    return bare && !aboutHair
+      ? { type: 'none', text: NOT_UNDERSTOOD, corrected: r.corrected, offTopic: true }
+      : { type: 'none', text: NOTHING_FOUND, corrected: r.corrected, offTopic: false }
   }
 
   const notes: AskNote[] = []
@@ -915,4 +940,13 @@ export function ask(query: string, ctx: AskContext): AskReply {
       : undefined,
     seeAll,
   }
+}
+
+/** What Ask did with a question, in the words the review queue stores. */
+export function askOutcome(reply: AskReply): { outcome: AskOutcome; matched?: string } {
+  if (reply.type === 'chat') return { outcome: 'chat' }
+  if (reply.type === 'none') return { outcome: reply.offTopic ? 'off-topic' : 'none' }
+  const matched = reply.hit.doc.id
+  if (reply.mode !== 'quote') return { outcome: reply.mode, matched }
+  return { outcome: reply.hit.doc.kind === 'answer' ? 'answer' : 'quote', matched }
 }

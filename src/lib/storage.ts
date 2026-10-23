@@ -45,6 +45,7 @@ export function emptyProfile(): HairProfile {
     schedules: [],
     submissions: [],
     updates: { check: true },
+    askSharing: true,
     createdISO: now,
     updatedISO: now,
   }
@@ -101,6 +102,8 @@ function migrate(stored: unknown): HairProfile {
       typeof s.updates === 'object' && s.updates !== null
         ? { ...base.updates, ...s.updates }
         : base.updates,
+    // v9 → v10. On, like a new install; the switch is on About.
+    askSharing: typeof s.askSharing === 'boolean' ? s.askSharing : base.askSharing,
     createdISO: s.createdISO ?? base.createdISO,
   }
 

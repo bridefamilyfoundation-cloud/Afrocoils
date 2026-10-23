@@ -2,8 +2,9 @@ import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { AskReplyView, Suggestions } from '../components/AskReplyView'
 import Icon from '../components/Icon'
-import { EXAMPLES } from '../content/ask'
+import { EXAMPLES, OPENER, OPENER_SUB, SHARING_LINE } from '../content/ask'
 import { ask, type AskReply } from '../lib/ask/engine'
+import { shareAsked } from '../lib/ask/share'
 import { resolveLocStage } from '../lib/locs'
 import { useHairProfile } from '../lib/profile-store'
 
@@ -14,13 +15,15 @@ import { useHairProfile } from '../lib/profile-store'
  * the question and this screen quotes it: the passage word for word, the
  * list beneath it as the list it is, any caution in full, and a button to
  * the page it came from. The only sentences that are not quotes are the
- * fixed lines in content/ask.ts. It runs on the phone, works in
- * aeroplane mode, and keeps nothing: the question lives in the URL, so
- * back returns to the last answer, and the "Earlier" list is held in
- * memory until the app closes.
+ * fixed lines in content/ask.ts. It answers on the phone and works in
+ * aeroplane mode. The question lives in the URL, so back returns to the
+ * last answer, and the "Earlier" list is held in memory until the app
+ * closes. A question typed here is shared anonymously with the review
+ * queue when it is asked (not when back replays it), while sharing is on.
  *
- * Reached from the app bar on every screen, not from the drawer or the
- * tab bar: it is a way into the six sections, not a seventh.
+ * The floating Ask button opens the same answers as a sheet; this is
+ * the full-screen form that links into Ask (the FAQ, the Styles search
+ * field) land on.
  */
 
 /** This session's questions, newest first. In memory only — never written to the profile. */
@@ -44,11 +47,16 @@ export default function AskScreen() {
   useEffect(() => setDraft(q), [q])
 
   const { identity, preferences, bio } = profile
-  const reply = useMemo<AskReply | undefined>(() => {
-    if (!q) return undefined
-    const locStage = identity.hairType === 'Locs' ? resolveLocStage(identity).stage : undefined
-    return ask(q, { identity, preferences, locStage, bio })
-  }, [q, identity, preferences, bio])
+  const ctx = useMemo(
+    () => ({
+      identity,
+      preferences,
+      bio,
+      locStage: identity.hairType === 'Locs' ? resolveLocStage(identity).stage : undefined,
+    }),
+    [identity, preferences, bio],
+  )
+  const reply = useMemo<AskReply | undefined>(() => (q ? ask(q, ctx) : undefined), [q, ctx])
 
   useEffect(() => {
     if (q) remember(q)
@@ -61,6 +69,7 @@ export default function AskScreen() {
       return
     }
     setParams({ q: next })
+    shareAsked(next, ask(next, ctx), profile.askSharing)
     // Close the keyboard so the answer is visible rather than under it.
     input.current?.blur()
   }
@@ -77,15 +86,12 @@ export default function AskScreen() {
     <>
       <section className="mb-lg">
         <h2 className="mb-xs font-headline-lg text-headline-lg-mobile text-on-background">
-          Ask AfroCoils
+          {OPENER}
         </h2>
-        <p className="font-body-md text-body-md text-on-surface-variant">
-          Describe what’s going on, or what you want to do. Every answer was written by people
-          for AfroCoils, fitted to your hair profile, on your phone.
-        </p>
+        <p className="font-body-md text-body-md text-on-surface-variant">{OPENER_SUB}</p>
       </section>
 
-      <form onSubmit={onSubmit} role="search" className="relative mb-xl">
+      <form onSubmit={onSubmit} role="search" className="relative mb-lg">
         <label htmlFor="ask-input" className="sr-only">
           Your question
         </label>
@@ -100,38 +106,30 @@ export default function AskScreen() {
           value={draft}
           onChange={(e) => setDraft(e.target.value)}
           maxLength={160}
-          placeholder="e.g. my ends keep breaking"
-          className="w-full rounded-full border-none bg-surface-container-low py-4 pl-lg pr-16 font-body-md text-body-md text-on-surface shadow-sm transition-all placeholder:text-outline focus:ring-2 focus:ring-primary/20"
+          placeholder="Type how your hair feels…"
+          className="w-full rounded-full border-none bg-surface-container-lowest py-4 pl-lg pr-16 font-body-md text-body-md text-on-surface shadow-card transition-all placeholder:text-outline focus:ring-2 focus:ring-primary/20"
         />
         <button
           type="submit"
           aria-label="Ask"
-          className="absolute right-2 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-primary-container text-on-primary-container transition-all active:scale-90"
+          className="absolute right-2 top-[0.375rem] flex h-11 w-11 items-center justify-center rounded-full bg-secondary text-on-secondary transition-all active:scale-90"
         >
           <Icon name="send" />
         </button>
+        {profile.askSharing && (
+          <p className="mt-xs text-center font-body-md text-[11px] leading-4 text-on-surface-variant">
+            {SHARING_LINE}
+          </p>
+        )}
       </form>
 
-      {!q && (
-        <>
-          <Suggestions title="Try asking" items={examples} onPick={submit} />
-          <p className="mb-2xl flex items-start gap-sm rounded-xl bg-surface-container p-md font-body-md text-caption text-on-surface-variant">
-            <Icon name="info" className="shrink-0 text-[16px] leading-4 text-primary" />
-            <span>
-              Ask isn’t AI and doesn’t make advice up. It finds the answer AfroCoils has
-              written for your question, shows the lines written for your kind of hair, and
-              links to where you fix it. Nothing you type is saved or sent anywhere, and it
-              works with no signal.
-            </span>
-          </p>
-        </>
-      )}
+      {!q && <Suggestions items={examples} onPick={submit} />}
 
       {q && reply && (
         <section aria-live="polite" className="mb-2xl">
           {/* The question, as asked — so the answer below has something to answer. */}
           <div className="mb-md flex justify-end">
-            <p className="max-w-[85%] rounded-2xl rounded-br-sm bg-tertiary-container px-lg py-md font-body-md text-body-md text-on-tertiary-container">
+            <p className="max-w-[85%] rounded-2xl rounded-br-sm bg-inverse-surface px-lg py-md font-body-md text-body-md text-inverse-on-surface">
               {q}
             </p>
           </div>

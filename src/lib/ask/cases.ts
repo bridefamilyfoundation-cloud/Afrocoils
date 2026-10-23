@@ -241,6 +241,20 @@ export const CASES: AskCase[] = [
   { q: 'how often should I retwist', hair: L, never: ['answer:detangle'] },
   { q: 'my curls wont go back after a silk press', hair: L, expect: ['answer:heat'], top: true },
 
+  // --- The openers on an empty Ask (content/ask.ts EXAMPLES) ---
+  { q: 'My hair is giving straw', hair: L, expect: ['answer:always-dry'], top: true },
+  { q: 'My edges left the group chat', expect: ['answer:edges'], top: true },
+  { q: 'Shrinkage stole my length', hair: L, expect: ['answer:shrinkage'], top: true },
+  { q: 'My scalp itches like it pays rent', expect: ['answer:itchy-scalp'], top: true },
+  { q: 'My scalp itches like it pays rent', hair: X, expect: ['answer:itchy-scalp'], top: true },
+  { q: 'My locs smell like a wet towel', hair: X, expect: ['answer:loc-smell'], top: true },
+  { q: 'My locs smell like a wet towel', expect: ['answer:loc-smell'], top: true },
+  { q: 'My locs are in their awkward phase', hair: X, expect: ['answer:loc-ugly-stage'], top: true },
+  { q: 'My roots are a fuzzy mess', hair: X, expect: ['answer:retwist-often'], top: true },
+  { q: 'tell me a joke', none: true },
+  { q: 'can i use rice water on my hair', hair: L, never: ['answer:dandruff'] },
+  { q: 'what is the weather today', none: true },
+
   // --- Small talk and nothing ---
   { q: 'hello', chat: true },
   { q: 'thank you', chat: true },

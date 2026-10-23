@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useRef, useState, type FormEvent, type RefObject } from 'react'
 import { AskReplyView, Suggestions } from './AskReplyView'
 import Icon from './Icon'
-import { EXAMPLES } from '../content/ask'
+import { EXAMPLES, OPENER, OPENER_SUB, SHARING_LINE } from '../content/ask'
 import { ask } from '../lib/ask/engine'
+import { shareAsked } from '../lib/ask/share'
 import { useBackDismiss } from '../lib/back-button'
 import { resolveLocStage } from '../lib/locs'
 import { useHairProfile } from '../lib/profile-store'
@@ -14,9 +15,11 @@ import { useHairProfile } from '../lib/profile-store'
  *
  * The same engine as `/ask` and the same reply card, as a thread rather
  * than one question at a time, so a follow-up ("and for locs?") sits
- * under the answer it follows. Nothing here is generated and nothing is
- * kept: the thread lives in memory until the app closes, the same as
- * the Earlier list on `/ask`, and is never written to the profile.
+ * under the answer it follows. Nothing here is generated. The thread
+ * lives in memory until the app closes and is never written to the
+ * profile; each question, as it is asked, is shared anonymously with
+ * the review queue while `askSharing` is on (lib/ask/share.ts), and the
+ * line under the box says so every time it is shown.
  *
  * Replies are worked out at render from the question and the *current*
  * profile, so finishing the porosity test and coming back re-fits every
@@ -44,7 +47,7 @@ export default function AskSheet({
   const [turns, setTurns] = useState(() => [...thread])
   const [draft, setDraft] = useState('')
   const input = useRef<HTMLInputElement>(null)
-    const latest = useRef<HTMLDivElement>(null)
+  const latest = useRef<HTMLDivElement>(null)
   useBackDismiss(open, close)
 
   useEffect(() => {
@@ -90,6 +93,7 @@ export default function AskSheet({
       return
     }
     thread.push({ id: nextId++, q })
+    shareAsked(q, ask(q, ctx), profile.askSharing)
     if (thread.length > MAX_TURNS) thread.splice(0, thread.length - MAX_TURNS)
     setTurns([...thread])
     setDraft('')
@@ -127,18 +131,13 @@ export default function AskSheet({
           open ? 'translate-y-0' : 'translate-y-full'
         }`}
       >
-        <header className="app-chrome flex items-center gap-md border-b border-outline-variant/30 px-lg py-md">
-          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-secondary text-on-secondary">
-            <Icon name="forum" className="text-[20px]" />
-          </span>
-          <div className="min-w-0 flex-1">
-            <h2 id="ask-sheet-title" className="font-headline-md text-body-lg font-bold text-on-surface">
-              Ask AfroCoils
-            </h2>
-            <p className="font-body-md text-caption text-on-surface-variant">
-              Written by people · fitted to your profile · works offline
-            </p>
-          </div>
+        <header className="app-chrome flex items-center gap-sm px-lg pb-sm pt-md">
+          <h2
+            id="ask-sheet-title"
+            className="min-w-0 flex-1 font-headline-md text-body-lg font-bold text-on-surface"
+          >
+            Ask AfroCoils
+          </h2>
           {turns.length > 0 && (
             <button
               type="button"
@@ -158,15 +157,19 @@ export default function AskSheet({
           </button>
         </header>
 
-        <div className="flex-1 overflow-y-auto px-lg py-lg" aria-live="polite">
+        <div className="flex-1 overflow-y-auto px-lg py-md" aria-live="polite">
           {turns.length === 0 ? (
-            <>
-              <p className="mb-lg font-body-md text-body-md text-on-surface">
-                {bio.name ? `Hi, ${bio.name.trim().split(/\s+/)[0]}! ` : 'Hi! '}
-                Tell me what’s going on with your hair, the way you’d say it to a friend.
+            <div className="flex min-h-full flex-col justify-center pb-2xl">
+              <span className="mb-md flex h-14 w-14 items-center justify-center rounded-full bg-secondary text-on-secondary">
+                <Icon name="forum" className="text-[28px]" />
+              </span>
+              <p className="mb-xs font-headline-md text-headline-md font-bold text-on-surface">
+                {bio.name ? `${bio.name.trim().split(/\s+/)[0]}, w` : 'W'}
+                {OPENER.slice(1)}
               </p>
-              <Suggestions title="Try asking" items={examples} onPick={submit} />
-            </>
+              <p className="mb-xl font-body-md text-body-md text-on-surface-variant">{OPENER_SUB}</p>
+              <Suggestions items={examples} onPick={submit} />
+            </div>
           ) : (
             turns.map((turn, i) => (
               <div
@@ -175,7 +178,7 @@ export default function AskSheet({
                 className="mb-2xl scroll-mt-md"
               >
                 <div className="mb-md flex justify-end">
-                  <p className="max-w-[85%] rounded-2xl rounded-br-sm bg-tertiary-container px-lg py-md font-body-md text-body-md text-on-tertiary-container">
+                  <p className="max-w-[85%] rounded-2xl rounded-br-sm bg-inverse-surface px-lg py-md font-body-md text-body-md text-inverse-on-surface">
                     {turn.q}
                   </p>
                 </div>
@@ -188,7 +191,7 @@ export default function AskSheet({
         <form
           onSubmit={onSubmit}
           role="search"
-          className="app-chrome relative border-t border-outline-variant/30 px-lg pb-[calc(0.75rem+var(--safe-bottom))] pt-md"
+          className="app-chrome relative px-lg pb-[calc(0.5rem+var(--safe-bottom))] pt-sm"
         >
           <label htmlFor="ask-sheet-input" className="sr-only">
             Your question
@@ -202,16 +205,21 @@ export default function AskSheet({
             value={draft}
             onChange={(e) => setDraft(e.target.value)}
             maxLength={160}
-            placeholder={turns.length ? 'Ask a follow-up…' : 'e.g. my ends keep breaking'}
-            className="w-full rounded-full border-none bg-surface-container-low py-4 pl-lg pr-16 font-body-md text-body-md text-on-surface shadow-sm placeholder:text-outline focus:ring-2 focus:ring-primary/20"
+            placeholder={turns.length ? 'Ask a follow-up…' : 'Type how your hair feels…'}
+            className="w-full rounded-full border-none bg-surface-container-lowest py-4 pl-lg pr-16 font-body-md text-body-md text-on-surface shadow-card placeholder:text-outline focus:ring-2 focus:ring-primary/20"
           />
           <button
             type="submit"
             aria-label="Ask"
-            className="absolute right-xl top-[1.375rem] flex h-11 w-11 items-center justify-center rounded-full bg-primary-container text-on-primary-container transition-all active:scale-90"
+            className="absolute right-xl top-[0.875rem] flex h-11 w-11 items-center justify-center rounded-full bg-secondary text-on-secondary transition-all active:scale-90"
           >
             <Icon name="send" />
           </button>
+          {profile.askSharing && (
+            <p className="mt-xs text-center font-body-md text-[11px] leading-4 text-on-surface-variant">
+              {SHARING_LINE}
+            </p>
+          )}
         </form>
       </section>
     </>

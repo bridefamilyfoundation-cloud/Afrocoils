@@ -26,7 +26,7 @@
 import { corsHeaders } from './cors.ts'
 import { rpc, supabaseConfig } from './supabase.ts'
 
-type RouteName = 'submissions'
+type RouteName = 'submissions' | 'questions'
 
 interface RouteLimits {
   /** Requests from one address within `windowS`. */
@@ -46,6 +46,10 @@ interface RouteLimits {
  */
 const LIMITS: Record<RouteName, RouteLimits> = {
   submissions: { perIp: 3, windowS: 300, perDay: 500 },
+  // A person asking Ask a run of follow-ups sends one row each, and
+  // thirty in five minutes is already more than anyone types. The daily
+  // ceiling keeps a script from filling the table the study reads.
+  questions: { perIp: 30, windowS: 300, perDay: 20000 },
 }
 
 async function incr(key: string, ttlSeconds: number): Promise<number> {

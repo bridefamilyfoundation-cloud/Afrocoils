@@ -46,16 +46,23 @@ picture; this file is the short version of what to keep in mind when editing.
   `autoUpdate` on. `markBundleHealthy()` runs from `UpdatePrompt`'s first
   effect so a bundle that crashes on load is rolled back; keep it after the
   first render, not before. A Play build leaves the manifest URL unset.
-- **No analytics, and this was decided rather than overlooked.** Google
-  Analytics was considered and declined on 2026-09-11: `gtag.js` is a
-  remote script, and more importantly the app tells users in three places
-  — the privacy policy, the FAQ and About — that it collects nothing and
-  that nothing leaves the device, and the landing site (`site/`) repeats
-  it publicly. That promise is a feature, not an omission. Anything that
-  would collect usage data needs those four pages rewritten and
-  `docs/play-release.md`'s data-safety note changed in the same commit.
-  The landing site holds itself to the same rule: no analytics, no
-  cookies, nothing loaded from another origin — its footer says so.
+- **No tracking, and one deliberate, anonymous exception: Ask questions.**
+  Google Analytics was considered and declined on 2026-09-11 (`gtag.js`
+  is a remote script, and the app promised to collect nothing). On
+  2026-10-23 the owner chose to collect every question typed into Ask, so
+  the team can study what Ask cannot answer and write it. That is the
+  *only* usage data, and it is bounded on purpose: the words, the outcome
+  (`AskOutcome`), the record matched and the bundle number — never the
+  profile, a device id or an IP (`AskQuestionRequest` in `types.ts`,
+  `supabase/functions/questions`, migration 0004). Sharing is on by
+  default, switched off on About (`askSharing`), disclosed under every
+  Ask box, kept twelve months. The privacy policy, FAQ, About, Docs, the
+  landing site (`site/`) and `docs/play-release.md`'s data-safety note
+  all say exactly this. Adding a field to that request, a second kind of
+  usage data, an analytics SDK or an identifier means rewriting those
+  pages in the same commit — policy first. The landing site holds itself
+  to no analytics, no cookies, nothing loaded from another origin — its
+  footer says so.
 - **`tailwind.config.js` is the single source of truth for the palette.** The
   token *names* are the prototype's, verbatim; the colour *values* are the
   brand's four — Light Cream `#E8D5C0` (the page), Burnt Orange `#E2583E`
@@ -201,7 +208,7 @@ picture; this file is the short version of what to keep in mind when editing.
   commit. `forYou` lines are whole sentences written for one kind of
   hair (porosity, texture, scalp, loc stage, climate, hard water, a
   care preference) and are *chosen* when every condition matches the
-  profile — at most two, labelled with what chose them. The first name
+  profile — the first that fits, labelled with what chose it. The first name
   in `{name}` slots of the fixed lines is the only value ever placed
   into a sentence. Every reply ends at an action: the answer's button,
   and the community block (`COMMUNITY` — About's tips, sharing a style,
@@ -218,10 +225,24 @@ picture; this file is the short version of what to keep in mind when editing.
     with a red-flag word leads with the documentation's dermatologist
     line. Outline sections of Locs World answer as "not written yet",
     with their topics as chips, never as advice.
-  - Nothing is stored or sent. On `/ask` the question lives in the URL
-    and the Earlier list in memory; the sheet's conversation is in
-    memory too and is gone when the app closes. Persisting questions
-    would be data collection under the analytics rule above.
+  - The question is shared anonymously, once, when it is asked
+    (`lib/ask/share.ts`), while `askSharing` is on — never on a re-render
+    or when back replays it, and never with anything from the profile.
+    Nothing is stored on the phone: on `/ask` the question lives in the
+    URL and the Earlier list in memory, and the sheet's conversation is
+    gone when the app closes.
+  - **The learning loop has a person in it.** `npm run ask:study` pulls
+    the queue, re-runs each question through today's Ask and reports
+    the unanswered backlog (most asked first, with `cases.ts` lines), the
+    loose or typo-dependent matches, and what has since been learned.
+    The fix is always written content — an `answers.ts` entry or a
+    phrasing in `asks` — then `ask:eval`. Reports go to `ask-study/`,
+    gitignored: they are what people typed, and the repo is public.
+  - Off-topic questions get `NOT_UNDERSTOOD` — one calm line back to
+    hair — via `OFF_TOPIC` words or no hair idea; anything that says
+    "hair" counts as a hair question and, if unanswered, gets
+    `NOTHING_FOUND` and lands in the backlog. Keep the reply small: one
+    lead, one card, one button, one community link.
   - A missed question is a missing `answers.ts` entry or a missing
     phrasing in its `asks`, not a reason to loosen the weights.
 
@@ -240,13 +261,15 @@ picture; this file is the short version of what to keep in mind when editing.
   — a new entry opts in to being shown to loc wearers, never out. Loc
   derivations (stage from install date, retwist cadence) live in
   `src/lib/locs.ts`.
-- The request/response contract between the app and the submissions
-  function (`supabase/functions/submissions/`) lives in
-  `src/lib/types.ts`; both sides import it so a shape change fails typecheck.
+- The request/response contracts between the app and its two functions
+  (`supabase/functions/submissions/`, `supabase/functions/questions/`)
+  live in `src/lib/types.ts`; both sides import them so a shape change
+  fails typecheck.
 - **`bio` is not `identity`.** `identity` is facts about the hair;
   `bio` is name, photo and climate. None of the profile crosses the wire
-  — the only request carrying user data is a style submission, which is
-  built from the submit form, not the profile. Climate is a picker over
+  — the requests carrying anything the user wrote are a style submission,
+  built from the submit form, and an Ask question, which is the typed
+  words only. Climate is a picker over
   `CLIMATES` rather than free text, which is why it is four coarse bands
   rather than a city.
 - The hair quiz (`src/lib/quiz.ts`, `/quiz`) and the pickers on the
@@ -510,13 +533,14 @@ picture; this file is the short version of what to keep in mind when editing.
    button and an Ask AI FAB in it. Those are history, not a spec — the app
    has no assistant. Re-tone any cool colour it brings with it, too.
 
-## The one server route
+## The two server routes
 
-`supabase/functions/submissions/` is a Supabase Edge Function that
-receives a style offered to the community library, and it is the only
-server code — there is no model client, no prompt and no
-`ANTHROPIC_API_KEY`. Under `_shared/`: `cors.ts` is the CORS policy,
-`limits.ts` one route's counters, `store.ts` the records and the
+`supabase/functions/submissions/` receives a style offered to the
+community library; `supabase/functions/questions/` records an Ask
+question (204, no body, never waited on). They are the only server code
+— there is no model client, no prompt and no `ANTHROPIC_API_KEY`. Under
+`_shared/`: `cors.ts` is the CORS policy, `limits.ts` the per-route
+counters, `store.ts` the records and the
 photographs, `supabase.ts` the connection all three use, and `env.ts` the
 two Deno globals, declared so `tsc -b` checks these files with the app.
 Keep them to web APIs (`fetch`, `crypto`, `atob`) — no `Buffer`, no

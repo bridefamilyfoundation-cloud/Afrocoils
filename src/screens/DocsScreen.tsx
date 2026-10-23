@@ -136,16 +136,19 @@ const SECTIONS: {
             keeps coming out”) and small typos, and says which spelling it used.
           </li>
           <li>
-            <strong>Every reply ends somewhere you can act.</strong> If nothing in the app
-            covers a question, it says so rather than guessing, and points you to the Quick Hair
-            Check, Hair Care and the style library. Every reply finishes with the community: the
-            tips collected on About, sharing your style, and contacting the team. Questions that
-            sound medical get the same advice as below: see a dermatologist or a trichologist.
+            <strong>Every reply ends somewhere you can act</strong>: a button to the screen
+            where you fix it, and a link to what the community says. If a question is about
+            hair but nothing is written for it, Ask says so rather than guessing and points you
+            to the Quick Hair Check; if it is not about hair, Ask says so calmly and offers a
+            few things to ask. Questions that sound medical get the same advice as below: see a
+            dermatologist or a trichologist.
           </li>
         </ul>
         <p>
-          It runs on your phone and works with no signal. What you type is not saved or sent
-          anywhere; the conversation is forgotten when the app closes.
+          It answers on your phone and works with no signal. The conversation is forgotten
+          when the app closes. Each question is shared anonymously with the team, who read
+          what Ask could not answer and write those answers next — the line under the box
+          says when sharing is on, and About switches it off.
         </p>
       </>
     ),
@@ -423,17 +426,20 @@ const SECTIONS: {
       <>
         <p>
           Your profile, length checks, calendar, photos and saved styles are stored on this
-          phone and nowhere else. There is no account, no sign-in, no analytics and no
-          tracking. Uninstalling the app deletes everything.
+          phone and nowhere else. There is no account, no sign-in and no tracking.
+          Uninstalling the app deletes everything on the phone.
         </p>
         <p>
-          Two things ever leave the phone. One is a style you choose to contribute, when it is
-          sent. The other is the update check described below, which carries nothing about
-          you.
+          Three things leave the phone. The questions you type into Ask, sent anonymously (the
+          words and what Ask answered, nothing from your profile, no identifier) so the team
+          can write the answers people are missing, kept for up to twelve months; switch this
+          off under About. A style you choose to contribute, when it is sent. And the update
+          check described below, which carries nothing about you.
         </p>
         <p>
           Everything you read ships inside the app, so it all works with no signal, including
-          in aeroplane mode. Ask searches it on the phone too, and keeps nothing you type.
+          in aeroplane mode. Ask answers on the phone too; with no signal, the question simply
+          is not shared.
         </p>
       </>
     ),

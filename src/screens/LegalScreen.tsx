@@ -7,8 +7,9 @@ import Icon from '../components/Icon'
  *
  * Privacy is written out in full, because it can be: the app's data
  * behaviour is now small enough to describe exactly — one document on
- * the device, one optional upload, one version check that carries
- * nothing, no analytics, no accounts. A policy
+ * the device, one optional upload, Ask questions shared anonymously
+ * (on by default, switched off on About), one version check that
+ * carries nothing, no accounts. A policy
  * is only worth writing when it can be checked against the code, and
  * every claim below has a file behind it.
  *
@@ -37,12 +38,13 @@ function PrivacyPolicy() {
       <section className="mb-2xl rounded-2xl shadow-card bg-surface-container-lowest p-lg">
         <h2 className="mb-sm font-headline-md text-body-lg text-on-surface">In short</h2>
         <p className="font-body-md text-body-md text-on-surface-variant">
-          AfroCoils has no accounts and no user database. Everything you enter — your hair
-          profile, length history, calendar, photographs and saved styles — is stored on your
-          own device and is never uploaded. The only data that ever leaves your phone is a
-          style you deliberately choose to contribute to the community library, and you
-          choose what is in it. Separately, the app asks our website whether a newer version
-          is out; that request carries nothing about you, and you can switch it off.
+          AfroCoils has no accounts. Everything you enter about yourself — your hair profile,
+          length history, calendar, photographs and saved styles — is stored on your own
+          device and is never uploaded. Two things leave your phone: the questions you type
+          into Ask, sent anonymously so we can write better answers (you can switch this
+          off), and a style you deliberately choose to contribute to the community library.
+          Separately, the app asks our update server whether a newer version is out; that
+          request carries nothing about you, and you can switch it off too.
         </p>
       </section>
 
@@ -63,7 +65,24 @@ function PrivacyPolicy() {
 
       <Article title="What leaves the device, and when">
         <p>
-          One thing: a style you submit through{' '}
+          <strong>Questions you type into Ask.</strong> Each question is sent to our server as
+          you ask it, together with what Ask answered (for example, which guide it showed)
+          and the number of the app update you are running. That is all: no name, nothing
+          from your hair profile, no account, no advertising or device identifier. Two
+          questions from the same phone cannot be linked to each other or to you. We use
+          them only to see what people ask and to write the answers that are missing; we
+          never sell them or use them for advertising. They are kept for up to twelve months
+          and then deleted. Because they are anonymous, we cannot find or delete one
+          particular person&rsquo;s questions, so if you would rather not share, switch it
+          off under{' '}
+          <Link to="/about" className="text-primary underline">
+            About
+          </Link>{' '}
+          — Ask works exactly the same either way, on your phone, and the line under the
+          question box tells you whether sharing is on.
+        </p>
+        <p>
+          <strong>A style you submit</strong> through{' '}
           <Link to="/styles/submit" className="text-primary underline">
             Share a style
           </Link>
@@ -72,7 +91,7 @@ function PrivacyPolicy() {
           sent to our server so a person can review them for the library.
         </p>
         <p>
-          Nothing else in your profile goes with it. Your name, your avatar, your length
+          Nothing else in your profile goes with a submission. Your name, your avatar, your length
           history, your calendar and your saved styles are not part of a submission. A
           submission is stored on your device first and only sent afterwards, so nothing is
           uploaded in the background and a failed send costs you nothing.
@@ -105,7 +124,11 @@ function PrivacyPolicy() {
 
       <Article title="What the app does not do">
         <ul className="list-disc space-y-xs pl-5">
-          <li>No analytics, no usage tracking, no advertising identifiers.</li>
+          <li>
+            No tracking: no analytics SDK, no advertising identifiers, nothing that links what
+            you do in the app to you. The Ask questions above are the only usage data, and
+            they carry no identifier.
+          </li>
           <li>No crash or telemetry reporting.</li>
           <li>No accounts, sign-in, email collection or newsletters.</li>
           <li>No third-party SDKs that observe your use of the app.</li>
@@ -130,28 +153,31 @@ function PrivacyPolicy() {
 
       <Article title="Who else is involved">
         <p>
-          Our server runs on Vercel, and submissions and their photographs are held in
-          Supabase storage until a person has reviewed them. Those providers process that data
-          on our behalf and for no other purpose. If you never submit a style, nothing of
-          yours reaches either. The version check goes to whoever hosts the AfroCoils website,
-          and carries nothing of yours.
+          Our server runs on Supabase. Shared Ask questions, and submissions with their
+          photographs, are held there; submissions until a person has reviewed them, questions
+          for up to twelve months. Supabase processes that data on our behalf and for no other
+          purpose. Like any server it sees your connection&rsquo;s IP address; ours uses it
+          only to limit how many requests one address can make, holds it for a few minutes
+          for that, and never stores it with a question or a submission. The version check
+          goes to the same server and carries nothing of yours. The AfroCoils website is
+          hosted on Vercel and sees nothing from the app.
         </p>
       </Article>
 
       <Article title="Children">
         <p>
           The app is not directed at children under 13 and collects nothing that would
-          identify one. A submission is the only way to send us anything, and it should be
-          made by the person whose hair and photographs it is, or by their parent or
-          guardian.
+          identify one: Ask questions are anonymous. A submission should be made by the
+          person whose hair and photographs it is, or by their parent or guardian.
         </p>
       </Article>
 
       <Article title="Your choices">
         <p>
           Withdraw a submission at any time from the Share a style screen — withdrawing
-          deletes its photographs from your device as well as the entry. Switch the version
-          check off under About. To remove everything the app holds, uninstall it. To have a reviewed submission removed after the fact,
+          deletes its photographs from your device as well as the entry. Switch Ask question
+          sharing and the version check off under About. To remove everything the app holds
+          on your phone, uninstall it. To have a reviewed submission removed after the fact,
           use the contact route below.
         </p>
       </Article>

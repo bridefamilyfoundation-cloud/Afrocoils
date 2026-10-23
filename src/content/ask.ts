@@ -201,6 +201,16 @@ export const DISTRESS =
 export const RED_FLAGS =
   'bleeding|blood|bleed|pus|infection|infected|swollen|swelling|fever|rash|sores|scab|scabs|ringworm|fungal|fungus|bald patch|bald patches|bald spot|bald spots|alopecia|painful|pain|burning|burns|chemical burn|hair falling out in clumps|clumps'
 
+/**
+ * Words that say a question is about something other than hair. They
+ * are never "corrected" into a hair word ("joke" is not a typo for
+ * "job"), and a question with one of these and no hair idea in it gets
+ * the calm off-topic line rather than the nearest guide. A question
+ * that also names hair ("my curls in humid weather") is unaffected.
+ */
+export const OFF_TOPIC =
+  'joke|jokes|funny|laugh|weather|forecast|rain|news|football|soccer|match|score|song|songs|music|movie|movies|film|series|recipe|recipes|cook|cooking|food|eat|president|politics|election|government|homework|maths|math|bitcoin|crypto|stock|stocks|money|loan|boyfriend|girlfriend|marry|marriage|religion|bible|quran|capital|country|history|science|physics|quantum|code|coding|programming|computer|phone|game|games|time|clock'
+
 /** Word for word from the documentation's "What it is not" section. */
 export const SAFETY_LINE =
   'Sudden shedding, bald patches, persistent scalp pain or anything that is getting worse is a question for a dermatologist or a trichologist.'
@@ -384,7 +394,7 @@ export const TOPICS: AskTopic[] = [
     id: 'delete-data',
     title: 'Delete your data',
     answer:
-      'Everything is stored on this phone and nowhere else, with no account to close. Uninstalling the app deletes everything.',
+      'Your profile, photos and history are stored on this phone and nowhere else, with no account to close. Uninstalling the app deletes everything on the phone. Questions you shared with Ask are anonymous, so they cannot be traced back to you; they are deleted after twelve months, and you can stop sharing under About.',
     route: '/legal/privacy',
     cta: 'Read the privacy policy',
     docs: 'data',
@@ -394,7 +404,7 @@ export const TOPICS: AskTopic[] = [
     id: 'offline',
     title: 'Using the app with no signal',
     answer:
-      'Everything you read ships inside the app, so it all works with no signal, including in aeroplane mode. Ask works offline too.',
+      'Everything you read ships inside the app, so it all works with no signal, including in aeroplane mode. Ask answers offline too.',
     route: '/docs?open=data',
     cta: 'Read about your data',
     docs: 'data',
@@ -528,37 +538,34 @@ export const LEADS = {
 } as const
 
 /**
- * When nothing in the app answers the question. It does not guess, and
- * it does not leave the person with nothing: it sends them to where most
- * problems start, then to the community.
+ * About hair, but nothing in the app answers it. It does not guess; it
+ * points at the one screen that covers most problems. The question goes
+ * to the review queue like every other (with sharing on), and this is
+ * the outcome a study counts first.
  */
 export const NOTHING_FOUND =
-  'AfroCoils hasn’t written an answer for that yet, and I won’t guess. Start from what you can see — the Quick Hair Check covers most hair problems — or take it to the community below.'
+  'I don’t have a written answer for that one yet — and questions like yours are how new answers get written. For now, the Quick Hair Check covers most hair problems.'
 
-export const NOT_UNDERSTOOD =
-  'Tell me what’s going on with your hair, scalp or style, the way you’d say it to a friend: “my ends keep breaking”, “my scalp itches under my braids”, “a quick style for work”.'
-
-/** Where a question with no written answer goes next. Always real screens. */
-export const DOORS: { to: string; label: string; icon: 'search' | 'spa' | 'auto_awesome' }[] = [
-  { to: '/sos/problem', label: 'Quick Hair Check', icon: 'search' },
-  { to: '/care', label: 'Hair Care', icon: 'spa' },
-  { to: '/styles', label: 'Style library', icon: 'auto_awesome' },
-]
+/** Where a question with no written answer goes next. */
+export const NONE_DOOR = { to: '/sos/problem', label: 'Open the Quick Hair Check' } as const
 
 /**
- * The foot of every reply. The community the app has today is the style
- * library people contribute to and the tips collected on About; there is
- * no feed, and this does not pretend there is one.
+ * Not about hair at all. Calm, short, and straight back to hair — no
+ * lecture about what Ask is.
  */
-export const COMMUNITY = {
-  title: 'Take it to the community',
-  text: 'Read the tips AfroCoils users have collected, share how you wear your hair, or tell the team what you came looking for.',
-  links: [
-    { to: '/about', label: 'Community tips' },
-    { to: '/styles/submit', label: 'Share your style' },
-    { to: '/legal/contact', label: 'Ask the team' },
-  ],
-} as const
+export const NOT_UNDERSTOOD =
+  'Ha — that one’s outside my lane. I only know hair. So, what’s your hair saying today?'
+
+/**
+ * The foot of every answer: one quiet link to the community the app has
+ * today — the tips collected on About. There is no feed, and this does
+ * not pretend there is one.
+ */
+export const COMMUNITY = { to: '/about', label: 'Still stuck? See what the community says' } as const
+
+/** Said under the box, every time the box is shown, while sharing is on. */
+export const SHARING_LINE =
+  'Questions are shared anonymously to help us write better answers. Turn this off in About.'
 
 /** Plain notes, kept beside the answer. */
 export const NOTES = {
@@ -598,37 +605,39 @@ export const SMALL_TALK: { match: string; reply: string }[] = [
     match:
       'who are you|what are you|are you ai|are you an ai|are you a bot|are you a robot|are you human|are you real|are you chatgpt|is this ai|is this chatgpt|what can you do|what do you do|how do you work|help',
     reply:
-      'I’m Ask. I’m not AI and I don’t make answers up: everything I show you was written by people for AfroCoils, matched to your hair profile, with a link to where you fix it. It all happens on your phone — nothing you type is saved or sent anywhere.',
+      'I’m Ask. I’m not AI and I don’t make answers up: everything I show you was written by people for AfroCoils and matched to your hair profile on your phone. Your question is shared anonymously, with nothing about you, so the team can write the answers people are missing — you can turn that off in About.',
   },
 ]
 
 /* ------------------------------------------------------------------ *
- * Example questions — shown on an empty screen, per hair type
+ * Openers — shown on an empty Ask, per hair type
+ *
+ * Light on purpose: someone opening Ask mid-problem is usually stressed,
+ * and a smile is a better start than a form. Every one of these must
+ * still land on a real answer — each is a case in lib/ask/cases.ts, and
+ * the phrasing it relies on is in that answer's `asks`. Four are shown.
  * ------------------------------------------------------------------ */
+
+export const OPENER = 'What’s your hair saying?'
+export const OPENER_SUB = 'Tell me like you’d tell a friend. I’m all ears (and edges).'
 
 export const EXAMPLES: Record<HairType | 'unknown', string[]> = {
   'Loose Natural': [
-    'Why is my hair breaking?',
-    'My scalp is itchy and flaky',
-    'A quick style for work',
-    'How do I stop tangles?',
-    'What is porosity?',
-    'How do I track my length?',
+    'My hair is giving straw',
+    'My edges left the group chat',
+    'Shrinkage stole my length',
+    'My scalp itches like it pays rent',
   ],
   Locs: [
-    'How often should I retwist?',
-    'My locs smell after washing',
-    'My locs feel dry and brittle',
-    'How do I look after starter locs?',
-    'Show me loc styles',
-    'What should I avoid putting on locs?',
+    'My locs smell like a wet towel',
+    'My locs are in their awkward phase',
+    'My roots are a fuzzy mess',
+    'My scalp itches like it pays rent',
   ],
   unknown: [
-    'Why is my hair falling out?',
-    'My scalp is itchy',
-    'A quick style for work',
-    'How often should I retwist my locs?',
-    'What is porosity?',
-    'What is my hair type?',
+    'My hair is giving straw',
+    'My edges left the group chat',
+    'My locs smell like a wet towel',
+    'My scalp itches like it pays rent',
   ],
 }

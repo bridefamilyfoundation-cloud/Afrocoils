@@ -29,9 +29,9 @@ export const FAQS: Faq[] = [
   {
     id: 'data',
     q: 'Where is my data kept?',
-    keys: 'where is my data stored|where is my information|who can see my data|is my data safe|do you collect data|do you sell my data|is my profile private',
+    keys: 'where is my data stored|where is my information|who can see my data|is my data safe|do you collect data|do you sell my data|is my profile private|are my questions saved|do you read my questions|turn off sharing',
     a: [
-      'On this phone, in one document, and nowhere else. Your hair profile, length history, calendar, photos and saved styles never leave the device — there is no account, no sign-in and no server holding any of it. Uninstalling the app deletes it. The single exception is a style you deliberately contribute, which is covered in the last question and in the ',
+      'Your hair profile, length history, calendar, photos and saved styles are kept on this phone, in one document, and nowhere else — there is no account, no sign-in and no server holding any of it. Uninstalling the app deletes it. Two things do leave the phone. The questions you type into Ask are sent anonymously — just the words and what Ask answered, with nothing from your profile and no identifier — so we can see what people ask and write the answers that are missing; they are kept for up to twelve months, and you can switch sharing off under About. And a style you deliberately contribute, covered in the last question. Both are in the ',
       { to: '/legal/privacy', label: 'privacy policy' },
       '. The app also asks our update server whether a newer version or update is out — a request that carries nothing about you, and that you can switch off under About.',
     ],
@@ -43,7 +43,7 @@ export const FAQS: Faq[] = [
     a: [
       'The words are not. Every guide, style and step was written by a person and ships inside the app. The style pictures are: each is an illustration generated before release to show the written style front, back and side, and nothing is generated on your phone. There is no chatbot, no generated advice and no model call behind any screen, which is also why the rescue flow works with the phone in aeroplane mode — usually where a hair emergency happens. What the app does is filter and rank content it already has against the profile you filled in. ',
       { to: '/ask', label: 'Ask' },
-      ', the button at the bottom right of every screen, works the same way: it finds the answer people have written for your question, adds the lines written for your kind of hair, and points you to where you fix it, all on your phone. It never writes an answer of its own, and what you type is not saved or sent anywhere.',
+      ', the button at the bottom right of every screen, works the same way: it finds the answer people have written for your question, adds the lines written for your kind of hair, and points you to where you fix it, all on your phone. It never writes an answer of its own. Your question is shared anonymously so the team can write the answers people are missing — by people, not by a model — and you can switch that off under About.',
     ],
   },
   {

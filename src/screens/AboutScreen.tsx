@@ -148,6 +148,8 @@ export default function AboutScreen() {
 
       <UpdatesSection />
 
+      <AskSharingSection />
+
       <section className="mb-2xl flex flex-col items-center gap-sm text-center">
         <p className="font-caption text-caption text-on-surface-variant">
           AfroCoils, version {VERSION}
@@ -301,6 +303,47 @@ function UpdatesSection() {
           </p>
         </>
       )}
+    </section>
+  )
+}
+
+/**
+ * The switch for sharing Ask questions, and exactly what it shares.
+ *
+ * On by default. The same words the privacy policy uses, because this
+ * is where someone decides, and the policy is where they check.
+ */
+function AskSharingSection() {
+  const { profile, update } = useHairProfile()
+  const sharing = profile.askSharing
+  return (
+    <section className="mb-2xl rounded-2xl shadow-card bg-surface-container-lowest p-lg">
+      <div className="mb-sm flex items-center gap-sm">
+        <Icon name="forum" className="text-primary" />
+        <h2 className="font-headline-md text-body-lg text-on-surface">Ask questions</h2>
+      </div>
+      <p className="mb-md font-body-md text-body-md text-on-surface-variant">
+        Questions you type into Ask are sent to the AfroCoils team so we can see what people
+        ask and write the answers that are missing. Only the words you typed go, with what Ask
+        answered and the app&rsquo;s update number — nothing from your profile, no name, no
+        account and no device identifier. Ask answers on your phone either way.
+      </p>
+      <button
+        type="button"
+        aria-pressed={sharing}
+        onClick={() => update({ askSharing: !sharing })}
+        className={`mb-md flex items-center gap-xs rounded-full px-lg py-2 font-label-md text-label-md transition-colors active:scale-95 ${
+          sharing ? 'bg-tertiary-fixed text-on-tertiary-fixed' : 'bg-surface-container-high text-on-surface-variant'
+        }`}
+      >
+        <Icon name={sharing ? 'check_circle' : 'radio_button_unchecked'} filled={sharing} className="text-[16px]" />
+        Share my questions anonymously
+      </button>
+      <p className="font-caption text-caption text-on-surface-variant">
+        Questions are kept for up to twelve months, read only by the team, and never sold or
+        used for advertising. Our server sees your connection&rsquo;s IP address, as any website
+        does, and does not store it with your question.
+      </p>
     </section>
   )
 }

@@ -32,7 +32,8 @@
     "images:locs": "node scripts/import-loc-images.mjs",
     "brand:import": "node scripts/import-brand.mjs",
     "ask:eval": "node scripts/ask-eval.mjs",
-    "backend:deploy": "supabase functions deploy submissions --no-verify-jwt --use-api",
+    "ask:study": "node scripts/ask-study.mjs",
+    "backend:deploy": "supabase functions deploy submissions --no-verify-jwt --use-api && supabase functions deploy questions --no-verify-jwt --use-api",
     "db:push": "supabase db push --linked"
   },
   "dependencies": {
