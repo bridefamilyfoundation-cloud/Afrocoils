@@ -85,9 +85,9 @@ const SECTIONS: {
             contact details are at its foot.
           </li>
           <li>
-            <strong>The logo</strong> in the middle of the top bar returns to Hair SOS, the{' '}
-            <strong>search icon</strong> opens Ask, and <strong>your photo</strong> on the right
-            opens your profile.
+            <strong>The logo</strong> in the middle of the top bar returns to Hair SOS, and{' '}
+            <strong>your photo</strong> on the right opens your profile. The{' '}
+            <strong>Ask</strong> button floats at the bottom right, above the tabs.
           </li>
           <li>
             Screens inside a section show a small <strong>“Part of …”</strong> label at the top
@@ -108,16 +108,23 @@ const SECTIONS: {
     body: (
       <>
         <p>
-          The search icon in the top bar, on every screen. Type a question the way you would say
-          it (“my ends keep breaking”, “a quick style for work”, “how do I set a reminder?”) and
-          Ask finds the part of the app that answers it.
+          The Ask button at the bottom right, on every screen. Type a question the way you would
+          say it (“my ends keep breaking”, “a quick style for work”, “how do I set a reminder?”)
+          and it opens a conversation: ask a follow-up and the answer appears beneath the last.
         </p>
         <ul>
           <li>
-            <strong>It quotes, it does not write.</strong> The answer is the passage from a
-            guide, the Quick Hair Check, Locs World, the style library, the product shelf or this
-            page, word for word, with a button to where it came from. Any caution on that
-            passage is shown in full.
+            <strong>Answers are written, not generated.</strong> Most common questions have an
+            answer written for them: a direct reply, what to do in order, and a button to the
+            screen where you do it. Anything else is answered from a guide, the Quick Hair Check,
+            Locs World, the style library, the product shelf or this page, word for word. Any
+            caution is shown in full.
+          </li>
+          <li>
+            <strong>It fits the answer to your profile.</strong> Some answers carry lines
+            written for one kind of hair (low porosity, starter locs, a dry climate, heatless
+            only), shown under “For your hair” when your profile matches, with what on your
+            profile chose them. If you have set a name, it uses it.
           </li>
           <li>
             <strong>It follows your hair type</strong>, the same as every list in the app.
@@ -129,14 +136,16 @@ const SECTIONS: {
             keeps coming out”) and small typos, and says which spelling it used.
           </li>
           <li>
-            <strong>If nothing in the app covers it, it says so</strong> rather than guessing.
-            Questions that sound medical get the same advice as below: see a dermatologist or a
-            trichologist.
+            <strong>Every reply ends somewhere you can act.</strong> If nothing in the app
+            covers a question, it says so rather than guessing, and points you to the Quick Hair
+            Check, Hair Care and the style library. Every reply finishes with the community: the
+            tips collected on About, sharing your style, and contacting the team. Questions that
+            sound medical get the same advice as below: see a dermatologist or a trichologist.
           </li>
         </ul>
         <p>
           It runs on your phone and works with no signal. What you type is not saved or sent
-          anywhere; the Earlier list is forgotten when the app closes.
+          anywhere; the conversation is forgotten when the app closes.
         </p>
       </>
     ),

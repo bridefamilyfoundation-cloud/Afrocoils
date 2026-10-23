@@ -52,7 +52,8 @@ function buildScreen(name: ScreenName): HTMLElement {
       tab.querySelector('[data-label]')?.remove()
     }
   })
-  navSlot.replaceWith(bar)
+  // The Ask button floats above the tab bar's right end on every screen.
+  navSlot.replaceWith($('[data-ask-source]', template).cloneNode(true), bar)
 
   screen.querySelectorAll<HTMLImageElement>('img[data-brand]').forEach((img) => {
     const brand = img.dataset.brand

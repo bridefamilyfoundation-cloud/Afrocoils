@@ -48,7 +48,7 @@ const ABOUT: { heading: string; body: string }[] = [
   },
   {
     heading: 'Nothing you read is generated',
-    body: 'Every guide, every style and every step in this app was written by a person, and all of it ships inside the app. The style pictures are the one exception: they are illustrations made with an image generator before release, one sitter shown front, back and side so that only the hair changes. There is no chatbot and no AI feature: what you are shown is content the app already has, filtered and ranked against the profile you filled in. Ask, the search icon in the top bar, works the same way: it finds the passage that answers your question and quotes it word for word, on your phone. It works with the phone in aeroplane mode, which is usually where a hair emergency happens.',
+    body: 'Every guide, every style and every step in this app was written by a person, and all of it ships inside the app. The style pictures are the one exception: they are illustrations made with an image generator before release, one sitter shown front, back and side so that only the hair changes. There is no chatbot and no AI feature: what you are shown is content the app already has, filtered and ranked against the profile you filled in. Ask, the button at the bottom right, works the same way: it finds the answer people have written for your question and shows it word for word, with the lines written for your kind of hair, on your phone. It works with the phone in aeroplane mode, which is usually where a hair emergency happens.',
   },
   {
     heading: 'It is not a stylist, and not a doctor',

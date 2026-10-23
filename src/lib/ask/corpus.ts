@@ -1,3 +1,4 @@
+import { KNOWLEDGE, type ForYou } from '../../content/answers'
 import { TOPICS } from '../../content/ask'
 import { FAQS, faqText } from '../../content/faq'
 import { GUIDES, guideHairTypes } from '../../content/guides'
@@ -24,6 +25,7 @@ import { sentences } from './text'
  */
 
 export type AskKind =
+  | 'answer'
   | 'guide'
   | 'concern'
   | 'loc-section'
@@ -70,6 +72,8 @@ export interface AskDoc {
   category?: ProductCategory
   /** A secondary link — the documentation section behind a how-to topic. */
   more?: { to: string; label: string }
+  /** Lines written for one kind of hair; the engine picks the ones the profile matches. */
+  forYou?: ForYou[]
 }
 
 const BOTH: HairType[] = [...HAIR_TYPES]
@@ -77,6 +81,33 @@ const BOTH: HairType[] = [...HAIR_TYPES]
 /** "My hair is…" + "Falling out" → "My hair is falling out". */
 function concernTitle(heading: string, label: string): string {
   return `${heading.replace(/…$/, '').trim()} ${label.toLowerCase()}`
+}
+
+/**
+ * The answer bank. The question is the title, so a question asked the
+ * way it was written lands on it; the answer is the one passage, and
+ * the steps are shown beneath it as the list they are.
+ */
+function answers(): AskDoc[] {
+  return KNOWLEDGE.map((entry) => ({
+    id: `answer:${entry.id}`,
+    kind: 'answer',
+    title: entry.question,
+    source: 'AfroCoils answers',
+    route: entry.next.to,
+    cta: entry.next.label,
+    hairTypes: entry.hairTypes ?? BOTH,
+    caution: entry.caution,
+    forYou: entry.forYou,
+    fields: {
+      title: entry.question,
+      keys: entry.asks.split('|').join('. '),
+      lead: entry.answer,
+      body: [...(entry.steps ?? []), ...(entry.forYou ?? []).map((f) => f.text)].join('. '),
+    },
+    passages: [{ text: entry.answer }],
+    points: entry.steps?.length ? [{ label: 'What to do', items: entry.steps, ordered: true }] : [],
+  }))
 }
 
 function guides(): AskDoc[] {
@@ -333,6 +364,7 @@ let cache: AskDoc[] | undefined
 /** The whole corpus, built once. */
 export function corpus(): AskDoc[] {
   cache ??= [
+    ...answers(),
     ...concerns(),
     ...guides(),
     ...locSections(),

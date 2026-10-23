@@ -43,7 +43,7 @@ export const FAQS: Faq[] = [
     a: [
       'The words are not. Every guide, style and step was written by a person and ships inside the app. The style pictures are: each is an illustration generated before release to show the written style front, back and side, and nothing is generated on your phone. There is no chatbot, no generated advice and no model call behind any screen, which is also why the rescue flow works with the phone in aeroplane mode — usually where a hair emergency happens. What the app does is filter and rank content it already has against the profile you filled in. ',
       { to: '/ask', label: 'Ask' },
-      ', the question box in the top bar, works the same way: it finds the passage that answers you and quotes it word for word, on your phone. It never writes an answer of its own, and what you type is not saved or sent anywhere.',
+      ', the button at the bottom right of every screen, works the same way: it finds the answer people have written for your question, adds the lines written for your kind of hair, and points you to where you fix it, all on your phone. It never writes an answer of its own, and what you type is not saved or sent anywhere.',
     ],
   },
   {

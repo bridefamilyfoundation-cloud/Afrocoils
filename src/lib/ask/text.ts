@@ -35,7 +35,10 @@ export function normalise(text: string): string {
   return text
     .toLowerCase()
     .replace(/[‘’ʼ`]/g, "'")
-    .replace(/\b(can|won|don|doesn|didn|isn|aren|wasn|weren|hasn|haven|shouldn|wouldn|couldn)'?t\b/g, '$1 not')
+    // "won't" is "will not"; read as "won not" it answered "who won the
+    // football" with a hair guide.
+    .replace(/\bwon'?t\b/g, 'will not')
+    .replace(/\b(can|don|doesn|didn|isn|aren|wasn|weren|hasn|haven|shouldn|wouldn|couldn)'?t\b/g, '$1 not')
     .replace(/'(s|re|ve|ll|d|m)\b/g, '')
     .replace(/&/g, ' and ')
     .replace(/[^a-z0-9]+/g, ' ')

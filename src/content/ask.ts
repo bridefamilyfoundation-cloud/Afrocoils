@@ -85,7 +85,7 @@ export const CONCEPTS: Record<string, string> = {
   density: 'density|dense|thick hair|thin hair|how much hair|full hair',
   texture: 'texture|strand width|fine hair|coarse hair|coarse|fine strands|medium texture',
   growth:
-    'grow|grows|growing|growth|grow faster|longer|length|length retention|retain|retention|retaining|not growing|stuck at the same length|stopped growing|hair growth|grow my hair|grow back',
+    'how fast does|how fast will|how quickly does|grow|grows|growing|growth|grow faster|longer|length|length retention|retain|retention|retaining|not growing|stuck at the same length|stopped growing|hair growth|grow my hair|grow back',
   night:
     'night|nighttime|night time|bedtime|bed|sleep|sleeping|satin|silk|bonnet|scarf|headscarf|durag|du rag|pillowcase|pillow|pineapple|pineappling',
   heat: 'heat|blow dry|blow dryer|blowdry|hair dryer|flat iron|straightener|straighten|straightening|press|pressed|silk press|heat damage|hooded dryer|curling iron|tongs',
@@ -496,36 +496,69 @@ export const TOPICS: AskTopic[] = [
  * question, so asking the same thing twice reads the same way twice.
  * ------------------------------------------------------------------ */
 
+/*
+ * `, {name}` is the one slot in these lines: the person's first name
+ * when the profile has one, removed cleanly when it does not. Nothing
+ * else is ever put into a line.
+ */
 export const LEADS = {
   answer: [
-    'Here’s what AfroCoils has on that.',
-    'Good question — this is the part of the app that covers it.',
-    'This is the closest answer in the app.',
+    'Here’s what to do, {name}.',
+    'Got you, {name}. Here’s the answer.',
+    'Here’s the straight answer, {name}.',
   ],
   worried: [
-    'That sounds stressful. Here’s what the app says.',
-    'Sorry you’re dealing with that. This is the part of the app written for it.',
-    'Let’s sort it out. Here’s the closest answer in the app.',
+    'That sounds stressful, {name}. Here’s what to do right now.',
+    'Sorry you’re dealing with that, {name}. Let’s sort it out.',
+    'Let’s fix this, {name}. Here’s what to do.',
   ],
   styles: [
-    'Here are styles from the library that fit.',
-    'A few from the style library that should work.',
+    'Here are styles that fit, {name}.',
+    'These will work, {name}. Tap one for the steps.',
   ],
-  products: ['From the product shelf, filtered to your profile:'],
-  howTo: ['Here’s how to do that in the app.', 'That lives here in the app.'],
+  products: ['From your shelf, filtered to your profile, {name}:'],
+  howTo: ['Here’s how to do that in the app, {name}.', 'That lives here, {name}.'],
   pending: [
     'Locs World has this down as a topic still being written, so there is no written answer yet. Here’s where it will be.',
   ],
-  unsure: [
-    'I’m not certain this is what you meant, but it’s the closest thing in the app.',
+  closest: [
+    'This is the part of AfroCoils that covers it, {name}.',
+    'Start here, {name}. It’s where the app covers this.',
   ],
 } as const
 
+/**
+ * When nothing in the app answers the question. It does not guess, and
+ * it does not leave the person with nothing: it sends them to where most
+ * problems start, then to the community.
+ */
 export const NOTHING_FOUND =
-  'I couldn’t find that in the app. Everything I can show you is written into AfroCoils, and nothing in it covers that yet.'
+  'AfroCoils hasn’t written an answer for that yet, and I won’t guess. Start from what you can see — the Quick Hair Check covers most hair problems — or take it to the community below.'
 
 export const NOT_UNDERSTOOD =
-  'I can only answer from what’s in AfroCoils — hair, scalp, styles, products and how the app works. Try describing what you see or feel, like “my scalp is itchy” or “my ends keep breaking”.'
+  'Tell me what’s going on with your hair, scalp or style, the way you’d say it to a friend: “my ends keep breaking”, “my scalp itches under my braids”, “a quick style for work”.'
+
+/** Where a question with no written answer goes next. Always real screens. */
+export const DOORS: { to: string; label: string; icon: 'search' | 'spa' | 'auto_awesome' }[] = [
+  { to: '/sos/problem', label: 'Quick Hair Check', icon: 'search' },
+  { to: '/care', label: 'Hair Care', icon: 'spa' },
+  { to: '/styles', label: 'Style library', icon: 'auto_awesome' },
+]
+
+/**
+ * The foot of every reply. The community the app has today is the style
+ * library people contribute to and the tips collected on About; there is
+ * no feed, and this does not pretend there is one.
+ */
+export const COMMUNITY = {
+  title: 'Take it to the community',
+  text: 'Read the tips AfroCoils users have collected, share how you wear your hair, or tell the team what you came looking for.',
+  links: [
+    { to: '/about', label: 'Community tips' },
+    { to: '/styles/submit', label: 'Share your style' },
+    { to: '/legal/contact', label: 'Ask the team' },
+  ],
+} as const
 
 /** Plain notes, kept beside the answer. */
 export const NOTES = {
@@ -546,16 +579,16 @@ export const SMALL_TALK: { match: string; reply: string }[] = [
     match:
       'hi|hello|hey|hiya|yo|good morning|good afternoon|good evening|morning|evening|howdy|hi there|hello there|sup|whats up',
     reply:
-      'Hi! Ask me anything about your hair or this app — like “why is my hair breaking?”, “my scalp is itchy” or “a quick style for work”.',
+      'Hi, {name}! Tell me what’s going on with your hair — like “why is my hair breaking?”, “my scalp is itchy” or “a quick style for work”.',
   },
   {
     match: 'how are you|how are you doing|you good|how is it going|hows it going',
-    reply: 'Doing well, thanks for asking! What’s going on with your hair today?',
+    reply: 'Doing well, thanks for asking, {name}! What’s going on with your hair today?',
   },
   {
     match:
       'thanks|thank you|thank u|thx|ty|cheers|thanks a lot|thank you so much|appreciate it|great|perfect|nice|cool|awesome|ok thanks|okay thanks|helpful|that helps',
-    reply: 'You’re welcome! Ask again whenever your hair needs something.',
+    reply: 'You’re welcome, {name}! Ask again whenever your hair needs something.',
   },
   {
     match: 'bye|goodbye|see you|see ya|later|good night|goodnight',
@@ -565,7 +598,7 @@ export const SMALL_TALK: { match: string; reply: string }[] = [
     match:
       'who are you|what are you|are you ai|are you an ai|are you a bot|are you a robot|are you human|are you real|are you chatgpt|is this ai|is this chatgpt|what can you do|what do you do|how do you work|help',
     reply:
-      'I’m Ask, the app’s search. I don’t write answers: everything I show you is quoted word for word from guides people wrote for AfroCoils, with a link to the page it came from. It all happens on your phone — nothing you type is saved or sent anywhere.',
+      'I’m Ask. I’m not AI and I don’t make answers up: everything I show you was written by people for AfroCoils, matched to your hair profile, with a link to where you fix it. It all happens on your phone — nothing you type is saved or sent anywhere.',
   },
 ]
 

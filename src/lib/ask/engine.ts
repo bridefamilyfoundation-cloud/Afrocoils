@@ -15,9 +15,18 @@ import {
   SAFETY_LINE,
   SMALL_TALK,
 } from '../../content/ask'
+import type { ForYou, ForYouWhen } from '../../content/answers'
 import { PRODUCTS, rankProducts, type RankedProduct } from '../../content/products'
 import { styleExclusion } from '../../content/styles'
-import type { CarePreferences, HairIdentity, HairType, LocStage, Occasion } from '../types'
+import {
+  PREFERENCE_LABELS,
+  type CarePreferences,
+  type HairBio,
+  type HairIdentity,
+  type HairType,
+  type LocStage,
+  type Occasion,
+} from '../types'
 import { corpus, type AskDoc, type AskKind, type AskPassage } from './corpus'
 import { editDistance, isStopword, normalise, stem, words } from './text'
 
@@ -46,6 +55,11 @@ import { editDistance, isStopword, normalise, stem, words } from './text'
  *    does not exist.
  * 5. **Answer** with the best record, its best passage, and the next few
  *    as "also in the app" — or say plainly that the app has nothing.
+ * 6. **Fit it to the person.** An answer-bank entry can carry lines
+ *    written for one kind of hair (low porosity, starter locs, a dry
+ *    climate). The ones the profile matches are shown, whole, beside
+ *    the answer. They are chosen, never composed — no profile value is
+ *    ever written into advice.
  */
 
 /* ------------------------------------------------------------------ *
@@ -466,6 +480,8 @@ function read(query: string, ix: Index): Reading {
  * ------------------------------------------------------------------ */
 
 const PRIOR: Record<AskKind, number> = {
+  // Written as replies to the question, so they lead when they fit.
+  answer: 1.3,
   concern: 1.15,
   guide: 1.1,
   'loc-section': 1,
@@ -486,6 +502,7 @@ const PRIOR: Record<AskKind, number> = {
  */
 const INTENT_BOOST: Record<Reading['intent'], Partial<Record<AskKind, number>>> = {
   style: {
+    answer: 0.6,
     style: 1.9,
     'loc-style': 1.6,
     topic: 0.9,
@@ -494,8 +511,8 @@ const INTENT_BOOST: Record<Reading['intent'], Partial<Record<AskKind, number>>> 
     product: 0.5,
     shelf: 0.6,
   },
-  product: { shelf: 2, product: 1.4, avoid: 1.5, guide: 0.8, concern: 0.7, topic: 0.6 },
-  howTo: { topic: 1.7, faq: 1.75, style: 0.5, 'loc-style': 0.5, product: 0.4, shelf: 0.5 },
+  product: { answer: 0.85, shelf: 2, product: 1.4, avoid: 1.5, guide: 0.8, concern: 0.7, topic: 0.6 },
+  howTo: { answer: 0.6, topic: 1.7, faq: 1.75, style: 0.5, 'loc-style': 0.5, product: 0.4, shelf: 0.5 },
   care: { product: 0.5, shelf: 0.7, 'loc-style': 0.7, style: 0.8 },
 }
 
@@ -504,6 +521,8 @@ export interface AskContext {
   preferences: CarePreferences
   /** Resolved from the install date when the profile has one. */
   locStage?: LocStage
+  /** Name for the greeting; climate and hard water for `forYou`. */
+  bio?: HairBio
 }
 
 interface Scored {
@@ -581,6 +600,12 @@ export interface AskHit {
   quote?: AskPassage
 }
 
+/** A line written for one kind of hair, and what on the profile chose it. */
+export interface AskForYou {
+  text: string
+  because: string
+}
+
 export interface AskNote {
   text: string
   to?: string
@@ -598,6 +623,7 @@ export type AskReply =
       styles: AskHit[]
       products: RankedProduct[]
       related: AskHit[]
+      forYou: AskForYou[]
       safety?: string
       notes: AskNote[]
       corrected?: string
@@ -613,6 +639,56 @@ function pick<T>(list: readonly T[], seed: string): T {
   let h = 0
   for (const ch of seed) h = (h * 31 + ch.charCodeAt(0)) | 0
   return list[Math.abs(h) % list.length]
+}
+
+/**
+ * Put the person's first name into a fixed line, or take the slot out.
+ * The name is the only thing ever placed into a line, and only into
+ * the voice — never into advice.
+ */
+export function withName(line: string, name: string | undefined): string {
+  const first = name?.trim().split(/\s+/)[0]
+  return line.replace(/, \{name\}/g, first ? `, ${first}` : '')
+}
+
+/** Which profile values a `forYou` line needs, as a reader would say them. */
+function describe(when: ForYouWhen): string {
+  const parts: string[] = []
+  if (when.hairType) parts.push(when.hairType === 'Locs' ? 'locs' : 'loose natural hair')
+  if (when.locStage) parts.push(`${when.locStage.toLowerCase()} locs`)
+  if (when.porosity) parts.push(`${when.porosity.toLowerCase()} porosity`)
+  if (when.texture) parts.push(`${when.texture.toLowerCase()} strands`)
+  if (when.scalpCondition) parts.push(`${when.scalpCondition.toLowerCase()} scalp`)
+  if (when.climate) parts.push(`${when.climate.toLowerCase()} climate`)
+  if (when.hardWater) parts.push('hard water')
+  if (when.preference) parts.push(PREFERENCE_LABELS[when.preference].toLowerCase())
+  return parts.join(', ')
+}
+
+/** At most two, so the answer stays the answer. */
+const MAX_FOR_YOU = 2
+
+/** The `forYou` lines whose every condition the profile meets. */
+function forYouFor(
+  lines: ForYou[] | undefined,
+  hairType: HairType | undefined,
+  ctx: AskContext,
+): AskForYou[] {
+  if (!lines) return []
+  const { identity, preferences, bio, locStage } = ctx
+  const matches = (w: ForYouWhen) =>
+    (w.hairType === undefined || w.hairType === hairType) &&
+    (w.locStage === undefined || (hairType === 'Locs' && w.locStage === locStage)) &&
+    (w.porosity === undefined || w.porosity === identity.porosity) &&
+    (w.texture === undefined || w.texture === identity.texture) &&
+    (w.scalpCondition === undefined || w.scalpCondition === identity.scalpCondition) &&
+    (w.climate === undefined || w.climate === bio?.climate) &&
+    (w.hardWater === undefined || w.hardWater === (bio?.hardWater ?? false)) &&
+    (w.preference === undefined || preferences[w.preference])
+  return lines
+    .filter((line) => matches(line.when))
+    .slice(0, MAX_FOR_YOU)
+    .map((line) => ({ text: line.text, because: describe(line.when) }))
 }
 
 /** The passage that shares the most with the question, or the record's opening one. */
@@ -676,7 +752,7 @@ export function ask(query: string, ctx: AskContext): AskReply {
   if (!normal) return { type: 'chat', text: NOT_UNDERSTOOD }
 
   const greeting = SMALL_TALK_LINES.get(normal.replace(/\s*(afrocoils?|ask|please|pls)$/, ''))
-  if (greeting) return { type: 'chat', text: greeting }
+  if (greeting) return { type: 'chat', text: withName(greeting, ctx.bio?.name) }
 
   const ix = index()
   const r = read(query, ix)
@@ -794,17 +870,22 @@ export function ask(query: string, ctx: AskContext): AskReply {
     // A question about locs keeps its extras about locs.
     .filter((s) => r.hairType !== 'Locs' || s.d.terms.has('#locs') || s.doc.hairTypes.length === 1)
     .filter((s) => !(mode === 'products' && s.doc.kind === 'product'))
+    // Under a written answer, "also in the app" is where to go deeper —
+    // the guides and checks — not more answers on the same subject.
+    .filter((s) => !(hit.doc.kind === 'answer' && s.doc.kind === 'answer'))
     .filter((s, i, all) => all.findIndex((o) => o.doc.title === s.doc.title) === i)
     .slice(0, 4 - extra.length)
     .map((s) => ({ doc: s.doc, score: s.score }))
   related.unshift(...extra)
 
+  // A partial match is still pointed at plainly: it is the part of the
+  // app nearest the question, and the card says where it came from.
   const weak = coverage(ix, top.d, r) < 0.5
   const lead = pick(
     mode === 'pending'
       ? LEADS.pending
       : weak
-        ? LEADS.unsure
+        ? LEADS.closest
         : mode === 'styles'
           ? LEADS.styles
           : mode === 'products'
@@ -819,12 +900,13 @@ export function ask(query: string, ctx: AskContext): AskReply {
 
   return {
     type: 'answer',
-    lead,
+    lead: withName(lead, ctx.bio?.name),
     hit,
     mode,
     styles,
     products,
     related,
+    forYou: mode === 'quote' ? forYouFor(hit.doc.forYou, hairType, ctx) : [],
     safety: r.medical ? SAFETY_LINE : undefined,
     notes,
     corrected: r.corrected,

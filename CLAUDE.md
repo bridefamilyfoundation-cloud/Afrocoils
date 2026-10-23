@@ -181,13 +181,30 @@ picture; this file is the short version of what to keep in mind when editing.
   the same commit. Lists the code already holds (time bands,
   categories, occasions, preferences, climates) are read from
   `types.ts` rather than retyped.
-- **Ask (`/ask`) is search that quotes, not an assistant.** It sits
-  behind the search icon in the app bar on every screen, not in the
-  drawer or the tab bar: it is a way into the six sections, not a
-  seventh. `src/lib/ask/` ranks a corpus built at runtime from the
-  content files and shows the best passage *verbatim* with a link to
-  its page; the only sentences that are not quotes are the fixed lines
-  in `src/content/ask.ts`. Four rules:
+- **Ask is search that quotes, not an assistant.** It opens from the
+  floating Ask button at the bottom right of every screen
+  (`AskLauncher`, a conversation sheet) and full screen at `/ask`, not
+  from the drawer or the tab bar: it is a way into the six sections,
+  not a seventh. It is not labelled AI, because it is not. `src/lib/ask/`
+  ranks a corpus built at runtime from the content files and shows the
+  best passage *verbatim* with a link to its page; the only sentences
+  that are not quotes are the fixed lines in `src/content/ask.ts`.
+
+  **The answer bank (`src/content/answers.ts`) leads.** Common
+  questions have a written reply: the question as the title, a direct
+  answer, ordered steps, a `caution` where one belongs, and `next` (the
+  screen where the fix is done). It ranks first when it fits and the
+  guides it summarises sit under it as "Also in the app". Each entry
+  must agree with the guide it restates; change both in the same
+  commit. `forYou` lines are whole sentences written for one kind of
+  hair (porosity, texture, scalp, loc stage, climate, hard water, a
+  care preference) and are *chosen* when every condition matches the
+  profile — at most two, labelled with what chose them. The first name
+  in `{name}` slots of the fixed lines is the only value ever placed
+  into a sentence. Every reply ends at an action: the answer's button,
+  and the community block (`COMMUNITY` — About's tips, sharing a style,
+  Contact; there is no feed and it does not pretend one). A question
+  nothing answers says so, without guessing, and offers `DOORS`. Rules:
   - Never compose an answer from fragments, reword a passage, or let a
     template interpolate advice. A quote that does not fit is a missing
     passage in the content, not a reason to write one in Ask.
@@ -199,9 +216,12 @@ picture; this file is the short version of what to keep in mind when editing.
     with a red-flag word leads with the documentation's dermatologist
     line. Outline sections of Locs World answer as "not written yet",
     with their topics as chips, never as advice.
-  - Nothing is stored or sent. The question lives in the URL and the
-    Earlier list in memory. Persisting questions would be data
-    collection under the analytics rule above.
+  - Nothing is stored or sent. On `/ask` the question lives in the URL
+    and the Earlier list in memory; the sheet's conversation is in
+    memory too and is gone when the app closes. Persisting questions
+    would be data collection under the analytics rule above.
+  - A missed question is a missing `answers.ts` entry or a missing
+    phrasing in its `asks`, not a reason to loosen the weights.
 
   The vocabulary in `content/ask.ts` is where most quality comes from.
   When Ask misses a real question, add it to `src/lib/ask/cases.ts`

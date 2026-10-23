@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Outlet, useLocation, useNavigationType } from 'react-router-dom'
 import AppFooter from './AppFooter'
+import AskLauncher from './AskLauncher'
 import BottomNav from './BottomNav'
 import NavDrawer from './NavDrawer'
 import TopAppBar from './TopAppBar'
@@ -69,6 +70,9 @@ export default function AppLayout() {
       <div className="h-32" />
 
       <BottomNav />
+
+      {/* Ask, from every screen: bottom right, above the tab bar. */}
+      <AskLauncher />
     </div>
   )
 }

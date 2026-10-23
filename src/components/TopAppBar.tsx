@@ -40,17 +40,8 @@ export default function TopAppBar({ onOpenMenu }: { onOpenMenu: () => void }) {
       </Link>
 
       <div className="flex items-center gap-sm justify-self-end">
-        {/* Ask, from every screen. It quotes the app rather than writing
-            anything, and needs no signal — see screens/AskScreen. */}
-        <Link
-          to="/ask"
-          aria-label="Ask a question"
-          data-tour="ask-button"
-          className="flex h-10 w-10 items-center justify-center rounded-full bg-surface-container-lowest shadow-card transition-all active:scale-90"
-        >
-          <Icon name="search" className="text-primary" />
-        </Link>
-
+        {/* Ask moved to the floating button at the bottom right
+            (components/AskLauncher), where a thumb already is. */}
         {/* The user's own photo once they have set one. There is no auth
             and no account here — the photo is a file on this device, so
             this is as personal as the app gets and as personal as it needs

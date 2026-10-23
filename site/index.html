@@ -630,7 +630,13 @@
       <div class="flex items-center justify-between px-5 pb-2 pt-12" data-appbar-source>
         <svg class="h-5 w-5 text-primary" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><use href="#i-menu" /></svg>
         <span class="flex items-center gap-1.5"><img data-brand="mark" class="h-6 w-6" alt="" /><img data-brand="wordmark" class="h-5 w-auto" alt="AfroCoils" /></span>
-        <svg class="h-5 w-5 text-primary" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><use href="#i-search" /></svg>
+        <span class="flex h-7 w-7 items-center justify-center rounded-full bg-surface-container-lowest text-primary shadow-card"><svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#i-user" /></svg></span>
+      </div>
+
+      <!-- Ask: the floating button above the tab bar's right end, as
+           AskLauncher draws it on every screen. -->
+      <div class="flex justify-end px-4 pb-1.5" data-ask-source>
+        <span class="flex h-8 items-center gap-1.5 rounded-full bg-secondary px-3 text-[11px] font-bold text-on-secondary shadow-float">Ask</span>
       </div>
 
       <!-- The bottom bar: four tabs in AppLayout's order, as a floating pill.

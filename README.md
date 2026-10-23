@@ -233,8 +233,14 @@ the app can say plainly that nothing it shows you was invented.
 
 ### Ask
 
-`/ask`, opened from the search icon in the app bar, answers a question by
-**quoting** the app rather than writing anything. `src/lib/ask/` indexes every
+Ask, opened from the floating button at the bottom right of every screen (a
+conversation sheet, `src/components/AskLauncher.tsx`) or full screen at
+`/ask`, answers a question by **quoting** the app rather than writing anything.
+Common questions have a written answer in `src/content/answers.ts`, with
+ordered steps, a button to the screen where the fix is done, and `forYou`
+lines chosen by the profile (porosity, loc stage, climate and so on). Every
+reply ends with the community: About's tips, sharing a style, and Contact.
+`src/lib/ask/` indexes those answers and every
 guide, Quick Hair Check concern, Locs World section, style, product, FAQ answer
 and how-to topic, ranks them against the question with BM25F, and shows the
 best passage word for word with a link to its page. It runs on the phone,

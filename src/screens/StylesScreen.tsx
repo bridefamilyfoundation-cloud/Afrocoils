@@ -149,7 +149,7 @@ export default function StylesScreen() {
   return (
     <>
       {/* The reference mockup's search field. It is a way into Ask, the
-          same screen the app bar's search icon opens — not a filter over
+          same answers the floating Ask button gives — not a filter over
           this list — so it is a link drawn as a field rather than an
           input that would have to pretend. */}
       <Link

@@ -48,7 +48,7 @@ export const TOUR_STEPS: TourStep[] = [
     path: '/sos',
     target: 'ask-button',
     title: 'Ask',
-    body: 'Type a question the way you would say it, like "my ends keep breaking". Ask finds the part of the app that answers it and quotes it, with a link. It works with no signal.',
+    body: 'The Ask button, bottom right on every screen. Type a question the way you would say it, like "my ends keep breaking", and get the answer AfroCoils has written for it, fitted to your profile, with a button to where you fix it. It works with no signal.',
   },
   {
     path: '/styles',
