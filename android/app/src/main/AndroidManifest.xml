@@ -2,12 +2,19 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <!--
+        allowBackup stays on, by the owner's decision (2026-10-24). Android
+        backs the profile up to the user's own encrypted Google account, so
+        it survives a new phone. Turning it off is a little more private
+        but loses everyone's profile, history and photos on a phone switch.
+    -->
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
+        android:usesCleartextTraffic="false"
         android:theme="@style/AppTheme">
 
         <activity

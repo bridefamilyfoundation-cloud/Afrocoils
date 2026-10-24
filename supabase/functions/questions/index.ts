@@ -1,5 +1,6 @@
 import type { AskQuestionRequest } from '../../../src/lib/types.ts'
 import { ASK_OUTCOMES, MAX_ASK_QUESTION_CHARS } from '../../../src/lib/types.ts'
+import { BodyTooLarge, readJson } from '../_shared/body.ts'
 import { checkLimits, limitResponse } from '../_shared/limits.ts'
 import { corsHeaders, jsonResponse } from '../_shared/cors.ts'
 import { serve } from '../_shared/env.ts'
@@ -58,7 +59,14 @@ async function POST(req: Request): Promise<Response> {
   const config = supabaseConfig()
   if (!config) return jsonResponse({ error: 'Not configured' }, 503, origin)
 
-  const input = validate(await req.json().catch(() => null))
+  // A question is a few hundred characters; nothing honest is near this.
+  const raw = await readJson(req, 16 * 1024).catch((error) => {
+    if (error instanceof BodyTooLarge) return undefined
+    throw error
+  })
+  if (raw === undefined) return jsonResponse({ error: 'Too large' }, 413, origin)
+
+  const input = validate(raw)
   if (!input) return jsonResponse({ error: 'Invalid question' }, 400, origin)
 
   try {

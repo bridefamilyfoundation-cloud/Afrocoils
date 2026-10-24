@@ -26,7 +26,16 @@ export function corsHeaders(origin: string | undefined): Record<string, string> 
   const headers: Record<string, string> = {
     'Access-Control-Allow-Methods': 'POST, OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type',
+    'Access-Control-Max-Age': '86400',
     Vary: 'Origin',
+    // Every response here is about one request and is never worth
+    // caching, and none of them is a page: a browser must not sniff one
+    // into HTML, frame it, or send a referrer onward from it.
+    'Cache-Control': 'no-store',
+    'X-Content-Type-Options': 'nosniff',
+    'X-Frame-Options': 'DENY',
+    'Referrer-Policy': 'no-referrer',
+    'Content-Security-Policy': "default-src 'none'; frame-ancestors 'none'",
   }
   if (origin && allowed.includes(origin)) {
     headers['Access-Control-Allow-Origin'] = origin

@@ -88,7 +88,10 @@ function PrivacyPolicy() {
           </Link>
           . When you tap submit, the write-up you typed, the photographs you attached, the
           credit name you chose and your confirmation that the images are yours to give are
-          sent to our server so a person can review them for the library.
+          sent to our server so a person can review them for the library. Each photograph is
+          checked there before it is kept: anything that is not a plain photo is refused, and
+          what is kept is rebuilt from the picture alone, without the hidden details a phone
+          writes into a photo — where it was taken, the time, the phone model.
         </p>
         <p>
           Nothing else in your profile goes with a submission. Your name, your avatar, your length
@@ -160,7 +163,8 @@ function PrivacyPolicy() {
           only to limit how many requests one address can make, holds it for a few minutes
           for that, and never stores it with a question or a submission. The version check
           goes to the same server and carries nothing of yours. The AfroCoils website is
-          hosted on Vercel and sees nothing from the app.
+          hosted on Vercel and sees nothing from the app, except that a new version you choose
+          to download comes from the website.
         </p>
       </Article>
 

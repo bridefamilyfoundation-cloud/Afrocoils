@@ -1,4 +1,6 @@
-import { existsSync, readFileSync } from 'node:fs'
+import { createHash } from 'node:crypto'
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
+import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import autoprefixer from 'autoprefixer'
 import tailwindcss from 'tailwindcss'
@@ -32,8 +34,12 @@ import { TIME_BANDS, type UpdateManifest } from './src/lib/types'
  */
 const site = (path: string) => fileURLToPath(new URL(`./site/${path}`, import.meta.url))
 
-/** site/release.json: the manifest's fields, less the page link, plus the package id. */
-type Release = Omit<UpdateManifest, 'page'> & { packageId: string }
+/**
+ * site/release.json: the manifest's fields, less the page link, plus the
+ * package id, plus `download` — the site-relative path the APK is served
+ * at. `url` is then only where the build fetches it from.
+ */
+type Release = Omit<UpdateManifest, 'page'> & { packageId: string; download?: string }
 
 function readRelease(): Release {
   const path = site('release.json')
@@ -75,7 +81,8 @@ function facts() {
     'release.sha256': release.sha256,
     'release.released': longDate(release.released),
     'release.releasedKey': release.released,
-    'release.url': release.url,
+    // The site's own copy (see `serveApk`), never the bucket URL.
+    'release.url': release.download ?? release.url,
     'count.styles': String(STYLES.length),
     'count.guides': String(GUIDES.length),
     'count.concerns': String(HAIR_CHECK.reduce((n, group) => n + group.concerns.length, 0)),
@@ -98,8 +105,9 @@ function siteFacts(): Plugin {
     resolveId: (id) => (id === VIRTUAL ? `\0${VIRTUAL}` : undefined),
     load(id) {
       if (id !== `\0${VIRTUAL}`) return
-      const { release, bands } = facts()
-      return `export const release = ${JSON.stringify(release)}\nexport const bands = ${JSON.stringify(bands)}\n`
+      const { release: { download, ...release }, bands } = facts()
+      const visible = { ...release, url: download ?? release.url }
+      return `export const release = ${JSON.stringify(visible)}\nexport const bands = ${JSON.stringify(bands)}\n`
     },
     transformIndexHtml(html) {
       const { tokens } = facts()
@@ -137,17 +145,94 @@ function requireReleaseFile(): Plugin {
   }
 }
 
+const OUT_DIR = fileURLToPath(new URL('./dist-site', import.meta.url))
+
+/**
+ * Publishes the APK from the site's own domain, verified.
+ *
+ * The bucket URL in release.json is where the file is fetched from at
+ * build time, not what visitors are sent to: the page links to
+ * `release.download`, and this writes the file there. The build fails
+ * unless the bytes match the size and SHA-256 that release.json — and so
+ * the download card — states, so the site cannot serve a file that
+ * differs from the one released, even if the bucket's copy is replaced.
+ *
+ * A local `apk-output/afrocoil.apk` with the right checksum is used
+ * instead of downloading, which is the case right after `site:release`.
+ */
+function serveApk(): Plugin {
+  return {
+    name: 'afrocoils:serve-apk',
+    apply: 'build',
+    async closeBundle() {
+      const release = readRelease()
+      if (!release.download) return
+      if (!/^download\/[A-Za-z0-9._-]+\.apk$/.test(release.download)) {
+        throw new Error(`site/release.json: download must be download/<file>.apk, not ${release.download}`)
+      }
+
+      const matches = (bytes: Buffer) =>
+        bytes.length === release.bytes && createHash('sha256').update(bytes).digest('hex') === release.sha256
+
+      const local = fileURLToPath(new URL('./apk-output/afrocoil.apk', import.meta.url))
+      let bytes = existsSync(local) ? readFileSync(local) : undefined
+      if (!bytes || !matches(bytes)) {
+        const response = await fetch(release.url)
+        if (!response.ok) throw new Error(`Fetching the APK from ${release.url} failed (${response.status}).`)
+        bytes = Buffer.from(await response.arrayBuffer())
+      }
+      if (!matches(bytes)) {
+        throw new Error(
+          `The APK at ${release.url} does not match the SHA-256 in site/release.json. ` +
+            'Refusing to publish it. Re-run `npm run site:release` from the real build.',
+        )
+      }
+
+      const target = join(OUT_DIR, release.download)
+      mkdirSync(dirname(target), { recursive: true })
+      writeFileSync(target, bytes)
+      console.log(`[site] ${release.download}: ${(bytes.length / 1e6).toFixed(1)} MB, sha256 verified`)
+    },
+  }
+}
+
+/**
+ * The page's Content-Security-Policy (vercel.json) allows inline script
+ * only by hash. Fails the build if an inline `<script>` in the built page
+ * has a hash that policy does not list — otherwise editing that one line
+ * would silently stop it running in production.
+ */
+function checkCspHashes(): Plugin {
+  return {
+    name: 'afrocoils:check-csp',
+    apply: 'build',
+    closeBundle() {
+      const html = readFileSync(join(OUT_DIR, 'index.html'), 'utf8')
+      const vercel = readFileSync(fileURLToPath(new URL('./vercel.json', import.meta.url)), 'utf8')
+      for (const [, body] of html.matchAll(/<script(?![^>]*\ssrc=)(?![^>]*type="application\/ld\+json")[^>]*>([\s\S]*?)<\/script>/g)) {
+        // Hashed as the browser hashes it: the HTML parser turns CRLF into
+        // LF first, so a Windows checkout and Vercel's agree.
+        const text = body.replace(/\r\n?/g, '\n')
+        const hash = `'sha256-${createHash('sha256').update(text).digest('base64')}'`
+        if (!vercel.includes(hash)) {
+          throw new Error(`An inline <script> in site/index.html is not allowed by the CSP in vercel.json. Add ${hash} to script-src.`)
+        }
+      }
+    },
+  }
+}
+
 export default defineConfig({
   root: site(''),
   base: './',
-  plugins: [siteFacts(), requireReleaseFile()],
+  plugins: [siteFacts(), requireReleaseFile(), serveApk(), checkCspHashes()],
   css: {
     postcss: {
       plugins: [tailwindcss({ config: site('tailwind.config.js') }), autoprefixer()],
     },
   },
   build: {
-    outDir: fileURLToPath(new URL('./dist-site', import.meta.url)),
+    outDir: OUT_DIR,
     emptyOutDir: true,
   },
   server: {

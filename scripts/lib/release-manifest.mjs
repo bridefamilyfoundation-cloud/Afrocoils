@@ -34,6 +34,18 @@ export const BUCKET = 'releases'
 /** The landing site, for the manifest's link to the checksum and install steps. */
 export const SITE_URL = 'https://afrocoils.vercel.app/'
 
+/**
+ * Where people download an APK from: the landing site's own domain.
+ *
+ * The bucket is the source, never the link. `npm run site:build` fetches
+ * the APK from the bucket, refuses it unless its SHA-256 matches
+ * site/release.json, and publishes it as a static file beside the page —
+ * so the download button, the in-app Download prompt and the response
+ * headers all name the site, and a file swapped in the bucket after
+ * release can never reach a phone through the site.
+ */
+export const downloadPath = (file) => `download/${file}`
+
 export const publicUrl = (path) =>
   `https://${PROJECT_REF}.supabase.co/storage/v1/object/public/${BUCKET}/${path}`
 
@@ -56,8 +68,14 @@ export function writeRelease(release) {
  * from the bucket and the landing page is elsewhere.
  */
 export function manifestFrom(release) {
-  const { packageId: _packageId, ...rest } = release
-  return { ...rest, page: `${SITE_URL}#download` }
+  const { packageId: _packageId, download, ...rest } = release
+  return {
+    ...rest,
+    // The APK through the site (see `downloadPath`); a bundle stays a
+    // bucket URL, because only the updater reads it and nobody sees it.
+    url: download ? new URL(download, SITE_URL).href : rest.url,
+    page: `${SITE_URL}#download`,
+  }
 }
 
 /** The day, local to this machine, as `YYYY-MM-DD` — never toISOString(), which is UTC. */

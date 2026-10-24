@@ -30,7 +30,7 @@
 import { createHash } from 'node:crypto'
 import { existsSync, readFileSync, statSync } from 'node:fs'
 import { dirname, join, resolve } from 'node:path'
-import { at, localDay, publicUrl, publishManifest, readRelease, upload, writeRelease } from './lib/release-manifest.mjs'
+import { at, downloadPath, localDay, publicUrl, publishManifest, readRelease, upload, writeRelease } from './lib/release-manifest.mjs'
 
 const args = process.argv.slice(2)
 const flag = (name) => {
@@ -128,6 +128,9 @@ const release = {
   // The build's local calendar day, from the file's own timestamp.
   released: localDay(statSync(apkPath).mtime),
   url,
+  // What the button and the in-app prompt link to: the site, which serves
+  // a checksum-verified copy of `url`. Absent with --url, which links out.
+  ...(flag('url') ? {} : { download: downloadPath(remote.slice('apk/'.length)) }),
   notes,
   // Pushed updates carry on from where they were; the next one is built
   // against this APK (ota:publish sets minVersionCode from versionCode).
@@ -145,5 +148,5 @@ publishManifest(release)
 
 console.log(`[site:release] ${packageId} ${version} (${versionCode}) · ${(release.bytes / 1e6).toFixed(1)} MB · Android ${release.minAndroid}+`)
 console.log(`[site:release] sha256 ${release.sha256}`)
-console.log(`[site:release] download: ${url}`)
+console.log(`[site:release] download: ${release.download ?? url} (from ${url})`)
 console.log('[site:release] Commit site/release.json and redeploy the landing site so its button follows.')

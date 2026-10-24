@@ -584,6 +584,24 @@ contribution twice. Keep that check *before* the photo upload — behind it,
 the duplicate is caught by the constraint only after four photographs have
 been orphaned in the bucket.
 
+**Every photograph passes `scanJpeg()` (`_shared/image-scan.ts`) before
+it is stored.** It walks the file segment by segment, refuses anything
+malformed, oversized in pixels, or carrying script or a second file in
+its metadata or after its end, and the route stores the *rebuilt* bytes
+(image data only — no EXIF, so no GPS), never the ones that arrived.
+Don't upload `input.photos` before that loop, and don't relax it to a
+magic-byte check. Both routes read their body through `readJson()` with
+a byte ceiling, never `req.json()`.
+
+**The APK is downloaded from the site, not the bucket.** `release.json`
+carries `url` (the bucket copy, the build's source) and `download` (the
+site path). `npm run site:build` fetches `url`, refuses it unless its
+size and SHA-256 match `release.json`, and writes it to `dist-site/` at
+`download`; `manifestFrom()` points latest.json's APK link there too.
+Don't put the bucket URL back on the page. The site's CSP is in
+`vercel.json` and allows inline script by hash only; the build fails if
+the hash drifts from `site/index.html`.
+
 Nothing it accepts is published: every submission lands as `Pending` for a
 human to read, because a moderation queue that auto-publishes is not a
 moderation queue, and this one holds a rights claim the library has already

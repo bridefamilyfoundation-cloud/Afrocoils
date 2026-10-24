@@ -7,6 +7,8 @@ import {
   STYLE_CATEGORIES,
   STYLE_DIFFICULTIES,
 } from '../../../src/lib/types.ts'
+import { BodyTooLarge, readJson } from '../_shared/body.ts'
+import { scanJpeg } from '../_shared/image-scan.ts'
 import { checkLimits, limitResponse } from '../_shared/limits.ts'
 import { corsHeaders, jsonResponse } from '../_shared/cors.ts'
 import { serve } from '../_shared/env.ts'
@@ -44,6 +46,17 @@ import {
  */
 
 const BASE64 = /^[A-Za-z0-9+/]+={0,2}$/
+
+/** `sub-<base36 time>-<random>` from the submit screen; nothing else is an id. */
+const CLIENT_ID = /^[A-Za-z0-9_-]{1,100}$/
+
+/**
+ * The largest body a real submission can be: every photograph at the
+ * byte cap, base64'd (four characters per three bytes), plus the text.
+ * Anything bigger is refused before it is read.
+ */
+const MAX_BODY_BYTES =
+  MAX_PHOTOS_PER_SUBMISSION * Math.ceil((MAX_SUBMISSION_PHOTO_BYTES * 4) / 3) + 256 * 1024
 
 /** One photograph, decoded and checked it came from the app's camera path. */
 function decodePhoto(value: unknown): Uint8Array | null {
@@ -107,7 +120,7 @@ function validate(body: unknown): ValidSubmission | null {
   const category = inList(STYLE_CATEGORIES, b.category)
   const hairType = inList(HAIR_TYPES, b.hairType)
   const clientId = text(b.clientId, 100)
-  if (!name || !hairType || !clientId) return null
+  if (!name || !hairType || !clientId || !CLIENT_ID.test(clientId)) return null
 
   // The same bar the submit screen holds the contributor to, restated
   // here because the screen is not what is being trusted: something a
@@ -198,9 +211,50 @@ async function POST(req: Request): Promise<Response> {
     )
   }
 
-  const input = validate(await req.json().catch(() => null))
+  let raw: unknown
+  try {
+    raw = await readJson(req, MAX_BODY_BYTES)
+  } catch (error) {
+    if (error instanceof BodyTooLarge) {
+      return jsonResponse({ error: 'That submission is too large to send.' }, 413, origin)
+    }
+    throw error
+  }
+
+  const input = validate(raw)
   if (!input) {
     return jsonResponse({ error: 'Invalid submission' }, 400, origin)
+  }
+
+  /*
+   * The security check, on every photograph, before anything is stored.
+   *
+   * `scanJpeg` walks each file as a decoder would and refuses one that
+   * is malformed, claims impossible dimensions, or carries script or a
+   * second file in its metadata or after its end. What passes is
+   * rebuilt from the image data alone — no EXIF (and so no GPS), no
+   * comments, no trailer — and the rebuilt bytes are what go in the
+   * bucket. The contributor never sees this happen unless a photo is
+   * refused.
+   */
+  for (const [index, photo] of input.photos.entries()) {
+    const verdict = await scanJpeg(photo)
+    if (!verdict.ok) {
+      console.warn(`[submissions] photo ${index} refused by the image check: ${verdict.reason}`)
+      return jsonResponse(
+        {
+          error:
+            'One of the photos did not pass the security check. Retake it with the camera or pick it again from the gallery.',
+        },
+        422,
+        origin,
+      )
+    }
+    input.photos[index] = verdict.bytes
+    console.log(
+      `[submissions] photo ${index} passed: ${verdict.width}x${verdict.height}, ` +
+        `${verdict.stripped} bytes of metadata removed, sha256 ${verdict.sha256.slice(0, 16)}`,
+    )
   }
 
   const { clientId } = input.body
