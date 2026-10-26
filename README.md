@@ -69,18 +69,21 @@ because Play rejects an unsigned AAB at upload.
 ### The one APK
 
 ```bash
-npm run apk   # -> apk-output/afrocoil.apk
+npm run apk   # -> apk-output/afrocoils.apk
 ```
 
 This is the command for any APK that goes onto a phone. It always writes
-the same file in the same folder, `apk-output/afrocoil.apk`, and deletes
-any other `.apk` in that folder. A file `afrocoil.json` beside it records
+the same file in the same folder, `apk-output/afrocoils.apk`, and deletes
+any other `.apk` in that folder. A file `afrocoils.json` beside it records
 the version, versionCode, checksum and signer.
 
 Each APK it produces installs over the app already on a phone, keeping the
 profile, because it fixes the three things Android checks:
 
-- **Same package id**, `com.afrocoilyhair.app`.
+- **Same package id**, `com.afrocoils.app`. It was `com.afrocoilyhair.app`
+  until 2026-10-23; Android treats the two as different apps, so a copy
+  installed under the old id cannot update to this one and has to be
+  uninstalled (losing its profile) before the new APK goes on.
 - **Same signing key.** The script reads the certificate off the built file
   and stops unless it is the pinned one
   (`6b782be2…466e`, `android/afro-coily-dev.keystore`) that every
@@ -89,7 +92,7 @@ profile, because it fixes the three things Android checks:
   and they would have to uninstall, losing their data.
 - **A higher versionCode.** `appVersionCode` is raised before each build,
   past whatever is in `gradle.properties`, `site/release.json` and the last
-  `afrocoil.json`. Commit the bumped `gradle.properties`.
+  `afrocoils.json`. Commit the bumped `gradle.properties`.
 
 Debug builds (`android:build`, `android:run`) sign with the same key when
 `keystore.properties` is present, so a debug install and a release install

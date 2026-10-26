@@ -33,10 +33,10 @@ def appVersionName = new JsonSlurper().parse(rootProject.file("../package.json")
 def appVersionCode = Integer.parseInt(project.findProperty("appVersionCode") ?: "1")
 
 android {
-    namespace = "com.afrocoilyhair.app"
+    namespace = "com.afrocoils.app"
     compileSdk = rootProject.ext.compileSdkVersion
     defaultConfig {
-        applicationId "com.afrocoilyhair.app"
+        applicationId "com.afrocoils.app"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode appVersionCode

@@ -40,7 +40,7 @@ Then point `android/keystore.properties` at it (copy from
 
 > `afro-coily-dev.keystore` is a throwaway for sideloading. Never upload a build
 > signed with it — `applicationId` and signing identity are bound together
-> permanently on first upload, and `com.afrocoilyhair.app` can never be reused.
+> permanently on first upload, and `com.afrocoils.app` can never be reused.
 
 **Back up the keystore file and both passwords off this machine.** While
 enrolled in Play App Signing a lost upload key is recoverable via a reset

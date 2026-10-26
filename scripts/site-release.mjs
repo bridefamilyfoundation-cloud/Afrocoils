@@ -45,7 +45,7 @@ function fail(message) {
   process.exit(1)
 }
 
-const apkPath = resolve(flag('apk') ?? at('apk-output/afrocoil.apk'))
+const apkPath = resolve(flag('apk') ?? at('apk-output/afrocoils.apk'))
 if (!existsSync(apkPath)) fail(`No APK at ${apkPath}. Run \`npm run apk\` first.`)
 
 /* What the build says it is. */
@@ -66,7 +66,7 @@ const previous = existsSync(at('site/release.json')) ? readRelease() : undefined
 
 /* `npm run apk` writes what it built beside the file. A stale APK from
    before a version bump is the likeliest way for this card to lie. */
-const metaPath = join(dirname(apkPath), 'afrocoil.json')
+const metaPath = join(dirname(apkPath), 'afrocoils.json')
 if (existsSync(metaPath)) {
   const meta = JSON.parse(readFileSync(metaPath, 'utf8'))
   if (meta.sha256 === sha256) {

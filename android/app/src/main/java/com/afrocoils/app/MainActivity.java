@@ -1,4 +1,4 @@
-package com.afrocoilyhair.app;
+package com.afrocoils.app;
 
 import com.getcapacitor.BridgeActivity;
 

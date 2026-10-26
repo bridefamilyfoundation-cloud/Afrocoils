@@ -101,7 +101,7 @@ function facts() {
 function siteFacts(): Plugin {
   const VIRTUAL = 'virtual:site-facts'
   return {
-    name: 'afrocoil:site-facts',
+    name: 'afrocoils:site-facts',
     resolveId: (id) => (id === VIRTUAL ? `\0${VIRTUAL}` : undefined),
     load(id) {
       if (id !== `\0${VIRTUAL}`) return
@@ -130,7 +130,7 @@ function siteFacts(): Plugin {
 /** Fails the build if the download button would point at nothing. */
 function requireReleaseFile(): Plugin {
   return {
-    name: 'afrocoil:require-release-file',
+    name: 'afrocoils:require-release-file',
     apply: 'build',
     buildStart() {
       const { url } = readRelease()
@@ -157,7 +157,7 @@ const OUT_DIR = fileURLToPath(new URL('./dist-site', import.meta.url))
  * the download card — states, so the site cannot serve a file that
  * differs from the one released, even if the bucket's copy is replaced.
  *
- * A local `apk-output/afrocoil.apk` with the right checksum is used
+ * A local `apk-output/afrocoils.apk` with the right checksum is used
  * instead of downloading, which is the case right after `site:release`.
  */
 function serveApk(): Plugin {
@@ -174,7 +174,7 @@ function serveApk(): Plugin {
       const matches = (bytes: Buffer) =>
         bytes.length === release.bytes && createHash('sha256').update(bytes).digest('hex') === release.sha256
 
-      const local = fileURLToPath(new URL('./apk-output/afrocoil.apk', import.meta.url))
+      const local = fileURLToPath(new URL('./apk-output/afrocoils.apk', import.meta.url))
       let bytes = existsSync(local) ? readFileSync(local) : undefined
       if (!bytes || !matches(bytes)) {
         const response = await fetch(release.url)

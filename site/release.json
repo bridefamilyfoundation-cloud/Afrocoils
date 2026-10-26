@@ -1,17 +1,17 @@
 {
   "version": "0.2.0",
-  "versionCode": 9,
-  "packageId": "com.afrocoilyhair.app",
+  "versionCode": 10,
+  "packageId": "com.afrocoils.app",
   "minSdk": 24,
   "minAndroid": "7.0",
-  "bytes": 9336886,
-  "sha256": "72a76ae7a65c7aeed106e62766a3593a5967830120637fe0ad1ba4e4b73cd66b",
-  "released": "2026-10-22",
-  "url": "https://runhkccoeyxfgsfrzezn.supabase.co/storage/v1/object/public/releases/apk/AfroCoils-0.2.0-9.apk",
-  "download": "download/AfroCoils-0.2.0-9.apk",
+  "bytes": 9362231,
+  "sha256": "c074c2592ab8516584493c3523d5cca0bfcf52e384a835967338877f94c5138f",
+  "released": "2026-10-26",
+  "url": "https://runhkccoeyxfgsfrzezn.supabase.co/storage/v1/object/public/releases/apk/AfroCoils-0.2.0-10.apk",
+  "download": "download/AfroCoils-0.2.0-10.apk",
   "notes": [
-    "New home-screen icon and launch screen: the logo fades softly below the hair",
-    "Hair SOS for your coils, written for type 4 hair"
+    "New app id: com.afrocoils.app. If you have the older AfroCoils installed, uninstall it first; your profile does not carry across.",
+    "Hair Growth: retention fitted at the afro-textured rate, trims logged"
   ],
   "bundle": {
     "code": 7,

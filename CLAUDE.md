@@ -637,7 +637,7 @@ again after the Supabase move); restore them from the last commit Vercel
 deployed.
 
 An APK for a phone comes from `npm run apk` and nothing else: one file,
-`apk-output/afrocoil.apk`. It raises `appVersionCode` and refuses any
+`apk-output/afrocoils.apk`. It raises `appVersionCode` and refuses any
 build not signed by the pinned certificate in `scripts/build-apk.mjs`,
 because a different key or a lower code is an APK that cannot install
 over the existing app. Do not change that pin, and do not let debug

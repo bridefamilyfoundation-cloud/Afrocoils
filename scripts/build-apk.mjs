@@ -1,5 +1,5 @@
 /**
- * Builds the one APK, at `apk-output/afrocoil.apk`.
+ * Builds the one APK, at `apk-output/afrocoils.apk`.
  *
  *   npm run apk
  *
@@ -7,7 +7,7 @@
  * because the three things Android checks are held fixed or forced
  * upward here rather than left to whoever runs the build:
  *
- * - **Package id**: `com.afrocoilyhair.app`, from build.gradle. A
+ * - **Package id**: `com.afrocoils.app`, from build.gradle. A
  *   different id is a second app, not an update.
  * - **Signature**: the build must be signed by the certificate pinned
  *   below, the one every installed copy carries. A different key and
@@ -45,7 +45,7 @@ const PINNED_CERT_SHA256 = '6b782be2da262dfb4dadf8ff02d2de9d82b4d5f561ef0a017657
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const at = (...parts) => join(ROOT, ...parts)
 const OUT_DIR = at('apk-output')
-const OUT_APK = join(OUT_DIR, 'afrocoil.apk')
+const OUT_APK = join(OUT_DIR, 'afrocoils.apk')
 const GRADLE_PROPS = at('android/gradle.properties')
 const BUILT_APK = at('android/app/build/outputs/apk/release/app-release.apk')
 const BUILT_META = at('android/app/build/outputs/apk/release/output-metadata.json')
@@ -126,8 +126,8 @@ const current = Number(/^appVersionCode=(\d+)/m.exec(props)?.[1] ?? 0)
 const published = existsSync(at('site/release.json'))
   ? Number(JSON.parse(readFileSync(at('site/release.json'), 'utf8')).versionCode ?? 0)
   : 0
-const lastOutput = existsSync(join(OUT_DIR, 'afrocoil.json'))
-  ? Number(JSON.parse(readFileSync(join(OUT_DIR, 'afrocoil.json'), 'utf8')).versionCode ?? 0)
+const lastOutput = existsSync(join(OUT_DIR, 'afrocoils.json'))
+  ? Number(JSON.parse(readFileSync(join(OUT_DIR, 'afrocoils.json'), 'utf8')).versionCode ?? 0)
   : 0
 const next = Math.max(current, published, lastOutput) + 1
 
@@ -170,7 +170,7 @@ const sha256 = createHash('sha256').update(readFileSync(OUT_APK)).digest('hex')
 // Beside the APK so the next build knows the last code even if
 // gradle.properties was reverted, and so a person can see what the file is.
 writeFileSync(
-  join(OUT_DIR, 'afrocoil.json'),
+  join(OUT_DIR, 'afrocoils.json'),
   JSON.stringify(
     {
       version,
