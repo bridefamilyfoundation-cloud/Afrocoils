@@ -13,6 +13,7 @@ import {
   projectMilestones,
   sortChecks,
 } from '../lib/growth'
+import { isLocs, resolveLocStage } from '../lib/locs'
 import { useHairProfile } from '../lib/profile-store'
 import { useBackDismiss } from '../lib/back-button'
 import type { LengthCheck, LengthUnit } from '../lib/types'
@@ -70,6 +71,14 @@ export default function GrowthScreen() {
   const hasData = lengthChecks.length > 0
   const nextMilestone = milestones.find((m) => !m.reached)
 
+  // Starter and budding locs contract as they mature, so the length of a
+  // loc can fall while the hair in it grows. A retention figure there
+  // would report shrinkage as breakage; the checks still record.
+  const locStage = isLocs(profile.identity) ? resolveLocStage(profile.identity).stage : undefined
+  const locsContracting = locStage === 'Starter' || locStage === 'Budding'
+  const retention = locsContracting ? undefined : stats.retention
+  const pct = (ratio: number) => Math.round(Math.min(1, Math.max(0, ratio)) * 100)
+
   return (
     <>
       <section data-tour="growth-heading" className="mb-xl text-center">
@@ -92,8 +101,9 @@ export default function GrowthScreen() {
             No length checks yet
           </h3>
           <p className="mx-auto mb-lg max-w-sm font-body-md text-body-md text-on-surface-variant">
-            Measure stretched, from scalp to ends. Two checks eight weeks apart is enough to
-            see whether you are retaining what you grow.
+            Measure stretched, from scalp to ends, on the same section each time. Check monthly:
+            after about four months there is enough to see past the tape&rsquo;s own error and
+            show whether you are keeping what you grow.
           </p>
           <button
             type="button"
@@ -109,6 +119,7 @@ export default function GrowthScreen() {
       {logging && (
         <LogLengthCheck
           unit={lengthUnit}
+          hasPrevious={hasData}
           onSave={saveCheck}
           onCancel={() => setLogging(false)}
         />
@@ -139,20 +150,26 @@ export default function GrowthScreen() {
                 Since last check
               </p>
               <p className="font-caption text-caption text-outline">
-                {stats.deltaDays === undefined ? 'first check' : `${stats.deltaDays} days`}
+                {stats.deltaDays === undefined
+                  ? 'first check'
+                  : stats.latest!.trimmedInches
+                    ? `${stats.deltaDays} days, ${formatLength(stats.latest!.trimmedInches, lengthUnit)} trimmed`
+                    : `${stats.deltaDays} days`}
               </p>
             </div>
 
             <div className="rounded-xl shadow-card bg-surface-container-lowest p-md text-center">
               <Icon name="shield" className="mb-xs text-primary" />
               <p className="font-headline-md text-headline-md text-on-surface">
-                {stats.retention === undefined
-                  ? '—'
-                  : `${Math.round(Math.max(0, stats.retention) * 100)}%`}
+                {retention === undefined ? '—' : `${pct(retention)}%`}
               </p>
               <p className="font-caption text-caption text-on-surface-variant">Retention</p>
               <p className="font-caption text-caption text-outline">
-                {stats.retention === undefined ? 'needs 4+ weeks' : 'of expected growth'}
+                {locsContracting
+                  ? 'after budding'
+                  : stats.retentionRange
+                    ? `likely ${pct(stats.retentionRange[0])}–${pct(stats.retentionRange[1])}%`
+                    : 'settling'}
               </p>
             </div>
           </section>
@@ -183,25 +200,41 @@ export default function GrowthScreen() {
             <LengthChart checks={lengthChecks} unit={lengthUnit} />
           </section>
 
-          {stats.retention !== undefined && (
-            <section className="mb-2xl rounded-2xl bg-secondary-fixed/30 p-lg">
-              <p className="font-body-md text-body-md text-on-secondary-fixed-variant">
-                Over {stats.totalDays} days you gained{' '}
-                <span className="text-on-secondary-fixed">
-                  {formatLength(stats.latest!.overall - sortChecks(lengthChecks)[0].overall, lengthUnit)}
-                </span>
-                . Scalp hair grows about {AVG_GROWTH_IN_PER_MONTH}&Prime; a month regardless of
-                routine, so retention compares what you kept against what you grew.
-                {stats.ownRateInPerMonth !== undefined && (
-                  <>
-                    {' '}
-                    Your own measured rate is{' '}
-                    {formatLength(stats.ownRateInPerMonth, lengthUnit, 2)} a month.
-                  </>
-                )}
-              </p>
-            </section>
-          )}
+          {/* How the retention figure was reached, or why there is none
+              yet. Every sentence here is a claim about lib/growth.ts. */}
+          <section className="mb-2xl rounded-2xl bg-secondary-fixed/30 p-lg">
+            <p className="font-body-md text-body-md text-on-secondary-fixed-variant">
+              {locsContracting ? (
+                <>
+                  Starter and budding locs shrink as they mature, so a loc can be growing
+                  steadily while measuring shorter. Retention starts once your locs reach the
+                  teen stage; until then, keep measuring &mdash; these checks become the record
+                  it is worked out from.
+                </>
+              ) : retention !== undefined ? (
+                <>
+                  Across {stats.totalDays} days your trend is{' '}
+                  <span className="text-on-secondary-fixed">
+                    {stats.trend!.netInPerMonth >= 0 ? '+' : ''}
+                    {formatLength(stats.trend!.netInPerMonth, lengthUnit, 2)} a month
+                  </span>
+                  {stats.trimmedInches > 0 &&
+                    `, with the ${formatLength(stats.trimmedInches, lengthUnit)} you trimmed added back`}
+                  . Afro-textured hair grows about {AVG_GROWTH_IN_PER_MONTH}&Prime; a month
+                  (0.2&ndash;0.4&Prime; from person to person), so retention compares what you
+                  kept with that. The range narrows with every check measured the same way.
+                </>
+              ) : (
+                <>
+                  A tape on coily hair is only good to about a quarter-inch, which is most of a
+                  month&rsquo;s growth. So retention waits until your checks span enough time to
+                  see past it &mdash; about four months of monthly checks, sooner if your
+                  measurements are consistent. The trend is fitted through every check, so none
+                  of them is wasted.
+                </>
+              )}
+            </p>
+          </section>
 
           <section className="mb-2xl">
             <h3 className="mb-xs font-headline-md text-body-lg font-bold text-on-surface">
@@ -211,7 +244,7 @@ export default function GrowthScreen() {
               Landmarks are approximate — where &ldquo;shoulder length&rdquo; falls depends on
               your torso, not on a number.
               {nextMilestone?.estimated &&
-                ' Dates use the 0.5" a month average until you have two checks two months apart.'}
+                ` Dates assume the ${AVG_GROWTH_IN_PER_MONTH}" a month average, all of it kept, until your own trend settles.`}
             </p>
             <ul className="space-y-sm">
               {milestones.map((milestone) => (
@@ -269,6 +302,11 @@ export default function GrowthScreen() {
                       {formatLength(entry.overall, lengthUnit)}
                     </span>
                   </div>
+                  {entry.trimmedInches !== undefined && (
+                    <p className="font-caption text-caption text-on-surface-variant">
+                      Trimmed {formatLength(entry.trimmedInches, lengthUnit)} since the check before
+                    </p>
+                  )}
                   {entry.note && (
                     <p className="font-body-md text-caption text-on-surface-variant">
                       {entry.note}

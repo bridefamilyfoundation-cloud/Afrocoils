@@ -295,7 +295,7 @@ export const TOPICS: AskTopic[] = [
     id: 'length-check',
     title: 'Log a length check',
     answer:
-      'On Hair Growth, measure stretched, from scalp to ends, in inches or centimetres. Two checks eight weeks apart is enough to see whether you are keeping what you grow; the chart and milestones build from there.',
+      'On Hair Growth, measure stretched, from scalp to ends, in inches or centimetres. Use the same section and the same day of your wash week each time, and log any trim on the next check. Monthly checks show whether you are keeping what you grow after about four months; the chart and milestones build from there.',
     route: '/growth',
     cta: 'Open Hair Growth',
     docs: 'growth',

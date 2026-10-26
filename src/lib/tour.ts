@@ -66,7 +66,7 @@ export const TOUR_STEPS: TourStep[] = [
     path: '/growth',
     target: 'growth-heading',
     title: 'Hair Growth',
-    body: 'Log a length check every few weeks and see what you are keeping, not just what you grow. Your own worn styles and photos live here too.',
+    body: 'Log a length check every month and see what you are keeping, not just what you grow. Your own worn styles and photos live here too.',
   },
   {
     path: '/locs',

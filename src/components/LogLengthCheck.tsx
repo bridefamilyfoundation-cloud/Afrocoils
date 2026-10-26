@@ -23,15 +23,19 @@ const SECTION_LABELS: Record<Section, string> = {
 
 export default function LogLengthCheck({
   unit,
+  hasPrevious,
   onSave,
   onCancel,
 }: {
   unit: LengthUnit
+  /** Whether there is an earlier check for a trim to have happened since. */
+  hasPrevious: boolean
   onSave: (check: LengthCheck) => void
   onCancel: () => void
 }) {
   const [date, setDate] = useState(todayKey())
   const [overall, setOverall] = useState('')
+  const [trimmed, setTrimmed] = useState('')
   const [sections, setSections] = useState<Partial<Record<Section, string>>>({})
   const [note, setNote] = useState('')
   const [showSections, setShowSections] = useState(false)
@@ -52,6 +56,18 @@ export default function LogLengthCheck({
       return
     }
 
+    // Blank means no trim. A typed value has to be a real, non-negative
+    // length: a trim silently dropped would be read as breakage.
+    let trimmedInches: number | undefined
+    if (hasPrevious && trimmed.trim() !== '') {
+      const cut = Number.parseFloat(trimmed)
+      if (!Number.isFinite(cut) || cut < 0) {
+        setError('Enter how much was trimmed, or leave it blank.')
+        return
+      }
+      if (cut > 0) trimmedInches = fromDisplay(cut, unit)
+    }
+
     const parsedSections: Partial<Record<Section, number>> = {}
     for (const section of SECTIONS) {
       const raw = sections[section]
@@ -69,6 +85,7 @@ export default function LogLengthCheck({
       dateISO: new Date(`${date}T12:00:00`).toISOString(),
       overall: fromDisplay(value, unit),
       sections: Object.keys(parsedSections).length > 0 ? parsedSections : undefined,
+      trimmedInches,
       note: note.trim() || undefined,
     })
   }
@@ -111,9 +128,34 @@ export default function LogLengthCheck({
             className={inputClass}
           />
           <p className="mt-xs font-caption text-caption text-on-surface-variant">
-            Measure stretched, from the scalp to the ends of your longest section.
+            Measure stretched, from the scalp to the ends, on the same section every time
+            &mdash; the crown is a good one &mdash; and on the same day of your wash week.
+            Checks taken the same way are what make the trend precise.
           </p>
         </div>
+
+        {hasPrevious && (
+          <div>
+            <label htmlFor="check-trimmed" className="mb-xs block font-label-md text-label-md text-on-surface-variant">
+              Trimmed since your last check ({unit === 'cm' ? 'cm' : 'inches'}, optional)
+            </label>
+            <input
+              id="check-trimmed"
+              type="number"
+              inputMode="decimal"
+              step="0.1"
+              min="0"
+              value={trimmed}
+              onChange={(e) => setTrimmed(e.target.value)}
+              placeholder="0"
+              className={inputClass}
+            />
+            <p className="mt-xs font-caption text-caption text-on-surface-variant">
+              A trim is added back before retention is worked out, so cutting off split ends
+              never counts as breakage.
+            </p>
+          </div>
+        )}
 
         <div>
           <button
@@ -163,7 +205,7 @@ export default function LogLengthCheck({
             value={note}
             maxLength={120}
             onChange={(e) => setNote(e.target.value)}
-            placeholder="e.g. Trimmed 0.25&quot; of split ends"
+            placeholder="e.g. Day 3 after wash, banded overnight"
             className={inputClass}
           />
         </div>

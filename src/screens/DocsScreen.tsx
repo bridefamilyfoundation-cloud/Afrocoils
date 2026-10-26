@@ -282,9 +282,18 @@ const SECTIONS: {
           </li>
           <li>
             <strong>Length checks</strong>: measure stretched, from scalp to ends, in inches or
-            centimetres. Two checks eight weeks apart is enough to see whether you are keeping
-            what you grow. The chart and milestones build from there. Your latest check also
-            tells the style rankings roughly how long your hair is.
+            centimetres, on the same section and the same day of your wash week each time. The
+            chart and milestones build from there. Your latest check also tells the style
+            rankings roughly how long your hair is.
+          </li>
+          <li>
+            <strong>Retention</strong>: a trend line fitted through every check, compared with
+            the 0.3&Prime; a month afro-textured hair grows on average (Loussouarn, 2001). A tape
+            on coily hair is only good to about a quarter-inch, so it waits until your checks
+            reach past that &mdash; about four months of monthly checks &mdash; and then shows a
+            range as well as a figure. Log a trim on the check after it and it is added back, so
+            a trim never counts as breakage. Starter and budding locs shrink as they mature, so
+            for them retention waits for the teen stage.
           </li>
           <li>
             <strong>My styles</strong>: styles you have actually worn, with your own photos. Any

@@ -555,15 +555,19 @@ One structural note:
 screen, because retention is the one number here a user could reasonably
 dispute:
 
-- **Retention** is length gained over expected growth, against the
-  0.5&Prime;/month population average. Suppressed below a 28-day span, where a
-  fortnight's growth is close to the measurement error. A net loss from
-  trimming produces a negative ratio; the screen clamps the displayed
-  percentage at zero rather than the model hiding it.
-- **Milestone ETAs** use the user's own measured rate once the record spans 60
-  days, and the population average before that — flagged as an estimate either
-  way. A flat or shrinking record yields no date at all rather than one in the
-  far future.
+- **Retention** is the slope of a least-squares line through every check
+  (inches logged as `trimmedInches` added back first, so a trim is never
+  breakage) over expected growth: 0.3&Prime;/month, the 256 µm/day
+  Loussouarn (2001) measured for afro-textured hair — not the 0.5&Prime;
+  quoted for straight hair. The tape error is taken as 0.25&Prime;, pooled
+  with the user's own scatter, and retention is shown only once the
+  slope's standard error is under 0.08&Prime;/month (about four months of
+  monthly checks), with a 95% range beside it. Starter and budding locs
+  get none: they contract as they mature.
+- **Milestone ETAs** use the fitted trend once it has settled, starting from
+  the line rather than the last reading, and the population average with
+  full retention before that — flagged as an estimate either way. A flat or
+  shrinking trend yields no date at all rather than one in the far future.
 - **Milestone landmarks are approximate by nature.** Where "shoulder length"
   falls depends on a torso, not a number, and the UI says so.
 

@@ -448,13 +448,13 @@ export const KNOWLEDGE: KnowledgeEntry[] = [
     question: 'Why isn’t my hair growing?',
     asks: 'why isnt my hair growing|my hair is not growing|hair stuck at same length|hair wont grow past|how to grow my hair longer|grow hair faster|length retention|how fast does hair grow|how fast does natural hair grow|natural hair growth rate|what makes hair grow faster',
     answer:
-      'It is growing, at about half an inch a month. The real question is whether you’re keeping it. Coily hair breaks at the ends as fast as it grows at the roots, so the length looks stuck. Nothing you put on your hair makes the follicle grow faster. What protects the ends is what gets you length.',
+      'It is growing, at about a third of an inch a month — a little slower than the half-inch usually quoted, which was measured on straight hair. The real question is whether you’re keeping it. Coily hair breaks at the ends as fast as it grows at the roots, so the length looks stuck. Nothing you put on your hair makes the follicle grow faster. What protects the ends is what gets you length.',
     steps: [
       'Measure stretched, root to tip, and log it on Hair Growth.',
       'Protect the ends: satin every night, ends tucked in low-manipulation styles.',
       'Detangle only when wet and slippery.',
       'Trim split ends before they travel up the strand.',
-      'Measure again in eight weeks. Two checks show whether you’re keeping what you grow.',
+      'Measure monthly, the same way each time. After about four months the app can show whether you’re keeping what you grow.',
     ],
     forYou: [
       {

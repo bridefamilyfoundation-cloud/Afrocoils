@@ -332,6 +332,12 @@ export interface LengthCheck {
   /** Always inches, regardless of `lengthUnit`. */
   overall: number
   sections?: Partial<Record<Section, number>>
+  /**
+   * Cut off since the previous check, always inches. Added back before
+   * the trend is fitted, so a trim is never read as breakage. Optional,
+   * so older checks need no migration — absent means none was logged.
+   */
+  trimmedInches?: number
   note?: string
 }
 

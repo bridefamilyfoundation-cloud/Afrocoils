@@ -6,24 +6,48 @@ import type { LengthBand, LengthCheck, LengthUnit } from './types'
  * Kept as pure functions rather than living inside the Growth screen so
  * the retention rule — the one number here a user could reasonably
  * dispute — can be read and tested on its own.
+ *
+ * The model: length = start + growth × time − trims − breakage. A tape
+ * cannot separate growth from breakage, so retention is the net rate
+ * (trims added back) over the expected growth rate, and it is held back
+ * until the record is long enough to be read past the tape's own error.
  */
 
 export const CM_PER_IN = 2.54
 
 /**
- * Average scalp hair growth. Roughly half an inch a month is the figure
- * the whole category quotes; it varies by person, which is exactly why
- * retention is framed below as a ratio against it rather than as a
- * verdict.
+ * Expected scalp hair growth for afro-textured hair: about 0.3" a month.
+ *
+ * Loussouarn (Br J Dermatol, 2001) measured 38 adults of central and
+ * west African heritage by phototrichogram at 256 ± 44 µm a day, against
+ * 396 for Caucasian hair — which is where the "half an inch a month" the
+ * rest of the category quotes comes from. 256 µm over 30.44 days is
+ * 0.31". Individuals ran from 150 to 363 µm a day (about 0.2"–0.4" a
+ * month), which is why retention is framed as a ratio against this
+ * figure rather than as a verdict on anyone's follicles.
  */
-export const AVG_GROWTH_IN_PER_MONTH = 0.5
+export const AVG_GROWTH_IN_PER_MONTH = 0.3
 const DAYS_PER_MONTH = 30.44
-const AVG_GROWTH_IN_PER_DAY = AVG_GROWTH_IN_PER_MONTH / DAYS_PER_MONTH
 
-/** Retention below this span is noise — a fortnight's growth is ~0.25". */
-const MIN_DAYS_FOR_RETENTION = 28
-/** Below this, the user's own growth rate is too noisy to project from. */
-const MIN_DAYS_FOR_OWN_RATE = 60
+/**
+ * How far one stretched tape measurement of coily hair is typically off:
+ * about a quarter-inch. That is most of a month's growth, which is the
+ * whole reason a trend is fitted through every check below rather than
+ * subtracting the first from the last.
+ */
+const MEASUREMENT_SD_IN = 0.25
+/**
+ * The assumed error above counts as this many checks' worth of evidence
+ * when the user's own scatter is read, so one lucky straight line cannot
+ * claim a precision nobody's tape has.
+ */
+const PRIOR_WEIGHT = 2
+/**
+ * A trend is reported once its standard error is this small, in inches a
+ * month. Monthly checks measured the same way reach it in about four
+ * months; two checks alone need about five months between them.
+ */
+const SETTLED_SD_IN_PER_MONTH = 0.08
 
 export function toDisplay(inches: number, unit: LengthUnit): number {
   return unit === 'cm' ? inches * CM_PER_IN : inches
@@ -46,47 +70,118 @@ function daysBetween(fromISO: string, toISO: string): number {
   return (Date.parse(toISO) - Date.parse(fromISO)) / 86_400_000
 }
 
+/**
+ * The record, fitted.
+ *
+ * A least-squares line through every check, not just the first and last,
+ * so a single badly-stretched measurement moves the answer a little
+ * instead of all the way. Inches trimmed off are added back before the
+ * fit — a trim is a choice, not breakage, and must not read as a loss of
+ * retention.
+ */
+export interface GrowthTrend {
+  /** Net inches a month kept on the head, trims added back. */
+  netInPerMonth: number
+  /** Standard error of that rate, in inches a month. */
+  sdInPerMonth: number
+  /** True once the rate is precise enough to report. */
+  settled: boolean
+  /** The line's value at the latest check, trims taken off again. */
+  fittedLatest: number
+}
+
+export function fitTrend(checks: LengthCheck[]): GrowthTrend | undefined {
+  const sorted = sortChecks(checks)
+  if (sorted.length < 2) return undefined
+
+  // A check's `trimmedInches` is what came off since the one before it,
+  // so the first check's is ignored: there is no interval for it to fall in.
+  let trimmed = 0
+  const points = sorted.map((check, i) => {
+    if (i > 0) trimmed += check.trimmedInches ?? 0
+    return {
+      t: daysBetween(sorted[0].dateISO, check.dateISO) / DAYS_PER_MONTH,
+      y: check.overall + trimmed,
+    }
+  })
+
+  const n = points.length
+  const tMean = points.reduce((sum, p) => sum + p.t, 0) / n
+  const yMean = points.reduce((sum, p) => sum + p.y, 0) / n
+  let sxx = 0
+  let sxy = 0
+  for (const p of points) {
+    sxx += (p.t - tMean) ** 2
+    sxy += (p.t - tMean) * (p.y - yMean)
+  }
+  // Every check on the same day: there is no time axis to fit along.
+  if (sxx === 0) return undefined
+
+  const slope = sxy / sxx
+  const intercept = yMean - slope * tMean
+  const sse = points.reduce((sum, p) => sum + (p.y - (intercept + slope * p.t)) ** 2, 0)
+  // The user's own scatter, pooled with the tape's typical error. Someone
+  // who measures carefully earns a narrower range; someone whose checks
+  // jump about gets a wider one, and the screen waits longer.
+  const noise = (sse + PRIOR_WEIGHT * MEASUREMENT_SD_IN ** 2) / (n - 2 + PRIOR_WEIGHT)
+  const sd = Math.sqrt(noise / sxx)
+
+  return {
+    netInPerMonth: slope,
+    sdInPerMonth: sd,
+    settled: sd <= SETTLED_SD_IN_PER_MONTH,
+    fittedLatest: intercept + slope * points[n - 1].t - trimmed,
+  }
+}
+
 export interface GrowthStats {
   latest?: LengthCheck
   previous?: LengthCheck
-  /** Inches gained since the previous check, and the gap it happened over. */
+  /** Inches gained since the previous check, as measured, and the gap it happened over. */
   deltaInches?: number
   deltaDays?: number
+  /** Inches logged as trimmed across the record. Never counted against retention. */
+  trimmedInches: number
+  trend?: GrowthTrend
   /**
-   * Share of expected growth still on the head, across the whole record.
-   * Undefined until there is enough of a span to mean anything.
+   * Share of expected growth still on the head, from the fitted trend.
+   * Undefined until the trend has settled.
    */
   retention?: number
-  /** The user's own measured growth, inches per month, across the record. */
-  ownRateInPerMonth?: number
+  /** The 95% range around `retention`, from the trend's standard error. */
+  retentionRange?: [number, number]
   totalDays?: number
 }
 
 export function deriveStats(checks: LengthCheck[]): GrowthStats {
   const sorted = sortChecks(checks)
-  if (sorted.length === 0) return {}
+  const trimmedInches = sorted
+    .slice(1)
+    .reduce((sum, check) => sum + (check.trimmedInches ?? 0), 0)
+  if (sorted.length === 0) return { trimmedInches }
 
   const latest = sorted[sorted.length - 1]
   const previous = sorted.length > 1 ? sorted[sorted.length - 2] : undefined
 
-  const stats: GrowthStats = { latest, previous }
+  const stats: GrowthStats = { latest, previous, trimmedInches }
 
   if (previous) {
     stats.deltaInches = latest.overall - previous.overall
     stats.deltaDays = Math.round(daysBetween(previous.dateISO, latest.dateISO))
   }
 
-  const first = sorted[0]
-  const totalDays = daysBetween(first.dateISO, latest.dateISO)
-  stats.totalDays = Math.round(totalDays)
+  stats.totalDays = Math.round(daysBetween(sorted[0].dateISO, latest.dateISO))
 
-  if (totalDays >= MIN_DAYS_FOR_RETENTION) {
-    const gained = latest.overall - first.overall
-    const expected = AVG_GROWTH_IN_PER_DAY * totalDays
-    // `expected` cannot be zero here: totalDays is past the minimum span.
-    stats.retention = gained / expected
-    if (totalDays >= MIN_DAYS_FOR_OWN_RATE) {
-      stats.ownRateInPerMonth = (gained / totalDays) * DAYS_PER_MONTH
+  const trend = fitTrend(sorted)
+  if (trend) {
+    stats.trend = trend
+    if (trend.settled) {
+      const margin = 1.96 * trend.sdInPerMonth
+      stats.retention = trend.netInPerMonth / AVG_GROWTH_IN_PER_MONTH
+      stats.retentionRange = [
+        (trend.netInPerMonth - margin) / AVG_GROWTH_IN_PER_MONTH,
+        (trend.netInPerMonth + margin) / AVG_GROWTH_IN_PER_MONTH,
+      ]
     }
   }
 
@@ -161,10 +256,11 @@ export function projectMilestones(checks: LengthCheck[], now = Date.now()): Mile
     // on hair nobody has put a tape to.
     if (measured >= milestone.inches) return { ...milestone, reached: true }
 
-    // Project with the user's own rate where the record is long enough to
-    // support one, otherwise the population average. A rate at or below
+    // Project with the user's own trend once it has settled, otherwise
+    // the population average with everything kept. A rate at or below
     // zero cannot reach anything, so no date is offered at all.
-    const rate = stats.ownRateInPerMonth ?? AVG_GROWTH_IN_PER_MONTH
+    const own = stats.trend?.settled ? stats.trend : undefined
+    const rate = own?.netInPerMonth ?? AVG_GROWTH_IN_PER_MONTH
     if (rate <= 0) return { ...milestone, reached: false }
 
     /*
@@ -184,7 +280,10 @@ export function projectMilestones(checks: LengthCheck[], now = Date.now()): Mile
       0,
       (now - Date.parse(stats.latest.dateISO)) / 86_400_000 / DAYS_PER_MONTH,
     )
-    const projectedNow = measured + rate * elapsedMonths
+    // Start from the fitted line rather than the last reading where there
+    // is one, so a single long or short measurement does not shift every
+    // date on the list.
+    const projectedNow = (own?.fittedLatest ?? measured) + rate * elapsedMonths
     const months = Math.max(0, (milestone.inches - projectedNow) / rate)
 
     const eta = new Date(now)
@@ -194,7 +293,7 @@ export function projectMilestones(checks: LengthCheck[], now = Date.now()): Mile
       ...milestone,
       reached: false,
       etaISO: eta.toISOString(),
-      estimated: stats.ownRateInPerMonth === undefined,
+      estimated: own === undefined,
     }
   })
 }
