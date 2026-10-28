@@ -3,11 +3,13 @@ import { Link, useNavigate } from 'react-router-dom'
 import { hasLocLook, slot as imageSlot } from '../assets/imagery'
 import Icon from '../components/Icon'
 import LocsMasthead from '../components/LocsMasthead'
+import { PlusBadge, PlusCard } from '../components/Plus'
 import PrototypeImage from '../components/PrototypeImage'
 import { LOC_CARE, outlineCount, type LocBlock } from '../content/loc-care'
 import { LOC_STYLES } from '../content/loc-styles'
 import { useOpenParam, useScrollToOpened } from '../lib/deep-link'
 import { isLocs, resolveLocStage } from '../lib/locs'
+import { locChapterFree, usePlus } from '../lib/plus'
 import { useHairProfile } from '../lib/profile-store'
 import { LOC_STAGES, type HairIdentity, type HairType } from '../lib/types'
 
@@ -235,6 +237,47 @@ function Block({ block }: { block: LocBlock }) {
   )
 }
 
+/**
+ * A Plus chapter before it is unlocked: every section heading, so the
+ * reader can see what the chapter covers, and the first two lines of the
+ * first section, so they can see how it is written. Then the way in.
+ */
+function LockedChapter({ chapter }: { chapter: (typeof LOC_CARE)[number] }) {
+  const [first, ...rest] = chapter.sections
+  const opening = first.blocks[0]
+  return (
+    <>
+      <h4 className="mb-xs font-headline-md text-body-lg text-on-surface">{first.heading}</h4>
+      <div className="relative mb-md max-h-32 overflow-hidden">
+        <Block block={{ ...opening, items: opening.items.slice(0, 2) }} />
+        <span aria-hidden className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-surface-container-lowest" />
+      </div>
+      {rest.length > 0 && (
+        <>
+          <p className="mb-xs font-label-md text-caption uppercase tracking-widest text-on-surface-variant">
+            Also in this chapter
+          </p>
+          <ul className="mb-md flex flex-wrap gap-xs">
+            {rest.map((section) => (
+              <li
+                key={section.heading}
+                className="rounded-full bg-surface-container px-md py-1 font-body-md text-caption text-on-surface-variant"
+              >
+                {section.heading}
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
+      <PlusCard
+        trigger="locs"
+        title="The rest of this chapter is in Plus"
+        body="One payment unlocks every chapter, for good."
+      />
+    </>
+  )
+}
+
 /** Topics a written guide will cover. Chips, so they cannot read as advice. */
 function TopicChips({ blocks }: { blocks: LocBlock[] }) {
   return (
@@ -271,6 +314,7 @@ export default function LocCareScreen() {
   useScrollToOpened(shown ? `loc-row-${shown}` : null)
   const locs = isLocs(profile.identity)
   const pending = outlineCount()
+  const { unlocked } = usePlus()
 
   return (
     <>
@@ -289,15 +333,18 @@ export default function LocCareScreen() {
       <LookbookDoor />
 
       {/* Said once, here, rather than on every unwritten section. The app
-          does not pretend a heading is an answer. */}
-      <p className="mb-xl flex items-start gap-sm rounded-xl bg-surface-container p-md font-body-md text-caption text-on-surface-variant">
-        <Icon name="info" className="shrink-0 text-[16px] leading-4 text-primary" />
-        <span>
-          {pending} sections below are still topic lists, shown as grey chips — the written
-          guides for them are on the way. Everything shown as a checked list is written and
-          ready to use.
-        </span>
-      </p>
+          does not pretend a heading is an answer. Every section is written
+          today, so this only returns if a new outline is added. */}
+      {pending > 0 && (
+        <p className="mb-xl flex items-start gap-sm rounded-xl bg-surface-container p-md font-body-md text-caption text-on-surface-variant">
+          <Icon name="info" className="shrink-0 text-[16px] leading-4 text-primary" />
+          <span>
+            {pending} sections below are still topic lists, shown as grey chips — the written
+            guides for them are on the way. Everything shown as a checked list is written and
+            ready to use.
+          </span>
+        </p>
+      )}
 
       <section className="mb-2xl space-y-sm">
         <h3 className="mb-md flex items-center gap-sm font-label-md text-caption uppercase tracking-[0.2em] text-on-surface-variant">
@@ -306,6 +353,7 @@ export default function LocCareScreen() {
         </h3>
         {LOC_CARE.map((chapter, index) => {
           const isOpen = open === chapter.id
+          const locked = !unlocked && !locChapterFree(chapter.id)
           return (
             <article
               key={chapter.id}
@@ -329,8 +377,9 @@ export default function LocCareScreen() {
                     {String(index + 1).padStart(2, '0')}
                   </span>
                   <span className="min-w-0 flex-1">
-                    <span className="block font-headline-md text-body-lg text-on-surface">
+                    <span className="flex items-center gap-sm font-headline-md text-body-lg text-on-surface">
                       {chapter.title}
+                      {locked && <PlusBadge />}
                     </span>
                     <span className="font-body-md text-caption text-on-surface-variant">
                       {chapter.sections.length} section
@@ -345,7 +394,10 @@ export default function LocCareScreen() {
               </h3>
 
               <div id={`loc-${chapter.id}`} hidden={!isOpen} className="px-lg pb-lg">
-                {chapter.sections.map((section) => (
+                {locked ? (
+                  <LockedChapter chapter={chapter} />
+                ) : (
+                chapter.sections.map((section) => (
                   <div key={section.heading} className="mb-lg last:mb-0">
                     <h4 className="mb-xs font-headline-md text-body-lg text-on-surface">
                       {section.heading}
@@ -363,7 +415,8 @@ export default function LocCareScreen() {
                       ))
                     )}
                   </div>
-                ))}
+                ))
+                )}
               </div>
             </article>
           )

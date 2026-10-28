@@ -327,9 +327,9 @@ const SECTIONS: {
             pictures yet links to the contribute form, already filled in with its name.
           </li>
           <li>
-            <strong>Chapters</strong> cover each stage. Some are fully written; others are still
-            an outline. An outline is shown as grey topic chips rather than as advice, so you
-            can tell which is which.
+            <strong>Chapters</strong> cover the whole loc journey, from deciding to loc to
+            colouring and repair. Signs, causes and what to do are listed together, and the
+            things to avoid are struck through so they never read as instructions.
           </li>
           <li>
             On your profile, set your loc type and the date you started, and the app works out

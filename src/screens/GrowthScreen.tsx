@@ -4,6 +4,7 @@ import Icon from '../components/Icon'
 import LengthChart from '../components/LengthChart'
 import LogLengthCheck from '../components/LogLengthCheck'
 import MyStyles from '../components/MyStyles'
+import { PlusBadge, PlusCard } from '../components/Plus'
 import ScreenFallback from '../components/ScreenFallback'
 import {
   AVG_GROWTH_IN_PER_MONTH,
@@ -14,6 +15,7 @@ import {
   sortChecks,
 } from '../lib/growth'
 import { isLocs, resolveLocStage } from '../lib/locs'
+import { usePlus } from '../lib/plus'
 import { useHairProfile } from '../lib/profile-store'
 import { useBackDismiss } from '../lib/back-button'
 import type { LengthCheck, LengthUnit } from '../lib/types'
@@ -38,6 +40,9 @@ export default function GrowthScreen() {
   const { profile, update, ready } = useHairProfile()
   const [logging, setLogging] = useState(false)
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null)
+  // The checks are always the user's to read. What Plus adds is the
+  // analysis of them: retention, the trend, and milestone dates.
+  const plus = usePlus()
 
   // Back cancels what is open over the page before it leaves the screen.
   // A delete confirmation that the back button walks straight past is the
@@ -53,6 +58,9 @@ export default function GrowthScreen() {
   function saveCheck(check: LengthCheck) {
     update({ lengthChecks: [...lengthChecks, check] })
     setLogging(false)
+    // Two checks is the first moment there is a trend to analyse, so it
+    // is the one place the app suggests Plus unasked — once per launch.
+    if (lengthChecks.length + 1 === 2) plus.offer('growth')
   }
 
   function deleteCheck(id: string) {
@@ -158,20 +166,32 @@ export default function GrowthScreen() {
               </p>
             </div>
 
-            <div className="rounded-xl shadow-card bg-surface-container-lowest p-md text-center">
-              <Icon name="shield" className="mb-xs text-primary" />
-              <p className="font-headline-md text-headline-md text-on-surface">
-                {retention === undefined ? '—' : `${pct(retention)}%`}
-              </p>
-              <p className="font-caption text-caption text-on-surface-variant">Retention</p>
-              <p className="font-caption text-caption text-outline">
-                {locsContracting
-                  ? 'after budding'
-                  : stats.retentionRange
-                    ? `likely ${pct(stats.retentionRange[0])}–${pct(stats.retentionRange[1])}%`
-                    : 'settling'}
-              </p>
-            </div>
+            {plus.unlocked ? (
+              <div className="rounded-xl shadow-card bg-surface-container-lowest p-md text-center">
+                <Icon name="shield" className="mb-xs text-primary" />
+                <p className="font-headline-md text-headline-md text-on-surface">
+                  {retention === undefined ? '—' : `${pct(retention)}%`}
+                </p>
+                <p className="font-caption text-caption text-on-surface-variant">Retention</p>
+                <p className="font-caption text-caption text-outline">
+                  {locsContracting
+                    ? 'after budding'
+                    : stats.retentionRange
+                      ? `likely ${pct(stats.retentionRange[0])}–${pct(stats.retentionRange[1])}%`
+                      : 'settling'}
+                </p>
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={() => plus.open('growth')}
+                className="flex flex-col items-center rounded-xl shadow-card bg-surface-container-lowest p-md text-center active:scale-[0.98]"
+              >
+                <Icon name="shield" className="mb-xs text-primary" />
+                <PlusBadge className="my-xs" />
+                <span className="font-caption text-caption text-on-surface-variant">Retention</span>
+              </button>
+            )}
           </section>
 
           <section className="mb-2xl rounded-2xl shadow-card bg-surface-container-lowest p-lg">
@@ -201,40 +221,51 @@ export default function GrowthScreen() {
           </section>
 
           {/* How the retention figure was reached, or why there is none
-              yet. Every sentence here is a claim about lib/growth.ts. */}
-          <section className="mb-2xl rounded-2xl bg-secondary-fixed/30 p-lg">
-            <p className="font-body-md text-body-md text-on-secondary-fixed-variant">
-              {locsContracting ? (
-                <>
-                  Starter and budding locs shrink as they mature, so a loc can be growing
-                  steadily while measuring shorter. Retention starts once your locs reach the
-                  teen stage; until then, keep measuring &mdash; these checks become the record
-                  it is worked out from.
-                </>
-              ) : retention !== undefined ? (
-                <>
-                  Across {stats.totalDays} days your trend is{' '}
-                  <span className="text-on-secondary-fixed">
-                    {stats.trend!.netInPerMonth >= 0 ? '+' : ''}
-                    {formatLength(stats.trend!.netInPerMonth, lengthUnit, 2)} a month
-                  </span>
-                  {stats.trimmedInches > 0 &&
-                    `, with the ${formatLength(stats.trimmedInches, lengthUnit)} you trimmed added back`}
-                  . Afro-textured hair grows about {AVG_GROWTH_IN_PER_MONTH}&Prime; a month
-                  (0.2&ndash;0.4&Prime; from person to person), so retention compares what you
-                  kept with that. The range narrows with every check measured the same way.
-                </>
-              ) : (
-                <>
-                  A tape on coily hair is only good to about a quarter-inch, which is most of a
-                  month&rsquo;s growth. So retention waits until your checks span enough time to
-                  see past it &mdash; about four months of monthly checks, sooner if your
-                  measurements are consistent. The trend is fitted through every check, so none
-                  of them is wasted.
-                </>
-              )}
-            </p>
-          </section>
+              yet. Every sentence here is a claim about lib/growth.ts.
+              The figure itself is Plus; why there isn't one yet is not. */}
+          {!plus.unlocked && retention !== undefined ? (
+            <div className="mb-2xl">
+              <PlusCard
+                trigger="growth"
+                title="Your retention figure is ready"
+                body={`Fitted through all ${lengthChecks.length} of your checks: how much of your growth you are keeping.`}
+              />
+            </div>
+          ) : (
+            <section className="mb-2xl rounded-2xl bg-secondary-fixed/30 p-lg">
+              <p className="font-body-md text-body-md text-on-secondary-fixed-variant">
+                {locsContracting ? (
+                  <>
+                    Starter and budding locs shrink as they mature, so a loc can be growing
+                    steadily while measuring shorter. Retention starts once your locs reach the
+                    teen stage; until then, keep measuring &mdash; these checks become the record
+                    it is worked out from.
+                  </>
+                ) : retention !== undefined ? (
+                  <>
+                    Across {stats.totalDays} days your trend is{' '}
+                    <span className="text-on-secondary-fixed">
+                      {stats.trend!.netInPerMonth >= 0 ? '+' : ''}
+                      {formatLength(stats.trend!.netInPerMonth, lengthUnit, 2)} a month
+                    </span>
+                    {stats.trimmedInches > 0 &&
+                      `, with the ${formatLength(stats.trimmedInches, lengthUnit)} you trimmed added back`}
+                    . Afro-textured hair grows about {AVG_GROWTH_IN_PER_MONTH}&Prime; a month
+                    (0.2&ndash;0.4&Prime; from person to person), so retention compares what you
+                    kept with that. The range narrows with every check measured the same way.
+                  </>
+                ) : (
+                  <>
+                    A tape on coily hair is only good to about a quarter-inch, which is most of a
+                    month&rsquo;s growth. So retention waits until your checks span enough time to
+                    see past it &mdash; about four months of monthly checks, sooner if your
+                    measurements are consistent. The trend is fitted through every check, so none
+                    of them is wasted.
+                  </>
+                )}
+              </p>
+            </section>
+          )}
 
           <section className="mb-2xl">
             <h3 className="mb-xs font-headline-md text-body-lg font-bold text-on-surface">
@@ -270,11 +301,21 @@ export default function GrowthScreen() {
                     </span>
                   </span>
                   <span className="font-caption text-caption text-on-surface-variant">
-                    {milestone.reached
-                      ? 'reached'
-                      : milestone.etaISO
-                        ? `est. ${formatMonth(milestone.etaISO)}`
-                        : '—'}
+                    {milestone.reached ? (
+                      'reached'
+                    ) : !milestone.etaISO ? (
+                      '—'
+                    ) : plus.unlocked ? (
+                      `est. ${formatMonth(milestone.etaISO)}`
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => plus.open('growth')}
+                        aria-label={`Estimated date for ${milestone.label}: part of Plus`}
+                      >
+                        <PlusBadge />
+                      </button>
+                    )}
                   </span>
                 </li>
               ))}

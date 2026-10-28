@@ -15,6 +15,7 @@
   "chevron_left": "e5cb",
   "chevron_right": "e5cc",
   "close": "e5cd",
+  "cloud_off": "e2c1",
   "content_cut": "e14e",
   "delete": "e872",
   "download": "f090",
@@ -30,8 +31,10 @@
   "history": "e8b3",
   "image": "e3f4",
   "info": "e88e",
+  "insights": "f092",
   "inventory_2": "e1a1",
   "linear_scale": "e260",
+  "lock": "e897",
   "menu": "e5d2",
   "menu_book": "ea19",
   "more_horiz": "e5d3",
@@ -53,5 +56,6 @@
   "view_column": "e8ec",
   "warning": "f083",
   "water_drop": "e798",
-  "waves": "e176"
+  "waves": "e176",
+  "workspace_premium": "e7af"
 }

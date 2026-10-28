@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { version } from '../../package.json'
 import Icon from '../components/Icon'
+import { PlusStatus } from '../components/Plus'
 import ScreenHeader from '../components/ScreenHeader'
 import { useHairProfile } from '../lib/profile-store'
 import {
@@ -147,6 +148,8 @@ export default function AboutScreen() {
       </section>
 
       <UpdatesSection />
+
+      <PlusStatus />
 
       <AskSharingSection />
 

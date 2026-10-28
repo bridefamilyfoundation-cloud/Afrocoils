@@ -657,6 +657,19 @@ export interface UpdateSettings {
   dismissedBundleCode?: number
 }
 
+/**
+ * AfroCoils Plus, the one-off unlock (see lib/plus.ts).
+ *
+ * `via: 'test'` is the stand-in purchase used until real billing is
+ * wired in, and is the only value today. A real purchase will record the
+ * store it came from, and whether it is honoured will be the server's
+ * decision, not this field's: anything on the phone can be edited.
+ */
+export interface PlusEntitlement {
+  via: 'test' | 'play'
+  unlockedISO: string
+}
+
 /** The persisted document. Versioned so migrations stay mechanical. */
 export const PROFILE_VERSION = 10
 
@@ -698,6 +711,8 @@ export interface HairProfile {
    * replaying it from the menu or the documentation page leaves this alone.
    */
   tourSeenISO?: string
+  /** Present once Plus is unlocked. Absent is the free app. */
+  plus?: PlusEntitlement
   createdISO: string
   updatedISO: string
 }

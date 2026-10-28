@@ -1,12 +1,14 @@
 import { useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import Icon from '../components/Icon'
+import { PlusCard } from '../components/Plus'
 import SectionCrumb from '../components/SectionCrumb'
 import StyleCard from '../components/StyleCard'
 import ScreenFallback from '../components/ScreenFallback'
 import { STYLES, rankStyles, styleExclusion } from '../content/styles'
 import { deriveLengthBand } from '../lib/growth'
 import { resolveLocStage } from '../lib/locs'
+import { FREE_RECOMMENDATIONS, usePlus } from '../lib/plus'
 import { useHairProfile } from '../lib/profile-store'
 import { PREFERENCE_LABELS, type CarePreferences } from '../lib/types'
 
@@ -56,6 +58,11 @@ export default function StyleRecommendationsScreen() {
   /* What the profile actually matched, as opposed to what survived the
      hard filters. Only these have a reason to show. */
   const matched = ranked.filter((r) => r.score > 0)
+  // The best matches show free, so the list proves itself before it is
+  // sold; the rest are Plus. The criteria above stay readable either way.
+  const { unlocked } = usePlus()
+  const shown = unlocked ? matched : matched.slice(0, FREE_RECOMMENDATIONS)
+  const more = matched.length - shown.length
 
   /*
    * What was dropped, and by what.
@@ -206,7 +213,7 @@ export default function StyleRecommendationsScreen() {
             </span>
           </div>
           <div className="grid grid-cols-2 gap-md sm:grid-cols-3">
-            {matched.map((r) => (
+            {shown.map((r) => (
               <StyleCard
                 key={r.style.id}
                 ranked={r}
@@ -216,6 +223,15 @@ export default function StyleRecommendationsScreen() {
               />
             ))}
           </div>
+          {more > 0 && (
+            <div className="mt-md">
+              <PlusCard
+                trigger="recommended"
+                title={`${more} more style${more === 1 ? '' : 's'} matched your hair`}
+                body="The full ranked list is part of Plus."
+              />
+            </div>
+          )}
         </section>
       ) : (
         <section className="mb-2xl rounded-2xl bg-secondary-container p-lg">

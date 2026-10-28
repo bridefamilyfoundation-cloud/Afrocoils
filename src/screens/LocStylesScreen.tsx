@@ -9,9 +9,11 @@ import {
 } from '../assets/imagery'
 import Icon from '../components/Icon'
 import LocsMasthead from '../components/LocsMasthead'
+import { PlusBadge, PlusCard } from '../components/Plus'
 import PrototypeImage from '../components/PrototypeImage'
 import { LOC_STYLES, LOC_STYLE_GROUPS, type LocStyle } from '../content/loc-styles'
 import { useOpenParam, useScrollToOpened } from '../lib/deep-link'
+import { locStyleFree, usePlus } from '../lib/plus'
 
 /**
  * The loc lookbook, at `/locs/styles`, inside Locs World.
@@ -113,6 +115,10 @@ function LocPlate({ style, number }: { style: LocStyle; number: number }) {
   const looks = locStyleLooks(style.id, style.name)
   const [lookIndex, setLookIndex] = useState(0)
   const pictured = hasLocLook(style.id)
+  const { unlocked } = usePlus()
+  // A Plus look shows its front and its description; the other angles
+  // and looks are what unlocking adds.
+  const locked = !unlocked && !locStyleFree(style.group)
 
   return (
     <article
@@ -129,9 +135,10 @@ function LocPlate({ style, number }: { style: LocStyle; number: number }) {
           </span>
           <h4 className="font-headline-md text-body-lg text-inverse-on-surface">{style.name}</h4>
         </span>
+        {locked && <PlusBadge className="mb-1" />}
       </header>
 
-      {looks.length > 1 && (
+      {!locked && looks.length > 1 && (
         <div role="group" aria-label={`${style.name} looks`} className="mb-sm flex gap-xs px-xs">
           {looks.map((_, i) => (
             <button
@@ -151,12 +158,34 @@ function LocPlate({ style, number }: { style: LocStyle; number: number }) {
         </div>
       )}
 
-      {/* Keyed by look so switching looks starts again at the front. */}
-      <AngleViewer key={lookIndex} look={looks[lookIndex]} seed={style.id} />
+      {locked ? (
+        <PrototypeImage
+          slot={looks[0][0].slot}
+          seed={style.id}
+          icon="photo_camera"
+          label="Front view coming"
+          rounded="rounded-2xl"
+          ratio={[4, 5]}
+          className="aspect-[4/5] w-full"
+        />
+      ) : (
+        // Keyed by look so switching looks starts again at the front.
+        <AngleViewer key={lookIndex} look={looks[lookIndex]} seed={style.id} />
+      )}
 
       <p className="mt-md px-xs pb-xs font-body-md text-body-md text-inverse-on-surface/85">
         {style.description}
       </p>
+      {locked && pictured && (
+        <div className="mx-xs mb-xs">
+          <PlusCard
+            dark
+            trigger="lookbook"
+            title="Back and side views are in Plus"
+            body={looks.length > 1 ? `And ${looks.length - 1} more look${looks.length > 2 ? 's' : ''}.` : undefined}
+          />
+        </div>
+      )}
       {!pictured && (
         <Link
           to={contributeLink(style)}

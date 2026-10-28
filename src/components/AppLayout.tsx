@@ -4,6 +4,7 @@ import AppFooter from './AppFooter'
 import AskLauncher from './AskLauncher'
 import BottomNav from './BottomNav'
 import NavDrawer from './NavDrawer'
+import { PlusProvider } from './Plus'
 import TopAppBar from './TopAppBar'
 import { useDocumentTitle } from '../lib/page-title'
 
@@ -51,28 +52,32 @@ export default function AppLayout() {
   }, [pathname, navigationType])
 
   return (
-    <div className="relative isolate min-h-full text-on-background">
-      <div aria-hidden className="page-wash fixed inset-0 -z-10" />
-      <TopAppBar onOpenMenu={() => setMenuOpen(true)} />
-      <NavDrawer open={menuOpen} onClose={() => setMenuOpen(false)} />
+    // Plus wraps the whole layout so any screen, and the Ask sheet, can
+    // open the one unlock sheet.
+    <PlusProvider>
+      <div className="relative isolate min-h-full text-on-background">
+        <div aria-hidden className="page-wash fixed inset-0 -z-10" />
+        <TopAppBar onOpenMenu={() => setMenuOpen(true)} />
+        <NavDrawer open={menuOpen} onClose={() => setMenuOpen(false)} />
 
-      {/* Clears the fixed app bar, whose real height is 64px plus the
-          status-bar inset — a flat pt-24 was right only on a device with
-          no cutout, and slid the top of every screen under the bar on
-          the ones that have one. */}
-      <main className="mx-auto max-w-5xl px-container-padding pt-[calc(6rem+var(--safe-top))]">
-        <Outlet />
-      </main>
+        {/* Clears the fixed app bar, whose real height is 64px plus the
+            status-bar inset — a flat pt-24 was right only on a device with
+            no cutout, and slid the top of every screen under the bar on
+            the ones that have one. */}
+        <main className="mx-auto max-w-5xl px-container-padding pt-[calc(6rem+var(--safe-top))]">
+          <Outlet />
+        </main>
 
-      <AppFooter />
+        <AppFooter />
 
-      {/* Spacer so the footer clears the fixed bottom nav. */}
-      <div className="h-32" />
+        {/* Spacer so the footer clears the fixed bottom nav. */}
+        <div className="h-32" />
 
-      <BottomNav />
+        <BottomNav />
 
-      {/* Ask, from every screen: bottom right, above the tab bar. */}
-      <AskLauncher />
-    </div>
+        {/* Ask, from every screen: bottom right, above the tab bar. */}
+        <AskLauncher />
+      </div>
+    </PlusProvider>
   )
 }

@@ -104,6 +104,11 @@ function migrate(stored: unknown): HairProfile {
         : base.updates,
     // v9 → v10. On, like a new install; the switch is on About.
     askSharing: typeof s.askSharing === 'boolean' ? s.askSharing : base.askSharing,
+    // Optional, so nothing to backfill; a malformed value is the free app.
+    plus:
+      typeof s.plus === 'object' && s.plus !== null && typeof s.plus.unlockedISO === 'string'
+        ? s.plus
+        : undefined,
     createdISO: s.createdISO ?? base.createdISO,
   }
 

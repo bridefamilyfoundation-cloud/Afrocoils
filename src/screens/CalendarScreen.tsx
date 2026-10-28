@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import SectionCrumb from '../components/SectionCrumb'
 import Icon, { type IconName } from '../components/Icon'
+import { PlusBadge } from '../components/Plus'
 import ScreenFallback from '../components/ScreenFallback'
 import { useHairProfile } from '../lib/profile-store'
 import { useBackDismiss } from '../lib/back-button'
@@ -30,6 +31,7 @@ import {
   type PermissionState,
 } from '../lib/notifications'
 import { isLocs } from '../lib/locs'
+import { usePlus } from '../lib/plus'
 import type { CareEvent, CareEventType, CareSchedule } from '../lib/types'
 import { CARE_EVENT_TYPES, LOC_ONLY_EVENTS, LOOSE_ONLY_EVENTS } from '../lib/types'
 
@@ -66,6 +68,7 @@ const MONTH_FORMAT: Intl.DateTimeFormatOptions = { month: 'long', year: 'numeric
 export default function CalendarScreen() {
   const { profile, update, ready } = useHairProfile()
   const locs = isLocs(profile.identity)
+  const plus = usePlus()
 
   const today = todayKey()
   const [cursor, setCursor] = useState(() => {
@@ -142,6 +145,12 @@ export default function CalendarScreen() {
    * is close to permanent on Android.
    */
   async function toggleReminder(schedule: CareSchedule) {
+    // Reminders are Plus. Turning one off never is, and one that was on
+    // before Plus existed keeps running.
+    if (!schedule.reminder && !plus.unlocked) {
+      plus.open('reminders')
+      return
+    }
     if (!schedule.reminder) {
       const state = permission === 'granted' ? permission : await requestPermission()
       setPermission(state)
@@ -492,6 +501,7 @@ function DueRow({
   onToggleReminder: () => void
 }) {
   const { schedule, dueKey, overdueDays } = status
+  const { unlocked } = usePlus()
   const overdue = overdueDays !== undefined && overdueDays > 0
   const dueToday = overdueDays === 0
 
@@ -583,6 +593,7 @@ function DueRow({
             >
               <Icon name="notifications" filled={schedule.reminder} className="text-[14px]" />
               {schedule.reminder ? `Remind at ${schedule.reminderTime}` : 'Remind me'}
+              {!schedule.reminder && !unlocked && <PlusBadge className="ml-xs" />}
             </button>
           )}
 
