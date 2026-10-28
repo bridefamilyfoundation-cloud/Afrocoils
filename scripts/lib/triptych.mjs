@@ -269,3 +269,29 @@ export async function cutTriptych(input, outFor) {
 
   return { rules: [a.start, b.start] }
 }
+
+/**
+ * Cut a sheet whose panels are already framed 4:5 portraits — split at the
+ * rules and write each view as it is, with no reframing. `measure()` finds
+ * the neck from the band of shirt at the foot of a tall panel; a panel that
+ * is already a portrait has almost none, so reframing it would drop the
+ * frame to the forehead.
+ */
+export async function sliceTriptych(input, outFor) {
+  const { data, info } = await sharp(input).removeAlpha().raw().toBuffer({ resolveWithObject: true })
+  const { width, height, channels } = info
+  const [a, b] = findRules(data, width, height, channels)
+  const panels = [
+    [0, a.start],
+    [a.end + 1, b.start],
+    [b.end + 1, width],
+  ]
+  for (const [index, [x0, x1]] of panels.entries()) {
+    await sharp(input)
+      .extract({ left: x0, top: 0, width: x1 - x0, height })
+      .resize(OUT.width, OUT.height, { fit: 'fill', kernel: 'lanczos3' })
+      .webp({ quality: 84 })
+      .toFile(outFor(ANGLES[index]))
+  }
+  return { rules: [a.start, b.start] }
+}

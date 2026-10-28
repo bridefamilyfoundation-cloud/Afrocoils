@@ -1,18 +1,18 @@
 {
   "source": "Locs Images/Generated images",
-  "note": "Each source is a 1536x1024 triptych — front | back | side, split by thin white rules — of the same sitter, top and backdrop as the loose-hair library. `style` is the id in src/content/loc-styles.ts; `look` numbers a second or third set for the same style (1 when omitted). `style: null` holds a sheet back. Assignments confirmed by the owner on 2026-10-19. The five starter-method and statement styles with no sheet (comb-coil, braided, interlocked, mohawk, crown) render placeholders until one is generated.",
+  "note": "Each source is a 1536x1024 triptych — front | back | side, split by thin white rules — of the same sitter, top and backdrop as the loose-hair library. `style` is the id in src/content/loc-styles.ts; `look` numbers a second or third set for the same style (1 when omitted). `style: null` holds a sheet back. Assignments confirmed by the owner on 2026-10-19. The five starter-method and statement styles with no sheet (comb-coil, braided, interlocked, mohawk, crown) render placeholders until one is generated. On 2026-10-28 every sheet with non-black hair was held back and replaced by a black-hair version (the `(black)` sheets), so the lookbook shows one hair colour throughout. `framed: true` marks a sheet whose panels are already 4:5 portraits (the `(black)` sheets were framed from grids of a different shape): they are cut at the rules as they are, with no reframing. `omit` lists angles a sheet does not really have: the panel is a stand-in that is cut for framing and then not written, so that slot keeps its placeholder.",
   "sheets": {
     "Three-View Honey Brown Locs Portrait.png": {
-      "style": "starter-locs",
-      "match": "Shoulder-length locs worn down, honey-brown ends, side part."
+      "style": null,
+      "match": "Held back: honey-brown hair; replaced by the black sheet for starter-locs."
     },
     "ChatGPT Image Oct 14, 2026, 04_25_54 PM.png": {
       "style": "two-strand-twist-starter-locs",
       "match": "Dark shoulder-length twists worn down with a side part."
     },
     "ChatGPT Image Oct 14, 2026, 04_30_04 PM.png": {
-      "style": "high-loc-bun",
-      "match": "Auburn locs gathered into a bun at the crown, grid-parted at the back."
+      "style": null,
+      "match": "Held back: auburn hair; replaced by the black sheet for high-loc-bun."
     },
     "Three-View Textured Bun Hairstyle Showcase.png": {
       "style": "high-loc-bun",
@@ -45,24 +45,24 @@
       "match": "Locs swept up and over to one side; the back view shows the fall to the right."
     },
     "Three-View Loc Bun Portrait.png": {
-      "style": "loc-petals",
-      "match": "Coiled loc ends gathered at the crown into a flower-like burst."
+      "style": null,
+      "match": "Held back: brown hair; replaced by the black sheet for loc-petals."
     },
     "ChatGPT Image Oct 14, 2026, 05_09_11 PM.png": {
-      "style": "barrel-twists",
-      "match": "Brown locs twisted together into ropes and swept up."
+      "style": null,
+      "match": "Held back: brown hair; replaced by the black sheet for barrel-twists."
     },
     "Loc Twist Bun Hairstyle Lookbook.png": {
-      "style": "barrel-twist-bun",
-      "match": "Barrel twists in a herringbone pattern, wrapped into a low bun."
+      "style": null,
+      "match": "Held back: caramel-highlighted hair; replaced by the black sheet for barrel-twist-bun."
     },
     "Triple-View Cornrow Space Buns Portrait.png": {
       "style": "double-bun-locs",
       "match": "Two buns at the crown over a parted base."
     },
     "Three-View Textured Loc Updo Portrait.png": {
-      "style": "loc-updo",
-      "match": "Locs pinned up into a full crown with two barrel twists framing the face."
+      "style": null,
+      "match": "Held back: reddish-brown hair; replaced by the black sheet for loc-updo."
     },
     "Braided Double Puff Hairstyle Reference.png": {
       "style": null,
@@ -75,6 +75,39 @@
     "ChatGPT Image Oct 14, 2026, 04_21_43 PM.png": {
       "style": null,
       "match": "Held back: curly double puffs that read as loose hair, not locs."
+    },
+    "Starter Locs (black, no side).png": {
+      "style": "starter-locs",
+      "framed": true,
+      "omit": [
+        "side"
+      ],
+      "match": "Shoulder-length locs worn down, side part. Front and back only — the third panel repeats the front and is not written."
+    },
+    "High Loc Bun (black).png": {
+      "style": "high-loc-bun",
+      "framed": true,
+      "match": "Locs gathered into a bun at the crown, grid-parted at the back."
+    },
+    "Loc Petals (black).png": {
+      "style": "loc-petals",
+      "framed": true,
+      "match": "Coiled loc ends gathered at the crown into a burst."
+    },
+    "Barrel Twists (black).png": {
+      "style": "barrel-twists",
+      "framed": true,
+      "match": "Locs twisted together into ropes and swept up."
+    },
+    "Barrel Twist Bun (black).png": {
+      "style": "barrel-twist-bun",
+      "framed": true,
+      "match": "Barrel twists in a herringbone pattern, wrapped into a low bun."
+    },
+    "Loc Updo (black).png": {
+      "style": "loc-updo",
+      "framed": true,
+      "match": "Locs pinned up into a full crown with two twists framing the face."
     }
   }
 }

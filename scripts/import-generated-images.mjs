@@ -20,7 +20,7 @@
 import { readFile, readdir, unlink } from 'node:fs/promises'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { cutTriptych } from './lib/triptych.mjs'
+import { cutTriptych, sliceTriptych } from './lib/triptych.mjs'
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..')
 const IMAGES = join(root, 'src/assets/images')
@@ -87,7 +87,7 @@ for (const file of await readdir(SOURCE)) {
 const existing = await readdir(IMAGES)
 let written = 0
 
-for (const [file, { style }] of Object.entries(sheets)) {
+for (const [file, { style, framed = false }] of Object.entries(sheets)) {
   if (!style) {
     console.log(`[generated] ${file}: held back, no style assigned`)
     continue
@@ -97,7 +97,8 @@ for (const [file, { style }] of Object.entries(sheets)) {
     await unlink(join(IMAGES, f))
   }
 
-  const { rules } = await cutTriptych(join(SOURCE, file), (angle) =>
+  const cut = framed ? sliceTriptych : cutTriptych
+  const { rules } = await cut(join(SOURCE, file), (angle) =>
     join(IMAGES, `style-${style}-${angle}.webp`),
   )
   written += 3

@@ -348,7 +348,12 @@ picture; this file is the short version of what to keep in mind when editing.
   `loc-style-<id>-front|back|side`, with `-<n>-` for a second look, and
   read through `locStyleLooks()`. The sheet-to-style mapping is
   `scripts/loc-generated-images.json` and is never guessed from a
-  filename; `style: null` holds a sheet back. Five styles have no sheet
+  filename; `style: null` holds a sheet back. Every picture in both
+  libraries shows black hair: the coloured sheets are held back and
+  their `(black)` replacements carry `framed: true` (panels already
+  4:5 portraits, sliced without reframing). Starter Locs has no side
+  view yet — its sheet carries `omit: ["side"]`, so that slot stays a
+  placeholder until one is generated. Five styles have no sheet
   yet and draw placeholders, and each of those plates — and the "Help
   finish the lookbook" block at the foot — links to `/styles/submit`
   with `?name=<style>&hair=Locs`, which pre-fills the form. Only `Locs`

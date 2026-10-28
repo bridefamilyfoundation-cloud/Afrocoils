@@ -30,7 +30,7 @@
 import { mkdir, readFile, readdir, rename, unlink } from 'node:fs/promises'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { cutTriptych } from './lib/triptych.mjs'
+import { cutTriptych, sliceTriptych } from './lib/triptych.mjs'
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..')
 const IMAGES = join(root, 'src/assets/images')
@@ -62,7 +62,7 @@ for (const f of await readdir(IMAGES)) {
 
 const sources = new Set(await readdir(SOURCE))
 let written = 0
-for (const [file, { style, look = 1 }] of Object.entries(MAPPING.sheets)) {
+for (const [file, { style, look = 1, omit = [], framed = false }] of Object.entries(MAPPING.sheets)) {
   if (!style) {
     console.log(`[locs] ${file}: held back, no style assigned`)
     continue
@@ -71,11 +71,17 @@ for (const [file, { style, look = 1 }] of Object.entries(MAPPING.sheets)) {
   if (!sources.has(file)) throw new Error(`${file}: not in ${MAPPING.source}`)
 
   const prefix = look === 1 ? `loc-style-${style}` : `loc-style-${style}-${look}`
-  const { rules } = await cutTriptych(join(SOURCE, file), (angle) =>
+  const cut = framed ? sliceTriptych : cutTriptych
+  const { rules } = await cut(join(SOURCE, file), (angle) =>
     join(IMAGES, `${prefix}-${angle}.webp`),
   )
-  written += 3
-  console.log(`[locs] ${file} -> ${prefix} (rules at ${rules[0]}, ${rules[1]})`)
+  // A sheet with no real view at some angle carries a stand-in panel so the
+  // cut frames like any other; that slot is not written and keeps its
+  // placeholder.
+  for (const angle of omit) await unlink(join(IMAGES, `${prefix}-${angle}.webp`))
+  written += 3 - omit.length
+  const skipped = omit.length > 0 ? `, no ${omit.join(', ')}` : ''
+  console.log(`[locs] ${file} -> ${prefix} (rules at ${rules[0]}, ${rules[1]}${skipped})`)
 }
 console.log(`[locs] ${written} files written`)
 

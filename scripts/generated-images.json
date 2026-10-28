@@ -1,6 +1,6 @@
 {
   "source": "Claude outputs",
-  "note": "Each source is a 1536x1024 triptych — front | back | side, split by thin white rules — of the same model, wardrobe and backdrop, so only the hair changes between styles. `style` is the library id the three panels fill; null holds a sheet back until someone decides which entry it shows. A wrong photograph beside a method is worse than a placeholder: someone follows the steps expecting the picture.",
+  "note": "Each source is a 1536x1024 triptych — front | back | side, split by thin white rules — of the same model, wardrobe and backdrop, so only the hair changes between styles. `style` is the library id the three panels fill; null holds a sheet back until someone decides which entry it shows. A wrong photograph beside a method is worse than a placeholder: someone follows the steps expecting the picture. `framed: true` marks a sheet whose panels are already 4:5 portraits; it is cut at the rules as it is, with no reframing.",
   "sheets": {
     "1.png": {
       "style": "afro-donut-bun",
@@ -35,8 +35,8 @@
       "match": "Named for it."
     },
     "Flat Twist Front Afro.png": {
-      "style": "flat-twist-front-afro",
-      "match": "Named for it."
+      "style": null,
+      "match": "Held back: auburn hair; replaced by the black sheet below."
     },
     "Pinned Afro Updo.png": {
       "style": "pinned-afro-updo",
@@ -61,6 +61,11 @@
     "Three-View Braided Puff Hairstyle Reference.png": {
       "style": "curved-weave-bun",
       "match": "One cornrow a side gathered at the back. Assigned by the owner; the picture ends in a puff where the write-up says a tight bun."
+    },
+    "Flat Twist Front Afro (black).png": {
+      "style": "flat-twist-front-afro",
+      "framed": true,
+      "match": "Named for it; black hair."
     }
   }
 }
