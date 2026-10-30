@@ -36,13 +36,11 @@ import {
  */
 
 /**
- * Curl pattern is the trait most often confused with texture, so the
- * picker says what the number and the letter each mean rather than
- * assuming a row of codes explains itself.
+ * Coil pattern is the trait most often confused with texture, so the
+ * picker says what the letter means rather than assuming a row of codes
+ * explains itself.
  */
-const CURL_HINT = `The number is the shape: ${CURL_FAMILIES.map(
-  (family) => `${family.digit} ${family.name.toLowerCase()}`,
-).join(', ')}. The letter is how tight it is, A being the loosest.`
+const CURL_HINT = `All Type 4 — ${CURL_FAMILIES[0].name.toLowerCase()}. The letter is how tight the coil is, A being the loosest.`
 
 /** Identity fields shared by both hair types, in the order they matter. */
 const SHARED_FIELDS: {
@@ -61,10 +59,10 @@ const SHARED_FIELDS: {
 }[] = [
   {
     key: 'curlPattern',
-    label: 'Curl Pattern',
+    label: 'Coil Pattern',
     icon: 'waves',
     options: CURL_PATTERNS,
-    locLabel: 'Curl Pattern (under the locs)',
+    locLabel: 'Coil Pattern (under the locs)',
     hint: CURL_HINT,
     describe: (value) => curlPatternLabel(value as (typeof CURL_PATTERNS)[number]),
   },
@@ -81,13 +79,13 @@ const SHARED_FIELDS: {
     label: 'Hair Texture',
     icon: 'linear_scale',
     options: HAIR_TEXTURES,
-    hint: 'How thick or wide one strand is — not how curly it is, and not how much of it you have.',
+    hint: 'How thick or wide one strand is — not how tightly it coils, and not how much of it you have.',
   },
   { key: 'scalpCondition', label: 'Scalp', icon: 'spa', options: SCALP_CONDITIONS },
 ]
 
 const HAIR_TYPE_BLURB: Record<HairType, string> = {
-  'Loose Natural': 'Any curl pattern worn loose, from straight through coily.',
+  'Loose Natural': 'Type 4 coils worn loose — 4A, 4B or 4C.',
   Locs: 'Locs at any stage, from starter coils to rooted.',
 }
 

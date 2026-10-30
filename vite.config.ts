@@ -54,6 +54,12 @@ export default defineConfig(({ mode }) => {
       // and `npm run ota:publish` zips it as a pushed update.
       outDir: 'dist',
     },
+    optimizeDeps: {
+      // Left alone, the dependency scan crawls every .html under the root,
+      // site/index.html included, and fails on its `virtual:site-facts`
+      // import, which only vite.site.config.ts provides.
+      entries: ['index.html'],
+    },
     server: {
       // `cap run android --livereload` points the device at this host/port.
       host: true,

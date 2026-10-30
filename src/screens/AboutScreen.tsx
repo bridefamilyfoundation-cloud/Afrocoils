@@ -25,23 +25,36 @@ import { isNative } from '../native/shell'
  * content about the app's point of view rather than a section of it.
  * They sit here, under the page that explains what the app believes.
  *
- * DRAFT COPY. Everything in ABOUT below is written to be replaced —
- * it says what the app currently does, which is the part that has to be
- * true, but the voice and emphasis are a first pass.
+ * The first three sections of ABOUT are the owner's copy, word for
+ * word (2026-10-30): Type 4 hair first, locs supported as one journey
+ * within it rather than the focus. The rest say what the app does with
+ * data and content, which the privacy policy and FAQ repeat.
  */
 
 /* Read from package.json, which is also where the Android versionName
    comes from — a literal here said 0.1.0 for the whole of 0.2.0. */
 const VERSION = version
 
-const ABOUT: { heading: string; body: string }[] = [
+const ABOUT: { heading: string; body: string | string[] }[] = [
   {
-    heading: 'What this is',
-    body: 'A hair app for type 4 hair, loose or locked. It opens into Hair SOS rather than a home page, because people reach for it mid-problem far more often than they browse it — hair that will not cooperate, twenty minutes, somewhere to be.',
+    heading: 'What is AfroCoils?',
+    body: [
+      'AfroCoils is your everyday hair companion, created specifically for women with Type 4 natural hair.',
+      'We help you understand your hair better, discover hairstyles that suit your hair type and condition, and build a hair-care routine that works for you.',
+      'From personalised hairstyle recommendations to simple hair-care guidance, AfroCoils is designed to make caring for and styling your natural hair easier, more convenient, and less overwhelming.',
+      'Whether you’re looking for a quick hairstyle, trying to address a hair-care concern, or simply learning what works best for your hair, AfroCoils is here to guide you.',
+    ],
   },
   {
-    heading: 'Who it is for',
-    body: 'Coils, curls and locs. Locs are treated as their own thing throughout, not as a style worn on loose hair: half the technique that is correct for loose hair will damage a loc, so the two never share a recommendation. Tell the app which you have and it stops showing you the other.',
+    heading: 'Who is AfroCoils for?',
+    body: [
+      'AfroCoils is designed for women with Type 4 natural hair, including 4A, 4B and 4C textures, who want to understand their hair, care for it, and explore suitable styling options.',
+      'Whether you wear your hair loose or in locs, AfroCoils aims to provide guidance and recommendations suited to your hair journey.',
+    ],
+  },
+  {
+    heading: 'Our mission',
+    body: 'Our mission is to make natural hair care simpler, more accessible, and more personalised, helping women feel more confident in understanding, caring for, and styling their hair.',
   },
   {
     heading: 'Your data stays on your device',
@@ -91,9 +104,19 @@ export default function AboutScreen() {
             <h2 className="mb-xs font-headline-md text-body-lg text-on-surface">
               {item.heading}
             </h2>
-            <p className="font-body-md text-body-md text-on-surface-variant">{item.body}</p>
+            {(Array.isArray(item.body) ? item.body : [item.body]).map((paragraph) => (
+              <p
+                key={paragraph}
+                className="mb-sm font-body-md text-body-md text-on-surface-variant last:mb-0"
+              >
+                {paragraph}
+              </p>
+            ))}
           </article>
         ))}
+        <p className="font-headline-md text-body-lg font-bold text-primary">
+          Your hair. Your journey. Your AfroCoils.
+        </p>
       </section>
 
       <section className="mb-2xl">

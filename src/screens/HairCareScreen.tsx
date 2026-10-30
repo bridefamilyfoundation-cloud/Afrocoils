@@ -102,13 +102,13 @@ export default function HairCareScreen() {
       note: 'How much hair is on your head, not how thick each strand is. Decides sectioning and product quantity.',
     },
     {
-      label: 'Curl pattern',
+      label: 'Coil pattern',
       value:
         identity.curlPattern &&
         `${curlPatternLabel(identity.curlPattern)} · ${curlFamilyOf(identity.curlPattern)?.name ?? ''}`.trim(),
       to: '/profile',
       action: identity.curlPattern ? 'Change it' : 'Set it',
-      note: 'The shape of a strand — Type 1 straight through Type 4 coily. It still matters with locs: it decides how fast they bud and shrink.',
+      note: 'The shape of your Type 4 coil — 4A, 4B or 4C. It still matters with locs: it decides how fast they bud and shrink.',
     },
     {
       label: 'Hair texture',

@@ -157,14 +157,14 @@ export const IMAGERY = {
   ),
   drynessRescue: slot(
     'dryness-rescue',
-    'Close up photography of rich, hydrated natural hair curls glistening with moisture. Droplets of water and nourishing oil catch the soft, golden hour sunlight.',
+    'Close up photography of rich, hydrated natural hair coils glistening with moisture. Droplets of water and nourishing oil catch the soft, golden hour sunlight.',
   ),
   community1: slot(
     'community-1',
     'A portrait of a woman with a large, beautiful afro, smiling warmly.',
   ),
   community2: slot('community-2', 'Close up of a person with braided hair looking serene.'),
-  community3: slot('community-3', 'A person with short, curly hair laughing.'),
+  community3: slot('community-3', 'A person with short, coily hair laughing.'),
   stopTheSnap: slot(
     'stop-the-snap',
     'Macro photography of a single hair strand under a microscope showing the cuticle structure, symbolising scientific care and precision.',

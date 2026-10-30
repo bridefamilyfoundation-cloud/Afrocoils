@@ -1,6 +1,6 @@
 /**
  * The landing page's behaviour: the scroll story, the phone mockups, the
- * reveal animations, and the QR code.
+ * reveal animations, the Ask demo, and the QR code.
  *
  * Everything here is progressive. With scripts off the page is complete —
  * every section visible, the download link in the HTML — and
@@ -10,7 +10,7 @@ import QRCode from 'qrcode'
 import heroUrl from '../src/assets/brand/afro-hero.webp'
 import markUrl from '../src/assets/brand/afro-mark.webp'
 import wordmarkUrl from '../src/assets/brand/afro-wordmark.webp'
-import { bands } from 'virtual:site-facts'
+import { askDemo, bands } from 'virtual:site-facts'
 
 const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches
 const $ = <T extends Element = HTMLElement>(selector: string, root: ParentNode = document) =>
@@ -197,6 +197,97 @@ const revealObserver = new IntersectionObserver(
   { threshold: 0.18 },
 )
 document.querySelectorAll('[data-reveal], [data-step]').forEach((el) => revealObserver.observe(el))
+
+/* ------------------------------------------------------------------ *
+ * Ask, replayed: the question is typed, sent, and answered with the
+ * Quick Hair Check card, word for word, on a loop while it is in view.
+ * Text goes in through textContent; the content is ours, but the card
+ * should never be the place that starts trusting it as HTML.
+ * ------------------------------------------------------------------ */
+const askBox = document.querySelector<HTMLElement>('#ask-demo')
+if (askBox) {
+  askBox.classList.remove('hidden')
+  const typed = $('[data-ask-typed]', askBox)
+  const caret = $('[data-ask-caret]', askBox)
+  const placeholder = $('[data-ask-placeholder]', askBox)
+  const send = $('[data-ask-send]', askBox)
+  const askSteps = [...askBox.querySelectorAll<HTMLElement>('[data-ask-step]')]
+  $('[data-ask-bubble]', askBox).textContent = askDemo.question
+  $('[data-ask-title]', askBox).textContent = askDemo.title
+  $('[data-ask-problem]', askBox).textContent = askDemo.problem
+  $('[data-ask-more]', askBox).textContent = askDemo.more ? `and ${askDemo.more} more on the page` : ''
+  const list = $('[data-ask-solutions]', askBox)
+  for (const line of askDemo.solutions) {
+    const li = document.createElement('li')
+    li.className = 'ask-tick flex gap-sm font-body-md text-[13.5px] text-on-surface'
+    li.innerHTML = '<svg class="mt-0.5 h-4 w-4 shrink-0 text-secondary" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><use href="#i-check" /></svg><span></span>'
+    li.lastElementChild!.textContent = line
+    list.append(li)
+  }
+  const ticks = [...list.children] as HTMLElement[]
+
+  const showAnswer = (on: boolean) => {
+    askSteps.forEach((el) => el.classList.toggle('is-on', on))
+    ticks.forEach((el) => el.classList.toggle('is-on', on))
+  }
+  const setTyped = (text: string) => {
+    typed.textContent = text
+    placeholder.hidden = text.length > 0
+  }
+
+  if (reduceMotion) {
+    caret.hidden = true
+    setTyped(askDemo.question)
+    showAnswer(true)
+  } else {
+    let visible = false
+    let run = 0
+    const wait = (ms: number, id: number) =>
+      new Promise<boolean>((done) => setTimeout(() => done(id === run && visible && !document.hidden), ms))
+
+    // One pass: type, send, answer, hold, clear. A new pass cancels the old one.
+    const play = async () => {
+      const id = ++run
+      showAnswer(false)
+      setTyped('')
+      caret.hidden = false
+      if (!(await wait(700, id))) return
+      for (let i = 1; i <= askDemo.question.length; i++) {
+        setTyped(askDemo.question.slice(0, i))
+        if (!(await wait(55 + (i % 4 === 0 ? 40 : 0), id))) return
+      }
+      if (!(await wait(450, id))) return
+      caret.hidden = true
+      send.style.transform = 'scale(0.86)'
+      if (!(await wait(160, id))) return
+      send.style.transform = ''
+      askSteps[0].classList.add('is-on')
+      if (!(await wait(450, id))) return
+      askSteps[1].classList.add('is-on')
+      for (const tick of ticks) {
+        if (!(await wait(260, id))) return
+        tick.classList.add('is-on')
+      }
+      if (!(await wait(6500, id))) return
+      showAnswer(false)
+      if (!(await wait(600, id))) return
+      play()
+    }
+
+    new IntersectionObserver(
+      ([entry]) => {
+        visible = entry.isIntersecting
+        if (visible) play()
+        else run++
+      },
+      { threshold: 0.35 },
+    ).observe(askBox)
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) run++
+      else if (visible) play()
+    })
+  }
+}
 
 /* ------------------------------------------------------------------ *
  * QR code to this page's download section, for someone on a computer.

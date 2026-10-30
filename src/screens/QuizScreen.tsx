@@ -313,7 +313,7 @@ function QuizResult() {
   const learned = [
     identity.hairType && { label: 'Hair type', value: identity.hairType },
     identity.curlPattern && {
-      label: 'Curl pattern',
+      label: 'Coil pattern',
       value: curlPatternLabel(identity.curlPattern),
     },
     identity.porosity && { label: 'Porosity', value: `${identity.porosity} porosity` },

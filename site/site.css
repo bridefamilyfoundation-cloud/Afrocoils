@@ -50,6 +50,48 @@
     animation-delay: var(--d, 0ms);
   }
 
+  /*
+   * The headline, line by line, rises out of a mask rather than fading in.
+   * The right padding keeps the italic's overhang from being clipped.
+   */
+  .mask-line {
+    display: block;
+    overflow: hidden;
+    padding: 0 0.12em 0.08em 0;
+    margin-bottom: -0.08em;
+  }
+  .mask-line > span {
+    display: block;
+  }
+  .js .mask-line > span {
+    transform: translateY(110%);
+    animation: unmask 1s cubic-bezier(0.16, 0.84, 0.24, 1) forwards;
+    animation-delay: var(--d, 0ms);
+  }
+
+  /* Ask, replayed (#ask-demo): the reply and its ticks arrive in turn. */
+  .ask-step,
+  .ask-tick {
+    opacity: 0;
+    transform: translateY(14px);
+    transition:
+      opacity 0.45s ease,
+      transform 0.55s cubic-bezier(0.2, 0.7, 0.2, 1);
+  }
+  .ask-tick {
+    transform: translateX(-10px);
+  }
+  .ask-step.is-on,
+  .ask-tick.is-on {
+    opacity: 1;
+    transform: none;
+  }
+  .ask-caret {
+    margin-left: 1px;
+    color: theme('colors.secondary');
+    animation: caret 1s steps(1) infinite;
+  }
+
   /* The illustration breathes; the ring behind it turns; the chips bob. */
   .float {
     animation: float 7s ease-in-out infinite;
@@ -175,6 +217,16 @@
     transform: none;
   }
 }
+@keyframes unmask {
+  to {
+    transform: none;
+  }
+}
+@keyframes caret {
+  50% {
+    opacity: 0;
+  }
+}
 @keyframes float {
   0%,
   100% {
@@ -221,7 +273,10 @@
     transition: none !important;
   }
   .js [data-reveal],
-  .js .rise {
+  .js .rise,
+  .js .mask-line > span,
+  .ask-step,
+  .ask-tick {
     opacity: 1;
     transform: none;
   }

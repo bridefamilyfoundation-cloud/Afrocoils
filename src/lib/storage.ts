@@ -2,7 +2,7 @@ import { Preferences } from '@capacitor/preferences'
 import { STYLES } from '../content/styles'
 import { deletePhoto } from './photos'
 import type { CareSchedule, HairIdentity, HairProfile, HairTexture, MyStyle } from './types'
-import { PROFILE_VERSION, defaultSchedules } from './types'
+import { CURL_PATTERNS, PROFILE_VERSION, defaultSchedules } from './types'
 
 /**
  * Persistence for the hair profile.
@@ -170,12 +170,19 @@ function orphanedPhotos(stored: unknown): string[] {
  * key is carried over when the new one is absent, so an answer given
  * before the rename survives, and is then dropped so the document does
  * not keep two names for one trait.
+ *
+ * A coil pattern outside Type 4 (an answer given while the pickers
+ * still offered Types 1 to 3) is cleared rather than kept, so it reads
+ * as "not set yet" instead of a value no screen can show or change.
  */
 function migrateIdentity(base: HairIdentity, stored: HairIdentity | undefined): HairIdentity {
   const next: HairIdentity = { ...base, ...stored }
   const legacy = (stored as { strandWidth?: HairTexture } | undefined)?.strandWidth
   if (next.texture === undefined && legacy !== undefined) next.texture = legacy
   delete (next as { strandWidth?: HairTexture }).strandWidth
+  if (next.curlPattern !== undefined && !(CURL_PATTERNS as readonly string[]).includes(next.curlPattern)) {
+    delete next.curlPattern
+  }
   return next
 }
 

@@ -49,7 +49,7 @@ export default function HairProblemScreen() {
         </h2>
         <p className="font-body-md text-on-surface-variant">
           Start from what is wrong. Everything here is written for{' '}
-          {locs ? 'locs' : 'loose coils and curls'}.
+          {locs ? 'locs' : 'loose coils'}.
         </p>
       </section>
 

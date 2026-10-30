@@ -53,7 +53,7 @@ const HAIR_TYPE_STEP: QuizStep = {
     {
       value: 'Loose Natural',
       label: 'Loose natural hair',
-      detail: 'Curls, coils or kinks that can be separated, combed and re-styled.',
+      detail: 'Type 4 coils and kinks that can be separated, combed and re-styled.',
     },
     {
       value: 'Locs',
@@ -68,53 +68,22 @@ const CURL_PATTERN_STEP: QuizStep = {
   field: 'curlPattern',
   kind: 'choice',
   title: 'What does a single strand do when it dries with no product in it?',
-  help: 'This is the shape of the strand — straight, wavy, curly or coily — not how thick it is. Look at the tightest section you have, usually the nape or the crown. Most people are a mix: pick the one that covers most of your head.',
+  help: 'This is the shape of the coil, not how thick the strand is. Look at the tightest section you have, usually the nape or the crown. Most people are a mix: pick the one that covers most of your head.',
   optional: true,
   choices: [
     {
-      value: '1',
-      label: 'Type 1 — stays flat',
-      detail: 'No curves or bends at all. Smooth and shiny, and the roots go oily quickly.',
-    },
-    {
-      value: '2A',
-      label: 'Type 2 — a barely-there wave',
-      detail: 'A loose, soft "S" that only shows towards the ends.',
-    },
-    {
-      value: '2B',
-      label: 'Type 2 — clear beachy bends',
-      detail: 'The "S" holds down most of the length and keeps its shape.',
-    },
-    {
-      value: '2C',
-      label: 'Type 2 — waves with a few curls in them',
-      detail: 'Bends deep enough that some sections close into loops.',
-    },
-    {
-      value: '3A',
-      label: 'Type 3 — large, loose loops',
-      detail: 'About the width of a piece of sidewalk chalk.',
-    },
-    { value: '3B', label: 'Type 3 — springy ringlets', detail: 'About the width of a marker pen.' },
-    {
-      value: '3C',
-      label: 'Type 3 — tight corkscrews',
-      detail: 'About the width of a pencil, densely packed.',
-    },
-    {
       value: '4A',
-      label: 'Type 4 — small, defined coils',
+      label: '4A — small, defined coils',
       detail: 'Springy O-shapes, roughly the width of a crochet needle.',
     },
     {
       value: '4B',
-      label: 'Type 4 — sharp bends, more Z than O',
-      detail: 'Folds at angles rather than curling; fluffy, less defined.',
+      label: '4B — sharp bends, more Z than O',
+      detail: 'Folds at angles rather than coiling; fluffy, less defined.',
     },
     {
       value: '4C',
-      label: 'Type 4 — very tight, almost no visible curl',
+      label: '4C — very tight, almost no visible coil',
       detail: 'Shrinks by 70% or more. The pattern only really shows when wet.',
     },
   ],
@@ -151,7 +120,7 @@ const TEXTURE_STEP: QuizStep = {
   field: 'texture',
   kind: 'choice',
   title: 'Take one shed strand and roll it between your fingers.',
-  help: 'Texture is how thick or wide one fibre is — nothing to do with how curly it is, or how much hair you have. Compare it against a piece of sewing thread. It is why two people with the same curl pattern can need completely different products.',
+  help: 'Texture is how thick or wide one fibre is — nothing to do with how tightly it coils, or how much hair you have. Compare it against a piece of sewing thread. It is why two people with the same curl pattern can need completely different products.',
   optional: true,
   choices: [
     {

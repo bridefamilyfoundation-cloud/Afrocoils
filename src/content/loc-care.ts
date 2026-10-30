@@ -122,7 +122,7 @@ export const LOC_CARE: LocChapter[] = [
             label: 'Hair type and texture',
             items: [
               'Tightly coiled hair locks fastest.',
-              'Looser curl patterns can loc, but take longer and may need interlocking to hold at the root.',
+              'Looser coil patterns can loc, but take longer and may need interlocking to hold at the root.',
             ],
           },
           {
@@ -740,7 +740,7 @@ export const LOC_CARE: LocChapter[] = [
           {
             label: 'Who may benefit from it',
             items: [
-              'Microlocs and Sisterlocks, looser curl patterns a retwist will not hold, and people who swim or sweat a lot.',
+              'Microlocs and Sisterlocks, looser coil patterns a retwist will not hold, and people who swim or sweat a lot.',
             ],
           },
           {
@@ -1014,7 +1014,7 @@ export const LOC_CARE: LocChapter[] = [
           },
           {
             label: 'Special occasion styles',
-            items: ['Updos, and curls set on rods or pipe cleaners on clean, dry locs.'],
+            items: ['Updos, and rod or pipe-cleaner sets on clean, dry locs.'],
           },
           {
             label: 'Short loc styles',
@@ -1444,7 +1444,7 @@ export const LOC_CARE: LocChapter[] = [
           {
             label: 'Heat styling safely',
             items: [
-              'Locs rarely need direct heat. Dry them on low with a diffuser, skip flat irons and curling tongs, and use rods for curls.',
+              'Locs rarely need direct heat. Dry them on low with a diffuser, skip flat irons and hot tongs, and use rods for a set.',
             ],
           },
         ],

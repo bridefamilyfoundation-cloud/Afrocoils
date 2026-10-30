@@ -86,48 +86,30 @@ export const LOC_STAGES = ['Starter', 'Budding', 'Teen', 'Mature', 'Rooted'] as 
 export type LocStage = (typeof LOC_STAGES)[number]
 
 /**
- * Curl pattern — the natural *shape* of a strand, and nothing else.
+ * Coil pattern — the natural *shape* of a strand, and nothing else.
  *
- * The number is the shape; the letter is how tight that shape is, A
- * being the loosest of its family. Type 1 carries no letter because
- * there is only one way to be straight.
+ * AfroCoils is written for Type 4 hair, so only the three Type 4
+ * patterns are offered; the letter is how tight the coil is, A being
+ * the loosest. Types 1 to 3 were removed on the owner's instruction —
+ * nothing in the app is written for them, and offering them implied
+ * otherwise. `migrate` in storage.ts clears any older answer outside
+ * this list. (The field keeps its stored name, `curlPattern`, so no
+ * profile has to be rewritten.)
  *
  * This is not `HairTexture`, which is how wide a single fibre is, and
  * not `Density`, which is how many fibres there are. All three are
  * independent: fine 4C and coarse 4C want opposite products.
  */
-export const CURL_PATTERNS = [
-  '1',
-  '2A',
-  '2B',
-  '2C',
-  '3A',
-  '3B',
-  '3C',
-  '4A',
-  '4B',
-  '4C',
-] as const
+export const CURL_PATTERNS = ['4A', '4B', '4C'] as const
 
 /**
- * The four families, in the words the profile pickers and the quiz use.
+ * The family, in the words the profile pickers and the quiz use.
  *
  * Held here rather than written out per screen because three surfaces
- * describe them and a fourth wording would be a fourth thing to keep
+ * describe it and a fourth wording would be a fourth thing to keep
  * true.
  */
 export const CURL_FAMILIES = [
-  {
-    digit: '1',
-    name: 'Straight',
-    summary: 'Lies flat, with no curves or bends. Smooth and shiny, and quick to go oily.',
-  },
-  { digit: '2', name: 'Wavy', summary: 'A soft "S" shape, or loose, beachy bends.' },
-  {
-    digit: '3',
-    name: 'Curly',
-    summary: 'Bouncy loops, spirals or corkscrews, with a three-dimensional spring to them.',
-  },
   {
     digit: '4',
     name: 'Coily',
@@ -170,25 +152,20 @@ export function curlFamilyOf(pattern: CurlPattern): (typeof CURL_FAMILIES)[numbe
   return CURL_FAMILIES.find((family) => family.digit === curlFamily(pattern))
 }
 
-/**
- * How a pattern is written on screen.
- *
- * Every value but one is already a readable code. A bare '1' in a row of
- * chips reads as a stray number, so it alone is spelled out.
- */
+/** How a pattern is written on screen. Each value is already a readable code. */
 export function curlPatternLabel(pattern: CurlPattern): string {
-  return pattern === '1' ? 'Type 1' : pattern
+  return pattern
 }
 
 export interface HairIdentity {
   /** Undefined means the user has not chosen yet; treat as loose for safety. */
   hairType?: HairType
-  /** The shape of a strand — Type 1 to Type 4. */
+  /** The shape of a strand — 4A, 4B or 4C. */
   curlPattern?: CurlPattern
   porosity?: PorosityLevel
   /** How many strands there are. */
   density?: Density
-  /** How wide one strand is. Independent of density and of curl pattern. */
+  /** How wide one strand is. Independent of density and of coil pattern. */
   texture?: HairTexture
   scalpCondition?: ScalpCondition
 
@@ -204,7 +181,7 @@ export interface HairIdentity {
 }
 
 /**
- * Curl pattern still matters with locs — it decides how fast they bud and
+ * Coil pattern still matters with locs — it decides how fast they bud and
  * how much they shrink — but nothing else loose-specific does. This is the
  * list the completeness meter and the profile screen ask for, per type.
  */

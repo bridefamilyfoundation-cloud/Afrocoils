@@ -186,7 +186,7 @@ export default function StyleRecommendationsScreen() {
             that filling in porosity will reorder this list. It will not
             — no contributed entry declares one. */}
         <p className="rounded-xl bg-surface-container p-md font-body-md text-caption text-on-surface-variant">
-          Your porosity, density, curl pattern and texture are <em>not</em> in this ranking.
+          Your porosity, density, coil pattern and texture are <em>not</em> in this ranking.
           No contributed style declares them yet, so they would change nothing here — the
           first three do decide your{' '}
           <Link to="/products" className="text-primary underline">

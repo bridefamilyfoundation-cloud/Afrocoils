@@ -4,4 +4,5 @@
 declare module 'virtual:site-facts' {
   export const release: Omit<import('../src/lib/types').UpdateManifest, 'page'> & { packageId: string }
   export const bands: { label: string; styles: { name: string; minutes: number }[] }[]
+  export const askDemo: { question: string; title: string; problem: string; solutions: string[]; more: number }
 }

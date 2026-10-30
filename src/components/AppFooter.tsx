@@ -10,8 +10,8 @@ const LINKS = [
 ]
 
 /**
- * The prototype's footer branded this "Curly Hair" and its app bar said
- * something else again. Both now draw the same <BrandLockup>, so there is
+ * The prototype's footer branded this with another name and its app bar
+ * said something else again. Both now draw the same <BrandLockup>, so there is
  * no longer a second copy of the name to fall out of step.
  */
 export default function AppFooter() {
@@ -22,7 +22,7 @@ export default function AppFooter() {
           <BrandLockup size="sm" />
         </Link>
         <p className="font-caption text-caption text-on-surface-variant">
-          © {new Date().getFullYear()} AfroCoils. Celebrating every coil and curl.
+          AfroCoils — Celebrating Every Coil.
         </p>
       </div>
 

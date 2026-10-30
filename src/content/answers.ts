@@ -518,7 +518,7 @@ export const KNOWLEDGE: KnowledgeEntry[] = [
     question: 'How do I stop single strand knots?',
     asks: 'how to stop single strand knots|fairy knots|ssk|knots on the ends|tiny knots in my hair|why do i get knots|knots keep coming back',
     answer:
-      'Single strand knots form when a curl coils back on itself and dries that way. You can’t stop every one, but stretched, moisturised ends get far fewer. A knot that has set hard can’t be undone. Snip just above it, because left in place it catches and breaks the strands around it.',
+      'Single strand knots form when a strand coils back on itself and dries that way. You can’t stop every one, but stretched, moisturised ends get far fewer. A knot that has set hard can’t be undone. Snip just above it, because left in place it catches and breaks the strands around it.',
     steps: [
       'Wear stretched styles more often: twists, braids, banding.',
       'Keep the ends moisturised and sealed.',
@@ -761,7 +761,7 @@ export const KNOWLEDGE: KnowledgeEntry[] = [
     question: 'Is heat bad for my natural hair?',
     asks: 'is heat bad for my hair|silk press damage|can i blow dry natural hair|heat damage|flat iron natural hair|how often can i use heat|my curls wont go back',
     answer:
-      'Heat isn’t forbidden, but each pass changes the hair a little, and too much too often leaves curls that won’t revert. That’s permanent heat damage, and the only fix is growing it out. Used rarely, low and protected, most hair handles it.',
+      'Heat isn’t forbidden, but each pass changes the hair a little, and too much too often leaves coils that won’t revert. That’s permanent heat damage, and the only fix is growing it out. Used rarely, low and protected, most hair handles it.',
     steps: [
       'Only use heat on clean, completely detangled hair.',
       'Always use a heat protectant.',

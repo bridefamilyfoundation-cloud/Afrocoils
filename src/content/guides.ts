@@ -76,7 +76,7 @@ export const GUIDES: Guide[] = [
       'Spray bottle of water',
       'Leave-in conditioner (the "L")',
       'Light oil — jojoba or grapeseed (the "O")',
-      'Curl cream or butter (the "C")',
+      'Leave-in cream or butter (the "C")',
       'Wide-tooth comb',
       'Satin scarf or bonnet',
     ],
@@ -95,7 +95,7 @@ export const GUIDES: Guide[] = [
       },
       {
         title: 'Cream — lock it in',
-        body: 'Finish with a curl cream or butter on the mid-lengths and ends, which are the oldest and driest parts of the strand. Skip the scalp.',
+        body: 'Finish with a cream or butter on the mid-lengths and ends, which are the oldest and driest parts of the strand. Skip the scalp.',
       },
       {
         title: 'Style low-tension and cover',
@@ -539,7 +539,7 @@ export const GUIDES: Guide[] = [
       },
       {
         title: 'Read how it feels dry',
-        body: 'Needs protein: limp, over-elastic, mushy when wet, will not hold a style, curl pattern looking looser than it used to. Needs moisture: rough, straw-like, tangles constantly, dull, brittle. The confusing part is that both are commonly described by the person experiencing them as "dry".',
+        body: 'Needs protein: limp, over-elastic, mushy when wet, will not hold a style, coil pattern looking looser than it used to. Needs moisture: rough, straw-like, tangles constantly, dull, brittle. The confusing part is that both are commonly described by the person experiencing them as "dry".',
       },
       {
         title: 'Move one lever, then wait',

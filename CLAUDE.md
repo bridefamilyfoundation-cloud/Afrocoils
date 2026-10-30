@@ -77,6 +77,17 @@ picture; this file is the short version of what to keep in mind when editing.
     missing, add it to the config under the name the prototype uses, derived
     from one of the four.
 
+- **AfroCoils is for Type 4 hair, and says "coils", never "curls".**
+  The audience is women with Type 4 natural hair (4A, 4B, 4C), worn loose
+  or in locs. Locs are supported, not the focus: About leads with the
+  owner's Type 4 copy. `CURL_PATTERNS` is `4A | 4B | 4C` only (the field
+  keeps its stored name `curlPattern`; `migrateIdentity` clears older
+  Type 1–3 answers), and on screen it is "Coil pattern". No visible copy
+  says curl, curls or curly; the exceptions are real product and brand
+  names in `products.ts` and the search vocabulary in `content/ask.ts`,
+  which has to match what people type. The line under the footer logo is
+  "AfroCoils — Celebrating Every Coil."
+
 ## Conventions
 
 - **The app is six sections, not a flat list of screens.** Hair SOS
@@ -517,7 +528,7 @@ picture; this file is the short version of what to keep in mind when editing.
   add a shopping list to an entry that deliberately has none.
   `hairCheckFor()` applies the same hard hair-type filter as everything
   else — anything turning on detangling, combing or a curl pattern is
-  loose-only, which is the whole "My curls are…" group plus tangling and
+  loose-only, which is the whole "My coils are…" group plus tangling and
   breakage, because the screen's own subtitle promises the user that what
   is on it is written for their hair type.
 

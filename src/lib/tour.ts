@@ -60,7 +60,7 @@ export const TOUR_STEPS: TourStep[] = [
     path: '/care',
     target: 'care-heading',
     title: 'Hair Care',
-    body: 'Your porosity, density, curl pattern and texture, a routine with reminders, a product shelf, and "Something is wrong" for when it is.',
+    body: 'Your porosity, density, coil pattern and texture, a routine with reminders, a product shelf, and "Something is wrong" for when it is.',
   },
   {
     path: '/growth',

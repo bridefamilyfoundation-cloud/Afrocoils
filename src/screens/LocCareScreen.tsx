@@ -99,7 +99,7 @@ const FIRST_QUESTION: { type: HairType; title: string; body: string; icon: 'wave
   {
     type: 'Loose Natural',
     title: 'Loose Natural Hair',
-    body: 'Personalised care and styling for your natural coils, curls, and kinks.',
+    body: 'Personalised care and styling for your natural coils and kinks.',
     icon: 'waves',
   },
   {

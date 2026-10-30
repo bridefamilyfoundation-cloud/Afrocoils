@@ -229,7 +229,7 @@ const SECTIONS: {
         <p>What your hair is, what it needs on a schedule, and what to put on it.</p>
         <ul>
           <li>
-            <strong>Know your hair</strong>: porosity, density, curl pattern and texture. Each
+            <strong>Know your hair</strong>: porosity, density, coil pattern and texture. Each
             card shows what your profile already holds. Porosity has its own short test; the
             others are set on your profile.
           </li>
@@ -356,7 +356,7 @@ const SECTIONS: {
             {list(CLIMATES)}).
           </li>
           <li>
-            <strong>About your hair</strong>: hair type, then curl pattern, porosity, density,
+            <strong>About your hair</strong>: hair type, then coil pattern, porosity, density,
             texture and scalp, or loc type and start date if you wear locs. The meter shows how
             much is filled in. The hair quiz fills in the same fields in plainer terms.
           </li>
@@ -397,7 +397,7 @@ const SECTIONS: {
             order. Most styles still work on shorter hair.
           </li>
           <li>
-            <strong>Porosity, density and curl pattern</strong> do not rank styles yet, because
+            <strong>Porosity, density and coil pattern</strong> do not rank styles yet, because
             no style in the library has been tagged with them.
           </li>
         </ul>

@@ -534,7 +534,7 @@ export const HAIR_CHECK: HairCheckGroup[] = [
   },
   {
     id: 'curls',
-    heading: 'My curls are…',
+    heading: 'My coils are…',
     // Every entry below turns on a curl pattern behaving as loose hair
     // does — definition, bounce-back, detangling. None of it applies to a
     // loc, which is meant to be matted and is never re-set.
@@ -543,11 +543,11 @@ export const HAIR_CHECK: HairCheckGroup[] = [
         id: 'curls-losing-definition',
         label: 'Losing definition',
         problem:
-          'Curl definition can decrease because of dryness, damage, buildup, heat, chemical processing, or changes in the hair’s condition.',
+          'Coil definition can decrease because of dryness, damage, buildup, heat, chemical processing, or changes in the hair’s condition.',
         signs: [
-          'Curls look less defined',
+          'Coils look less defined',
           'Hair appears puffy',
-          'Curl pattern looks inconsistent',
+          'Coil pattern looks inconsistent',
         ],
         solutions: [
           'Clarify when there is buildup',
@@ -569,10 +569,10 @@ export const HAIR_CHECK: HairCheckGroup[] = [
         id: 'curls-not-bouncing-back',
         label: 'Not bouncing back',
         problem:
-          'Hair that does not return to its normal curl pattern may have experienced heat or chemical damage.',
+          'Hair that does not return to its normal coil pattern may have experienced heat or chemical damage.',
         signs: [
           'Some areas remain straight',
-          'Curl pattern is permanently looser',
+          'Coil pattern is permanently looser',
           'Hair feels weak',
           'Reduced elasticity',
         ],
@@ -589,7 +589,7 @@ export const HAIR_CHECK: HairCheckGroup[] = [
       {
         id: 'curls-extremely-dry',
         label: 'Extremely dry',
-        problem: 'Very dry curls lack sufficient moisture and conditioning.',
+        problem: 'Very dry coils lack sufficient moisture and conditioning.',
         signs: [
           'Rough texture',
           'Dull appearance',
@@ -617,7 +617,7 @@ export const HAIR_CHECK: HairCheckGroup[] = [
         id: 'curls-breaking',
         label: 'Breaking',
         problem:
-          'Curly and coily hair can be vulnerable to breakage because of its structure, dryness, manipulation, and mechanical stress.',
+          'Coily hair can be vulnerable to breakage because of its structure, dryness, manipulation, and mechanical stress.',
         signs: ['Short broken hairs', 'Uneven length', 'Split ends', 'Reduced density'],
         solutions: [
           'Detangle gently',

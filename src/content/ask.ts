@@ -57,7 +57,7 @@ export const CONCEPTS: Record<string, string> = {
     'tangle|tangles|tangled|tangling|knot|knots|knotted|matting|matted|fairy knots|single strand knots|ssk|detangle|detangling|detangler|comb through|hard to comb|combing',
   frizz: 'frizz|frizzy|puffy|fluffy|halo|flyaways|fuzz|fuzzy',
   definition:
-    'definition|defined|define|undefined|curl clumps|clumping|wash and go|wash n go|wash & go|twist out|twistout|braid out|braidout|bantu knot out|curls not popping|limp curls|bounce|bouncing back|springy',
+    'definition|defined|define|undefined|curl clumps|clumping|wash and go|wash n go|wash & go|twist out|twistout|braid out|braidout|bantu knot out|curls not popping|limp curls|stringy|bounce|bouncing back|springy',
   shrinkage: 'shrinkage|shrink|shrinks|shrunk|stretch|stretched|stretching|banding|blow out|length check shrinkage',
   curls: 'curl|curls|curly|coil|coils|coily|kink|kinky|kinks|zigzag|4c|4b|4a|3c|3b|type 4|type 3|afro textured|afro-textured',
   // "Oily" is left out on purpose: it stems to "oil", and "which oil

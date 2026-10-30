@@ -102,8 +102,9 @@
               <span class="h-2 w-2 rounded-full bg-secondary"></span>
               Type 4 hair · loose or locked
             </p>
-            <h1 class="rise font-headline-lg text-[44px] font-bold leading-[1.02] tracking-[-0.03em] text-primary sm:text-[60px] lg:text-[76px]" style="--d: 90ms">
-              Hair SOS<br /><span class="font-medium italic text-brand-espresso/80">for your coils.</span>
+            <h1 class="font-headline-lg text-[44px] font-bold leading-[1.02] tracking-[-0.03em] text-primary sm:text-[60px] lg:text-[76px]">
+              <span class="mask-line"><span style="--d: 90ms">Hair SOS</span></span>
+              <span class="mask-line"><span class="font-medium italic text-brand-espresso/80" style="--d: 230ms">for your coils.</span></span>
             </h1>
             <p class="rise mx-auto mt-lg max-w-xl font-body-lg text-body-lg text-on-surface-variant md:mx-0" style="--d: 200ms">
               <strong class="font-semibold text-primary">AfroCoils.</strong> Tailored to your hair, your hair care, and easy styling.
@@ -202,7 +203,7 @@
                   <span class="absolute left-0 top-1 h-full w-[3px] rounded-full bg-outline-variant/40"><span class="step-bar block h-full w-full rounded-full bg-secondary"></span></span>
                   <p class="mb-sm font-label-md text-label-md uppercase tracking-[0.16em] text-on-surface-variant">04 · Hair Care</p>
                   <h3 class="mb-md font-headline-lg text-[30px] font-semibold leading-tight text-primary">Know your hair, then look after it.</h3>
-                  <p class="max-w-md font-body-lg text-body-lg text-on-surface-variant">A five-question porosity test, your density, curl pattern and texture. Then a care calendar that works out what&rsquo;s due next, a product shelf filtered to your profile and your water &mdash; and when something&rsquo;s wrong, the Quick Hair Check starts from the symptom.</p>
+                  <p class="max-w-md font-body-lg text-body-lg text-on-surface-variant">A five-question porosity test, your density, coil pattern and texture. Then a care calendar that works out what&rsquo;s due next, a product shelf filtered to your profile and your water &mdash; and when something&rsquo;s wrong, the Quick Hair Check starts from the symptom.</p>
                   <div class="mt-lg lg:hidden" data-slot="care"></div>
                 </div>
               </li>
@@ -246,10 +247,32 @@
       <!-- ============================== NUMBERS ============================== -->
       <section class="bg-brand-chocolate py-24 text-inverse-on-surface">
         <div class="mx-auto max-w-6xl px-container-padding">
-          <div data-reveal class="mb-2xl max-w-2xl">
-            <p class="mb-sm font-label-md text-label-md uppercase tracking-[0.18em] text-primary-fixed-dim">All written by people</p>
-            <h2 class="font-headline-lg text-[34px] font-semibold leading-tight tracking-tight sm:text-[44px]">Nothing on the screen was invented.</h2>
-            <p class="mt-md font-body-lg text-body-lg text-inverse-on-surface/80">There&rsquo;s no chatbot and no model behind any screen. Every guide, style and step ships inside the app; it filters and ranks what it already has against the profile you filled in.</p>
+          <div class="mb-2xl grid items-center gap-2xl lg:grid-cols-[1fr_440px]">
+            <div data-reveal class="max-w-2xl">
+              <p class="mb-sm font-label-md text-label-md uppercase tracking-[0.18em] text-primary-fixed-dim">All written by people</p>
+              <h2 class="font-headline-lg text-[34px] font-semibold leading-tight tracking-tight sm:text-[44px]">Nothing on the screen was invented.</h2>
+              <p class="mt-md font-body-lg text-body-lg text-inverse-on-surface/80">There&rsquo;s no chatbot and no model behind any screen. Every guide, style and step ships inside the app; it filters and ranks what it already has against the profile you filled in.</p>
+            </div>
+            <!-- Ask, replayed: a question typed, and the written card Ask answers it with,
+                 word for word. Filled by main.ts from askDemo (vite.site.config.ts), so it
+                 changes when hair-check.ts does. Decorative, and absent without scripts. -->
+            <div id="ask-demo" data-reveal style="--d: 120ms" class="hidden rounded-[32px] bg-surface-container-low p-lg text-on-surface shadow-2xl shadow-black/30" aria-hidden="true">
+              <p class="font-headline-md text-[20px] font-bold leading-tight text-primary">What&rsquo;s your hair saying?</p>
+              <div class="mt-md flex items-center gap-sm rounded-full bg-surface-container-lowest py-1.5 pl-md pr-1.5 shadow-card">
+                <span class="min-w-0 flex-1 truncate font-body-md text-[15px]"><span data-ask-typed></span><span data-ask-caret class="ask-caret">|</span><span data-ask-placeholder class="text-on-surface-variant">Type how your hair feels&hellip;</span></span>
+                <span data-ask-send class="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-secondary text-on-secondary transition-transform duration-150"><svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><use href="#i-send" /></svg></span>
+              </div>
+              <div class="mt-md min-h-[300px]">
+                <div data-ask-step class="ask-step ml-auto w-fit max-w-[85%] rounded-[20px] rounded-br-md bg-brand-chocolate px-md py-sm font-body-md text-[15px] text-inverse-on-surface" data-ask-bubble></div>
+                <div data-ask-step class="ask-step mt-md rounded-3xl bg-surface-container-lowest p-md shadow-card">
+                  <p class="font-label-md text-[11px] uppercase tracking-[0.14em] text-on-surface-variant">Quick Hair Check</p>
+                  <p class="mt-1 font-headline-md text-[17px] font-bold text-primary" data-ask-title></p>
+                  <p class="mt-sm font-body-md text-[13.5px] leading-snug text-on-surface-variant" data-ask-problem></p>
+                  <ul class="mt-sm space-y-1" data-ask-solutions></ul>
+                  <p class="mt-1 pl-6 font-caption text-[12px] text-on-surface-variant" data-ask-more></p>
+                </div>
+              </div>
+            </div>
           </div>
           <dl class="grid grid-cols-2 gap-px overflow-hidden rounded-3xl bg-white/10 lg:grid-cols-4">
             <div data-reveal style="--d: 0ms" class="flex flex-col-reverse justify-end bg-brand-chocolate p-lg sm:p-xl">
@@ -290,7 +313,7 @@
               <div class="absolute -right-16 -top-16 h-48 w-48 rounded-full bg-secondary-container/50 transition-transform duration-700 group-hover:scale-125"></div>
               <span class="relative mb-lg grid h-14 w-14 place-items-center rounded-2xl bg-primary-container text-on-primary-container"><svg class="h-7 w-7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-styles" /></svg></span>
               <h3 class="relative mb-sm font-headline-lg text-[28px] font-semibold text-primary">Loose Natural Hair</h3>
-              <p class="relative mb-lg font-body-md text-body-md text-on-surface-variant">Personalised care and styling for your natural coils, curls, and kinks.</p>
+              <p class="relative mb-lg font-body-md text-body-md text-on-surface-variant">Personalised care and styling for your natural coils and kinks.</p>
               <ul class="relative space-y-sm">
                 <li class="flex gap-sm font-body-md text-body-md text-on-surface"><svg class="mt-1 h-4 w-4 shrink-0 text-secondary" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-check" /></svg>%count.styles% contributed styles, by time, category and occasion</li>
                 <li class="flex gap-sm font-body-md text-body-md text-on-surface"><svg class="mt-1 h-4 w-4 shrink-0 text-secondary" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-check" /></svg>Detangling, wash day and night-routine guides</li>
@@ -547,7 +570,7 @@
           <div class="mt-2 grid grid-cols-2 gap-2">
             <div class="rounded-xl bg-surface-container-lowest p-2.5"><p class="text-[10px] text-on-surface-variant">Hair porosity</p><p class="font-headline-md text-[14px] font-semibold text-on-surface">Low</p></div>
             <div class="rounded-xl bg-surface-container-lowest p-2.5"><p class="text-[10px] text-on-surface-variant">Hair density</p><p class="font-headline-md text-[14px] font-semibold text-on-surface">Medium</p></div>
-            <div class="rounded-xl bg-surface-container-lowest p-2.5"><p class="text-[10px] text-on-surface-variant">Curl pattern</p><p class="font-headline-md text-[14px] font-semibold text-on-surface">4C · Coily</p></div>
+            <div class="rounded-xl bg-surface-container-lowest p-2.5"><p class="text-[10px] text-on-surface-variant">Coil pattern</p><p class="font-headline-md text-[14px] font-semibold text-on-surface">4C · Coily</p></div>
             <div class="rounded-xl bg-surface-container-lowest p-2.5"><p class="text-[10px] text-on-surface-variant">Hair texture</p><p class="font-headline-md text-[14px] font-semibold text-on-surface">Fine</p></div>
           </div>
           <div class="mt-3 space-y-2">
@@ -600,7 +623,7 @@
             <span class="rounded-xl bg-surface-container-lowest py-2.5 text-center text-[12px] font-semibold text-on-surface">Locs</span>
           </div>
           <div class="mt-3 space-y-1.5">
-            <div class="flex justify-between rounded-lg bg-surface-container-lowest px-3 py-2 text-[12px]"><span class="text-on-surface-variant">Curl Pattern</span><span class="font-semibold text-on-surface">4C</span></div>
+            <div class="flex justify-between rounded-lg bg-surface-container-lowest px-3 py-2 text-[12px]"><span class="text-on-surface-variant">Coil Pattern</span><span class="font-semibold text-on-surface">4C</span></div>
             <div class="flex justify-between rounded-lg bg-surface-container-lowest px-3 py-2 text-[12px]"><span class="text-on-surface-variant">Porosity</span><span class="font-semibold text-on-surface">Low</span></div>
             <div class="flex justify-between rounded-lg bg-surface-container-lowest px-3 py-2 text-[12px]"><span class="text-on-surface-variant">Density</span><span class="font-semibold text-on-surface">Medium</span></div>
             <div class="flex justify-between rounded-lg bg-surface-container-lowest px-3 py-2 text-[12px]"><span class="text-on-surface-variant">Scalp</span><span class="font-semibold text-on-surface">Balanced</span></div>

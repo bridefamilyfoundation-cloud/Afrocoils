@@ -72,6 +72,21 @@ function facts() {
       .map((s) => ({ name: s.name, minutes: s.minutes })),
   }))
 
+  /* The Ask demo in the "written by people" section: one question, and the
+     Quick Hair Check card Ask answers it with, built the way Ask titles it
+     (the group's heading completed by the concern's label). */
+  const ASK_QUESTION = 'my edges are thinning'
+  const askGroup = HAIR_CHECK.find((group) => group.concerns.some((c) => c.id === 'edges-thinning'))
+  const askConcern = askGroup?.concerns.find((c) => c.id === 'edges-thinning')
+  if (!askGroup || !askConcern) throw new Error('The site\'s Ask demo needs the edges-thinning entry in src/content/hair-check.ts.')
+  const askDemo = {
+    question: ASK_QUESTION,
+    title: `${askGroup.heading.replace(/…$/, '')} ${askConcern.label.toLowerCase()}`,
+    problem: askConcern.problem,
+    solutions: askConcern.solutions.slice(0, 3),
+    more: Math.max(0, askConcern.solutions.length - 3),
+  }
+
   const tokens: Record<string, string> = {
     'release.version': release.version,
     'release.versionCode': String(release.versionCode),
@@ -95,7 +110,7 @@ function facts() {
     ).join(''),
   }
 
-  return { release, bands, tokens }
+  return { release, bands, askDemo, tokens }
 }
 
 function siteFacts(): Plugin {
@@ -105,9 +120,9 @@ function siteFacts(): Plugin {
     resolveId: (id) => (id === VIRTUAL ? `\0${VIRTUAL}` : undefined),
     load(id) {
       if (id !== `\0${VIRTUAL}`) return
-      const { release: { download, ...release }, bands } = facts()
+      const { release: { download, ...release }, bands, askDemo } = facts()
       const visible = { ...release, url: download ?? release.url }
-      return `export const release = ${JSON.stringify(visible)}\nexport const bands = ${JSON.stringify(bands)}\n`
+      return `export const release = ${JSON.stringify(visible)}\nexport const bands = ${JSON.stringify(bands)}\nexport const askDemo = ${JSON.stringify(askDemo)}\n`
     },
     transformIndexHtml(html) {
       const { tokens } = facts()
