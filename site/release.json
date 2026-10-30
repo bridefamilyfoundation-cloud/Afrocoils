@@ -14,15 +14,14 @@
     "Hair Growth: retention fitted at the afro-textured rate, trims logged"
   ],
   "bundle": {
-    "code": 7,
-    "minVersionCode": 9,
-    "bytes": 4776431,
-    "sha256": "143099bac2c4b1c950e12e9e15f3628770eec8ce790b3ee568080f56647b0ce9",
-    "released": "2026-10-26",
-    "url": "https://runhkccoeyxfgsfrzezn.supabase.co/storage/v1/object/public/releases/bundles/7.zip",
+    "code": 8,
+    "minVersionCode": 10,
+    "bytes": 4517362,
+    "sha256": "02d72a97efae994e1fc66c2831b93fc5061166b7ff282a06f8d0cd66eb39dc6a",
+    "released": "2026-10-30",
+    "url": "https://runhkccoeyxfgsfrzezn.supabase.co/storage/v1/object/public/releases/bundles/8.zip",
     "notes": [
-      "Hair Growth: retention now uses the afro-textured growth rate and every check",
-      "Log a trim with a length check so it never counts as breakage"
+      "Written for Type 4 hair: coil patterns 4A to 4C, and coils throughout"
     ]
   }
 }
