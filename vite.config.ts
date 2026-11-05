@@ -78,13 +78,12 @@ export default defineConfig(({ mode }) => {
        * is discovered by a reviewer.
        */
       proxy: process.env.DEV_API_PROXY
-        ? {
-            '/submissions': {
-              target: process.env.DEV_API_PROXY,
-              changeOrigin: true,
-              secure: true,
-            },
-          }
+        ? Object.fromEntries(
+            ['/submissions', '/questions', '/auth', '/billing'].map((path) => [
+              path,
+              { target: process.env.DEV_API_PROXY, changeOrigin: true, secure: true },
+            ]),
+          )
         : undefined,
     },
   }

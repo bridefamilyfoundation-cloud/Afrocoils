@@ -9,6 +9,9 @@
     },
     {
       "path": "./tsconfig.site.json"
+    },
+    {
+      "path": "./admin"
     }
   ]
 }

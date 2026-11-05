@@ -16,6 +16,10 @@ const DEFAULT_ALLOWED_ORIGINS = [
   'https://localhost',
   'capacitor://localhost',
   'http://localhost:5173',
+  // The admin site (admin/). Its requests carry an admin token, which is
+  // the access control; this only lets its browser read the answers.
+  'https://admin.afrocoils.app',
+  'http://localhost:5174',
 ]
 
 export function corsHeaders(origin: string | undefined): Record<string, string> {
@@ -24,8 +28,9 @@ export function corsHeaders(origin: string | undefined): Record<string, string> 
     ...(env('ALLOWED_ORIGINS')?.split(',').map((o) => o.trim()) ?? []),
   ]
   const headers: Record<string, string> = {
-    'Access-Control-Allow-Methods': 'POST, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type',
+    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+    // Authorization carries a member or admin token (`_shared/token.ts`).
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
     'Access-Control-Max-Age': '86400',
     Vary: 'Origin',
     // Every response here is about one request and is never worth

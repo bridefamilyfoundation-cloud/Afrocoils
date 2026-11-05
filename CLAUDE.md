@@ -46,6 +46,29 @@ picture; this file is the short version of what to keep in mind when editing.
   `autoUpdate` on. `markBundleHealthy()` runs from `UpdatePrompt`'s first
   effect so a bundle that crashes on load is rolled back; keep it after the
   first render, not before. A Play build leaves the manifest URL unset.
+- **Every feature is for paying members (decided 2026-11-05).** A phone
+  without a paid membership shows the front page — the collage, the
+  title, and "Inside AfroCoils", the six sections *described* from
+  `content/membership.ts`, not linked — plus `/join` and the legal
+  pages. Nothing else: no drawer, no tab bar, no Ask, no tour.
+  `AppLayout`'s `lockedCanOpen()` is the one gate; every other address
+  redirects to `/join`. The front page's own button is "Explore more
+  features", which leads there. A member is an **email address**,
+  confirmed with a six-digit code (`auth`), paid as a **monthly Paystack
+  subscription** started on Paystack's page in the browser (`billing`),
+  and recorded in `members` (migration 0005). `membershipOpen()` in
+  `types.ts` is the access rule on both sides — paid-until plus
+  `MEMBERSHIP_GRACE_DAYS` — and the phone keeps the answer on the
+  profile (`membership`) so the app still opens with no signal once
+  signed in. `MembershipSync` re-asks on launch and on return (always
+  while locked, at most every 12h while open); a 401 signs out, and
+  signing out never touches the hair profile. The price lives in the
+  Paystack plan, never in code. An earlier one-off "AfroCoils Plus" with
+  per-feature locks shipped in test mode in pushed update 8 and was
+  removed: `plus` is a legacy key, dropped on load. Don't reintroduce
+  per-feature locks — the whole app is the product. A Play build cannot
+  use this flow as it stands (see `docs/play-release.md`). Setup:
+  `docs/membership-setup.md`.
 - **No tracking, and one deliberate, anonymous exception: Ask questions.**
   Google Analytics was considered and declined on 2026-09-11 (`gtag.js`
   is a remote script, and the app promised to collect nothing). On
@@ -58,7 +81,10 @@ picture; this file is the short version of what to keep in mind when editing.
   default, switched off on About (`askSharing`), disclosed under every
   Ask box, kept twelve months. The privacy policy, FAQ, About, Docs, the
   landing site (`site/`) and `docs/play-release.md`'s data-safety note
-  all say exactly this. Adding a field to that request, a second kind of
+  all say exactly this. **The membership token never rides on an Ask
+  question** — the question stays anonymous because nothing in it says
+  who asked; attaching the token would make every question a member's.
+  Adding a field to that request, a second kind of
   usage data, an analytics SDK or an identifier means rewriting those
   pages in the same commit — policy first. The landing site holds itself
   to no analytics, no cookies, nothing loaded from another origin — its
@@ -277,10 +303,11 @@ picture; this file is the short version of what to keep in mind when editing.
   live in `src/lib/types.ts`; both sides import them so a shape change
   fails typecheck.
 - **`bio` is not `identity`.** `identity` is facts about the hair;
-  `bio` is name, photo and climate. None of the profile crosses the wire
-  — the requests carrying anything the user wrote are a style submission,
-  built from the submit form, and an Ask question, which is the typed
-  words only. Climate is a picker over
+  `bio` is name, photo and climate. None of the hair profile crosses the
+  wire. What does: the membership email and code (`auth`) and the token
+  on a status check — never joined to anything about the hair — a style
+  submission, built from the submit form, and an Ask question, which is
+  the typed words only. Climate is a picker over
   `CLIMATES` rather than free text, which is why it is four coarse bands
   rather than a city.
 - The hair quiz (`src/lib/quiz.ts`, `/quiz`) and the pickers on the
@@ -549,19 +576,33 @@ picture; this file is the short version of what to keep in mind when editing.
    button and an Ask AI FAB in it. Those are history, not a spec — the app
    has no assistant. Re-tone any cool colour it brings with it, too.
 
-## The two server routes
+## The server routes
 
 `supabase/functions/submissions/` receives a style offered to the
 community library; `supabase/functions/questions/` records an Ask
-question (204, no body, never waited on). They are the only server code
-— there is no model client, no prompt and no `ANTHROPIC_API_KEY`. Under
+question (204, no body, never waited on). `auth/` sends and checks
+sign-in codes and answers membership status; `billing/` starts a
+Paystack checkout, opens the manage page and receives Paystack's webhook
+(believed only on a matching `x-paystack-signature`); `inbound/` takes
+Resend's `email.received` webhook (Svix signature) and files mail to
+support@ and hello@ as text; `admin/` serves admin.afrocoils.app behind
+an admin token *and* the `ADMIN_EMAILS` list. That is all the server
+code — there is no model client, no prompt and no `ANTHROPIC_API_KEY`.
+Tokens are our own HMAC (`_shared/token.ts`, `AUTH_SECRET`); codes are
+stored only as an HMAC, ten minutes, five tries. `auth/request-code`
+answers 204 whoever asks, so it cannot be used to find members or
+admins. Under
 `_shared/`: `cors.ts` is the CORS policy, `limits.ts` the per-route
 counters, `store.ts` the records and the
-photographs, `supabase.ts` the connection all three use, and `env.ts` the
+photographs, `supabase.ts` the connection all of them use, `members.ts`,
+`paystack.ts` and `email.ts` the three new concerns, and `env.ts` the
 two Deno globals, declared so `tsc -b` checks these files with the app.
 Keep them to web APIs (`fetch`, `crypto`, `atob`) — no `Buffer`, no
 `process`. It moved here from a Vercel function on 2026-10-21; Vercel now
-builds only the landing page. Deploy with `npm run backend:deploy` (JWT
+builds only the landing page and, as a second project rooted at `admin/`,
+the admin site (`npm run admin:build`, its own `vercel.json` and CSP,
+noindexed). The admin approves submissions as a *decision* only — a
+library entry is still written by hand with steps. Deploy with `npm run backend:deploy` (JWT
 verification off: the app holds no Supabase key to present).
 
 **The backend is one Supabase project**, `runhkccoeyxfgsfrzezn`, and the

@@ -634,21 +634,105 @@ export interface UpdateSettings {
   dismissedBundleCode?: number
 }
 
-/**
- * AfroCoils Plus, the one-off unlock (see lib/plus.ts).
+/* ------------------------------------------------------------------ *
+ * Membership
  *
- * `via: 'test'` is the stand-in purchase used until real billing is
- * wired in, and is the only value today. A real purchase will record the
- * store it came from, and whether it is honoured will be the server's
- * decision, not this field's: anything on the phone can be edited.
+ * Every feature is for paying members (decided 2026-11-05). A member is
+ * an email address: it is confirmed with a six-digit code sent from
+ * no-reply@afrocoils.app, paid for as a monthly Paystack subscription,
+ * and recorded in the `members` table (migration 0005). The `auth`
+ * function issues a signed token for a confirmed address and answers
+ * how long that address is paid up to; the `billing` function starts a
+ * checkout and receives Paystack's webhook. Both import these types, so
+ * a shape change fails typecheck on whichever side forgot.
+ *
+ * The phone keeps the answer — `Membership` on the profile — so the app
+ * works with no signal for as long as the membership is paid, and asks
+ * again when it has signal (`lib/membership.ts`).
+ * ------------------------------------------------------------------ */
+
+/**
+ * Paystack's subscription states, plus `none` for an address that has
+ * never subscribed. `non-renewing` still has access until `paidUntil`;
+ * `attention` is a failed renewal Paystack is retrying.
  */
-export interface PlusEntitlement {
-  via: 'test' | 'play'
-  unlockedISO: string
+export const MEMBER_STATUSES = ['active', 'non-renewing', 'attention', 'cancelled', 'none'] as const
+export type MemberStatus = (typeof MEMBER_STATUSES)[number]
+
+/**
+ * Days of access past `paidUntil`. Paystack charges on the renewal date
+ * and can take a day or two to retry a failed card; nobody should be
+ * locked out of their own routine by that. Server and phone use the same
+ * number.
+ */
+export const MEMBERSHIP_GRACE_DAYS = 3
+
+/** Whether a paid-until date still opens the app at `now`. The one rule, on both sides. */
+export function membershipOpen(paidUntilISO: string | null | undefined, now: Date = new Date()): boolean {
+  if (!paidUntilISO) return false
+  const until = Date.parse(paidUntilISO)
+  if (!Number.isFinite(until)) return false
+  return now.getTime() < until + MEMBERSHIP_GRACE_DAYS * 86_400_000
+}
+
+/** What the phone remembers about its member. Absent: signed out. */
+export interface Membership {
+  email: string
+  /** Signed by the `auth` function. Proves the address was confirmed; carries no payment state. */
+  token: string
+  status: MemberStatus
+  /** The end of the paid period, from the server. Null: never paid. */
+  paidUntilISO: string | null
+  /** When the server last answered. */
+  checkedISO: string
+}
+
+export type CodePurpose = 'member' | 'admin'
+
+/** POST auth/request-code. Always answers 204, member or not, so it says nothing about who is one. */
+export interface RequestCodeRequest {
+  email: string
+  purpose: CodePurpose
+}
+
+/** POST auth/verify. */
+export interface VerifyCodeRequest {
+  email: string
+  code: string
+  purpose: CodePurpose
+}
+
+/** The monthly plan, as Paystack holds it. `amount` is in the currency's minor unit (kobo). */
+export interface PlanPrice {
+  amount: number
+  currency: string
+  interval: string
+}
+
+/** auth/verify and auth/status (Bearer token) for a member. */
+export interface MembershipResponse {
+  email: string
+  token: string
+  status: MemberStatus
+  paidUntilISO: string | null
+  /** Present when the address is not paid up, so the join screen can say what it costs. */
+  price?: PlanPrice | null
+}
+
+/** auth/verify for an admin. */
+export interface AdminSessionResponse {
+  email: string
+  token: string
+  expiresISO: string
+}
+
+/** POST billing/checkout and billing/manage (Bearer token): a Paystack page to open in the browser. */
+export interface BillingLinkResponse {
+  url: string
 }
 
 /** The persisted document. Versioned so migrations stay mechanical. */
-export const PROFILE_VERSION = 10
+export const PROFILE_VERSION = 11
 
 export interface HairProfile {
   version: number
@@ -688,8 +772,13 @@ export interface HairProfile {
    * replaying it from the menu or the documentation page leaves this alone.
    */
   tourSeenISO?: string
-  /** Present once Plus is unlocked. Absent is the free app. */
-  plus?: PlusEntitlement
+  /**
+   * The signed-in member: email, token and how long they are paid up.
+   * Absent is signed out, which shows the front page and the join
+   * screen and nothing else. The email is the one thing on the profile
+   * that leaves the phone — to `auth` and `billing`, never to Ask.
+   */
+  membership?: Membership
   createdISO: string
   updatedISO: string
 }

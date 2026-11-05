@@ -394,7 +394,7 @@ export const TOPICS: AskTopic[] = [
     id: 'delete-data',
     title: 'Delete your data',
     answer:
-      'Your profile, photos and history are stored on this phone and nowhere else, with no account to close. Uninstalling the app deletes everything on the phone. Questions you shared with Ask are anonymous, so they cannot be traced back to you; they are deleted after twelve months, and you can stop sharing under About.',
+      'Your profile, photos and history are stored on this phone and nowhere else. Uninstalling the app deletes everything on the phone. Your membership is your email: to have it removed, cancel the membership and write to support@afrocoils.app. Questions you shared with Ask are anonymous, so they cannot be traced back to you; they are deleted after twelve months, and you can stop sharing under About.',
     route: '/legal/privacy',
     cta: 'Read the privacy policy',
     docs: 'data',
@@ -483,10 +483,20 @@ export const TOPICS: AskTopic[] = [
   {
     id: 'contact',
     title: 'Contact the people who make the app',
-    answer: 'Contact is the way to reach the people who make it.',
+    answer: 'Write to support@afrocoils.app about signing in, payments or something not working, and to hello@afrocoils.app about anything else. A person reads both.',
     route: '/legal/contact',
     cta: 'Contact us',
     keys: 'contact you|email you|talk to someone|talk to a person|customer service|report a bug|send feedback|who made this',
+  },
+  {
+    id: 'membership',
+    title: 'Your membership',
+    answer:
+      'Your membership is your email, and it is monthly. My Hair Profile shows when it renews, and Manage or cancel opens Paystack’s page to change the card or cancel; the app stays open to the end of the month you paid for. On a new phone, sign in with the same email. Sign out is there too, and leaves your hair profile on the phone.',
+    route: '/profile',
+    cta: 'Open My Hair Profile',
+    docs: 'membership',
+    keys: 'my membership|my subscription|cancel my subscription|cancel membership|stop paying|change my card|update my card|renew|renewal|sign out|log out|new phone|sign in on another phone|how much is it|price|paystack|refund',
   },
   {
     id: 'terms',

@@ -27,11 +27,21 @@ export interface Faq {
 
 export const FAQS: Faq[] = [
   {
+    id: 'membership',
+    q: 'Why do I need a membership?',
+    keys: 'why do i have to pay|how much does it cost|is it free|membership|subscription|subscribe|sign in|log in|login|cancel my subscription|renew|paystack|how do i pay|price',
+    a: [
+      'Every feature of AfroCoils is for members. Membership is monthly and paid by card on Paystack’s page; the price is shown before you pay, and it pays for writing the guides and keeping the app going. Your email is your membership: enter it on the Become a member screen, type in the six-digit code we send, and pay. To use it on a new phone, sign in with the same email. Cancel any time from My Hair Profile — the app stays open to the end of the month you paid for. Once signed in it works with no signal. The ',
+      { to: '/legal/terms', label: 'terms' },
+      ' have the details.',
+    ],
+  },
+  {
     id: 'data',
     q: 'Where is my data kept?',
     keys: 'where is my data stored|where is my information|who can see my data|is my data safe|do you collect data|do you sell my data|is my profile private|are my questions saved|do you read my questions|turn off sharing',
     a: [
-      'Your hair profile, length history, calendar, photos and saved styles are kept on this phone, in one document, and nowhere else — there is no account, no sign-in and no server holding any of it. Uninstalling the app deletes it. Two things do leave the phone. The questions you type into Ask are sent anonymously — just the words and what Ask answered, with nothing from your profile and no identifier — so we can see what people ask and write the answers that are missing; they are kept for up to twelve months, and you can switch sharing off under About. And a style you deliberately contribute, covered in the last question. Both are in the ',
+      'Your hair profile, length history, calendar, photos and saved styles are kept on this phone, in one document, and nowhere else — no server holds any of it, and none of it is linked to your membership. Uninstalling the app deletes it. Your membership is your email: we keep it, whether it is paid up, and the record of your payments, while Paystack holds your card. Beyond signing in and paying, two things leave the phone. The questions you type into Ask are sent anonymously — just the words and what Ask answered, with nothing from your profile and no identifier — so we can see what people ask and write the answers that are missing; they are kept for up to twelve months, and you can switch sharing off under About. And a style you deliberately contribute, covered in the last question. Both are in the ',
       { to: '/legal/privacy', label: 'privacy policy' },
       '. The app also asks our update server whether a newer version or update is out — a request that carries nothing about you, and that you can switch off under About.',
     ],

@@ -1,10 +1,8 @@
 import { Link } from 'react-router-dom'
 import Icon from './Icon'
-import { PlusCard } from './Plus'
 import { COMMUNITY, NONE_DOOR } from '../content/ask'
 import type { AskPoints } from '../lib/ask/corpus'
 import type { AskForYou, AskHit, AskReply } from '../lib/ask/engine'
-import { askDocLocked, usePlus } from '../lib/plus'
 
 /**
  * One reply from Ask, drawn the same way wherever Ask is opened — the
@@ -179,10 +177,6 @@ function AnswerCard({
   // One list, not every list the source has: the card is the answer,
   // and the full page is one tap away.
   const points = doc.points[0]
-  // A Plus section is still found, never hidden: its title and first
-  // line show, then the way in. A caution is safety and shows in full.
-  const { unlocked } = usePlus()
-  const locked = askDocLocked(doc.id, unlocked)
   return (
     <article className="rounded-2xl bg-surface-container-lowest p-lg shadow-card">
       {doc.kind !== 'answer' && (
@@ -201,17 +195,7 @@ function AnswerCard({
         </p>
       )}
 
-      {locked ? (
-        <>
-          {points && points.items[0] && (
-            <p className="mb-md font-body-md text-body-md text-on-surface-variant">
-              {points.items[0]}
-            </p>
-          )}
-          <PlusCard trigger="ask" title="Part of Plus" body="The full answer is in Locs World." />
-        </>
-      ) : (
-        points &&
+      {points &&
         (pending ? (
           <TopicList points={points} />
         ) : (
@@ -219,8 +203,7 @@ function AnswerCard({
           // show (five at most, by how they are written). A quoted guide
           // shows its first few; the page behind the button has the rest.
           <PointList points={points} onPage={doc.kind !== 'answer'} />
-        ))
-      )}
+        ))}
 
       {forYou.length > 0 && (
         <div className="mb-md rounded-xl bg-surface-container p-md">
@@ -236,7 +219,7 @@ function AnswerCard({
         </div>
       )}
 
-      {!locked && <PrimaryLink to={doc.route} label={doc.cta} />}
+      <PrimaryLink to={doc.route} label={doc.cta} />
     </article>
   )
 }

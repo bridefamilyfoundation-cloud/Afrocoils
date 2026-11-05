@@ -38,6 +38,7 @@ const AboutScreen = lazy(() => import('./screens/AboutScreen'))
 const LegalScreen = lazy(() => import('./screens/LegalScreen'))
 const QuizScreen = lazy(() => import('./screens/QuizScreen'))
 const AskScreen = lazy(() => import('./screens/AskScreen'))
+const JoinScreen = lazy(() => import('./screens/JoinScreen'))
 
 export default function App() {
   return (
@@ -115,6 +116,10 @@ export default function App() {
                 the app bar on every screen. A way into the six sections,
                 not a seventh, so it has no drawer entry and no tab. */}
             <Route path="/ask" element={<AskScreen />} />
+            {/* Joining, paying and signing in: one flow, and with the
+                front page and the legal pages the only screen a phone
+                without a paid membership can open (AppLayout's gate). */}
+            <Route path="/join" element={<JoinScreen />} />
           </Route>
 
           {/* Older links and saved shortcuts. */}

@@ -435,24 +435,64 @@ const SECTIONS: {
       <>
         <p>
           Your profile, length checks, calendar, photos and saved styles are stored on this
-          phone and nowhere else. There is no account, no sign-in and no tracking.
-          Uninstalling the app deletes everything on the phone.
+          phone and nowhere else, and none of it is tied to your membership. There is no
+          tracking. Uninstalling the app deletes everything on the phone.
         </p>
         <p>
-          Three things leave the phone. The questions you type into Ask, sent anonymously (the
-          words and what Ask answered, nothing from your profile, no identifier) so the team
-          can write the answers people are missing, kept for up to twelve months; switch this
-          off under About. A style you choose to contribute, when it is sent. And the update
-          check described below, which carries nothing about you.
+          Your membership is your email address. Signing in sends it, then the code; paying
+          happens on Paystack&rsquo;s page; and while you are signed in the app checks at
+          most twice a day that the membership is still paid, sending only your sign-in token.
+          Beyond that, three things leave the phone. The questions you type into Ask, sent
+          anonymously (the words and what Ask answered, nothing from your profile, not your
+          email, no identifier) so the team can write the answers people are missing, kept for
+          up to twelve months; switch this off under About. A style you choose to contribute,
+          when it is sent. And the update check described below, which carries nothing about
+          you.
         </p>
         <p>
-          Everything you read ships inside the app, so it all works with no signal, including
-          in aeroplane mode. Ask answers on the phone too; with no signal, the question simply
-          is not shared.
+          Everything you read ships inside the app, so once you are signed in it all works
+          with no signal, including in aeroplane mode. Ask answers on the phone too; with no
+          signal, the question simply is not shared.
         </p>
       </>
     ),
     links: [{ to: '/legal/privacy', label: 'Privacy policy' }],
+  },
+  {
+    id: 'membership',
+    icon: 'workspace_premium',
+    title: 'Membership',
+    body: (
+      <>
+        <p>
+          Every section of the app is for members. Without a membership the app shows its
+          front page and what is inside it, and Explore more features leads to Become a
+          member.
+        </p>
+        <p>
+          Your email is your membership. Enter it, type in the six-digit code we email you,
+          and pay the monthly membership by card on Paystack&rsquo;s page, which opens in
+          your browser. Come back to the app and it opens by itself once the payment is
+          through; I&rsquo;ve paid &mdash; check again asks straight away. On a new phone,
+          sign in with the same email and skip the payment.
+        </p>
+        <p>
+          My Hair Profile shows the email, when the membership renews, Manage or cancel
+          (Paystack&rsquo;s page for the card and for cancelling) and Sign out. Cancelling
+          keeps the app open to the end of the month you paid for. A failed renewal leaves it
+          open for three more days while Paystack retries the card. Signing out, or a
+          membership ending, locks the app but leaves your hair profile on the phone.
+        </p>
+        <p>
+          Once signed in, the app needs no signal. It checks the membership when it opens and
+          when you come back to it, at most twice a day, whenever it has a connection.
+        </p>
+      </>
+    ),
+    links: [
+      { to: '/profile', label: 'My Hair Profile' },
+      { to: '/legal/terms', label: 'Terms of Service' },
+    ],
   },
   {
     id: 'updates',

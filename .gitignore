@@ -49,3 +49,6 @@ supabase/.temp/
 
 # Ask study reports: questions people typed. Never commit them.
 ask-study/
+
+# Admin site build output (admin/, its own Vercel project)
+admin/dist/

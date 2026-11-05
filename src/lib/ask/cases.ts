@@ -163,6 +163,12 @@ export const CASES: AskCase[] = [
   { q: 'what stage are my locs', hair: X, expect: ['topic:loc-stage'], top: true },
   { q: 'change my profile picture', expect: ['topic:bio'], top: true },
   { q: 'contact support', expect: ['topic:contact'], top: true },
+  // --- Membership (every feature is for members, from 2026-11-05) ---
+  { q: 'how do I cancel my subscription', expect: ['topic:membership'], top: true },
+  { q: 'change my card', expect: ['topic:membership'], top: true },
+  { q: 'how much does it cost', expect: ['topic:membership', 'faq:membership'], top: true },
+  { q: 'sign in on my new phone', expect: ['topic:membership', 'faq:membership'], top: true },
+  { q: 'why do I have to pay', expect: ['faq:membership', 'topic:membership'], top: true },
   { q: 'how are styles recommended', expect: ['topic:recommendations'], top: true },
 
   // --- Typos ---

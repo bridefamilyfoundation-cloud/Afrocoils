@@ -1,8 +1,16 @@
 import { Preferences } from '@capacitor/preferences'
 import { STYLES } from '../content/styles'
 import { deletePhoto } from './photos'
-import type { CareSchedule, HairIdentity, HairProfile, HairTexture, MyStyle } from './types'
-import { CURL_PATTERNS, PROFILE_VERSION, defaultSchedules } from './types'
+import type {
+  CareSchedule,
+  HairIdentity,
+  HairProfile,
+  HairTexture,
+  MemberStatus,
+  Membership,
+  MyStyle,
+} from './types'
+import { CURL_PATTERNS, MEMBER_STATUSES, PROFILE_VERSION, defaultSchedules } from './types'
 
 /**
  * Persistence for the hair profile.
@@ -104,11 +112,9 @@ function migrate(stored: unknown): HairProfile {
         : base.updates,
     // v9 → v10. On, like a new install; the switch is on About.
     askSharing: typeof s.askSharing === 'boolean' ? s.askSharing : base.askSharing,
-    // Optional, so nothing to backfill; a malformed value is the free app.
-    plus:
-      typeof s.plus === 'object' && s.plus !== null && typeof s.plus.unlockedISO === 'string'
-        ? s.plus
-        : undefined,
+    // v10 → v11. Optional; anything malformed is signed out, and the
+    // server is asked again on the next sign-in.
+    membership: validMembership(s.membership),
     createdISO: s.createdISO ?? base.createdISO,
   }
 
@@ -139,7 +145,25 @@ const LEGACY_KEYS = [
   'tryOnFace',
   'tryOnConsent',
   'welcomeSeenISO',
+  // AfroCoils Plus, the one-off unlock that shipped in test mode in
+  // pushed update 8. Replaced by membership; a test unlock opens nothing.
+  'plus',
 ] as const
+
+function validMembership(value: unknown): Membership | undefined {
+  if (typeof value !== 'object' || value === null) return undefined
+  const m = value as Partial<Membership>
+  if (typeof m.email !== 'string' || typeof m.token !== 'string') return undefined
+  return {
+    email: m.email,
+    token: m.token,
+    status: (MEMBER_STATUSES as readonly string[]).includes(m.status as string)
+      ? (m.status as MemberStatus)
+      : 'none',
+    paidUntilISO: typeof m.paidUntilISO === 'string' ? m.paidUntilISO : null,
+    checkedISO: typeof m.checkedISO === 'string' ? m.checkedISO : new Date(0).toISOString(),
+  }
+}
 
 /**
  * Photo filenames left behind by the try-on feature.

@@ -26,7 +26,7 @@
 import { corsHeaders } from './cors.ts'
 import { rpc, supabaseConfig } from './supabase.ts'
 
-type RouteName = 'submissions' | 'questions'
+type RouteName = 'submissions' | 'questions' | 'auth-code' | 'auth-verify' | 'auth-status' | 'billing' | 'admin'
 
 interface RouteLimits {
   /** Requests from one address within `windowS`. */
@@ -50,6 +50,32 @@ const LIMITS: Record<RouteName, RouteLimits> = {
   // thirty in five minutes is already more than anyone types. The daily
   // ceiling keeps a script from filling the table the study reads.
   questions: { perIp: 30, windowS: 300, perDay: 20000 },
+  // Each code is an email Resend sends and bills; five in ten minutes is
+  // someone who cannot find the first one. The daily ceiling is the
+  // sending budget, and `checkKeyLimit` caps each address on top.
+  'auth-code': { perIp: 5, windowS: 600, perDay: 2000 },
+  // Five wrong guesses also burn the code itself (bump_login_attempt).
+  'auth-verify': { perIp: 20, windowS: 600, perDay: 10000 },
+  // The phone asks at most twice a day and on sign-in.
+  'auth-status': { perIp: 60, windowS: 600, perDay: 50000 },
+  billing: { perIp: 20, windowS: 600, perDay: 5000 },
+  // A person paging through the queue, behind an admin token.
+  admin: { perIp: 300, windowS: 300, perDay: 50000 },
+}
+
+/**
+ * A counter on anything other than the caller's address — one email
+ * asking for codes from many addresses, say. Fails closed like
+ * `checkLimits`.
+ */
+export async function checkKeyLimit(key: string, max: number, windowS: number): Promise<boolean> {
+  try {
+    const window = Math.floor(Date.now() / 1000 / windowS)
+    return (await incr(`rl:key:${key}:${window}`, windowS)) <= max
+  } catch (error) {
+    console.error('[limits] counter store unreachable; refusing', error)
+    return false
+  }
 }
 
 async function incr(key: string, ttlSeconds: number): Promise<number> {

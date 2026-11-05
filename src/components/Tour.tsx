@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
+import { hasAccess } from '../lib/membership'
 import Icon from './Icon'
 import { useBackDismiss } from '../lib/back-button'
 import { useHairProfile } from '../lib/profile-store'
@@ -77,11 +78,12 @@ export default function Tour() {
   // never seen it. `ready` first: until the disk read resolves the
   // profile is empty, and an empty profile has never seen anything.
   useEffect(() => {
-    if (offered.current || !ready || profile.tourSeenISO) return
+    // Members only: the tour walks through sections a locked phone cannot open.
+    if (offered.current || !ready || profile.tourSeenISO || !hasAccess(profile.membership)) return
     if (!FRONT.includes(pathname)) return
     offered.current = true
     startTour()
-  }, [ready, profile.tourSeenISO, pathname])
+  }, [ready, profile.tourSeenISO, profile.membership, pathname])
 
   const finish = useCallback(() => {
     endTour()

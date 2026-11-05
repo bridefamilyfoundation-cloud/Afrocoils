@@ -6,17 +6,19 @@ import Icon from '../components/Icon'
  * The footer documents.
  *
  * Privacy is written out in full, because it can be: the app's data
- * behaviour is now small enough to describe exactly — one document on
- * the device, one optional upload, Ask questions shared anonymously
- * (on by default, switched off on About), one version check that
- * carries nothing, no accounts. A policy
- * is only worth writing when it can be checked against the code, and
- * every claim below has a file behind it.
+ * behaviour is small enough to describe exactly — one document on the
+ * device, a membership by email (decided 2026-11-05: every feature is
+ * for paying members), payment on Paystack's page, one optional upload,
+ * Ask questions shared anonymously (on by default, switched off on
+ * About), one version check that carries nothing. A policy is only worth
+ * writing when it can be checked against the code, and every claim
+ * below has a file behind it.
  *
- * Terms and Contact are still deliberately empty. They need decisions
- * nobody has made (a legal entity, a jurisdiction, a support address)
- * and inventing plausible clauses would be worse than an empty page,
- * because drafted text looks finished and tends to ship.
+ * Terms carry what the code decides — what membership is, how it renews
+ * and ends — and list what is still a decision (the legal entity, the
+ * jurisdiction, the refund policy) rather than inventing it: drafted
+ * clauses look finished and tend to ship. Contact is written: the
+ * support address exists.
  *
  * **If anything about data collection changes, this page changes first.**
  * Adding an analytics SDK, a crash reporter or an account system would
@@ -27,8 +29,8 @@ import Icon from '../components/Icon'
 /** What the owner still has to supply before this is a publishable policy. */
 const OUTSTANDING = [
   'The legal entity that operates AfroCoils, and its registered address',
-  'A contact address for privacy and data requests',
   'The governing jurisdiction',
+  'How long a lapsed member’s email and payment records are kept',
   'An effective date, set when it is first published',
 ]
 
@@ -38,13 +40,16 @@ function PrivacyPolicy() {
       <section className="mb-2xl rounded-2xl shadow-card bg-surface-container-lowest p-lg">
         <h2 className="mb-sm font-headline-md text-body-lg text-on-surface">In short</h2>
         <p className="font-body-md text-body-md text-on-surface-variant">
-          AfroCoils has no accounts. Everything you enter about yourself — your hair profile,
-          length history, calendar, photographs and saved styles — is stored on your own
-          device and is never uploaded. Two things leave your phone: the questions you type
-          into Ask, sent anonymously so we can write better answers (you can switch this
+          AfroCoils is for members, and your membership is your email address. We hold that
+          email, whether and until when it is paid up, and the record of your payments; the
+          card itself is handled by Paystack and never reaches us. Everything you enter about
+          your hair — your profile, length history, calendar, photographs and saved styles —
+          stays on your own device and is never uploaded, and none of it is linked to your
+          email. Besides signing in and paying, two things leave your phone: the questions you
+          type into Ask, sent anonymously so we can write better answers (you can switch this
           off), and a style you deliberately choose to contribute to the community library.
-          Separately, the app asks our update server whether a newer version is out; that
-          request carries nothing about you, and you can switch it off too.
+          The app also asks our update server whether a newer version is out; that request
+          carries nothing about you, and you can switch it off too.
         </p>
       </section>
 
@@ -59,7 +64,42 @@ function PrivacyPolicy() {
         <p>
           None of it is transmitted anywhere, and none of it is readable by other apps.
           Uninstalling AfroCoils deletes all of it. There is no copy on a server to ask us
-          to delete, because there is no server holding one.
+          to delete, because there is no server holding one. The same document also keeps
+          your membership — your email, a sign-in token and the date you are paid up to — so
+          the app opens without signal.
+        </p>
+      </Article>
+
+      <Article title="Your membership">
+        <p>
+          <strong>Signing in.</strong> You type your email into the app and we send a
+          six-digit code to it, from no-reply@afrocoils.app, through our email provider,
+          Resend. Entering the code proves the address is yours. We keep the code only as a
+          scrambled fingerprint, for ten minutes, and the address itself in our members list.
+        </p>
+        <p>
+          <strong>Paying.</strong> Membership is a monthly subscription paid by card on
+          Paystack&rsquo;s own page, which opens in your browser. Paystack holds your card
+          details; we never see them. Paystack tells us your email, the amount, the date and
+          its own reference numbers for the payment and the subscription, and we keep those
+          so we know you are paid up and can help if something goes wrong.
+        </p>
+        <p>
+          <strong>Staying signed in.</strong> While you are signed in, the app asks our server
+          when it opens and at most twice a day whether your membership is still paid up. That
+          request carries your sign-in token and nothing else: not your hair profile, not your
+          Ask questions. We note when we last heard from your email, and nothing about what
+          you did in the app.
+        </p>
+        <p>
+          We use your email only to sign you in, to run your membership and to answer you when
+          you write to us. No newsletters, no marketing, and we never sell or share it except
+          with Paystack and Resend, to do exactly those jobs. To have it removed, cancel your
+          membership and write to{' '}
+          <a href="mailto:support@afrocoils.app" className="text-primary underline">
+            support@afrocoils.app
+          </a>
+          ; we keep the payment records the law requires us to keep.
         </p>
       </Article>
 
@@ -68,7 +108,8 @@ function PrivacyPolicy() {
           <strong>Questions you type into Ask.</strong> Each question is sent to our server as
           you ask it, together with what Ask answered (for example, which guide it showed)
           and the number of the app update you are running. That is all: no name, nothing
-          from your hair profile, no account, no advertising or device identifier. Two
+          from your hair profile, not your email or membership, no advertising or device
+          identifier. Two
           questions from the same phone cannot be linked to each other or to you. We use
           them only to see what people ask and to write the answers that are missing; we
           never sell them or use them for advertising. They are kept for up to twelve months
@@ -133,8 +174,14 @@ function PrivacyPolicy() {
             they carry no identifier.
           </li>
           <li>No crash or telemetry reporting.</li>
-          <li>No accounts, sign-in, email collection or newsletters.</li>
-          <li>No third-party SDKs that observe your use of the app.</li>
+          <li>
+            No newsletters or marketing email. Your email is for signing in, your membership
+            and replies to you, and nothing about your hair is stored with it.
+          </li>
+          <li>
+            No third-party SDKs that observe your use of the app. Paying happens on
+            Paystack&rsquo;s page in your browser, not inside the app.
+          </li>
           <li>
             No AI features. Nothing you enter is sent to a model, because the app makes no
             model calls at all.
@@ -166,12 +213,18 @@ function PrivacyPolicy() {
           hosted on Vercel and sees nothing from the app, except that a new version you choose
           to download comes from the website.
         </p>
+        <p>
+          <strong>Paystack</strong> takes your card payment and runs the monthly subscription,
+          under its own privacy policy. <strong>Resend</strong> sends the sign-in codes and our
+          replies, and receives mail you send to support@ or hello@afrocoils.app; we keep that
+          correspondence as text so we can answer it.
+        </p>
       </Article>
 
       <Article title="Children">
         <p>
-          The app is not directed at children under 13 and collects nothing that would
-          identify one: Ask questions are anonymous. A submission should be made by the
+          The app is not directed at children under 13, and membership is for adults who can
+          pay by card. Ask questions are anonymous. A submission should be made by the
           person whose hair and photographs it is, or by their parent or guardian.
         </p>
       </Article>
@@ -181,8 +234,9 @@ function PrivacyPolicy() {
           Withdraw a submission at any time from the Share a style screen — withdrawing
           deletes its photographs from your device as well as the entry. Switch Ask question
           sharing and the version check off under About. To remove everything the app holds
-          on your phone, uninstall it. To have a reviewed submission removed after the fact,
-          use the contact route below.
+          on your phone, uninstall it. Cancel your membership from My Hair Profile, and sign
+          the phone out there too. To have your email removed, or a reviewed submission
+          removed after the fact, write to support@afrocoils.app.
         </p>
       </Article>
 
@@ -223,24 +277,100 @@ function Article({ title, children }: { title: string; children: React.ReactNode
   )
 }
 
-const SHELLS: Record<string, { title: string; needs: string[] }> = {
-  terms: {
-    title: 'Terms of Service',
-    needs: [
-      'Acceptable use and account termination',
-      'That hair guidance is informational and not medical advice',
-      'Liability limits and warranty disclaimers',
-      'Ownership and licensing of contributed photos and write-ups',
-    ],
-  },
-  contact: {
-    title: 'Contact Us',
-    needs: [
-      'Support email or in-app contact form',
-      'Expected response time',
-      'A separate route for privacy and data requests',
-    ],
-  },
+/** What the Terms still need, as decisions rather than drafted clauses. */
+const TERMS_OUTSTANDING = [
+  'The legal entity that runs AfroCoils, its registered address and the governing law',
+  'The refund policy for a month already paid for',
+  'Liability limits and warranty disclaimers',
+  'Ownership and licensing of contributed photos and write-ups',
+  'An effective date, set when it is first published',
+]
+
+function Terms() {
+  return (
+    <>
+      <Article title="Membership">
+        <p>
+          Every feature of AfroCoils is for members. A membership belongs to one email
+          address, confirmed with a code we send to it, and is paid as a monthly
+          subscription by card through Paystack at the price shown before you pay.
+        </p>
+        <p>
+          It renews each month on the date you first paid, until you cancel. Cancel any time
+          from My Hair Profile (Manage or cancel opens Paystack&rsquo;s page for your
+          subscription). Cancelling stops the next charge; the app stays open to the end of
+          the month you have already paid for.
+        </p>
+        <p>
+          If a renewal fails, Paystack tries the card again, and the app stays open for three
+          days past the end of the paid month while it does. After that it locks until the
+          membership is paid again. Your hair profile, history and photographs stay on your
+          phone throughout, and open again when you do.
+        </p>
+        <p>
+          One membership is for one person. You can sign in with it on a new phone; sharing
+          the address so others can sign in is not allowed, and we can end a membership that
+          is being shared.
+        </p>
+      </Article>
+
+      <Article title="What the app is, and is not">
+        <p>
+          AfroCoils is written guidance about Type 4 hair and locs. It is information, not
+          medical advice, and it does not diagnose. Where a guide says to see a dermatologist
+          or a professional loctician, do.
+        </p>
+      </Article>
+
+      <section className="mb-2xl rounded-2xl border border-dashed border-outline-variant bg-surface-container/50 p-lg">
+        <div className="mb-sm flex items-center gap-sm">
+          <Icon name="info" className="text-primary" />
+          <h2 className="font-headline-md text-body-lg text-on-surface">Not finished yet</h2>
+        </div>
+        <p className="mb-md font-body-md text-body-md text-on-surface-variant">
+          What is written above is how membership works in the app today. These are still
+          decisions rather than text, and are left blank rather than filled with placeholder
+          legal wording:
+        </p>
+        <ul className="list-disc space-y-xs pl-5">
+          {TERMS_OUTSTANDING.map((item) => (
+            <li key={item} className="font-body-md text-body-md text-on-surface">
+              {item}
+            </li>
+          ))}
+        </ul>
+      </section>
+    </>
+  )
+}
+
+function Contact() {
+  return (
+    <>
+      <Article title="Write to us">
+        <p>
+          <strong>Support</strong> — signing in, payments, your membership, something not
+          working:{' '}
+          <a href="mailto:support@afrocoils.app" className="text-primary underline">
+            support@afrocoils.app
+          </a>
+          . Write from the email your membership is on if it is about the membership.
+        </p>
+        <p>
+          <strong>Everything else</strong> — a question about the guides, a style you want to
+          share, working with us:{' '}
+          <a href="mailto:hello@afrocoils.app" className="text-primary underline">
+            hello@afrocoils.app
+          </a>
+          .
+        </p>
+        <p>
+          A person reads every message. Privacy and data requests (having your email removed,
+          or a submission taken down) go to support@ too.
+        </p>
+      </Article>
+    </>
+  )
 }
 
 export default function LegalScreen() {
@@ -258,42 +388,23 @@ export default function LegalScreen() {
     )
   }
 
-  const doc = slug ? SHELLS[slug] : undefined
-  if (!doc) return <Navigate to="/sos" replace />
+  if (slug === 'terms') {
+    return (
+      <>
+        <ScreenHeader title="Terms of Service" subtitle="How membership works, and what the app is for." />
+        <Terms />
+      </>
+    )
+  }
 
-  return (
-    <>
-      <ScreenHeader title={doc.title} />
+  if (slug === 'contact') {
+    return (
+      <>
+        <ScreenHeader title="Contact Us" subtitle="Two addresses, both read by a person." />
+        <Contact />
+      </>
+    )
+  }
 
-      <section className="mb-2xl rounded-2xl border border-dashed border-outline-variant bg-surface-container/50 p-xl">
-        <p className="mb-lg font-body-md text-body-md text-on-surface-variant">
-          This document has not been written yet. It is intentionally blank rather than
-          filled with placeholder legal text &mdash; drafted clauses look finished and tend
-          to ship.
-        </p>
-        <h2 className="mb-sm font-headline-md text-body-lg font-bold text-on-surface">
-          It will need to cover
-        </h2>
-        <ul className="list-disc space-y-xs pl-5">
-          {doc.needs.map((item) => (
-            <li key={item} className="font-body-md text-body-md text-on-surface">
-              {item}
-            </li>
-          ))}
-        </ul>
-      </section>
-
-      <p className="text-center font-body-md text-body-md text-on-surface-variant">
-        The{' '}
-        <Link to="/legal/privacy" className="text-primary underline">
-          privacy policy
-        </Link>{' '}
-        is written, and the{' '}
-        <Link to="/faq" className="text-primary underline">
-          FAQ
-        </Link>{' '}
-        answers most of what people ask.
-      </p>
-    </>
-  )
+  return <Navigate to="/sos" replace />
 }

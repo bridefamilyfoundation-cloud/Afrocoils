@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { version } from '../../package.json'
 import Icon from '../components/Icon'
-import { PlusStatus } from '../components/Plus'
 import ScreenHeader from '../components/ScreenHeader'
 import { useHairProfile } from '../lib/profile-store'
 import {
@@ -57,8 +56,8 @@ const ABOUT: { heading: string; body: string | string[] }[] = [
     body: 'Our mission is to make natural hair care simpler, more accessible, and more personalised, helping women feel more confident in understanding, caring for, and styling their hair.',
   },
   {
-    heading: 'Your data stays on your device',
-    body: 'Your hair profile, your length checks, your calendar and your photos are stored on this phone and nowhere else. There is no account, no sign-in and no server holding your history. Uninstalling the app deletes all of it. The one routine request the app makes is asking our website whether a newer version is out, and that carries nothing about you — see Updates below.',
+    heading: 'Your hair data stays on your device',
+    body: 'Your hair profile, your length checks, your calendar and your photos are stored on this phone and nowhere else, and none of it is tied to your membership. Your membership is your email: we hold it, whether it is paid up and the record of your payments, and Paystack holds your card. While you are signed in the app checks now and then that the membership is still paid, sending your sign-in token and nothing else. It also asks our website whether a newer version is out, which carries nothing about you — see Updates below.',
   },
   {
     heading: 'Nothing you read is generated',
@@ -171,8 +170,6 @@ export default function AboutScreen() {
       </section>
 
       <UpdatesSection />
-
-      <PlusStatus />
 
       <AskSharingSection />
 
@@ -351,8 +348,9 @@ function AskSharingSection() {
       <p className="mb-md font-body-md text-body-md text-on-surface-variant">
         Questions you type into Ask are sent to the AfroCoils team so we can see what people
         ask and write the answers that are missing. Only the words you typed go, with what Ask
-        answered and the app&rsquo;s update number — nothing from your profile, no name, no
-        account and no device identifier. Ask answers on your phone either way.
+        answered and the app&rsquo;s update number — nothing from your profile, no name, not
+        your email or membership, and no device identifier. Ask answers on your phone either
+        way.
       </p>
       <button
         type="button"

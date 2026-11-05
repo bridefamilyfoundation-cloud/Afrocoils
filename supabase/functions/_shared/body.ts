@@ -10,11 +10,30 @@
 
 export class BodyTooLarge extends Error {}
 
+/**
+ * The raw body as text, with the same ceiling. For webhooks, whose
+ * signature is over the exact bytes sent — parsing and re-serialising
+ * first would change them.
+ */
+export async function readText(req: Request, maxBytes: number): Promise<string> {
+  return new TextDecoder().decode(await readBytes(req, maxBytes))
+}
+
 /** The parsed JSON body, `null` when it is not JSON, or throws `BodyTooLarge`. */
 export async function readJson(req: Request, maxBytes: number): Promise<unknown> {
+  const all = await readBytes(req, maxBytes)
+  if (all.length === 0) return null
+  try {
+    return JSON.parse(new TextDecoder().decode(all))
+  } catch {
+    return null
+  }
+}
+
+async function readBytes(req: Request, maxBytes: number): Promise<Uint8Array> {
   const declared = Number(req.headers.get('content-length'))
   if (Number.isFinite(declared) && declared > maxBytes) throw new BodyTooLarge()
-  if (!req.body) return null
+  if (!req.body) return new Uint8Array(0)
 
   const reader = req.body.getReader()
   const chunks: Uint8Array[] = []
@@ -36,9 +55,5 @@ export async function readJson(req: Request, maxBytes: number): Promise<unknown>
     all.set(chunk, at)
     at += chunk.length
   }
-  try {
-    return JSON.parse(new TextDecoder().decode(all))
-  } catch {
-    return null
-  }
+  return all
 }

@@ -4,8 +4,10 @@ import { styleCover } from '../assets/imagery'
 import { AfroMark } from '../components/BrandMark'
 import Icon, { type IconName } from '../components/Icon'
 import PrototypeImage from '../components/PrototypeImage'
+import { MEMBER_SECTIONS } from '../content/membership'
 import { STYLES } from '../content/styles'
 import { isLocs } from '../lib/locs'
+import { hasAccess } from '../lib/membership'
 import { useHairProfile } from '../lib/profile-store'
 
 /**
@@ -95,6 +97,9 @@ export default function EmergencyScreen() {
   const { profile, completeness, ready } = useHairProfile()
   const locs = isLocs(profile.identity)
   const doors = useRef<HTMLElement>(null)
+  // Locked (no paid membership): the same first screen, then what the
+  // app holds, described rather than linked, and the way to join.
+  const open = hasAccess(profile.membership)
 
   return (
     <>
@@ -147,109 +152,174 @@ export default function EmergencyScreen() {
             <span className="h-1.5 w-1.5 rounded-full bg-outline-variant" />
             <span className="h-1.5 w-6 rounded-full bg-tertiary" />
           </span>
-          <button
-            type="button"
-            onClick={() => doors.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
-            className="flex items-center gap-md rounded-full bg-inverse-surface py-1.5 pl-lg pr-1.5 font-label-md text-body-md font-semibold text-inverse-on-surface shadow-float transition-all active:scale-95"
-          >
-            Get Started
-            <span className="flex h-11 w-11 items-center justify-center rounded-full bg-secondary text-on-secondary">
-              <Icon name="arrow_forward" />
-            </span>
-          </button>
+          {open ? (
+            <button
+              type="button"
+              onClick={() => doors.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
+              className="flex items-center gap-md rounded-full bg-inverse-surface py-1.5 pl-lg pr-1.5 font-label-md text-body-md font-semibold text-inverse-on-surface shadow-float transition-all active:scale-95"
+            >
+              Get Started
+              <span className="flex h-11 w-11 items-center justify-center rounded-full bg-secondary text-on-secondary">
+                <Icon name="arrow_forward" />
+              </span>
+            </button>
+          ) : (
+            <Link
+              to="/join"
+              className="flex items-center gap-md rounded-full bg-inverse-surface py-1.5 pl-lg pr-1.5 font-label-md text-body-md font-semibold text-inverse-on-surface shadow-float transition-all active:scale-95"
+            >
+              Explore more features
+              <span className="flex h-11 w-11 items-center justify-center rounded-full bg-secondary text-on-secondary">
+                <Icon name="arrow_forward" />
+              </span>
+            </Link>
+          )}
         </div>
       </section>
 
-      {/* scroll-mt clears the fixed app bar when Get Started lands here. */}
-      <section ref={doors} className="mb-xl mt-2xl scroll-mt-24 text-center">
-        <h2 className="mb-sm font-headline-lg text-headline-lg text-on-background">
-          What&rsquo;s Your Emergency?
-        </h2>
-        <p className="mx-auto max-w-md font-body-md text-on-surface-variant">
-          Two ways in. Everything behind them is written down and on this phone, so it
-          works with no signal.
-        </p>
-      </section>
-
-      <section data-tour="sos-doors" className="mb-2xl space-y-md">
-        {DOORS.map((door) => (
-          <Link
-            key={door.to}
-            to={door.to}
-            className="flex items-center gap-md rounded-2xl bg-surface-container-lowest p-md shadow-card transition-all active:scale-[0.98]"
-          >
-            <span
-              className={`flex h-16 w-16 shrink-0 items-center justify-center rounded-xl ${door.theme}`}
+      {!open && (
+        <>
+          <section className="mb-lg mt-2xl text-center">
+            <h2 className="mb-sm font-headline-lg text-headline-lg text-on-background">
+              Inside AfroCoils
+            </h2>
+            <p className="mx-auto max-w-md font-body-md text-on-surface-variant">
+              A guide to Type 4 hair, loose or loc&rsquo;d, written by people and kept on your phone so
+              it works with no signal. Six sections, for members.
+            </p>
+          </section>
+          <ul className="mb-xl space-y-sm">
+            {MEMBER_SECTIONS.map((item) => (
+              <li
+                key={item.title}
+                className="flex items-start gap-md rounded-2xl bg-surface-container-lowest p-md shadow-card"
+              >
+                <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary-container text-on-primary-container">
+                  <Icon name={item.icon} className="text-[24px]" />
+                </span>
+                <span>
+                  <span className="block font-headline-md text-body-lg font-bold text-on-surface">
+                    {item.title}
+                  </span>
+                  <span className="block font-body-md text-caption text-on-surface-variant">
+                    {item.body}
+                  </span>
+                </span>
+              </li>
+            ))}
+          </ul>
+          <div className="mb-xl text-center">
+            <Link
+              to="/join"
+              className="inline-flex items-center gap-sm rounded-full bg-secondary px-xl py-4 font-label-md text-body-lg font-bold text-on-secondary shadow-card transition-all active:scale-95"
             >
-              <Icon name={door.icon} className="text-3xl" />
-            </span>
-            <span className="min-w-0 flex-1 text-left">
-              <span className="mb-xs block font-headline-md text-body-lg font-bold text-on-surface">
-                {door.title}
-              </span>
-              <span className="block font-body-md text-caption text-on-surface-variant">
-                {door.body}
-              </span>
-            </span>
-            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-secondary text-on-secondary">
+              Explore more features
               <Icon name="arrow_forward" className="text-[20px]" />
-            </span>
-          </Link>
-        ))}
-      </section>
-
-      {/* Not another door — a short list is what makes this triage. A loc
-          wearer's reference lives in its own section, and this is the
-          pointer to it, shown only to the people it is for.
-
-          Gated on `ready` with everything else below: the store hands
-          out an empty profile until the disk read resolves, so without
-          it this card was absent on first paint and popped in a beat
-          later, moving the doors under a thumb already reaching for
-          one. */}
-      {ready && locs && (
-        <Link
-          to="/locs"
-          className="mb-2xl flex items-center gap-md rounded-xl shadow-card bg-surface-container-lowest p-lg transition-all active:scale-[0.98]"
-        >
-          <Icon name="waves" className="shrink-0 text-primary" />
-          <span className="min-w-0 flex-1">
-            <span className="block font-headline-md text-body-lg text-on-surface">
-              Locs World
-            </span>
-            <span className="block font-body-md text-caption text-on-surface-variant">
-              Understand, start, maintain and care for your locs.
-            </span>
-          </span>
-          <Icon name="arrow_forward" className="shrink-0 text-outline" />
-        </Link>
+            </Link>
+            <p className="mt-md font-body-md text-caption text-on-surface-variant">
+              Already a member?{' '}
+              <Link to="/join" className="text-primary underline">
+                Sign in with your email
+              </Link>
+            </p>
+          </div>
+        </>
       )}
 
-      {/* The one thing worth interrupting the doors for: without a hair
-          type, every list behind them is generic. Shown only while that
-          is true — and only once the profile has actually been read.
+      {open && (
+        <>
+          {/* scroll-mt clears the fixed app bar when Get Started lands here. */}
+          <section ref={doors} className="mb-xl mt-2xl scroll-mt-24 text-center">
+            <h2 className="mb-sm font-headline-lg text-headline-lg text-on-background">
+              What&rsquo;s Your Emergency?
+            </h2>
+            <p className="mx-auto max-w-md font-body-md text-on-surface-variant">
+              Two ways in. Everything behind them is written down and on this phone, so it
+              works with no signal.
+            </p>
+          </section>
 
-          `ready` is not cosmetic here. `completeness` is 0 until the
-          disk read resolves, so every launch used to open by telling a
-          user who finished the quiz weeks ago that nothing was
-          personalised yet, then take it back. This is the screen every
-          launch lands on; it cannot open on a claim it is about to
-          withdraw. */}
-      {ready && completeness < 1 && (
-        <section className="rounded-2xl shadow-card bg-surface-container-lowest p-lg text-center">
-          <p className="mb-md font-body-md text-body-md text-on-surface-variant">
-            {completeness === 0
-              ? 'Nothing here is personalised until the app knows whether you have loose hair or locs. That one answer changes half of it.'
-              : `Your profile is ${Math.round(completeness * 100)}% filled in — the rest sharpens everything above.`}
-          </p>
-          <Link
-            to="/quiz"
-            className="inline-flex items-center gap-sm rounded-full bg-primary px-xl py-3 font-label-md text-label-md text-on-primary transition-all active:scale-95"
-          >
-            <Icon name="science" className="text-[18px]" />
-            {completeness === 0 ? 'Take the hair quiz' : 'Finish the quiz'}
-          </Link>
-        </section>
+          <section data-tour="sos-doors" className="mb-2xl space-y-md">
+            {DOORS.map((door) => (
+              <Link
+                key={door.to}
+                to={door.to}
+                className="flex items-center gap-md rounded-2xl bg-surface-container-lowest p-md shadow-card transition-all active:scale-[0.98]"
+              >
+                <span
+                  className={`flex h-16 w-16 shrink-0 items-center justify-center rounded-xl ${door.theme}`}
+                >
+                  <Icon name={door.icon} className="text-3xl" />
+                </span>
+                <span className="min-w-0 flex-1 text-left">
+                  <span className="mb-xs block font-headline-md text-body-lg font-bold text-on-surface">
+                    {door.title}
+                  </span>
+                  <span className="block font-body-md text-caption text-on-surface-variant">
+                    {door.body}
+                  </span>
+                </span>
+                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-secondary text-on-secondary">
+                  <Icon name="arrow_forward" className="text-[20px]" />
+                </span>
+              </Link>
+            ))}
+          </section>
+
+          {/* Not another door — a short list is what makes this triage. A loc
+              wearer's reference lives in its own section, and this is the
+              pointer to it, shown only to the people it is for.
+
+              Gated on `ready` with everything else below: the store hands
+              out an empty profile until the disk read resolves, so without
+              it this card was absent on first paint and popped in a beat
+              later, moving the doors under a thumb already reaching for
+              one. */}
+          {ready && locs && (
+            <Link
+              to="/locs"
+              className="mb-2xl flex items-center gap-md rounded-xl shadow-card bg-surface-container-lowest p-lg transition-all active:scale-[0.98]"
+            >
+              <Icon name="waves" className="shrink-0 text-primary" />
+              <span className="min-w-0 flex-1">
+                <span className="block font-headline-md text-body-lg text-on-surface">
+                  Locs World
+                </span>
+                <span className="block font-body-md text-caption text-on-surface-variant">
+                  Understand, start, maintain and care for your locs.
+                </span>
+              </span>
+              <Icon name="arrow_forward" className="shrink-0 text-outline" />
+            </Link>
+          )}
+
+          {/* The one thing worth interrupting the doors for: without a hair
+              type, every list behind them is generic. Shown only while that
+              is true — and only once the profile has actually been read.
+
+              `ready` is not cosmetic here. `completeness` is 0 until the
+              disk read resolves, so every launch used to open by telling a
+              user who finished the quiz weeks ago that nothing was
+              personalised yet, then take it back. This is the screen every
+              launch lands on; it cannot open on a claim it is about to
+              withdraw. */}
+          {ready && completeness < 1 && (
+            <section className="rounded-2xl shadow-card bg-surface-container-lowest p-lg text-center">
+              <p className="mb-md font-body-md text-body-md text-on-surface-variant">
+                {completeness === 0
+                  ? 'Nothing here is personalised until the app knows whether you have loose hair or locs. That one answer changes half of it.'
+                  : `Your profile is ${Math.round(completeness * 100)}% filled in — the rest sharpens everything above.`}
+              </p>
+              <Link
+                to="/quiz"
+                className="inline-flex items-center gap-sm rounded-full bg-primary px-xl py-3 font-label-md text-label-md text-on-primary transition-all active:scale-95"
+              >
+                <Icon name="science" className="text-[18px]" />
+                {completeness === 0 ? 'Take the hair quiz' : 'Finish the quiz'}
+              </Link>
+            </section>
+          )}
+        </>
       )}
     </>
   )

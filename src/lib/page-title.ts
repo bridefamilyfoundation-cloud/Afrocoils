@@ -46,6 +46,7 @@ const TITLES: Record<string, string> = {
   '/faq': `Frequently asked questions · ${SUFFIX}`,
   '/docs': `How the app works · ${SUFFIX}`,
   '/ask': `Ask a question · ${SUFFIX}`,
+  '/join': `Become a member · ${SUFFIX}`,
   '/legal/privacy': `Privacy policy · ${SUFFIX}`,
   '/legal/terms': `Terms of service · ${SUFFIX}`,
   '/legal/contact': `Contact us · ${SUFFIX}`,

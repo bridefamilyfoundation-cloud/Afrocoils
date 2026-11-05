@@ -130,6 +130,84 @@ export async function select<T>(
   return (await response.json()) as T[]
 }
 
+/**
+ * Insert, or update the row whose primary key (or `onConflict` columns)
+ * already exists. `ignore` leaves an existing row alone instead, which is
+ * how a redelivered webhook becomes a no-op.
+ */
+export async function upsert(
+  config: SupabaseConfig,
+  table: string,
+  rows: unknown[],
+  options: { onConflict?: string; ignore?: boolean } = {},
+): Promise<void> {
+  const query = options.onConflict ? `?on_conflict=${encodeURIComponent(options.onConflict)}` : ''
+  const response = await fetch(`${config.url}/rest/v1/${table}${query}`, {
+    method: 'POST',
+    headers: {
+      ...authHeaders(config),
+      'Content-Type': 'application/json',
+      Prefer: `resolution=${options.ignore ? 'ignore' : 'merge'}-duplicates,return=minimal`,
+    },
+    body: JSON.stringify(rows),
+  })
+  if (!response.ok) throw await failure(response, `Upsert into ${table}`)
+}
+
+/** Update the rows a PostgREST filter selects, and return them. */
+export async function patch<T>(
+  config: SupabaseConfig,
+  table: string,
+  filter: string,
+  values: Record<string, unknown>,
+): Promise<T[]> {
+  const response = await fetch(`${config.url}/rest/v1/${table}?${filter}`, {
+    method: 'PATCH',
+    headers: {
+      ...authHeaders(config),
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+      Prefer: 'return=representation',
+    },
+    body: JSON.stringify(values),
+  })
+  if (!response.ok) throw await failure(response, `Update ${table}`)
+  return (await response.json()) as T[]
+}
+
+/** Delete the rows a PostgREST filter selects. */
+export async function remove(config: SupabaseConfig, table: string, filter: string): Promise<void> {
+  const response = await fetch(`${config.url}/rest/v1/${table}?${filter}`, {
+    method: 'DELETE',
+    headers: { ...authHeaders(config), Prefer: 'return=minimal' },
+  })
+  if (!response.ok) throw await failure(response, `Delete from ${table}`)
+}
+
+/**
+ * Insert one row and return it as stored, for the generated id. Used by
+ * the support inbox, where a new thread's id is its first message's.
+ */
+export async function insertReturning<T>(
+  config: SupabaseConfig,
+  table: string,
+  row: unknown,
+): Promise<T | undefined> {
+  const response = await fetch(`${config.url}/rest/v1/${table}`, {
+    method: 'POST',
+    headers: {
+      ...authHeaders(config),
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+      Prefer: 'return=representation',
+    },
+    body: JSON.stringify([row]),
+  })
+  if (!response.ok) throw await failure(response, `Insert into ${table}`)
+  const rows = (await response.json()) as T[]
+  return rows[0]
+}
+
 /** Call a Postgres function. Used for the atomic counter increment. */
 export async function rpc<T>(
   config: SupabaseConfig,

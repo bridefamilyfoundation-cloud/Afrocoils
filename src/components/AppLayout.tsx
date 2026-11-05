@@ -1,16 +1,30 @@
 import { useEffect, useRef, useState } from 'react'
-import { Outlet, useLocation, useNavigationType } from 'react-router-dom'
+import { Navigate, Outlet, useLocation, useNavigationType } from 'react-router-dom'
 import AppFooter from './AppFooter'
 import AskLauncher from './AskLauncher'
 import BottomNav from './BottomNav'
 import NavDrawer from './NavDrawer'
-import { PlusProvider } from './Plus'
+import ScreenFallback from './ScreenFallback'
 import TopAppBar from './TopAppBar'
+import { hasAccess } from '../lib/membership'
 import { useDocumentTitle } from '../lib/page-title'
+import { useHairProfile } from '../lib/profile-store'
+
+/**
+ * What a phone without a paid membership can open: the front page (at
+ * its three addresses), the join screen, and the legal pages the join
+ * screen links to — someone is asked to agree to the terms and the
+ * privacy policy before paying, so both have to be readable first.
+ * Every other address goes to the join screen.
+ */
+const OPEN_WHEN_LOCKED = new Set(['/', '/home', '/sos', '/join'])
+const lockedCanOpen = (pathname: string) => OPEN_WHEN_LOCKED.has(pathname) || pathname.startsWith('/legal/')
 
 export default function AppLayout() {
   const [menuOpen, setMenuOpen] = useState(false)
   const { pathname } = useLocation()
+  const { profile, ready } = useHairProfile()
+  const open = hasAccess(profile.membership)
 
   // A distinct title per route: the browser tab, the Android recents
   // card and a screen reader's navigation announcement all read it.
@@ -51,33 +65,38 @@ export default function AppLayout() {
     }
   }, [pathname, navigationType])
 
+  // Nothing is decided until the profile has been read: an empty profile
+  // is signed out, and a member must not be bounced to the join screen
+  // for the moment it takes to read their own phone.
+  if (!ready) return <ScreenFallback />
+  if (!open && !lockedCanOpen(pathname)) return <Navigate to="/join" replace />
+
   return (
-    // Plus wraps the whole layout so any screen, and the Ask sheet, can
-    // open the one unlock sheet.
-    <PlusProvider>
-      <div className="relative isolate min-h-full text-on-background">
-        <div aria-hidden className="page-wash fixed inset-0 -z-10" />
-        <TopAppBar onOpenMenu={() => setMenuOpen(true)} />
-        <NavDrawer open={menuOpen} onClose={() => setMenuOpen(false)} />
+    <div className="relative isolate min-h-full text-on-background">
+      <div aria-hidden className="page-wash fixed inset-0 -z-10" />
+      {/* Locked, the bar keeps the name and loses the way in: the menu,
+          the tab bar and Ask all lead to sections a non-member cannot
+          open. */}
+      <TopAppBar onOpenMenu={open ? () => setMenuOpen(true) : undefined} />
+      {open && <NavDrawer open={menuOpen} onClose={() => setMenuOpen(false)} />}
 
-        {/* Clears the fixed app bar, whose real height is 64px plus the
-            status-bar inset — a flat pt-24 was right only on a device with
-            no cutout, and slid the top of every screen under the bar on
-            the ones that have one. */}
-        <main className="mx-auto max-w-5xl px-container-padding pt-[calc(6rem+var(--safe-top))]">
-          <Outlet />
-        </main>
+      {/* Clears the fixed app bar, whose real height is 64px plus the
+          status-bar inset — a flat pt-24 was right only on a device with
+          no cutout, and slid the top of every screen under the bar on
+          the ones that have one. */}
+      <main className="mx-auto max-w-5xl px-container-padding pt-[calc(6rem+var(--safe-top))]">
+        <Outlet />
+      </main>
 
-        <AppFooter />
+      <AppFooter locked={!open} />
 
-        {/* Spacer so the footer clears the fixed bottom nav. */}
-        <div className="h-32" />
+      {/* Spacer so the footer clears the fixed bottom nav. */}
+      <div className={open ? 'h-32' : 'h-8'} />
 
-        <BottomNav />
+      {open && <BottomNav />}
 
-        {/* Ask, from every screen: bottom right, above the tab bar. */}
-        <AskLauncher />
-      </div>
-    </PlusProvider>
+      {/* Ask, from every screen: bottom right, above the tab bar. */}
+      {open && <AskLauncher />}
+    </div>
   )
 }

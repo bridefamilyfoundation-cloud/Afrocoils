@@ -97,13 +97,32 @@ for sideloading, and works unsigned.
 Most rejections happen here, not in the build.
 
 **Privacy policy URL — mandatory, must be live before the listing is.** The
-hair profile, photos, growth history and calendar stay on the device. Two
-things leave it: the questions typed into Ask, sent anonymously while sharing
-is on (on by default, off under About), and a community style submission, which
-the user starts deliberately and which carries the photographs and text they
-wrote. Say exactly that.
+hair profile, photos, growth history and calendar stay on the device. What
+leaves it: the member's email (signing in, `auth`), a status check carrying
+only the sign-in token, payment on Paystack's page, the questions typed into
+Ask, sent anonymously while sharing is on (on by default, off under About), and
+a community style submission, which the user starts deliberately and which
+carries the photographs and text they wrote. Say exactly that.
 
-**Data safety form.** Declare two collections, both optional:
+**Payments — read this before submitting to Play at all.** Since 2026-11-05
+every feature is for paying members, paid as a monthly Paystack subscription
+on a web page. Google Play's Payments policy requires Play Billing for digital
+content and subscriptions sold to a Play install, and forbids steering Play
+users to another payment method. The sideloaded APK and the Play build cannot
+share this flow: a Play build needs Play Billing (a native plugin, a
+server-side purchase check that marks the email paid in `members`, and the
+join screen offering Play's purchase instead of the Paystack button) — or a
+build where purchase is not offered in the app at all. Decide which before the
+first Play upload.
+
+**Data safety form.** Declare:
+
+- **Personal info → Email address**: collected, required (it is the
+  membership), processed for *Account management* and *App functionality*,
+  shared with Paystack and Resend as processors only, linked to the user,
+  deletable on request to support@afrocoils.app. Encrypted in transit.
+- **Financial info → Purchase history**: the Paystack payment record (amount,
+  date, reference). No card data — Paystack holds it.
 
 - **App activity → Other user-generated content** (and **In-app search
   history**): the Ask question text, collected, not shared with third parties,
@@ -115,8 +134,11 @@ wrote. Say exactly that.
 
 Inconsistency between this form and observed network behaviour is the single
 most common rejection — and this app's network behaviour is easy to describe:
-a POST to `questions` each time a question is asked in Ask (while sharing is
-on), a POST to `submissions` only when the user taps Share, plus a GET of the
+POSTs to `auth` when signing in and on a status check (on open and on return,
+at most every twelve hours while paid), a POST to `billing` when the user taps
+Subscribe or Manage, a POST to `questions` each time a question is asked in Ask
+(while sharing is on, never with the token), a POST to `submissions` only when
+the user taps Share, plus a GET of the
 public `latest.json` in the Supabase `releases` bucket on open (the update
 check, `src/lib/updates.ts`).
 That GET sends no user data and no identifier, so it declares nothing — but say

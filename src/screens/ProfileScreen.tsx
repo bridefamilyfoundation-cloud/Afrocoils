@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 import BioCard from '../components/BioCard'
 import Icon, { type IconName } from '../components/Icon'
-import { PlusStatus } from '../components/Plus'
+import MembershipCard from '../components/MembershipCard'
 import ScreenFallback from '../components/ScreenFallback'
 import { useHairProfile } from '../lib/profile-store'
 import { describeLocs, formatLocAge, resolveLocStage, retwistWeeks } from '../lib/locs'
@@ -484,7 +484,7 @@ export default function ProfileScreen() {
         )}
       </section>
 
-      <PlusStatus />
+      <MembershipCard />
     </>
   )
 }

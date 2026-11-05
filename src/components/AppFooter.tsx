@@ -14,7 +14,9 @@ const LINKS = [
  * said something else again. Both now draw the same <BrandLockup>, so there is
  * no longer a second copy of the name to fall out of step.
  */
-export default function AppFooter() {
+/** Locked: only the pages a non-member can open — Privacy, Terms, Contact. */
+export default function AppFooter({ locked = false }: { locked?: boolean }) {
+  const links = locked ? LINKS.filter((link) => link.to.startsWith('/legal/')) : LINKS
   return (
     <footer className="mt-2xl flex w-full flex-col items-center gap-md bg-surface-container-highest px-container-padding py-xl md:flex-row md:justify-between">
       <div className="flex flex-col items-center md:items-start">
@@ -27,7 +29,7 @@ export default function AppFooter() {
       </div>
 
       <nav className="flex flex-wrap justify-center gap-lg">
-        {LINKS.map((link) => (
+        {links.map((link) => (
           <Link
             key={link.to}
             to={link.to}
