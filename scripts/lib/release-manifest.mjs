@@ -32,7 +32,7 @@ export const PROJECT_REF = 'runhkccoeyxfgsfrzezn'
 export const BUCKET = 'releases'
 
 /** The landing site, for the manifest's link to the checksum and install steps. */
-export const SITE_URL = 'https://afrocoils.vercel.app/'
+export const SITE_URL = 'https://afrocoils.app/'
 
 /**
  * Where people download an APK from: the landing site's own domain.
