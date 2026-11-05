@@ -14,14 +14,14 @@
     "Hair Growth: retention fitted at the afro-textured rate, trims logged"
   ],
   "bundle": {
-    "code": 8,
+    "code": 9,
     "minVersionCode": 10,
-    "bytes": 4517362,
-    "sha256": "02d72a97efae994e1fc66c2831b93fc5061166b7ff282a06f8d0cd66eb39dc6a",
-    "released": "2026-10-30",
-    "url": "https://runhkccoeyxfgsfrzezn.supabase.co/storage/v1/object/public/releases/bundles/8.zip",
+    "bytes": 4521525,
+    "sha256": "57f860b30c82fded2ede6441a736cce6b730d1697d45e22515281bda405eec15",
+    "released": "2026-11-05",
+    "url": "https://runhkccoeyxfgsfrzezn.supabase.co/storage/v1/object/public/releases/bundles/9.zip",
     "notes": [
-      "Written for Type 4 hair: coil patterns 4A to 4C, and coils throughout"
+      "Membership: sign in with your email to open AfroCoils"
     ]
   }
 }
