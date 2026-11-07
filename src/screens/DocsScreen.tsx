@@ -3,7 +3,7 @@ import Icon, { type IconName } from '../components/Icon'
 import ScreenHeader from '../components/ScreenHeader'
 import { useOpenParam, useScrollToOpened } from '../lib/deep-link'
 import { startTour } from '../lib/tour'
-import { CLIMATES, OCCASIONS, PREFERENCE_LABELS, STYLE_CATEGORIES, TIME_BANDS } from '../lib/types'
+import { CLIMATES, ENFORCED_PREFERENCES, OCCASIONS, PREFERENCE_LABELS, RANKED_PREFERENCES, STYLE_CATEGORIES, TIME_BANDS } from '../lib/types'
 
 /**
  * The documentation, at `/docs`: the whole app on one page.
@@ -27,10 +27,8 @@ import { CLIMATES, OCCASIONS, PREFERENCE_LABELS, STYLE_CATEGORIES, TIME_BANDS } 
 
 const list = (items: readonly string[]) => items.join(', ')
 
-const [ENFORCED, RANKED] = (() => {
-  const labels = Object.values(PREFERENCE_LABELS)
-  return [labels.slice(0, 3), labels.slice(3)]
-})()
+const ENFORCED = ENFORCED_PREFERENCES.map((key) => PREFERENCE_LABELS[key])
+const RANKED = RANKED_PREFERENCES.map((key) => PREFERENCE_LABELS[key])
 
 const SECTIONS: {
   id: string
@@ -349,23 +347,39 @@ const SECTIONS: {
     title: 'My Hair Profile',
     body: (
       <>
-        <p>Two kinds of thing live here, and none of it leaves your phone.</p>
+        <p>
+          None of it leaves your phone. Your name and photo sit at the top. Under them, a card
+          shows what the app knows about your hair, how much is filled in, and what is still
+          to add; tap anything on it to go to that answer. Below that, each answer is one row
+          showing its value. Tap a row to change it.
+        </p>
         <ul>
           <li>
-            <strong>About you</strong>: a name, a photo and your climate (
-            {list(CLIMATES)}).
+            <strong>Your hair</strong>: hair type first, then coil pattern, porosity, density
+            and strand texture. Until hair type is set, only that question shows.
           </li>
           <li>
-            <strong>About your hair</strong>: hair type, then coil pattern, porosity, density,
-            texture and scalp, or loc type and start date if you wear locs. The meter shows how
-            much is filled in. The hair quiz fills in the same fields in plainer terms.
+            <strong>Your locs</strong> (loc wearers only): loc type, how they started, the
+            start date and the stage, plus how often to retwist.
           </li>
           <li>
-            <strong>Care preferences</strong>: {list(ENFORCED)} are <em>enforced</em>, so
-            anything that breaks one is removed before you see it. {list(RANKED)} only change
-            the order.
+            <strong>Scalp &amp; surroundings</strong>: scalp, climate ({list(CLIMATES)}) and
+            whether you have hard water.
+          </li>
+          <li>
+            <strong>Your rules</strong>: <em>Strict rules</em> ({list(ENFORCED)}) are always
+            followed, so anything that breaks one is removed before you see it.{' '}
+            <em>Preferences</em> ({list(RANKED)}) only change the order.
+          </li>
+          <li>
+            <strong>Products &amp; membership</strong>: your product shelf and, if you are
+            signed in, your membership.
           </li>
         </ul>
+        <p>
+          The hair quiz fills in the same answers in plainer terms. Under a row you are unsure
+          of, <em>Not sure?</em> asks just that one question, or opens the porosity test.
+        </p>
       </>
     ),
     links: [
@@ -477,7 +491,7 @@ const SECTIONS: {
           sign in with the same email and skip the payment.
         </p>
         <p>
-          My Hair Profile shows the email, when the membership renews, Manage or cancel
+          The Membership row at the foot of My Hair Profile shows the email, when the membership renews, Manage or cancel
           (Paystack&rsquo;s page for the card and for cancelling) and Sign out. Cancelling
           keeps the app open to the end of the month you paid for. A failed renewal leaves it
           open for three more days while Paystack retries the card. Signing out, or a

@@ -1,5 +1,5 @@
 import type { HairType, Occasion } from '../lib/types'
-import { PREFERENCE_LABELS, TIME_BANDS } from '../lib/types'
+import { ENFORCED_PREFERENCES, PREFERENCE_LABELS, RANKED_PREFERENCES, TIME_BANDS } from '../lib/types'
 
 /**
  * What Ask knows that the rest of the app does not say outright.
@@ -255,10 +255,8 @@ export interface AskTopic {
   hairTypes?: HairType[]
 }
 
-const [ENFORCED, RANKED] = (() => {
-  const labels = Object.values(PREFERENCE_LABELS)
-  return [labels.slice(0, 3), labels.slice(3)]
-})()
+const ENFORCED = ENFORCED_PREFERENCES.map((key) => PREFERENCE_LABELS[key])
+const RANKED = RANKED_PREFERENCES.map((key) => PREFERENCE_LABELS[key])
 
 export const TOPICS: AskTopic[] = [
   {
@@ -276,7 +274,7 @@ export const TOPICS: AskTopic[] = [
     title: 'Tell the app you have locs or loose hair',
     answer:
       'Set your hair type on My Hair Profile, or take the hair quiz. Until the app knows, every list is generic; once it does, loose-hair technique is never shown to a loc wearer.',
-    route: '/profile',
+    route: '/profile?open=hairType',
     cta: 'Open My Hair Profile',
     docs: 'start',
     keys: 'change my hair type|set my hair type|switch to locs|i have locs now|i took my locs out|update my profile|edit my profile|change profile',
@@ -344,8 +342,8 @@ export const TOPICS: AskTopic[] = [
   {
     id: 'preferences',
     title: 'Care preferences',
-    answer: `On My Hair Profile, ${ENFORCED.join(', ')} are enforced, so anything that breaks one is removed before you see it. ${RANKED.join(' and ')} only change the order.`,
-    route: '/profile',
+    answer: `On My Hair Profile, Strict rules are ${ENFORCED.join(', ')}: anything that breaks one is removed before you see it. Preferences are ${RANKED.join(' and ')}, and only change the order.`,
+    route: '/profile?open=rules',
     cta: 'Open My Hair Profile',
     docs: 'profile',
     keys: 'heatless|no heat|silicone free|protein sensitive|low manipulation|prefer protective|preferences|preference|filter out|hide products with',
@@ -445,7 +443,7 @@ export const TOPICS: AskTopic[] = [
     title: 'Your loc stage and retwist routine',
     answer:
       'On your profile, set your loc type and the date you started, and the app works out your loc stage and your retwist routine.',
-    route: '/profile',
+    route: '/profile?open=locType',
     cta: 'Open My Hair Profile',
     docs: 'locs',
     keys: 'what stage are my locs|loc stage|my loc age|how old are my locs|when did i start my locs|loc start date|retwist schedule|retwist routine|how often should i retwist',
@@ -455,8 +453,8 @@ export const TOPICS: AskTopic[] = [
     id: 'bio',
     title: 'Your name, photo and climate',
     answer:
-      'About you, on My Hair Profile, is a name, a photo and your climate. None of it leaves your phone.',
-    route: '/profile',
+      'My Hair Profile has your name and photo at the top, and your climate and hard water under Scalp & surroundings. None of it leaves your phone.',
+    route: '/profile?open=climate',
     cta: 'Open My Hair Profile',
     docs: 'profile',
     keys: 'change my name|change my photo|profile picture|profile photo|avatar|my climate|weather|humid|humidity|cold weather|hot weather|harmattan',
@@ -493,7 +491,7 @@ export const TOPICS: AskTopic[] = [
     title: 'Your membership',
     answer:
       'Your membership is your email, and it is monthly. My Hair Profile shows when it renews, and Manage or cancel opens Paystack’s page to change the card or cancel; the app stays open to the end of the month you paid for. On a new phone, sign in with the same email. Sign out is there too, and leaves your hair profile on the phone.',
-    route: '/profile',
+    route: '/profile?open=membership',
     cta: 'Open My Hair Profile',
     docs: 'membership',
     keys: 'my membership|my subscription|cancel my subscription|cancel membership|stop paying|change my card|update my card|renew|renewal|sign out|log out|new phone|sign in on another phone|how much is it|price|paystack|refund',

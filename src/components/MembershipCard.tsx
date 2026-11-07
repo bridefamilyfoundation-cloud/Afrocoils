@@ -5,7 +5,7 @@ import { useHairProfile } from '../lib/profile-store'
 import type { MemberStatus } from '../lib/types'
 
 /**
- * The membership, at the foot of My Hair Profile: which email, until
+ * The membership, in the last row of My Hair Profile: which email, until
  * when, and the two things a member can do about it — manage the
  * subscription on Paystack's page (card, cancel), and sign this phone
  * out. Signing out keeps the hair profile on the phone; signing back in
@@ -23,7 +23,11 @@ const STATUS_LINE: Record<MemberStatus, (until: string | null) => string> = {
   none: (until) => (until ? `Open until ${longDate(until)}` : 'Not paid'),
 }
 
-export default function MembershipCard() {
+/**
+ * `embedded` drops the card and its heading, for the profile's
+ * Membership row, which already names it and shows the email.
+ */
+export default function MembershipCard({ embedded = false }: { embedded?: boolean }) {
   const { profile, update } = useHairProfile()
   const membership = profile.membership
   const [busy, setBusy] = useState(false)
@@ -45,7 +49,14 @@ export default function MembershipCard() {
   }
 
   return (
-    <section aria-labelledby="membership" className="mt-2xl rounded-2xl bg-surface-container-lowest p-lg shadow-card">
+    <section
+      aria-labelledby={embedded ? undefined : 'membership'}
+      aria-label={embedded ? 'Membership' : undefined}
+      className={embedded ? '' : 'mt-2xl rounded-2xl bg-surface-container-lowest p-lg shadow-card'}
+    >
+      {embedded ? (
+        <p className="mb-xs truncate font-body-md text-caption text-on-surface-variant">{membership.email}</p>
+      ) : (
       <div className="mb-md flex items-center gap-md">
         <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-secondary text-on-secondary">
           <Icon name="workspace_premium" className="text-[22px]" />
@@ -57,6 +68,7 @@ export default function MembershipCard() {
           <p className="truncate font-body-md text-caption text-on-surface-variant">{membership.email}</p>
         </div>
       </div>
+      )}
       <p className="mb-lg font-body-md text-body-md text-on-surface">
         {STATUS_LINE[membership.status](membership.paidUntilISO)}
       </p>

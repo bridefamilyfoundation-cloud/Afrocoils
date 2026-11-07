@@ -289,7 +289,10 @@ picture; this file is the short version of what to keep in mind when editing.
   passes. How-to topics restate `/docs`, so they move with it. Links
   into a long screen use `?open=<id>` (`src/lib/deep-link.ts`) because
   a second `#` would be read as a route; FAQ, Docs, Locs World, the
-  Quick Hair Check and Products honour it.
+  Quick Hair Check, Products and My Hair Profile honour it
+  (the profile's ids are its row ids — `density`, `climate`, `rules`,
+  `membership` — and `/quiz?step=<id>` asks one question and returns
+  there).
 - Screens live in `src/screens/`, shared UI in `src/components/`.
 - **Hair type is the fork above everything.** `identity.hairType` is
   `'Loose Natural' | 'Locs'`, and styles, guides, products, the calendar's

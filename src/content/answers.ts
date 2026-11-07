@@ -780,7 +780,7 @@ export const KNOWLEDGE: KnowledgeEntry[] = [
       },
     ],
     hairTypes: LOOSE,
-    next: { to: '/profile', label: 'Set your heat preference' },
+    next: { to: '/profile?open=rules', label: 'Set your heat preference' },
   },
   {
     id: 'transition',
@@ -866,7 +866,7 @@ export const KNOWLEDGE: KnowledgeEntry[] = [
         text: 'For locs, use a light water-based spray and a few drops of oil every few days. Leave heavy butters out even in dry weather. They only collect dust.',
       },
     ],
-    next: { to: '/profile', label: 'Set your climate' },
+    next: { to: '/profile?open=climate', label: 'Set your climate' },
   },
   {
     id: 'rosemary-oil',

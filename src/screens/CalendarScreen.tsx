@@ -203,7 +203,7 @@ export default function CalendarScreen() {
             action={
               profile.identity.hairType
                 ? undefined
-                : { to: '/profile', label: 'Set your hair type' }
+                : { to: '/profile?open=hairType', label: 'Set your hair type' }
             }
           />
         ) : (

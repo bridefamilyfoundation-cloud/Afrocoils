@@ -281,6 +281,16 @@ export const PREFERENCE_LABELS: Record<keyof CarePreferences, string> = {
   lowManipulation: 'Low manipulation',
 }
 
+/**
+ * Which preferences exclude and which only rank. Named lists rather
+ * than "the first three", so the profile can draw them as two groups
+ * ("Strict rules" / "Preferences") and Docs and Ask can say which is which
+ * without counting. `styleExclusion` in content/styles.ts is what makes
+ * the first list true.
+ */
+export const ENFORCED_PREFERENCES = ['heatlessOnly', 'siliconeFree', 'proteinSensitive'] as const satisfies readonly (keyof CarePreferences)[]
+export const RANKED_PREFERENCES = ['protectiveBias', 'lowManipulation'] as const satisfies readonly (keyof CarePreferences)[]
+
 export interface ShelfProduct {
   id: string
   name: string

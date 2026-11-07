@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import Icon from '../components/Icon'
 import ScreenHeader from '../components/ScreenHeader'
 import SectionCrumb from '../components/SectionCrumb'
@@ -23,6 +23,11 @@ import type { HairIdentity, HairType } from '../lib/types'
  *
  * The step list itself is derived from the answer to question one, so
  * answering "Locs" rewrites the rest of the quiz underneath the user.
+ *
+ * `?step=<id>` asks that one question alone and returns to the profile
+ * with its row open — the "Not sure?" link under a profile field. Hair
+ * type is not offered that way: it is the first question of the whole
+ * quiz, and the profile row already explains it.
  */
 
 function ProgressBar({ current, total }: { current: number; total: number }) {
@@ -122,17 +127,21 @@ export default function QuizScreen() {
 
   const { identity } = profile
   const steps = useMemo(() => quizStepsFor(identity.hairType), [identity.hairType])
+  const [params] = useSearchParams()
+  const only = params.get('step')
+  const single = only && only !== 'hairType' ? steps.find((s) => s.id === only) : undefined
 
   // Clamped rather than trusted: answering "Locs" lengthens the step list
   // and switching back shortens it, and the index survives both.
-  const step: QuizStep | undefined = steps[Math.min(index, steps.length - 1)]
+  const step: QuizStep | undefined = single ?? steps[Math.min(index, steps.length - 1)]
 
   function setField(field: keyof HairIdentity, value: string | undefined) {
     update({ identity: { ...identity, [field]: value } })
   }
 
   function next() {
-    if (index >= steps.length - 1) setDone(true)
+    if (single) navigate(`/profile?open=${single.field}`, { replace: true })
+    else if (index >= steps.length - 1) setDone(true)
     else setIndex((i) => i + 1)
   }
 
@@ -156,15 +165,21 @@ export default function QuizScreen() {
       <SectionCrumb to="/profile" label="My Hair Profile" />
       <ScreenHeader
         title="Hair quiz"
-        subtitle="Answer what you can. Everything here is skippable except the first question."
+        subtitle={
+          single
+            ? 'One question, in plain terms. Your answer goes straight onto your profile.'
+            : 'Answer what you can. Everything here is skippable except the first question.'
+        }
       />
 
-      <ProgressBar current={index + 1} total={steps.length} />
+      {!single && <ProgressBar current={index + 1} total={steps.length} />}
 
       <section className="mb-xl">
-        <p className="mb-xs font-caption text-caption uppercase tracking-widest text-outline">
-          Question {index + 1} of {steps.length}
-        </p>
+        {!single && (
+          <p className="mb-xs font-caption text-caption uppercase tracking-widest text-outline">
+            Question {index + 1} of {steps.length}
+          </p>
+        )}
         <h2 className="mb-sm font-headline-lg text-headline-md text-on-background">
           {step.title}
         </h2>
@@ -267,7 +282,7 @@ export default function QuizScreen() {
       <section className="mb-2xl flex items-center justify-between gap-md">
         <button
           type="button"
-          onClick={() => (index === 0 ? navigate(-1) : setIndex((i) => i - 1))}
+          onClick={() => (single || index === 0 ? navigate(-1) : setIndex((i) => i - 1))}
           className="flex items-center gap-xs rounded-full px-lg py-2 font-label-md text-label-md text-on-surface-variant active:scale-95"
         >
           <Icon name="chevron_left" className="text-[18px]" />

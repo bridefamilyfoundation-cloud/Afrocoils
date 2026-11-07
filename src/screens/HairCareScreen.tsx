@@ -97,7 +97,7 @@ export default function HairCareScreen() {
     {
       label: 'Hair density',
       value: identity.density,
-      to: '/profile',
+      to: '/profile?open=density',
       action: identity.density ? 'Change it' : 'Set it',
       note: 'How much hair is on your head, not how thick each strand is. Decides sectioning and product quantity.',
     },
@@ -106,14 +106,14 @@ export default function HairCareScreen() {
       value:
         identity.curlPattern &&
         `${curlPatternLabel(identity.curlPattern)} · ${curlFamilyOf(identity.curlPattern)?.name ?? ''}`.trim(),
-      to: '/profile',
+      to: '/profile?open=curlPattern',
       action: identity.curlPattern ? 'Change it' : 'Set it',
       note: 'The shape of your Type 4 coil — 4A, 4B or 4C. It still matters with locs: it decides how fast they bud and shrink.',
     },
     {
       label: 'Hair texture',
       value: identity.texture,
-      to: '/profile',
+      to: '/profile?open=texture',
       action: identity.texture ? 'Change it' : 'Set it',
       note: 'How thick or wide a single strand is. Fine strands are weighed down by heavy products; coarse ones usually need them.',
     },

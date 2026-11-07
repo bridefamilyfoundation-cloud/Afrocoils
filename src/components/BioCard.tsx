@@ -5,16 +5,15 @@ import PrototypeImage from './PrototypeImage'
 import UserPhoto from './UserPhoto'
 import { PhotoError, capturePhoto, deletePhoto, photosAvailable } from '../lib/photos'
 import { useHairProfile } from '../lib/profile-store'
-import { CLIMATES, type Climate } from '../lib/types'
 
 /**
- * Name, photo and climate — the top of the profile screen.
+ * Name and photo — the top of the profile screen.
  *
- * None of this is a property of the hair, which is why it is kept in
- * `bio` rather than in `identity`. The split is not cosmetic: name and
- * photo never leave the device, while climate is sent with every request
- * because humidity and hard water change what actually works often
- * enough that advice given without them is advice given blind.
+ * Neither is a property of the hair, which is why they are kept in
+ * `bio` rather than in `identity`, and neither leaves the device.
+ * Climate and hard water are `bio` too, but they change advice, so they
+ * are edited with the scalp under "Scalp & surroundings" on the profile
+ * rather than here beside the name.
  *
  * The photo follows the same rule as the style photos: the profile
  * document stores a filename and the bytes live on disk, because the
@@ -22,13 +21,6 @@ import { CLIMATES, type Climate } from '../lib/types'
  * a photo deletes the old file first, so the directory does not
  * accumulate orphans nothing points at.
  */
-
-const CLIMATE_HINT: Record<Climate, string> = {
-  'Humid / tropical': 'Swelling, reversion and frizz. Sealing beats soaking.',
-  'Dry / arid': 'Moisture leaves fast. Layer, then seal, and re-moisturise often.',
-  'Cold / low humidity': 'Indoor heating strips moisture. Satin and heavier sealants.',
-  Temperate: 'No strong seasonal pull in either direction.',
-}
 
 export default function BioCard() {
   const { profile, update } = useHairProfile()
@@ -61,12 +53,8 @@ export default function BioCard() {
     if (previous) await deletePhoto(previous)
   }
 
-  function setClimate(value: Climate) {
-    update({ bio: { ...bio, climate: bio.climate === value ? undefined : value } })
-  }
-
   return (
-    <section className="mb-2xl">
+    <section className="mb-lg">
       <div className="flex flex-col items-center text-center">
         <div className="relative mb-md">
           {bio.photo ? (
@@ -145,71 +133,6 @@ export default function BioCard() {
         )}
       </div>
 
-      <div className="mt-lg rounded-2xl shadow-card bg-surface-container-lowest p-lg">
-        <div className="mb-xs flex items-center gap-sm">
-          <Icon name="waves" className="text-primary" />
-          <h3 className="flex-1 font-caption text-caption uppercase tracking-widest text-on-surface-variant">
-            Where your hair lives
-          </h3>
-        </div>
-        <p className="mb-md font-caption text-caption text-on-surface-variant">
-          Climate and water hardness change which products work, so the shelf and the
-          guides read them. Nothing on this card leaves the phone.
-        </p>
-
-        <div className="mb-md flex flex-wrap gap-sm">
-          {CLIMATES.map((option) => {
-            const on = bio.climate === option
-            return (
-              <button
-                key={option}
-                type="button"
-                aria-pressed={on}
-                onClick={() => setClimate(option)}
-                className={`rounded-full px-lg py-2 font-label-md text-label-md transition-colors active:scale-95 ${
-                  on
-                    ? 'bg-inverse-surface text-inverse-on-surface'
-                    : 'bg-surface-container-lowest text-on-surface shadow-card'
-                }`}
-              >
-                {option}
-              </button>
-            )
-          })}
-        </div>
-
-        {bio.climate && (
-          <p className="mb-md font-body-md text-caption text-on-surface-variant">
-            {CLIMATE_HINT[bio.climate]}
-          </p>
-        )}
-
-        {/* Kept separate from climate rather than made a fifth option:
-            hard water is plumbing, not weather, and someone in a humid
-            city can have it too. Folding it in would make them choose. */}
-        <button
-          type="button"
-          aria-pressed={bio.hardWater === true}
-          onClick={() => update({ bio: { ...bio, hardWater: !bio.hardWater } })}
-          className={`flex w-full items-center gap-sm rounded-xl px-md py-3 text-left font-body-md text-body-md transition-colors active:scale-[0.98] ${
-            bio.hardWater
-              ? 'bg-tertiary-fixed text-on-tertiary-fixed'
-              : 'bg-surface-container text-on-surface-variant'
-          }`}
-        >
-          <Icon
-            name={bio.hardWater ? 'check_circle' : 'radio_button_unchecked'}
-            filled={bio.hardWater}
-            className="shrink-0 text-[18px]"
-          />
-          <span className="min-w-0 flex-1">
-            I live in a hard water area
-            <span className="block font-caption text-caption opacity-80">
-              Limescale on the kettle and taps is the usual tell. It changes clarifying advice.
-            </span>
-          </span>
-        </button>
-      </div>
     </section>
   )
 }

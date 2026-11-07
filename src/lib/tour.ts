@@ -78,7 +78,7 @@ export const TOUR_STEPS: TourStep[] = [
     path: '/profile',
     target: 'profile-heading',
     title: 'My Hair Profile',
-    body: 'Tell the app whether you have loose hair or locs and the rest follows. The hair quiz fills this in from what you can see on your own head.',
+    body: 'Tell the app whether you have loose hair or locs and the rest follows. The card at the top shows what the app knows and what is still missing; tap any row to change it. The hair quiz fills it all in from what you can see on your own head.',
   },
   {
     path: '/sos',

@@ -73,7 +73,7 @@ function StageStrip({ identity }: { identity: HairIdentity }) {
         ))}
       </ol>
       <Link
-        to="/profile"
+        to="/profile?open=locStage"
         className="mt-sm flex items-center gap-xs font-caption text-caption text-inverse-primary"
       >
         {stage
