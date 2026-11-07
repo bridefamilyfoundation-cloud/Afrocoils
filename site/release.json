@@ -14,14 +14,14 @@
     "Hair Growth: retention fitted at the afro-textured rate, trims logged"
   ],
   "bundle": {
-    "code": 9,
+    "code": 10,
     "minVersionCode": 10,
-    "bytes": 4521525,
-    "sha256": "57f860b30c82fded2ede6441a736cce6b730d1697d45e22515281bda405eec15",
-    "released": "2026-11-05",
-    "url": "https://runhkccoeyxfgsfrzezn.supabase.co/storage/v1/object/public/releases/bundles/9.zip",
+    "bytes": 4523286,
+    "sha256": "48daf262fcc660fe2ab020f40f4cbf2d53128f43d3d66437b40b8ed278dd1bd1",
+    "released": "2026-11-07",
+    "url": "https://runhkccoeyxfgsfrzezn.supabase.co/storage/v1/object/public/releases/bundles/10.zip",
     "notes": [
-      "Membership: sign in with your email to open AfroCoils"
+      "A clearer My Hair Profile: your answers at a glance, one row at a time"
     ]
   }
 }
