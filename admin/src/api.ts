@@ -1,4 +1,4 @@
-import type { AdminSessionResponse, MemberStatus } from '../../src/lib/types'
+import type { AdminSessionResponse, MemberStatus, PlanId } from '../../src/lib/types'
 
 /**
  * The admin site's only connection: the `auth` and `admin` Edge
@@ -87,6 +87,10 @@ export interface MemberRow {
   source: 'paystack' | 'manual'
   paystack_customer: string | null
   paystack_subscription: string | null
+  plan: PlanId | null
+  period_start: string | null
+  trial_ends_at: string | null
+  last_notice: string | null
   note: string | null
   created_at: string
   updated_at: string

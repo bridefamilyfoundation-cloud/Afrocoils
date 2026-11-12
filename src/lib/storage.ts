@@ -10,7 +10,7 @@ import type {
   Membership,
   MyStyle,
 } from './types'
-import { CURL_PATTERNS, MEMBER_STATUSES, PROFILE_VERSION, defaultSchedules } from './types'
+import { CURL_PATTERNS, MEMBER_STATUSES, PROFILE_VERSION, defaultSchedules, isPlanId, parseFloor } from './types'
 
 /**
  * Persistence for the hair profile.
@@ -108,7 +108,7 @@ function migrate(stored: unknown): HairProfile {
     // from before update checks existed gets them on, like a new one.
     updates:
       typeof s.updates === 'object' && s.updates !== null
-        ? { ...base.updates, ...s.updates }
+        ? { ...base.updates, ...s.updates, floor: parseFloor((s.updates as { floor?: unknown }).floor) }
         : base.updates,
     // v9 → v10. On, like a new install; the switch is on About.
     askSharing: typeof s.askSharing === 'boolean' ? s.askSharing : base.askSharing,
@@ -161,6 +161,11 @@ function validMembership(value: unknown): Membership | undefined {
       ? (m.status as MemberStatus)
       : 'none',
     paidUntilISO: typeof m.paidUntilISO === 'string' ? m.paidUntilISO : null,
+    plan: isPlanId(m.plan) ? m.plan : null,
+    periodStartISO: typeof m.periodStartISO === 'string' ? m.periodStartISO : null,
+    trialEndsISO: typeof m.trialEndsISO === 'string' ? m.trialEndsISO : null,
+    // Older documents predate the flag; their status was only ever a Paystack one.
+    renews: typeof m.renews === 'boolean' ? m.renews : m.status === 'active',
     checkedISO: typeof m.checkedISO === 'string' ? m.checkedISO : new Date(0).toISOString(),
   }
 }

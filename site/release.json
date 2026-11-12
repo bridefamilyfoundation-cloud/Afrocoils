@@ -1,27 +1,24 @@
 {
   "version": "0.2.0",
-  "versionCode": 10,
+  "versionCode": 12,
   "packageId": "com.afrocoils.app",
   "minSdk": 24,
   "minAndroid": "7.0",
-  "bytes": 9362231,
-  "sha256": "c074c2592ab8516584493c3523d5cca0bfcf52e384a835967338877f94c5138f",
-  "released": "2026-10-26",
-  "url": "https://runhkccoeyxfgsfrzezn.supabase.co/storage/v1/object/public/releases/apk/AfroCoils-0.2.0-10.apk",
-  "download": "download/AfroCoils-0.2.0-10.apk",
-  "notes": [
-    "New app id: com.afrocoils.app. If you have the older AfroCoils installed, uninstall it first; your profile does not carry across.",
-    "Hair Growth: retention fitted at the afro-textured rate, trims logged"
-  ],
+  "bytes": 9115331,
+  "sha256": "4098bf0376adc2ed5fe4df3d48d0d557c5f312682ae4b1b0b55d4e7017b7ef4c",
+  "released": "2026-11-12",
+  "url": "https://runhkccoeyxfgsfrzezn.supabase.co/storage/v1/object/public/releases/apk/AfroCoils-0.2.0-12.apk",
+  "download": "download/AfroCoils-0.2.0-12.apk",
+  "notes": [],
   "bundle": {
-    "code": 10,
+    "code": 11,
     "minVersionCode": 10,
-    "bytes": 4523286,
-    "sha256": "48daf262fcc660fe2ab020f40f4cbf2d53128f43d3d66437b40b8ed278dd1bd1",
-    "released": "2026-11-07",
-    "url": "https://runhkccoeyxfgsfrzezn.supabase.co/storage/v1/object/public/releases/bundles/10.zip",
+    "bytes": 4530075,
+    "sha256": "d99dd3bcf08e9251491e45a0b3c3f19092237eeb0b0a5898d1a1da852b3858aa",
+    "released": "2026-11-12",
+    "url": "https://runhkccoeyxfgsfrzezn.supabase.co/storage/v1/object/public/releases/bundles/11.zip",
     "notes": [
-      "A clearer My Hair Profile: your answers at a glance, one row at a time"
+      "Ready"
     ]
   }
 }

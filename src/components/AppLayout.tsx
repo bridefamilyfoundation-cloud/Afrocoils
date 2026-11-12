@@ -3,6 +3,7 @@ import { Navigate, Outlet, useLocation, useNavigationType } from 'react-router-d
 import AppFooter from './AppFooter'
 import AskLauncher from './AskLauncher'
 import BottomNav from './BottomNav'
+import MembershipNotice from './MembershipNotice'
 import NavDrawer from './NavDrawer'
 import ScreenFallback from './ScreenFallback'
 import TopAppBar from './TopAppBar'
@@ -85,6 +86,7 @@ export default function AppLayout() {
           no cutout, and slid the top of every screen under the bar on
           the ones that have one. */}
       <main className="mx-auto max-w-5xl px-container-padding pt-[calc(6rem+var(--safe-top))]">
+        {open && <MembershipNotice />}
         <Outlet />
       </main>
 

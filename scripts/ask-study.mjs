@@ -31,6 +31,7 @@ import { execFileSync } from 'node:child_process'
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { createServer } from 'vite'
+import { supabaseEnv } from './lib/supabase-env.mjs'
 
 const args = process.argv.slice(2)
 const flag = (name) => {
@@ -64,7 +65,7 @@ function pull() {
   const out = execFileSync(
     process.platform === 'win32' ? 'npx.cmd' : 'npx',
     ['supabase', 'db', 'query', '--linked', '--output-format', 'json', sql],
-    { encoding: 'utf8', stdio: ['ignore', 'pipe', 'inherit'], shell: process.platform === 'win32' },
+    { encoding: 'utf8', stdio: ['ignore', 'pipe', 'inherit'], shell: process.platform === 'win32', env: supabaseEnv() },
   )
   const rows = rowsIn(JSON.parse(out.slice(out.search(/[[{]/))))
   if (!rows) throw new Error('No rows in the CLI output. Is the CLI linked to runhkccoeyxfgsfrzezn?')

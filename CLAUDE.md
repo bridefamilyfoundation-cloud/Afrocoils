@@ -46,6 +46,23 @@ picture; this file is the short version of what to keep in mind when editing.
   `autoUpdate` on. `markBundleHealthy()` runs from `UpdatePrompt`'s first
   effect so a bundle that crashes on load is rolled back; keep it after the
   first render, not before. A Play build leaves the manifest URL unset.
+- **The kill switch is `floor` in `latest.json`, and it sends nothing.**
+  `npm run release:floor -- --bundle N --apk M` (added 2026-11-12)
+  retires every copy below pushed update N or APK build M: `RetiredGate`
+  replaces the whole app with one screen offering the update, no "Not
+  now". It reaches a phone two ways — the update check, and
+  `MembershipResponse.floor`, which `_shared/releases.ts` reads from the
+  same latest.json — so the About switch is not a way round it, and that
+  switch still stops the update check exactly as the policy says. The
+  phone only receives two numbers; reporting its own version to the
+  server would be data collection, policy first. Three rules: the floor
+  is never above what is published (the script refuses, `manifestFrom`
+  and the client both clamp), so publish first and raise it after;
+  `site:release` and `ota:publish` carry it forward; and only copies
+  that contain the gate obey it — update 11 and APK 11 onward. Nothing
+  retires an older copy, which is why the APK must be rebuilt whenever
+  the lock or the gate changes: a fresh install and a rolled-back push
+  both land on the APK's own bundle.
 - **Every feature is for paying members (decided 2026-11-05).** A phone
   without a paid membership shows the front page — the collage, the
   title, and "Inside AfroCoils", the six sections *described* from
@@ -54,16 +71,28 @@ picture; this file is the short version of what to keep in mind when editing.
   `AppLayout`'s `lockedCanOpen()` is the one gate; every other address
   redirects to `/join`. The front page's own button is "Explore more
   features", which leads there. A member is an **email address**,
-  confirmed with a six-digit code (`auth`), paid as a **monthly Paystack
-  subscription** started on Paystack's page in the browser (`billing`),
-  and recorded in `members` (migration 0005). `membershipOpen()` in
+  confirmed with a six-digit code (`auth`), paid as a **Paystack
+  subscription on one of three plans** — Monthly, 6 Months, Annual
+  (`PLANS` in `types.ts`, decided 2026-11-11) — started on Paystack's
+  page in the browser (`billing`), and recorded in `members` (migrations
+  0005, 0006). New members get **one three-day free trial, no card**
+  (`TRIAL_DAYS`), started by a button on `/join` — never by signing in —
+  and limited to one per person by the `trials` table, keyed on the
+  address without its `+tag` (and Gmail dots). `accessOpen()` in
   `types.ts` is the access rule on both sides — paid-until plus
-  `MEMBERSHIP_GRACE_DAYS` — and the phone keeps the answer on the
-  profile (`membership`) so the app still opens with no signal once
-  signed in. `MembershipSync` re-asks on launch and on return (always
-  while locked, at most every 12h while open); a 401 signs out, and
-  signing out never touches the hair profile. The price lives in the
-  Paystack plan, never in code. An earlier one-off "AfroCoils Plus" with
+  `MEMBERSHIP_GRACE_DAYS`, or a live trial with no grace — and the phone
+  keeps the answer on the profile (`membership`) so the app still opens
+  with no signal once signed in. `MembershipSync` re-asks on launch and
+  on return (always while locked, straight after a checkout was opened,
+  otherwise at most every 12h); a 401 signs out, and signing out never
+  touches the hair profile. A payment is believed from the signed
+  webhook *or* from `transaction/verify` on the checkout's reference
+  (`_shared/membership.ts`), recorded once by `recordCharge()`. Every
+  price lives in its Paystack plan, never in code — the savings on
+  `/join` are computed from those prices. Reminders are service mail
+  only, sent once each by the daily `billing/reminders` run (pg_cron)
+  and mirrored by `MembershipNotice` in the app; adding a kind of email
+  is a privacy-policy sentence first. An earlier one-off "AfroCoils Plus" with
   per-feature locks shipped in test mode in pushed update 8 and was
   removed: `plus` is a legacy key, dropped on load. Don't reintroduce
   per-feature locks — the whole app is the product. A Play build cannot

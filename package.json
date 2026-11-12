@@ -25,6 +25,7 @@
     "images:import": "node scripts/import-drive-images.mjs",
     "site:release": "node scripts/site-release.mjs",
     "ota:publish": "node scripts/ota-publish.mjs",
+    "release:floor": "node scripts/release-floor.mjs",
     "site:dev": "vite --config vite.site.config.ts",
     "site:build": "tsc -p tsconfig.site.json && vite build --config vite.site.config.ts",
     "site:preview": "vite preview --config vite.site.config.ts",
@@ -35,8 +36,9 @@
     "brand:import": "node scripts/import-brand.mjs",
     "ask:eval": "node scripts/ask-eval.mjs",
     "ask:study": "node scripts/ask-study.mjs",
-    "backend:deploy": "supabase functions deploy submissions --no-verify-jwt --use-api && supabase functions deploy questions --no-verify-jwt --use-api && supabase functions deploy auth --no-verify-jwt --use-api && supabase functions deploy billing --no-verify-jwt --use-api && supabase functions deploy inbound --no-verify-jwt --use-api && supabase functions deploy admin --no-verify-jwt --use-api",
-    "db:push": "supabase db push --linked"
+    "backend:deploy": "node scripts/supabase.mjs --deploy-functions",
+    "db:push": "node scripts/supabase.mjs db push --linked",
+    "supabase": "node scripts/supabase.mjs"
   },
   "dependencies": {
     "@capacitor/android": "^8.4.2",

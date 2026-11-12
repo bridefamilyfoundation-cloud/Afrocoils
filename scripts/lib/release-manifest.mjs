@@ -20,6 +20,7 @@
  * from the same file the landing site's download card is built from.
  */
 import { spawnSync } from 'node:child_process'
+import { supabaseEnv } from './supabase-env.mjs'
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { dirname, join, relative, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -68,14 +69,28 @@ export function writeRelease(release) {
  * from the bucket and the landing page is elsewhere.
  */
 export function manifestFrom(release) {
-  const { packageId: _packageId, download, ...rest } = release
+  const { packageId: _packageId, download, floor: asked, ...rest } = release
+  const floor = clampFloor(asked, release)
   return {
     ...rest,
+    ...(floor ? { floor } : {}),
     // The APK through the site (see `downloadPath`); a bundle stays a
     // bucket URL, because only the updater reads it and nobody sees it.
     url: download ? new URL(download, SITE_URL).href : rest.url,
     page: `${SITE_URL}#download`,
   }
+}
+
+/**
+ * The kill switch (`ReleaseFloor` in src/lib/types.ts), never above what
+ * is published: a floor no phone can climb to would lock every copy with
+ * nothing to update to. Undefined when it retires nothing.
+ */
+export function clampFloor(floor, release) {
+  const whole = (n) => (Number.isInteger(n) && n > 0 ? n : 0)
+  const bundle = Math.min(whole(floor?.bundle), Number(release.bundle?.code) || 0)
+  const versionCode = Math.min(whole(floor?.versionCode), Number(release.versionCode) || 0)
+  return bundle || versionCode ? { bundle, versionCode } : undefined
 }
 
 /** The day, local to this machine, as `YYYY-MM-DD` — never toISOString(), which is UTC. */
@@ -120,7 +135,7 @@ function storage(args) {
   const windows = process.platform === 'win32'
   const q = (arg) => (windows && /\s/.test(arg) ? `"${arg}"` : arg)
   const all = ['supabase', 'storage', ...args, '--experimental', '--linked']
-  return spawnSync('npx', all.map(q), { cwd: ROOT, stdio: 'inherit', shell: windows }).status === 0
+  return spawnSync('npx', all.map(q), { cwd: ROOT, stdio: 'inherit', shell: windows, env: supabaseEnv() }).status === 0
 }
 
 /** Write latest.json from site/release.json and upload it. */

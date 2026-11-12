@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { membershipOpen } from '../../../src/lib/types'
+import { PLANS, accessOpen, trialOpen } from '../../../src/lib/types'
 import type { PageProps } from '../App'
 import { day, when, type MemberRow } from '../api'
 import { Button, Card, Pill, Problem, input } from '../ui'
@@ -100,14 +100,18 @@ export default function Members({ api }: PageProps) {
           <p className="text-sm text-on-surface-variant">No members{search ? ' match' : ' yet'}.</p>
         )}
         {data?.map((m) => {
-          const open = membershipOpen(m.paid_until)
+          const open = accessOpen({ paidUntilISO: m.paid_until, trialEndsISO: m.trial_ends_at })
+          const trialing = trialOpen(m.trial_ends_at)
           return (
             <Card key={m.email} className="!p-md">
               <div className="flex flex-wrap items-center justify-between gap-sm">
                 <div className="min-w-0">
                   <p className="truncate font-bold">{m.email}</p>
                   <p className="text-xs text-on-surface-variant">
-                    Paid until {day(m.paid_until)} · {m.source} · last seen {when(m.last_seen_at)}
+                    {m.plan ? PLANS[m.plan].label : 'No plan'} · paid until {day(m.paid_until)}
+                    {m.trial_ends_at ? ` · trial ${trialing ? 'ends' : 'ended'} ${day(m.trial_ends_at)}` : ''} · {m.source} · last
+                    seen {when(m.last_seen_at)}
+                    {m.last_notice ? ` · last reminder ${m.last_notice}` : ''}
                   </p>
                 </div>
                 <div className="flex items-center gap-xs">

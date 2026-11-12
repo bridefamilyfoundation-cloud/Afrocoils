@@ -3,6 +3,7 @@ import { App } from '@capacitor/app'
 import Icon from './Icon'
 import { useBackDismiss } from '../lib/back-button'
 import { useHairProfile } from '../lib/profile-store'
+import { useRetired } from './RetiredGate'
 import {
   checkForUpdates,
   formatBytes,
@@ -43,6 +44,9 @@ export default function UpdatePrompt() {
   const status = useUpdateStatus()
   const [closed, setClosed] = useState(false)
   const enabled = ready && profile.updates.check
+  // A retired copy shows RetiredGate, which offers the same update with
+  // no "Not now"; this sheet would only sit on top of it.
+  const retired = useRetired()
 
   // The resume listener outlives renders, so it reads the setting
   // through a ref rather than capturing the first one it saw.
@@ -84,7 +88,7 @@ export default function UpdatePrompt() {
   // Back cannot interrupt a download that is already verifying.
   useBackDismiss(open && !installing, () => setClosed(true))
 
-  if (!apk && !push) return null
+  if (retired || (!apk && !push)) return null
 
   const notes = apk?.notes ?? push?.notes ?? []
 

@@ -100,6 +100,79 @@ export function codeMail(to: string, code: string, purpose: 'member' | 'admin'):
 }
 
 /* ------------------------------------------------------------------ *
+ * Membership notices
+ * ------------------------------------------------------------------ */
+
+/**
+ * The four reminders the daily run sends (billing/reminders), each once:
+ *
+ * - `trial-ending`: the free trial ends within a day.
+ * - `ending`: a membership that will not renew ends within three days.
+ * - `renewing`: a plan renews within three days, and for how much.
+ * - `ended`: access has just closed.
+ *
+ * Service mail about the membership, nothing else: no offers, no
+ * newsletter. The privacy policy names exactly these.
+ */
+export type NoticeKind = 'trial-ending' | 'ending' | 'renewing' | 'ended'
+
+export interface NoticeDetails {
+  /** The date the notice is about, already written out ("14 November 2026"). */
+  date: string
+  /** "6 Months", for a plan. */
+  planLabel?: string
+  /** "₦7,500", for a renewal. */
+  amount?: string
+}
+
+const NOTICE: Record<NoticeKind, (d: NoticeDetails) => { subject: string; lines: string[] }> = {
+  'trial-ending': (d) => ({
+    subject: 'Your AfroCoils free trial ends tomorrow',
+    lines: [
+      `Your three-day free trial ends on ${d.date}.`,
+      'To keep AfroCoils open, choose a plan in the app: Monthly, 6 Months or Annual. Open the app and tap Choose a plan on the banner, or go to My Hair Profile → Membership.',
+      'If you do nothing, the app simply locks. Your hair profile, history and photos stay on your phone.',
+    ],
+  }),
+  ending: (d) => ({
+    subject: `Your AfroCoils membership ends on ${d.date}`,
+    lines: [
+      `Your ${d.planLabel ? `${d.planLabel} ` : ''}membership is not set to renew, and ends on ${d.date}.`,
+      'To keep the app open, choose a plan in the app before then: My Hair Profile → Membership → Choose a plan.',
+      'Your hair profile, history and photos stay on your phone either way.',
+    ],
+  }),
+  renewing: (d) => ({
+    subject: `Your AfroCoils membership renews on ${d.date}`,
+    lines: [
+      `Your ${d.planLabel ?? ''} membership renews on ${d.date}${d.amount ? `, and Paystack will charge ${d.amount} to your card` : ''}.`,
+      'Nothing to do if you want to carry on. To change the card or cancel, open the app: My Hair Profile → Membership → Manage or cancel. Cancelling keeps the app open to the end of the period you have paid for.',
+    ],
+  }),
+  ended: (d) => ({
+    subject: 'Your AfroCoils membership has ended',
+    lines: [
+      `Your access to AfroCoils ended on ${d.date}, so the app is now locked.`,
+      'Your hair profile, history and photos are still on your phone, and open again as soon as you choose a plan in the app.',
+    ],
+  }),
+}
+
+export function noticeMail(to: string, kind: NoticeKind, details: NoticeDetails): OutgoingMail {
+  const { subject, lines } = NOTICE[kind](details)
+  const footer = 'AfroCoils — Celebrating Every Coil.'
+  const text = [...lines, footer, 'Questions? Reply to support@afrocoils.app.'].join('\n\n')
+  const html = `<!doctype html><html><body style="margin:0;background:#E8D5C0;font-family:Arial,Helvetica,sans-serif;color:#5A2108">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td align="center" style="padding:32px 16px">
+<table role="presentation" width="100%" style="max-width:440px;background:#ffffff;border-radius:16px" cellpadding="0" cellspacing="0"><tr><td style="padding:32px">
+<p style="margin:0 0 16px;font-size:20px;font-weight:bold;color:#3F1708">${escape(subject)}</p>
+${lines.map((line) => `<p style="margin:0 0 16px;font-size:14px;line-height:1.5">${escape(line)}</p>`).join('\n')}
+<p style="margin:0;font-size:13px;color:#7a4a32">${escape(footer)}<br>Questions? Write to <a href="mailto:support@afrocoils.app" style="color:#E2583E">support@afrocoils.app</a>.</p>
+</td></tr></table></td></tr></table></body></html>`
+  return { from: FROM_NOREPLY, to, subject, text, html, replyTo: 'support@afrocoils.app' }
+}
+
+/* ------------------------------------------------------------------ *
  * Receiving
  * ------------------------------------------------------------------ */
 

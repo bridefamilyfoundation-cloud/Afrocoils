@@ -105,8 +105,8 @@ a community style submission, which the user starts deliberately and which
 carries the photographs and text they wrote. Say exactly that.
 
 **Payments — read this before submitting to Play at all.** Since 2026-11-05
-every feature is for paying members, paid as a monthly Paystack subscription
-on a web page. Google Play's Payments policy requires Play Billing for digital
+every feature is for paying members, paid as a Paystack subscription (Monthly,
+6 Months or Annual, after an optional three-day free trial) on a web page. Google Play's Payments policy requires Play Billing for digital
 content and subscriptions sold to a Play install, and forbids steering Play
 users to another payment method. The sideloaded APK and the Play build cannot
 share this flow: a Play build needs Play Billing (a native plugin, a

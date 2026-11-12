@@ -169,6 +169,11 @@ export const CASES: AskCase[] = [
   { q: 'how much does it cost', expect: ['topic:membership', 'faq:membership'], top: true },
   { q: 'sign in on my new phone', expect: ['topic:membership', 'faq:membership'], top: true },
   { q: 'why do I have to pay', expect: ['faq:membership', 'topic:membership'], top: true },
+  { q: 'is there a free trial', expect: ['topic:membership', 'faq:membership'], top: true },
+  { q: 'when does my trial end', expect: ['topic:membership', 'faq:membership'], top: true },
+  { q: 'how much is the annual plan', expect: ['topic:membership', 'faq:membership'], top: true },
+  { q: 'can I pay for 6 months', expect: ['topic:membership', 'faq:membership'], top: true },
+  { q: 'when does my membership expire', expect: ['topic:membership', 'faq:membership'], top: true },
   { q: 'how are styles recommended', expect: ['topic:recommendations'], top: true },
 
   // --- Typos ---

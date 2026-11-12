@@ -412,7 +412,7 @@ export const TOPICS: AskTopic[] = [
     id: 'updates',
     title: 'Updating the app',
     answer:
-      'When the app opens it asks our update server whether anything newer is out, carrying nothing about you. Most updates install in place: a sheet says one is ready, you tap Update now and the app restarts into it, with nothing to reinstall. A change to the app itself comes as a new version to download instead. Nothing installs on its own, and you can switch the check off on About.',
+      'When the app opens it asks our update server whether anything newer is out, carrying nothing about you. Most updates install in place: a sheet says one is ready, you tap Update now and the app restarts into it, with nothing to reinstall. A change to the app itself comes as a new version to download instead. Nothing installs on its own, and you can switch the check off on About. Now and then we retire an old version: the app then opens on one screen asking you to update, and carries on as soon as you have, with your profile untouched.',
     route: '/about',
     cta: 'Open About',
     docs: 'updates',
@@ -490,11 +490,11 @@ export const TOPICS: AskTopic[] = [
     id: 'membership',
     title: 'Your membership',
     answer:
-      'Your membership is your email, and it is monthly. My Hair Profile shows when it renews, and Manage or cancel opens Paystack’s page to change the card or cancel; the app stays open to the end of the month you paid for. On a new phone, sign in with the same email. Sign out is there too, and leaves your hair profile on the phone.',
+      'Your membership is your email. New members can try it free for three days with no card, then choose Monthly, 6 Months or Annual; the longer plans cost less per month. My Hair Profile shows your plan, when it started and when it renews or ends; Choose a plan is there while you are on the trial or a plan that won’t renew, and Manage or cancel opens Paystack’s page to change the card or cancel. The app stays open to the end of the period you paid for, and we email you before a trial ends and before a plan renews or ends. On a new phone, sign in with the same email. Sign out is there too, and leaves your hair profile on the phone.',
     route: '/profile?open=membership',
     cta: 'Open My Hair Profile',
     docs: 'membership',
-    keys: 'my membership|my subscription|cancel my subscription|cancel membership|stop paying|change my card|update my card|renew|renewal|sign out|log out|new phone|sign in on another phone|how much is it|price|paystack|refund',
+    keys: 'my membership|my subscription|cancel my subscription|cancel membership|stop paying|change my card|update my card|renew|renewal|sign out|log out|new phone|sign in on another phone|how much is it|price|paystack|refund|free trial|my trial|trial ends|when does my trial end|plans|my plan|change my plan|switch plan|6 months|six months|annual plan|yearly plan|when does my membership end|expiry|expires',
   },
   {
     id: 'terms',

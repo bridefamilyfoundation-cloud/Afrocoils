@@ -65,8 +65,8 @@ function PrivacyPolicy() {
           None of it is transmitted anywhere, and none of it is readable by other apps.
           Uninstalling AfroCoils deletes all of it. There is no copy on a server to ask us
           to delete, because there is no server holding one. The same document also keeps
-          your membership — your email, a sign-in token and the date you are paid up to — so
-          the app opens without signal.
+          your membership — your email, a sign-in token, your plan and the dates it and any
+          free trial start and end — so the app opens without signal.
         </p>
       </Article>
 
@@ -78,11 +78,26 @@ function PrivacyPolicy() {
           scrambled fingerprint, for ten minutes, and the address itself in our members list.
         </p>
         <p>
-          <strong>Paying.</strong> Membership is a monthly subscription paid by card on
-          Paystack&rsquo;s own page, which opens in your browser. Paystack holds your card
-          details; we never see them. Paystack tells us your email, the amount, the date and
-          its own reference numbers for the payment and the subscription, and we keep those
-          so we know you are paid up and can help if something goes wrong.
+          <strong>The free trial.</strong> A new member can try every section free for three
+          days, with no card. We note that your address has had its trial, and when it ends,
+          so each person has one; for that we also keep the address with any
+          &ldquo;+&rdquo; part removed (and, for Gmail, its dots), because those reach the
+          same inbox.
+        </p>
+        <p>
+          <strong>Paying.</strong> Membership is a subscription on one of three plans —
+          Monthly, 6 Months or Annual — paid by card on Paystack&rsquo;s own page, which opens
+          in your browser. Paystack holds your card details; we never see them. Paystack tells
+          us your email, the plan, the amount, the date and its own reference numbers for the
+          payment and the subscription, and we keep those so we know you are paid up and can
+          help if something goes wrong. When you start a payment we keep its reference
+          number, so our server can ask Paystack whether it went through.
+        </p>
+        <p>
+          <strong>Reminder emails.</strong> We email you, from no-reply@afrocoils.app, the day
+          before your free trial ends, three days before a plan renews or ends, and once when
+          your access has ended. We keep a note of the last reminder sent so nobody gets one
+          twice. These are about your membership and nothing else.
         </p>
         <p>
           <strong>Staying signed in.</strong> While you are signed in, the app asks our server
@@ -92,8 +107,8 @@ function PrivacyPolicy() {
           you did in the app.
         </p>
         <p>
-          We use your email only to sign you in, to run your membership and to answer you when
-          you write to us. No newsletters, no marketing, and we never sell or share it except
+          We use your email only to sign you in, to run your membership (the reminders above
+          included) and to answer you when you write to us. No newsletters, no marketing, and we never sell or share it except
           with Paystack and Resend, to do exactly those jobs. To have it removed, cancel your
           membership and write to{' '}
           <a href="mailto:support@afrocoils.app" className="text-primary underline">
@@ -214,9 +229,9 @@ function PrivacyPolicy() {
           to download comes from the website.
         </p>
         <p>
-          <strong>Paystack</strong> takes your card payment and runs the monthly subscription,
-          under its own privacy policy. <strong>Resend</strong> sends the sign-in codes and our
-          replies, and receives mail you send to support@ or hello@afrocoils.app; we keep that
+          <strong>Paystack</strong> takes your card payment and runs the subscription, under its
+          own privacy policy. <strong>Resend</strong> sends the sign-in codes, the reminder
+          emails and our replies, and receives mail you send to support@ or hello@afrocoils.app; we keep that
           correspondence as text so we can answer it.
         </p>
       </Article>
@@ -280,7 +295,7 @@ function Article({ title, children }: { title: string; children: React.ReactNode
 /** What the Terms still need, as decisions rather than drafted clauses. */
 const TERMS_OUTSTANDING = [
   'The legal entity that runs AfroCoils, its registered address and the governing law',
-  'The refund policy for a month already paid for',
+  'The refund policy for a period already paid for, including a 6-month or annual plan cancelled early',
   'Liability limits and warranty disclaimers',
   'Ownership and licensing of contributed photos and write-ups',
   'An effective date, set when it is first published',
@@ -292,18 +307,28 @@ function Terms() {
       <Article title="Membership">
         <p>
           Every feature of AfroCoils is for members. A membership belongs to one email
-          address, confirmed with a code we send to it, and is paid as a monthly
-          subscription by card through Paystack at the price shown before you pay.
+          address, confirmed with a code we send to it, and is paid as a subscription by
+          card through Paystack on one of three plans — Monthly, 6 Months or Annual — at the
+          price shown for each before you pay. The longer plans cost less per month.
         </p>
         <p>
-          It renews each month on the date you first paid, until you cancel. Cancel any time
-          from My Hair Profile (Manage or cancel opens Paystack&rsquo;s page for your
-          subscription). Cancelling stops the next charge; the app stays open to the end of
-          the month you have already paid for.
+          <strong>Free trial.</strong> A new member can use every section free for three
+          days, once per person, without a card. When the trial ends the app locks until you
+          choose a plan; nothing is charged unless you choose one. Choosing a plan during the
+          trial starts the plan that day.
+        </p>
+        <p>
+          A plan renews at the end of each period — every month, every six months or every
+          year, from the date you paid — at the plan&rsquo;s price, until you cancel. We email
+          you three days before it renews. Cancel any time from My Hair Profile (Manage or
+          cancel opens Paystack&rsquo;s page for your subscription). Cancelling stops the next
+          charge; the app stays open to the end of the period you have already paid for. To
+          change plan, cancel the current one and choose the new one; it starts the day you
+          pay for it.
         </p>
         <p>
           If a renewal fails, Paystack tries the card again, and the app stays open for three
-          days past the end of the paid month while it does. After that it locks until the
+          days past the end of the paid period while it does. After that it locks until the
           membership is paid again. Your hair profile, history and photographs stay on your
           phone throughout, and open again when you do.
         </p>

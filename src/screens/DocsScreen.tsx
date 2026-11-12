@@ -484,17 +484,26 @@ const SECTIONS: {
           member.
         </p>
         <p>
-          Your email is your membership. Enter it, type in the six-digit code we email you,
-          and pay the monthly membership by card on Paystack&rsquo;s page, which opens in
-          your browser. Come back to the app and it opens by itself once the payment is
-          through; I&rsquo;ve paid &mdash; check again asks straight away. On a new phone,
-          sign in with the same email and skip the payment.
+          Your email is your membership. Enter it and type in the six-digit code we email
+          you. A new member can then start a three-day free trial &mdash; every section, no
+          card &mdash; or choose a plan straight away: Monthly, 6 Months or Annual, each
+          showing its price, what it comes to a month and what it saves against paying
+          monthly. Paying happens by card on Paystack&rsquo;s page, which opens in your
+          browser. Come back to the app and it opens by itself once the payment is through;
+          I&rsquo;ve paid &mdash; check again asks straight away. On a new phone, sign in with
+          the same email and skip the payment.
         </p>
         <p>
-          The Membership row at the foot of My Hair Profile shows the email, when the membership renews, Manage or cancel
-          (Paystack&rsquo;s page for the card and for cancelling) and Sign out. Cancelling
-          keeps the app open to the end of the month you paid for. A failed renewal leaves it
-          open for three more days while Paystack retries the card. Signing out, or a
+          The Membership row at the foot of My Hair Profile shows the email, the plan, its
+          length, when it started and when it renews or ends with the days left, Choose a plan
+          (on the trial, or a plan that won&rsquo;t renew), Manage or cancel
+          (Paystack&rsquo;s page for the card and for cancelling) and Sign out. A plan chosen
+          during the trial starts the day you pay. Cancelling keeps the app open to the end of
+          the period you paid for. On the last day of a trial, and in the last three days of a
+          plan that won&rsquo;t renew, a reminder sits at the top of the app&rsquo;s screens
+          (not the front page), and we email you the day before a
+          trial ends, three days before a plan renews or ends, and when access ends. A failed
+          renewal leaves the app open for three more days while Paystack retries the card. Signing out, or a
           membership ending, locks the app but leaves your hair profile on the phone.
         </p>
         <p>
@@ -529,6 +538,12 @@ const SECTIONS: {
           download, Android asks you to confirm, and it installs over this one with your
           profile intact. Nothing installs on its own either way, and you can switch the
           check off on About, which also lists any update you put off.
+        </p>
+        <p>
+          Now and then we retire an old version. If yours is one, the app opens on a single
+          screen asking you to update, and carries on as soon as you have. Your profile is not
+          touched. The app learns this from the update check and from your membership check,
+          so it applies with the update check switched off too.
         </p>
       </>
     ),

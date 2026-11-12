@@ -2,7 +2,8 @@ import { useSyncExternalStore } from 'react'
 import { App } from '@capacitor/app'
 import { Capacitor, CapacitorHttp } from '@capacitor/core'
 import { CapacitorUpdater } from '@capgo/capacitor-updater'
-import type { BundleRelease, UpdateManifest } from './types'
+import type { BundleRelease, ReleaseFloor, UpdateManifest } from './types'
+import { parseFloor } from './types'
 
 /**
  * Telling an installed copy that something newer has been posted.
@@ -115,6 +116,41 @@ export function useUpdateStatus(): UpdateStatus {
 }
 
 /* ------------------------------------------------------------------ *
+ * The kill switch (`ReleaseFloor` in types.ts).
+ *
+ * Whatever last told this phone the floor — the update check below, or a
+ * membership answer (lib/membership.ts) — reports it here. `RetiredGate`
+ * reads it, keeps it on the profile, and stops the app when this copy is
+ * under it.
+ * ------------------------------------------------------------------ */
+
+let reportedFloor: ReleaseFloor | undefined
+const floorListeners = new Set<() => void>()
+
+export function reportFloor(next: ReleaseFloor): void {
+  if (reportedFloor && reportedFloor.bundle === next.bundle && reportedFloor.versionCode === next.versionCode) return
+  reportedFloor = next
+  floorListeners.forEach((listener) => listener())
+}
+
+/** The floor heard since the app started, or undefined if nothing has answered yet. */
+export function useReportedFloor(): ReleaseFloor | undefined {
+  return useSyncExternalStore(
+    (listener) => {
+      floorListeners.add(listener)
+      return () => floorListeners.delete(listener)
+    },
+    () => reportedFloor,
+  )
+}
+
+/** Whether a copy at this bundle and APK build is under the floor. Native only: the web version is always current. */
+export function isRetired(floor: ReleaseFloor | undefined, build: number | undefined): boolean {
+  if (!floor || !Capacitor.isNativePlatform()) return false
+  return RUNNING_BUNDLE < floor.bundle || (build !== undefined && build < floor.versionCode)
+}
+
+/* ------------------------------------------------------------------ *
  * Reading versions.
  * ------------------------------------------------------------------ */
 
@@ -152,6 +188,7 @@ function parseManifest(data: unknown): UpdateManifest | null {
     page: m.page as string,
     notes: stringList(m.notes),
     bundle: parseBundle(m.bundle),
+    floor: parseFloor(m.floor),
   }
 }
 
@@ -242,6 +279,14 @@ export function checkForUpdates({ force = false }: { force?: boolean } = {}): Pr
       const { build } = await installedVersion()
       const checkedAt = Date.now()
       lastChecked = checkedAt
+
+      // The kill switch, never above what this same manifest offers: a
+      // floor nobody can climb to would lock every phone with no way out.
+      // No floor in the manifest clears one set earlier.
+      reportFloor({
+        bundle: Math.min(manifest.floor?.bundle ?? 0, manifest.bundle?.code ?? 0),
+        versionCode: Math.min(manifest.floor?.versionCode ?? 0, manifest.versionCode),
+      })
 
       if (!(manifest.versionCode > build)) {
         // No new APK. A pushed update is the other thing there can be —

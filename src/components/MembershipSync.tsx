@@ -1,5 +1,12 @@
 import { useEffect, useRef } from 'react'
-import { MembershipError, checkStatus, dueForCheck, hasAccess, toMembership } from '../lib/membership'
+import {
+  MembershipError,
+  checkStatus,
+  checkoutRecentlyOpened,
+  dueForCheck,
+  hasAccess,
+  toMembership,
+} from '../lib/membership'
 import { useHairProfile } from '../lib/profile-store'
 
 /**
@@ -8,7 +15,9 @@ import { useHairProfile } from '../lib/profile-store'
  * Asks the server on launch and whenever the app comes back to the
  * front — every time while the app is locked (someone who has just paid
  * on Paystack's page is coming back to see it open), and at most every
- * `RECHECK_HOURS` while it is open. No signal is not an error: the last
+ * `RECHECK_HOURS` while it is open — except straight after a Paystack
+ * checkout was opened, when someone on the trial is coming back to see
+ * their plan start. No signal is not an error: the last
  * answer stands, so a paid member keeps the app offline. A 401 means the
  * token is no good any more, and signs the phone out; the hair profile
  * itself is untouched.
@@ -26,7 +35,8 @@ export default function MembershipSync() {
       const current = membership.current
       if (!current || busy.current) return
       const open = hasAccess(current)
-      if (open && !dueForCheck(current)) return
+      const justPaid = onResume && checkoutRecentlyOpened()
+      if (open && !justPaid && !dueForCheck(current)) return
       if (!open && !onResume && !dueForCheck(current)) return
       busy.current = true
       try {

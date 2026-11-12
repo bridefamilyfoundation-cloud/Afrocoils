@@ -29,9 +29,9 @@ export const FAQS: Faq[] = [
   {
     id: 'membership',
     q: 'Why do I need a membership?',
-    keys: 'why do i have to pay|how much does it cost|is it free|membership|subscription|subscribe|sign in|log in|login|cancel my subscription|renew|paystack|how do i pay|price',
+    keys: 'why do i have to pay|how much does it cost|is it free|free trial|trial|plans|6 months|six months|annual|yearly|membership|subscription|subscribe|sign in|log in|login|cancel my subscription|renew|paystack|how do i pay|price',
     a: [
-      'Every feature of AfroCoils is for members. Membership is monthly and paid by card on Paystack’s page; the price is shown before you pay, and it pays for writing the guides and keeping the app going. Your email is your membership: enter it on the Become a member screen, type in the six-digit code we send, and pay. To use it on a new phone, sign in with the same email. Cancel any time from My Hair Profile — the app stays open to the end of the month you paid for. Once signed in it works with no signal. The ',
+      'Every feature of AfroCoils is for members, and new members can try it free for three days, with no card. After that there are three plans — Monthly, 6 Months and Annual — paid by card on Paystack’s page; each price is shown before you pay, the longer plans cost less per month, and it pays for writing the guides and keeping the app going. Your email is your membership: enter it on the Become a member screen, type in the six-digit code we send, then start the trial or choose a plan. My Hair Profile shows your plan, when it started and when it renews or ends, and we email you before a trial ends and before a plan renews or ends. To use it on a new phone, sign in with the same email. Cancel any time from My Hair Profile — the app stays open to the end of the period you paid for. Once signed in it works with no signal. The ',
       { to: '/legal/terms', label: 'terms' },
       ' have the details.',
     ],

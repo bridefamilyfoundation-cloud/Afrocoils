@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import BioCard from '../components/BioCard'
 import Icon, { type IconName } from '../components/Icon'
 import MembershipCard from '../components/MembershipCard'
+import { memberSummary } from '../lib/membership'
 import ScreenFallback from '../components/ScreenFallback'
 import { useOpenParam, useScrollToOpened } from '../lib/deep-link'
 import { useHairProfile } from '../lib/profile-store'
@@ -13,7 +14,6 @@ import type {
   Climate,
   HairIdentity,
   HairType,
-  MemberStatus,
 } from '../lib/types'
 import {
   CLIMATES,
@@ -74,14 +74,6 @@ const CLIMATE_HINT: Record<Climate, string> = {
   'Dry / arid': 'Moisture leaves fast. Layer, then seal, and re-moisturise often.',
   'Cold / low humidity': 'Indoor heating strips moisture. Satin and heavier sealants.',
   Temperate: 'No strong seasonal pull in either direction.',
-}
-
-const MEMBER_SHORT: Record<MemberStatus, string> = {
-  active: 'Active',
-  'non-renewing': 'Cancelled',
-  attention: 'Needs attention',
-  cancelled: 'Cancelled',
-  none: 'Not paid',
 }
 
 /** A trait picked from chips. `id` is the row id and the identity key. */
@@ -654,7 +646,7 @@ export default function ProfileScreen() {
             id="membership"
             icon="workspace_premium"
             label="Membership"
-            value={MEMBER_SHORT[profile.membership.status]}
+            value={memberSummary(profile.membership)}
             open={open === 'membership'}
             onToggle={toggle}
           >

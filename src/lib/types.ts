@@ -606,6 +606,39 @@ export interface UpdateManifest {
    * is published with `npm run ota:publish`.
    */
   bundle?: BundleRelease
+  /**
+   * The kill switch. Absent, or both numbers 0: nothing is retired. Set
+   * with `npm run release:floor`, any time, without a release.
+   */
+  floor?: ReleaseFloor
+}
+
+/**
+ * The oldest copy still allowed to run.
+ *
+ * A copy running a pushed update below `bundle`, or an APK below
+ * `versionCode`, stops at one screen that offers the update and nothing
+ * else (`RetiredGate`). It reaches a phone two ways, so neither the
+ * update-check switch on About nor a signed-out phone is a way round it:
+ * in `latest.json` (the update check), and in every membership answer
+ * (`MembershipResponse.floor`, which the server reads from the same
+ * latest.json). Either way the phone only *receives* two numbers and
+ * compares them with its own; it sends nothing it did not send before.
+ *
+ * Only copies that carry this code obey it — update 11 and the APK built
+ * with it, onward. Nothing can retire an older copy from outside.
+ */
+export interface ReleaseFloor {
+  bundle: number
+  versionCode: number
+}
+
+/** A floor from JSON, or undefined if it is not one. Bad numbers read as 0, which retires nothing. */
+export function parseFloor(value: unknown): ReleaseFloor | undefined {
+  if (typeof value !== 'object' || value === null) return undefined
+  const f = value as Record<string, unknown>
+  const whole = (n: unknown) => (typeof n === 'number' && Number.isInteger(n) && n > 0 ? n : 0)
+  return { bundle: whole(f.bundle), versionCode: whole(f.versionCode) }
 }
 
 /**
@@ -642,6 +675,12 @@ export interface UpdateSettings {
   dismissedVersionCode?: number
   /** The same, for a pushed update (`BundleRelease.code`). */
   dismissedBundleCode?: number
+  /**
+   * The last `ReleaseFloor` this phone was told, kept so a retired copy
+   * stays retired with no signal. Absent: none. Replaced by whatever the
+   * next answer says, so lowering the floor releases the phone again.
+   */
+  floor?: ReleaseFloor
 }
 
 /* ------------------------------------------------------------------ *
@@ -649,8 +688,9 @@ export interface UpdateSettings {
  *
  * Every feature is for paying members (decided 2026-11-05). A member is
  * an email address: it is confirmed with a six-digit code sent from
- * no-reply@afrocoils.app, paid for as a monthly Paystack subscription,
- * and recorded in the `members` table (migration 0005). The `auth`
+ * no-reply@afrocoils.app, tried free for three days, paid for as a
+ * Paystack subscription on one of three plans (monthly, six months, a
+ * year), and recorded in the `members` table (migration 0005). The `auth`
  * function issues a signed token for a confirmed address and answers
  * how long that address is paid up to; the `billing` function starts a
  * checkout and receives Paystack's webhook. Both import these types, so
@@ -677,12 +717,72 @@ export type MemberStatus = (typeof MEMBER_STATUSES)[number]
  */
 export const MEMBERSHIP_GRACE_DAYS = 3
 
-/** Whether a paid-until date still opens the app at `now`. The one rule, on both sides. */
+/** Whether a paid-until date still opens the app at `now`. The paid half of the rule, on both sides. */
 export function membershipOpen(paidUntilISO: string | null | undefined, now: Date = new Date()): boolean {
   if (!paidUntilISO) return false
   const until = Date.parse(paidUntilISO)
   if (!Number.isFinite(until)) return false
   return now.getTime() < until + MEMBERSHIP_GRACE_DAYS * 86_400_000
+}
+
+/**
+ * The free trial: three days, once per person, no card. Started from
+ * the join screen (`billing/trial`), never on its own by signing in, so
+ * confirming an email does not spend it. Unlike a paid period it has no
+ * grace days: the trial ends when it says it ends.
+ */
+export const TRIAL_DAYS = 3
+
+/** Whether a trial end still opens the app at `now`. */
+export function trialOpen(trialEndsISO: string | null | undefined, now: Date = new Date()): boolean {
+  if (!trialEndsISO) return false
+  const until = Date.parse(trialEndsISO)
+  return Number.isFinite(until) && now.getTime() < until
+}
+
+/** The whole access rule, on both sides: paid up (with grace), or inside the trial. */
+export function accessOpen(
+  m: { paidUntilISO: string | null | undefined; trialEndsISO?: string | null },
+  now: Date = new Date(),
+): boolean {
+  return membershipOpen(m.paidUntilISO, now) || trialOpen(m.trialEndsISO, now)
+}
+
+/**
+ * The three plans. Each is its own Paystack plan, named by a secret
+ * (`PAYSTACK_PLAN_MONTHLY`, `…_BIANNUAL`, `…_ANNUAL`), and each renews
+ * at its own interval until cancelled. What they cost is the Paystack
+ * plan's amount, never a number here: changing a price is a dashboard
+ * edit, not a release. A plan whose secret is unset is simply not
+ * offered.
+ */
+export const PLAN_IDS = ['monthly', 'biannual', 'annual'] as const
+export type PlanId = (typeof PLAN_IDS)[number]
+
+export const PLANS: Record<PlanId, { label: string; months: number; duration: string }> = {
+  monthly: { label: 'Monthly', months: 1, duration: '1 month' },
+  biannual: { label: '6 Months', months: 6, duration: '6 months' },
+  annual: { label: 'Annual', months: 12, duration: '12 months' },
+}
+
+export function isPlanId(value: unknown): value is PlanId {
+  return typeof value === 'string' && (PLAN_IDS as readonly string[]).includes(value)
+}
+
+/** "₦7,500" from kobo. Shared so the phone and the reminder emails write a price the same way. */
+export function formatAmount(amount: number, currency: string): string {
+  return new Intl.NumberFormat('en-NG', {
+    style: 'currency',
+    currency,
+    maximumFractionDigits: amount % 100 === 0 ? 0 : 2,
+  }).format(amount / 100)
+}
+
+/** One plan as the join screen offers it. `amount` is in kobo. */
+export interface PlanOffer {
+  id: PlanId
+  amount: number
+  currency: string
 }
 
 /** What the phone remembers about its member. Absent: signed out. */
@@ -693,6 +793,14 @@ export interface Membership {
   status: MemberStatus
   /** The end of the paid period, from the server. Null: never paid. */
   paidUntilISO: string | null
+  /** The plan last paid for. Null: never paid, or access given by hand. */
+  plan: PlanId | null
+  /** When the current paid period began (the last charge). */
+  periodStartISO: string | null
+  /** When the free trial ends or ended. Null: never started. */
+  trialEndsISO: string | null
+  /** Whether a Paystack subscription will charge again by itself. */
+  renews: boolean
   /** When the server last answered. */
   checkedISO: string
 }
@@ -712,7 +820,7 @@ export interface VerifyCodeRequest {
   purpose: CodePurpose
 }
 
-/** The monthly plan, as Paystack holds it. `amount` is in the currency's minor unit (kobo). */
+/** A plan as Paystack holds it. `amount` is in the currency's minor unit (kobo). */
 export interface PlanPrice {
   amount: number
   currency: string
@@ -725,8 +833,27 @@ export interface MembershipResponse {
   token: string
   status: MemberStatus
   paidUntilISO: string | null
-  /** Present when the address is not paid up, so the join screen can say what it costs. */
+  plan?: PlanId | null
+  periodStartISO?: string | null
+  trialEndsISO?: string | null
+  /** A Paystack subscription that will charge again by itself. */
+  renews?: boolean
+  /** Whether this address can still start its free trial. */
+  trialAvailable?: boolean
+  /**
+   * The monthly plan's price, for phones on bundles from before the
+   * three plans (update 10 and earlier). Newer phones read `plans`.
+   */
   price?: PlanPrice | null
+  /** Present when a plan can be chosen: the plans on offer, cheapest period first. */
+  plans?: PlanOffer[] | null
+  /** The kill switch, as latest.json has it. Absent when the server could not read it: keep the last one. */
+  floor?: ReleaseFloor
+}
+
+/** POST billing/checkout. Absent `plan` is monthly, which is what older phones send. */
+export interface CheckoutRequest {
+  plan?: PlanId
 }
 
 /** auth/verify for an admin. */

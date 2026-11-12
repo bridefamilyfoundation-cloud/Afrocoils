@@ -3,14 +3,13 @@ import type {
   CodePurpose,
   MembershipResponse,
 } from '../../../src/lib/types.ts'
-import { membershipOpen } from '../../../src/lib/types.ts'
 import { BodyTooLarge, readJson } from '../_shared/body.ts'
 import { corsHeaders, jsonResponse } from '../_shared/cors.ts'
 import { codeMail, sendMail } from '../_shared/email.ts'
 import { env, serve } from '../_shared/env.ts'
 import { checkKeyLimit, checkLimits, limitResponse } from '../_shared/limits.ts'
-import { db, getMember, laterOf, saveMember, type MemberRow } from '../_shared/members.ts'
-import { fetchSubscription, memberStatus, planPrice } from '../_shared/paystack.ts'
+import { membershipFor } from '../_shared/membership.ts'
+import { db } from '../_shared/members.ts'
 import { remove, rpc, select, upsert } from '../_shared/supabase.ts'
 import { bearer, hashCode, newCode, normalEmail, sameBytes, signToken } from '../_shared/token.ts'
 
@@ -162,43 +161,12 @@ async function status(req: Request, origin?: string): Promise<Response> {
 }
 
 /**
- * What the phone is told about an address, with a fresh token.
- *
- * Self-healing: if a Paystack member looks lapsed, Paystack itself is
- * asked before the answer goes back, so a webhook that never arrived
- * costs a member nothing.
+ * What the phone is told about an address, with a fresh token. Before
+ * answering it checks with Paystack — a checkout not yet seen paid, a
+ * subscription that looks lapsed — so a webhook that never arrived
+ * costs a member nothing (`_shared/membership.ts`).
  */
-async function membership(email: string): Promise<MembershipResponse> {
-  let member: MemberRow | undefined = await getMember(email)
-
-  if (member?.paystack_subscription && !membershipOpen(member.paid_until)) {
-    try {
-      const sub = await fetchSubscription(member.paystack_subscription)
-      member = await saveMember(email, {
-        status: memberStatus(sub.status),
-        paid_until: laterOf(member.paid_until, sub.next_payment_date),
-      })
-    } catch (error) {
-      console.error('[auth] subscription refresh failed', error)
-    }
-  }
-
-  if (member) {
-    // Best-effort: the admin's "last seen" column, nothing more.
-    void saveMember(email, { last_seen_at: new Date().toISOString() }).catch(() => undefined)
-  }
-
-  const paidUntilISO = member?.paid_until ? new Date(member.paid_until).toISOString() : null
-  const open = membershipOpen(paidUntilISO)
-  const { token } = await signToken(email, 'member')
-  return {
-    email,
-    token,
-    status: member?.status ?? 'none',
-    paidUntilISO,
-    price: open ? undefined : await planPrice(),
-  }
-}
+const membership = (email: string): Promise<MembershipResponse> => membershipFor(email)
 
 /* ------------------------------------------------------------------ */
 

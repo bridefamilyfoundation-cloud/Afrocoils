@@ -1,17 +1,21 @@
 /**
- * Paystack: the monthly plan, checkout, the subscription, the webhook.
+ * Paystack: the three plans, checkout, verification, the subscription,
+ * the webhook.
  *
- * PAYSTACK_SECRET_KEY and PAYSTACK_PLAN_CODE live in the function
- * environment. The price is the plan's, read from Paystack rather than
- * written here, so changing it in the Paystack dashboard changes it
- * everywhere without a release.
+ * PAYSTACK_SECRET_KEY lives in the function environment, and so does
+ * one plan code per plan: PAYSTACK_PLAN_MONTHLY (PAYSTACK_PLAN_CODE, the
+ * single plan before 2026-11-11, still counts as it), PAYSTACK_PLAN_BIANNUAL
+ * and PAYSTACK_PLAN_ANNUAL. The prices are the plans', read from
+ * Paystack rather than written here, so changing one in the Paystack
+ * dashboard changes it everywhere without a release.
  *
  * Card details never come near this project: checkout happens on
  * Paystack's own page, and what arrives here is the customer's email,
  * the amount and Paystack's references.
  */
 import { env } from './env.ts'
-import type { MemberStatus, PlanPrice } from '../../../src/lib/types.ts'
+import type { MemberStatus, PlanId, PlanOffer, PlanPrice } from '../../../src/lib/types.ts'
+import { PLAN_IDS } from '../../../src/lib/types.ts'
 
 const API = 'https://api.paystack.co'
 
@@ -21,10 +25,25 @@ function secretKey(): string {
   return key
 }
 
-export function planCode(): string {
-  const code = env('PAYSTACK_PLAN_CODE')
-  if (!code) throw new Error('PAYSTACK_PLAN_CODE is missing from the function environment')
-  return code
+const PLAN_ENV: Record<PlanId, string[]> = {
+  monthly: ['PAYSTACK_PLAN_MONTHLY', 'PAYSTACK_PLAN_CODE'],
+  biannual: ['PAYSTACK_PLAN_BIANNUAL'],
+  annual: ['PAYSTACK_PLAN_ANNUAL'],
+}
+
+/** The Paystack plan code for one of ours, or undefined when that plan is not set up. */
+export function planCodeFor(plan: PlanId): string | undefined {
+  for (const name of PLAN_ENV[plan]) {
+    const code = env(name)?.trim()
+    if (code) return code
+  }
+  return undefined
+}
+
+/** Ours, for a Paystack plan code. Undefined: not one of our plans. */
+export function planIdFor(code: string | null | undefined): PlanId | undefined {
+  if (!code) return undefined
+  return PLAN_IDS.find((id) => planCodeFor(id) === code)
 }
 
 async function call<T>(path: string, init: RequestInit = {}): Promise<T> {
@@ -44,49 +63,88 @@ async function call<T>(path: string, init: RequestInit = {}): Promise<T> {
 }
 
 /* ------------------------------------------------------------------ *
- * The plan
+ * The plans
  * ------------------------------------------------------------------ */
 
-let cachedPrice: { price: PlanPrice; at: number } | undefined
+const cachedPrices = new Map<PlanId, { price: PlanPrice; at: number }>()
 
-/** The plan's price, cached for ten minutes per function instance. Null if Paystack cannot be reached. */
-export async function planPrice(): Promise<PlanPrice | null> {
-  if (cachedPrice && Date.now() - cachedPrice.at < 600_000) return cachedPrice.price
+/** One plan's price, cached for ten minutes per function instance. Null if unset or unreachable. */
+export async function planPrice(plan: PlanId = 'monthly'): Promise<PlanPrice | null> {
+  const cached = cachedPrices.get(plan)
+  if (cached && Date.now() - cached.at < 600_000) return cached.price
+  const code = planCodeFor(plan)
+  if (!code) return null
   try {
-    const plan = await call<{ amount: number; currency: string; interval: string }>(
-      `/plan/${encodeURIComponent(planCode())}`,
+    const data = await call<{ amount: number; currency: string; interval: string }>(
+      `/plan/${encodeURIComponent(code)}`,
     )
-    const price = { amount: plan.amount, currency: plan.currency, interval: plan.interval }
-    cachedPrice = { price, at: Date.now() }
+    const price = { amount: data.amount, currency: data.currency, interval: data.interval }
+    cachedPrices.set(plan, { price, at: Date.now() })
     return price
   } catch (error) {
-    console.error('[paystack] plan lookup failed', error)
+    console.error(`[paystack] ${plan} plan lookup failed`, error)
     return null
   }
 }
 
+/** Every plan that is set up and reachable, in PLAN_IDS order. */
+export async function planOffers(): Promise<PlanOffer[]> {
+  const prices = await Promise.all(PLAN_IDS.map((id) => planPrice(id)))
+  return PLAN_IDS.flatMap((id, i) => {
+    const price = prices[i]
+    return price ? [{ id, amount: price.amount, currency: price.currency }] : []
+  })
+}
+
 /* ------------------------------------------------------------------ *
- * Checkout
+ * Checkout and verification
  * ------------------------------------------------------------------ */
 
 /**
- * A Paystack checkout page that subscribes `email` to the plan. The
- * amount is required by the API and overridden by the plan's own.
+ * A Paystack checkout page that subscribes `email` to `plan`. The
+ * amount is required by the API and overridden by the plan's own. The
+ * reference comes back too, so the payment can be verified without
+ * waiting on the webhook.
  */
-export async function startCheckout(email: string): Promise<string> {
-  const price = await planPrice()
-  const data = await call<{ authorization_url: string }>('/transaction/initialize', {
+export async function startCheckout(email: string, plan: PlanId): Promise<{ url: string; reference: string }> {
+  const code = planCodeFor(plan)
+  if (!code) throw new Error(`No Paystack plan is set up for ${plan}`)
+  const price = await planPrice(plan)
+  const data = await call<{ authorization_url: string; reference: string }>('/transaction/initialize', {
     method: 'POST',
     body: JSON.stringify({
       email,
       amount: price?.amount ?? 100,
-      plan: planCode(),
+      plan: code,
       callback_url: env('PAYSTACK_CALLBACK_URL') || 'https://afrocoils.app/joined.html',
       channels: ['card'],
-      metadata: { source: 'afrocoils-app' },
+      metadata: { source: 'afrocoils-app', plan },
     }),
   })
-  return data.authorization_url
+  return { url: data.authorization_url, reference: data.reference }
+}
+
+export interface PaystackTransaction {
+  reference: string
+  status: string
+  amount: number
+  currency: string
+  paid_at: string | null
+  customer: { email: string; customer_code: string }
+  plan?: string | { plan_code?: string } | null
+  plan_object?: { plan_code?: string } | null
+}
+
+/** Paystack's own word on one transaction: `status` is `success` once it is paid. */
+export function verifyTransaction(reference: string): Promise<PaystackTransaction> {
+  return call<PaystackTransaction>(`/transaction/verify/${encodeURIComponent(reference)}`)
+}
+
+/** The plan code on a transaction, whichever of its shapes Paystack sent. */
+export function transactionPlanCode(tx: PaystackTransaction): string | undefined {
+  if (tx.plan_object?.plan_code) return tx.plan_object.plan_code
+  if (typeof tx.plan === 'string') return tx.plan || undefined
+  return tx.plan?.plan_code
 }
 
 /* ------------------------------------------------------------------ *

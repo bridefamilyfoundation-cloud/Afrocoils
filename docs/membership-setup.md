@@ -10,8 +10,11 @@ What talks to what:
 ```
 phone ──auth/request-code──▶ auth fn ──Resend──▶ code email from no-reply@afrocoils.app
 phone ──auth/verify, status─▶ auth fn ──▶ members table
+phone ──billing/trial───────▶ billing fn ──▶ trials, members (three days, no card)
 phone ──billing/checkout────▶ billing fn ──Paystack──▶ checkout page (browser)
 Paystack ──webhook──────────▶ billing fn ──▶ members, payments
+auth/status ──transaction/verify──▶ Paystack (a checkout not yet seen paid)
+pg_cron, daily ──billing/reminders──▶ billing fn ──Resend──▶ trial / renewal / ending emails
 mail to support@/hello@ ──▶ Resend ──webhook──▶ inbound fn ──▶ support_messages
 admin.afrocoils.app ──admin token──▶ admin fn ──▶ every table above + submissions + ask_questions
 ```
@@ -52,9 +55,23 @@ lowest priority points. Wait for Resend to show every record as verified.
 
 1. Business account verified for live payments (test keys work before
    that, for trying the flow end to end).
-2. **Products → Plans → Create plan**: interval **Monthly**, the price you
-   want, currency NGN. Copy the plan code (`PLN_…`). The app and the join
-   screen read the price from this plan — change it here, not in code.
+2. **Products → Plans → Create plan**, three times, currency NGN, and copy
+   each plan code (`PLN_…`):
+
+   | Plan | Paystack interval | Amount | Secret |
+   |---|---|---|---|
+   | Monthly | Monthly | ₦1,500 | `PAYSTACK_PLAN_MONTHLY` |
+   | 6 Months | Biannually | ₦7,500 | `PAYSTACK_PLAN_BIANNUAL` |
+   | Annual | Annually | ₦12,000 | `PAYSTACK_PLAN_ANNUAL` |
+
+   The app and the join screen read every price from these plans, and work
+   out "₦1,250 a month · Save ₦1,500" from them — change a price here, not
+   in code. A plan whose secret is unset is not offered. `PAYSTACK_PLAN_CODE`
+   (the single plan before 2026-11-11) still counts as Monthly if
+   `PAYSTACK_PLAN_MONTHLY` is unset.
+
+   The free trial (three days, no card) is ours, not Paystack's: don't set
+   an invoice limit or a trial on these plans.
 3. **Settings → API Keys & Webhooks**: copy the **secret key**, and set the
    webhook URL to
    `https://runhkccoeyxfgsfrzezn.supabase.co/functions/v1/billing/webhook`.
@@ -73,14 +90,29 @@ npx supabase secrets set --project-ref runhkccoeyxfgsfrzezn `
   RESEND_API_KEY=<re_…> `
   RESEND_WEBHOOK_SECRET=<whsec_…> `
   PAYSTACK_SECRET_KEY=<sk_live_… or sk_test_…> `
-  PAYSTACK_PLAN_CODE=<PLN_…> `
+  PAYSTACK_PLAN_MONTHLY=<PLN_…> `
+  PAYSTACK_PLAN_BIANNUAL=<PLN_…> `
+  PAYSTACK_PLAN_ANNUAL=<PLN_…> `
+  CRON_SECRET=<48 random characters> `
   PAYSTACK_CALLBACK_URL=https://afrocoils.app/joined.html `
   ADMIN_EMAILS=<your email>,<anyone else>
-npm run db:push          # migration 0005: members, login_codes, payments, support_messages
+npm run db:push          # 0005: members, login_codes, payments, support_messages
+                         # 0006: plans, trials, pending checkouts, the daily reminder job
 npm run backend:deploy   # all six functions, JWT verification off
 ```
 
-Generate `AUTH_SECRET` with
+Then put the **same** `CRON_SECRET` into Vault, once, so the daily job can
+present it (SQL editor in the Supabase dashboard — not a migration, which
+is public):
+
+```sql
+select vault.create_secret('<the CRON_SECRET value>', 'cron_secret');
+```
+
+Check the job with `select * from cron.job_run_details order by start_time desc limit 5;`
+and the function's logs ("reminders: N sent of M checked").
+
+Generate `AUTH_SECRET` (and `CRON_SECRET`) with
 `node -e "console.log(require('crypto').randomBytes(48).toString('base64url'))"`.
 Changing it signs every phone out (their next status check answers 401);
 keep it stable. None of these values belongs in an `.env` file, the repo or
@@ -113,9 +145,17 @@ and `joined.html` match.
 
 ## Testing before going live
 
-- With Paystack **test** keys and a test plan, the whole loop runs: sign in,
-  Subscribe, pay with Paystack's test card, come back — the app opens.
-- In the admin, **Members → Grant** gives any email a month without paying;
+- With Paystack **test** keys and three test plans, the whole loop runs:
+  sign in, start the trial (the app opens), choose a plan, pay with
+  Paystack's test card, come back — My Hair Profile shows the plan.
+- Payment is believed from the webhook *or* from `transaction/verify` on
+  the checkout's reference, whichever comes first; turning the webhook off
+  in test mode and tapping "I've paid — check again" proves the second.
+- Reminders: `curl -X POST -H "x-cron-secret: <value>" https://runhkccoeyxfgsfrzezn.supabase.co/functions/v1/billing/reminders`
+  runs one pass by hand and answers `{ checked, sent }`. Each email goes
+  once (`members.last_notice`).
+- In the admin, **Members → Grant** gives any email a month without paying
+  (shown as "Membership given by AfroCoils", not a plan);
   that is also the way to let a reviewer or a tester in.
 - `auth/status` self-heals: if a webhook was missed, the next status check
   asks Paystack for the subscription before answering.

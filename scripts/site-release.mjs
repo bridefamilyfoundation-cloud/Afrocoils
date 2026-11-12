@@ -135,6 +135,8 @@ const release = {
   // Pushed updates carry on from where they were; the next one is built
   // against this APK (ota:publish sets minVersionCode from versionCode).
   ...(previous?.bundle ? { bundle: previous.bundle } : {}),
+  // The kill switch stays where it was set; a new APK does not lift it.
+  ...(previous?.floor ? { floor: previous.floor } : {}),
 }
 
 if (!flag('url')) {
