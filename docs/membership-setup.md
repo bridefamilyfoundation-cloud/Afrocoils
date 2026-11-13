@@ -158,4 +158,20 @@ and `joined.html` match.
   (shown as "Membership given by AfroCoils", not a plan);
   that is also the way to let a reviewer or a tester in.
 - `auth/status` self-heals: if a webhook was missed, the next status check
-  asks Paystack for the subscription before answering.
+  asks Paystack for the subscription before answering. It believes the
+  subscription's next payment date only while Paystack calls it `active`,
+  so a failed renewal (`attention`) or a revoke is never undone by it.
+- **Revoke** (admin) stops the Paystack subscription, ends paid time and
+  any running trial (the trial stays used), and sends no "ended" email.
+  If Paystack could not be reached, the member's note names the
+  subscription to cancel in the dashboard.
+- **Refunds and chargebacks** are made in the Paystack dashboard; the
+  webhook hears `refund.processed` and `charge.dispute.resolve` (anything
+  but `declined`) and marks the payment. A full one on the member's
+  latest payment ends access exactly as Revoke does; a partial one, or
+  one on an older period, only leaves a note. An opened dispute is a
+  note too. Test: refund a test-mode charge and check Payments shows
+  "Refunded" and the member is locked.
+- A member whose renewal Paystack is still retrying, or whose
+  subscription is still active, cannot start a second checkout: they are
+  sent to Manage or cancel instead, so the card is never charged twice.

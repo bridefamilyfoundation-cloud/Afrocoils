@@ -7,7 +7,7 @@ import { useLoad } from './useLoad'
 const money = (amount: number, currency: string) =>
   new Intl.NumberFormat('en-NG', { style: 'currency', currency }).format(amount / 100)
 
-/** Successful Paystack charges, from the webhook. Refunds are made in the Paystack dashboard. */
+/** Successful Paystack charges, from the webhook, with any refund or chargeback the webhook reported since. */
 export default function Payments({ api }: PageProps) {
   const [email, setEmail] = useState('')
   const [filter, setFilter] = useState('')
@@ -42,7 +42,9 @@ export default function Payments({ api }: PageProps) {
       <p className="mb-md text-sm text-on-surface-variant">
         {data?.length ?? '…'} payments
         {[...totals].map(([currency, amount]) => ` · ${money(amount, currency)}`)} (latest 500).
-        Refunds and disputes are handled in the Paystack dashboard.
+        Refunds and disputes are made in the Paystack dashboard. A full refund or a lost
+        chargeback on a member&rsquo;s latest payment ends their access; anything else leaves a
+        note on the member.
       </p>
       <Card className="overflow-x-auto !p-0">
         <table className="w-full text-left text-sm">
@@ -59,7 +61,17 @@ export default function Payments({ api }: PageProps) {
               <tr key={p.reference} className="border-t border-outline-variant/40">
                 <td className="whitespace-nowrap p-sm">{when(p.paid_at)}</td>
                 <td className="p-sm">{p.email}</td>
-                <td className="whitespace-nowrap p-sm">{money(p.amount, p.currency)}</td>
+                <td className="whitespace-nowrap p-sm">
+                  {money(p.amount, p.currency)}
+                  {p.reversal && (
+                    <span className="ml-xs text-xs font-bold text-error">
+                      {p.reversal === 'refund' ? 'Refunded' : 'Charged back'}
+                      {p.reversed_amount != null && p.reversed_amount < p.amount
+                        ? ` ${money(p.reversed_amount, p.currency)}`
+                        : ''}
+                    </span>
+                  )}
+                </td>
                 <td className="p-sm font-mono text-xs">{p.reference}</td>
               </tr>
             ))}

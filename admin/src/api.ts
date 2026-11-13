@@ -104,6 +104,9 @@ export interface PaymentRow {
   currency: string
   paid_at: string
   plan: string | null
+  reversed_at: string | null
+  reversal: 'refund' | 'chargeback' | null
+  reversed_amount: number | null
 }
 
 export interface ThreadSummary {

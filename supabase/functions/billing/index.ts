@@ -13,9 +13,17 @@ import { corsHeaders, jsonResponse } from '../_shared/cors.ts'
 import { noticeMail, sendMail, type NoticeKind } from '../_shared/email.ts'
 import { env, serve } from '../_shared/env.ts'
 import { checkLimits, limitResponse } from '../_shared/limits.ts'
-import { autoRenewing, membershipFor, refreshMember, trialAvailable } from '../_shared/membership.ts'
+import {
+  appendNote,
+  autoRenewing,
+  membershipFor,
+  refreshMember,
+  reverseCharge,
+  trialAvailable,
+} from '../_shared/membership.ts'
 import { db, getMember, laterOf, recordCharge, saveMember, trialKey, type MemberRow } from '../_shared/members.ts'
 import {
+  fetchSubscription,
   manageLink,
   memberStatus,
   planCodeFor,
@@ -83,6 +91,26 @@ async function checkout(req: Request, origin?: string): Promise<Response> {
       origin,
     )
   }
+  // A subscription Paystack still charges — a renewal it is retrying
+  // (`attention`), or an active one whose period looks lapsed here — would
+  // carry on charging beside a new one. Ask Paystack, since a missed
+  // webhook can leave the row stale either way.
+  if (member?.paystack_subscription) {
+    const sub = await fetchSubscription(member.paystack_subscription)
+    if (sub.status === 'active' || sub.status === 'attention') {
+      await saveMember(session.sub, { status: memberStatus(sub.status) })
+      return jsonResponse(
+        {
+          error:
+            sub.status === 'attention'
+              ? 'Your last renewal didn’t go through, and Paystack is still trying that card. Update the card under Manage or cancel — or cancel there, then choose a plan here.'
+              : 'You already have a plan that renews by itself. To switch plans, cancel it first under Manage or cancel, then choose the new one.',
+        },
+        409,
+        origin,
+      )
+    }
+  }
   const { url, reference } = await startCheckout(session.sub, plan)
   await saveMember(session.sub, { pending_reference: reference })
   return jsonResponse({ url } satisfies BillingLinkResponse, 200, origin)
@@ -146,6 +174,12 @@ interface PaystackEvent {
     customer?: { email?: string; customer_code?: string }
     plan?: { plan_code?: string } | null
     subscription?: { subscription_code?: string; status?: string; next_payment_date?: string | null } | null
+    /** Refund events: the charge refunded. */
+    transaction_reference?: string
+    /** Dispute events: the charge disputed. */
+    transaction?: { reference?: string; amount?: number } | null
+    refund_amount?: number | null
+    resolution?: string | null
   }
 }
 
@@ -214,6 +248,32 @@ async function webhook(req: Request): Promise<Response> {
     case 'invoice.payment_failed':
       await saveMember(email, { status: 'attention' })
       break
+
+    // Refunds are made in the Paystack dashboard; this is how the
+    // membership hears of one. Only `processed` means the money went back.
+    case 'refund.processed': {
+      const reference = data.transaction_reference ?? data.transaction?.reference
+      if (!reference) break
+      await reverseCharge({ reference, kind: 'refund', amount: data.amount })
+      break
+    }
+
+    // A chargeback opened is not yet lost: note it, change nothing.
+    case 'charge.dispute.create': {
+      const member = await getMember(email)
+      const reference = data.transaction?.reference ?? 'a payment'
+      if (member) await saveMember(email, { note: appendNote(member.note, `chargeback opened on ${reference}`) })
+      break
+    }
+
+    // `declined` is the dispute thrown out (the charge stands); any other
+    // resolution, `merchant-accepted` included, sends the money back.
+    case 'charge.dispute.resolve': {
+      const reference = data.transaction?.reference
+      if (!reference || !data.resolution || data.resolution === 'declined') break
+      await reverseCharge({ reference, kind: 'chargeback', amount: data.refund_amount ?? undefined })
+      break
+    }
 
     case 'invoice.update': {
       const sub = data.subscription

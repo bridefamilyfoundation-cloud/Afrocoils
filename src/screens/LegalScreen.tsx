@@ -89,8 +89,8 @@ function PrivacyPolicy() {
           Monthly, 6 Months or Annual — paid by card on Paystack&rsquo;s own page, which opens
           in your browser. Paystack holds your card details; we never see them. Paystack tells
           us your email, the plan, the amount, the date and its own reference numbers for the
-          payment and the subscription, and we keep those so we know you are paid up and can
-          help if something goes wrong. When you start a payment we keep its reference
+          payment and the subscription, and whether a payment was later refunded or disputed,
+          and we keep those so we know you are paid up and can help if something goes wrong. When you start a payment we keep its reference
           number, so our server can ask Paystack whether it went through.
         </p>
         <p>

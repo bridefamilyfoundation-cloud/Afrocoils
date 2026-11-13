@@ -103,6 +103,14 @@ export async function recordCharge(charge: Charge): Promise<void> {
     { ignore: true },
   )
   if (!charge.plan) return
+  // Refunded or charged back since (`reverseCharge`): a replayed
+  // `charge.success` must not reopen the period it paid for.
+  const [stored] = await select<{ reversed_at: string | null }>(
+    db(),
+    'payments',
+    `reference=eq.${encodeURIComponent(charge.reference)}&select=reversed_at&limit=1`,
+  )
+  if (stored?.reversed_at) return
   const member = await getMember(charge.email)
   const until = monthsAfter(charge.paidAt, PLANS[charge.plan].months)
   const later = laterOf(member?.paid_until, until)

@@ -5,7 +5,7 @@ import { MAILBOXES, sendMail, type Mailbox } from '../_shared/email.ts'
 import { env, serve } from '../_shared/env.ts'
 import { checkLimits, limitResponse } from '../_shared/limits.ts'
 import { db, getMember, laterOf, saveMember } from '../_shared/members.ts'
-import { disableSubscription } from '../_shared/paystack.ts'
+import { appendNote, closeAccess } from '../_shared/membership.ts'
 import { insert, insertReturning, patch, select, signedPhotoUrl } from '../_shared/supabase.ts'
 import { bearer, normalEmail } from '../_shared/token.ts'
 
@@ -123,19 +123,8 @@ async function changeMember(body: Record<string, unknown>, by: string) {
   if (action === 'revoke') {
     const member = await getMember(email)
     if (!member) throw new Refusal(404, 'No such member')
-    // Stop the card being charged for access they no longer have.
-    if (member.paystack_subscription && member.paystack_email_token) {
-      await disableSubscription(member.paystack_subscription, member.paystack_email_token).catch((error) =>
-        console.error('[admin] could not disable the Paystack subscription', error),
-      )
-    }
-    // Back past the grace period, so the next status check locks it.
-    const past = new Date(Date.now() - (MEMBERSHIP_GRACE_DAYS + 1) * 86_400_000).toISOString()
-    return saveMember(email, {
-      status: 'cancelled',
-      paid_until: past,
-      note: appendNote(member.note, `${by}: revoked`),
-    })
+    // Stops the card, ends paid time *and* any running trial.
+    return closeAccess(member, `${by}: revoked`)
   }
 
   if (action === 'note') {
@@ -144,10 +133,6 @@ async function changeMember(body: Record<string, unknown>, by: string) {
   throw new Refusal(400, 'Unknown action')
 }
 
-function appendNote(existing: string | null | undefined, line: string): string {
-  const date = new Date().toISOString().slice(0, 10)
-  return [existing, `${date} ${line}`].filter(Boolean).join('\n').slice(-500)
-}
 
 function listPayments(url: URL) {
   const email = normalEmail(url.searchParams.get('email'))
