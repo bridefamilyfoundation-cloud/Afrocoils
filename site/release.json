@@ -11,15 +11,14 @@
   "download": "download/AfroCoils-0.2.0-12.apk",
   "notes": [],
   "bundle": {
-    "code": 12,
+    "code": 13,
     "minVersionCode": 12,
-    "bytes": 4530056,
-    "sha256": "69c2b658818022da77b442f259216d08f9a716dfc619b5128351a376bfc5ddf0",
-    "released": "2026-11-12",
-    "url": "https://runhkccoeyxfgsfrzezn.supabase.co/storage/v1/object/public/releases/bundles/12.zip",
+    "bytes": 4530105,
+    "sha256": "f3c8a431b40c9410e7828f46085ce04f355ca033acefcd909829e28d0dc84079",
+    "released": "2026-11-13",
+    "url": "https://runhkccoeyxfgsfrzezn.supabase.co/storage/v1/object/public/releases/bundles/13.zip",
     "notes": [
-      "A three-day free trial for new members",
-      "Reminders before a trial or membership ends"
+      "Privacy policy: refunds and disputes are part of the payment record"
     ]
   }
 }
