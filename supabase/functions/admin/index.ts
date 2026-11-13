@@ -1,7 +1,15 @@
 import { MEMBERSHIP_GRACE_DAYS } from '../../../src/lib/types.ts'
 import { BodyTooLarge, readJson } from '../_shared/body.ts'
 import { corsHeaders, jsonResponse } from '../_shared/cors.ts'
-import { MAILBOXES, sendMail, type Mailbox } from '../_shared/email.ts'
+import {
+  KNOWN_MAILBOXES,
+  MAILBOX_PATTERN,
+  mailboxAddress,
+  mailboxFrom,
+  replyMailbox,
+  sendMail,
+  type Mailbox,
+} from '../_shared/email.ts'
 import { env, serve } from '../_shared/env.ts'
 import { checkLimits, limitResponse } from '../_shared/limits.ts'
 import { db, getMember, laterOf, saveMember } from '../_shared/members.ts'
@@ -21,7 +29,8 @@ import { bearer, normalEmail } from '../_shared/token.ts'
  * GET  members?q=                     members, newest change first
  * POST members {email, action, ...}   grant | revoke | note
  * GET  payments?email=                Paystack charges
- * GET  threads?status=open|closed|all the support inbox
+ * GET  mailboxes                      every @afrocoils.app address with mail, and its counts
+ * GET  threads?status=&mailbox=       conversations, all or one mailbox's
  * GET  thread?id=                     one conversation; marks it read
  * POST reply {thread, text}           answer from the mailbox it came to
  * POST compose {to, subject, text, mailbox}
@@ -140,7 +149,7 @@ function listPayments(url: URL) {
 }
 
 /* ------------------------------------------------------------------ *
- * Support inbox
+ * Mail: one inbox per @afrocoils.app address
  * ------------------------------------------------------------------ */
 
 interface Message {
@@ -159,14 +168,26 @@ interface Message {
   created_at: string
 }
 
-async function listThreads(url: URL) {
-  const status = url.searchParams.get('status') ?? 'open'
+interface ThreadSummary {
+  id: number
+  mailbox: Mailbox
+  with: string
+  subject: string
+  status: 'open' | 'closed'
+  unread: boolean
+  count: number
+  lastISO: string
+  preview: string
+}
+
+/** Every conversation, newest first, built from the latest 2,000 messages. */
+async function allThreads(): Promise<ThreadSummary[]> {
   const rows = await select<Message>(
     db(),
     'support_messages',
-    'select=id,thread_id,direction,mailbox,from_address,to_address,subject,status,read,created_at,body&order=created_at.desc&limit=1000',
+    'select=id,thread_id,direction,mailbox,from_address,to_address,subject,status,read,created_at,body&order=created_at.desc&limit=2000',
   )
-  const threads = new Map<number, { id: number; mailbox: Mailbox; with: string; subject: string; status: string; unread: boolean; count: number; lastISO: string; preview: string }>()
+  const threads = new Map<number, ThreadSummary>()
   for (const row of rows) {
     const id = row.thread_id ?? row.id
     const t = threads.get(id)
@@ -191,7 +212,43 @@ async function listThreads(url: URL) {
       }
     }
   }
-  return [...threads.values()].filter((t) => status === 'all' || t.status === status)
+  return [...threads.values()]
+}
+
+async function listThreads(url: URL) {
+  const status = url.searchParams.get('status') ?? 'open'
+  const mailbox = url.searchParams.get('mailbox') ?? ''
+  return (await allThreads()).filter(
+    (t) => (status === 'all' || t.status === status) && (!mailbox || t.mailbox === mailbox),
+  )
+}
+
+/** The named mailboxes (always), then any other address that has had mail, busiest first. */
+async function listMailboxes() {
+  const counts = new Map<Mailbox, { unread: number; open: number; total: number }>()
+  for (const name of Object.keys(KNOWN_MAILBOXES)) counts.set(name, { unread: 0, open: 0, total: 0 })
+  for (const t of await allThreads()) {
+    const c = counts.get(t.mailbox) ?? { unread: 0, open: 0, total: 0 }
+    c.total++
+    if (t.unread) c.unread++
+    if (t.status === 'open') c.open++
+    counts.set(t.mailbox, c)
+  }
+  const known = Object.keys(KNOWN_MAILBOXES)
+  return [...counts.entries()]
+    .sort(([a, x], [b, y]) => {
+      const ia = known.indexOf(a)
+      const ib = known.indexOf(b)
+      if (ia !== -1 || ib !== -1) return (ia === -1 ? 99 : ia) - (ib === -1 ? 99 : ib)
+      return y.total - x.total || a.localeCompare(b)
+    })
+    .map(([mailbox, c]) => ({
+      mailbox,
+      address: mailboxAddress(mailbox),
+      known: mailbox in KNOWN_MAILBOXES,
+      repliesFrom: mailboxAddress(replyMailbox(mailbox)),
+      ...c,
+    }))
 }
 
 async function thread(url: URL) {
@@ -213,7 +270,7 @@ async function reply(body: Record<string, unknown>, by: string) {
 
   const subject = /^re:/i.test(last.subject) ? last.subject : `Re: ${last.subject || 'your message'}`
   const resendId = await sendMail({
-    from: MAILBOXES[last.mailbox],
+    from: mailboxFrom(last.mailbox),
     to: last.from_address,
     subject,
     text: message,
@@ -224,7 +281,7 @@ async function reply(body: Record<string, unknown>, by: string) {
       resend_id: resendId || null,
       direction: 'out',
       mailbox: last.mailbox,
-      from_address: `${last.mailbox}@afrocoils.app`,
+      from_address: mailboxAddress(replyMailbox(last.mailbox)),
       to_address: last.from_address,
       subject,
       body: message,
@@ -240,15 +297,23 @@ async function compose(body: Record<string, unknown>, by: string) {
   const to = normalEmail(body.to)
   const subject = text(body.subject, 300)
   const message = text(body.text, 20_000)
-  const mailbox: Mailbox = body.mailbox === 'hello' ? 'hello' : 'support'
+  const asked = text(body.mailbox, 64).toLowerCase() || 'support'
+  if (!MAILBOX_PATTERN.test(asked)) throw new Refusal(400, 'Not a mailbox')
+  const mailbox = replyMailbox(asked)
+  if (!(mailbox in KNOWN_MAILBOXES)) {
+    // Any other address may be written from once it has had mail, so a typo
+    // cannot invent a new sender.
+    const [seen] = await select(db(), 'support_messages', `mailbox=eq.${enc(mailbox)}&select=id&limit=1`)
+    if (!seen) throw new Refusal(400, `${mailboxAddress(mailbox)} has no mail yet`)
+  }
   if (!to || !subject || !message) throw new Refusal(400, 'To, subject and message are needed')
 
-  const resendId = await sendMail({ from: MAILBOXES[mailbox], to, subject, text: message })
+  const resendId = await sendMail({ from: mailboxFrom(mailbox), to, subject, text: message })
   const row = await insertReturning<{ id: number }>(db(), 'support_messages', {
     resend_id: resendId || null,
     direction: 'out',
     mailbox,
-    from_address: `${mailbox}@afrocoils.app`,
+    from_address: mailboxAddress(mailbox),
     to_address: to,
     subject,
     body: message,
@@ -351,6 +416,7 @@ serve(async (req) => {
       if (route === 'overview') result = await overview()
       else if (route === 'members') result = await listMembers(url)
       else if (route === 'payments') result = await listPayments(url)
+      else if (route === 'mailboxes') result = await listMailboxes()
       else if (route === 'threads') result = await listThreads(url)
       else if (route === 'thread') result = await thread(url)
       else if (route === 'submissions') result = await listSubmissions(url)

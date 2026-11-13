@@ -231,7 +231,7 @@ function PrivacyPolicy() {
         <p>
           <strong>Paystack</strong> takes your card payment and runs the subscription, under its
           own privacy policy. <strong>Resend</strong> sends the sign-in codes, the reminder
-          emails and our replies, and receives mail you send to support@ or hello@afrocoils.app; we keep that
+          emails and our replies, and receives mail you send to any @afrocoils.app address (support@, hello@ or another); we keep that
           correspondence as text so we can answer it.
         </p>
       </Article>

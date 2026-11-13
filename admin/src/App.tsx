@@ -13,7 +13,7 @@ const PAGES = {
   dashboard: { label: 'Overview', Page: Dashboard },
   members: { label: 'Members', Page: Members },
   payments: { label: 'Payments', Page: Payments },
-  inbox: { label: 'Inbox', Page: Inbox },
+  inbox: { label: 'Mail', Page: Inbox },
   submissions: { label: 'Style submissions', Page: Submissions },
   questions: { label: 'Ask questions', Page: Questions },
 } as const

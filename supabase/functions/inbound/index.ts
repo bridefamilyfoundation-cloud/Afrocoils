@@ -1,11 +1,21 @@
 import { BodyTooLarge, readText } from '../_shared/body.ts'
-import { fetchReceived, htmlToText, verifyResendWebhook, type Mailbox } from '../_shared/email.ts'
+import {
+  KNOWN_MAILBOXES,
+  fetchReceived,
+  htmlToText,
+  mailboxAddress,
+  mailboxOf,
+  verifyResendWebhook,
+  type Mailbox,
+} from '../_shared/email.ts'
 import { serve } from '../_shared/env.ts'
 import { db } from '../_shared/members.ts'
 import { insertReturning, patch, select } from '../_shared/supabase.ts'
 
 /**
- * Mail to support@ and hello@afrocoils.app, from Resend's inbound webhook.
+ * Mail to any @afrocoils.app address, from Resend's inbound webhook.
+ * Each address is its own mailbox (support, hello, or whatever was
+ * written to), and a conversation stays in the mailbox it arrived at.
  *
  * Resend receives for the domain (the MX record in docs/membership-setup.md)
  * and POSTs an `email.received` event here carrying only the envelope;
@@ -41,11 +51,10 @@ function address(value: string): string {
   return (/<([^>]+)>/.exec(value)?.[1] ?? value).trim().toLowerCase()
 }
 
-function mailboxOf(recipients: string[]): Mailbox | null {
-  const addresses = recipients.map(address)
-  if (addresses.includes('support@afrocoils.app')) return 'support'
-  if (addresses.includes('hello@afrocoils.app')) return 'hello'
-  return null
+/** Which of our addresses it was for: a named mailbox first, when it went to several. */
+function pickMailbox(recipients: string[]): Mailbox | null {
+  const ours = recipients.map(mailboxOf).filter((m): m is Mailbox => m !== null)
+  return ours.find((m) => m in KNOWN_MAILBOXES) ?? ours[0] ?? null
 }
 
 /** "Re: Fwd: My order" → "my order", so a reply finds its thread. */
@@ -53,22 +62,28 @@ function baseSubject(subject: string): string {
   return subject.replace(/^\s*((re|fwd?|aw)\s*:\s*)+/i, '').trim().toLowerCase()
 }
 
-async function findThread(from: string, subject: string, inReplyTo: string | undefined): Promise<number | null> {
+async function findThread(
+  mailbox: Mailbox,
+  from: string,
+  subject: string,
+  inReplyTo: string | undefined,
+): Promise<number | null> {
   const config = db()
   if (inReplyTo) {
     const [hit] = await select<MessageRow>(
       config,
       'support_messages',
-      `message_id=eq.${encodeURIComponent(inReplyTo)}&select=id,thread_id&limit=1`,
+      `message_id=eq.${encodeURIComponent(inReplyTo)}&mailbox=eq.${encodeURIComponent(mailbox)}&select=id,thread_id&limit=1`,
     )
     if (hit) return hit.thread_id ?? hit.id
   }
-  // The same sender on the same subject within a month is the same conversation.
+  // The same sender on the same subject to the same address within a month
+  // is the same conversation.
   const since = new Date(Date.now() - 30 * 86_400_000).toISOString()
   const candidates = await select<MessageRow & { subject: string }>(
     config,
     'support_messages',
-    `or=(from_address.eq.${encodeURIComponent(from)},to_address.eq.${encodeURIComponent(from)})&created_at=gte.${since}&select=id,thread_id,subject&order=created_at.desc&limit=20`,
+    `mailbox=eq.${encodeURIComponent(mailbox)}&or=(from_address.eq.${encodeURIComponent(from)},to_address.eq.${encodeURIComponent(from)})&created_at=gte.${since}&select=id,thread_id,subject&order=created_at.desc&limit=20`,
   )
   const match = candidates.find((row) => baseSubject(row.subject) === baseSubject(subject))
   return match ? (match.thread_id ?? match.id) : null
@@ -100,7 +115,7 @@ serve(async (req) => {
     if (seen) return new Response(null, { status: 200 })
 
     const mail = await fetchReceived(id)
-    const mailbox = mailboxOf([...(event.data.received_for ?? []), ...(mail.to ?? [])])
+    const mailbox = pickMailbox([...(event.data.received_for ?? []), ...(mail.to ?? [])])
     if (!mailbox) return new Response(null, { status: 200 })
 
     const from = address(mail.from)
@@ -111,13 +126,13 @@ serve(async (req) => {
     const headers = Object.fromEntries(Object.entries(mail.headers ?? {}).map(([k, v]) => [k.toLowerCase(), v]))
     const inReplyTo = headers['in-reply-to']?.trim()
 
-    const thread = await findThread(from, subject, inReplyTo)
+    const thread = await findThread(mailbox, from, subject, inReplyTo)
     const row = await insertReturning<MessageRow>(db(), 'support_messages', {
       resend_id: id,
       direction: 'in',
       mailbox,
       from_address: from,
-      to_address: `${mailbox}@afrocoils.app`,
+      to_address: mailboxAddress(mailbox),
       subject,
       body: text.slice(0, MAX_BODY_CHARS),
       message_id: mail.message_id ?? headers['message-id'] ?? null,

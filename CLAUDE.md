@@ -617,7 +617,8 @@ sign-in codes and answers membership status; `billing/` starts a
 Paystack checkout, opens the manage page and receives Paystack's webhook
 (believed only on a matching `x-paystack-signature`); `inbound/` takes
 Resend's `email.received` webhook (Svix signature) and files mail to
-support@ and hello@ as text; `admin/` serves admin.afrocoils.app behind
+any @afrocoils.app address as text, one mailbox per address (the
+admin Inbox lists each; no-reply@ is answered from support@); `admin/` serves admin.afrocoils.app behind
 an admin token *and* the `ADMIN_EMAILS` list. That is all the server
 code — there is no model client, no prompt and no `ANTHROPIC_API_KEY`.
 Tokens are our own HMAC (`_shared/token.ts`, `AUTH_SECRET`); codes are

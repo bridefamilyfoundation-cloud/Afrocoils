@@ -109,9 +109,22 @@ export interface PaymentRow {
   reversed_amount: number | null
 }
 
+/** One @afrocoils.app address and its conversations. */
+export interface MailboxSummary {
+  mailbox: string
+  address: string
+  /** support, hello, no-reply: listed even when empty. */
+  known: boolean
+  /** Where replies come from (no-reply@ is answered from support@). */
+  repliesFrom: string
+  unread: number
+  open: number
+  total: number
+}
+
 export interface ThreadSummary {
   id: number
-  mailbox: 'support' | 'hello'
+  mailbox: string
   with: string
   subject: string
   status: 'open' | 'closed'
@@ -124,7 +137,7 @@ export interface ThreadSummary {
 export interface MessageRow {
   id: number
   direction: 'in' | 'out'
-  mailbox: 'support' | 'hello'
+  mailbox: string
   from_address: string
   to_address: string
   subject: string

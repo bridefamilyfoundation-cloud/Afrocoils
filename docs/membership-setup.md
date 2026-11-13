@@ -15,7 +15,7 @@ phone ──billing/checkout────▶ billing fn ──Paystack──▶ c
 Paystack ──webhook──────────▶ billing fn ──▶ members, payments
 auth/status ──transaction/verify──▶ Paystack (a checkout not yet seen paid)
 pg_cron, daily ──billing/reminders──▶ billing fn ──Resend──▶ trial / renewal / ending emails
-mail to support@/hello@ ──▶ Resend ──webhook──▶ inbound fn ──▶ support_messages
+mail to any @afrocoils.app ──▶ Resend ──webhook──▶ inbound fn ──▶ support_messages
 admin.afrocoils.app ──admin token──▶ admin fn ──▶ every table above + submissions + ask_questions
 ```
 
@@ -45,7 +45,7 @@ run the CLI with the AfroCoils account's token per command:
 | `resend._domainkey` | TXT | *(the DKIM key Resend shows)* | Signs outgoing mail |
 | `send` | MX | `feedback-smtp.<region>.amazonses.com`, priority 10 | Bounces for sent mail |
 | `send` | TXT | `v=spf1 include:amazonses.com ~all` | Allows Resend to send |
-| `@` | MX | *(the receiving host Resend shows)*, priority 10 | Delivers support@ and hello@ to Resend |
+| `@` | MX | *(the receiving host Resend shows)*, priority 10 | Delivers every @afrocoils.app address to Resend |
 | `_dmarc` | TXT | `v=DMARC1; p=none; rua=mailto:support@afrocoils.app` | Start at `p=none`; move to `quarantine` once reports are clean |
 
 There must be **no other MX on `@`**, or mail to support@ goes wherever the

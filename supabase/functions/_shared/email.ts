@@ -1,5 +1,6 @@
 /**
- * Mail, through Resend: sign-in codes out, support mail in and out.
+ * Mail, through Resend: sign-in codes out, mail to any @afrocoils.app
+ * address in, and the admin's replies out.
  *
  * RESEND_API_KEY lives in the function environment (`supabase secrets
  * set`) and nowhere else. The domain afrocoils.app is verified in Resend
@@ -15,12 +16,47 @@ const API = 'https://api.resend.com'
 /** Who the app's own mail comes from. */
 export const FROM_NOREPLY = 'AfroCoils <no-reply@afrocoils.app>'
 
-/** The two addresses people write to, and that the admin replies from. */
-export const MAILBOXES = {
-  support: 'AfroCoils Support <support@afrocoils.app>',
-  hello: 'AfroCoils <hello@afrocoils.app>',
-} as const
-export type Mailbox = keyof typeof MAILBOXES
+export const MAIL_DOMAIN = 'afrocoils.app'
+
+/**
+ * A mailbox is the local part of an @afrocoils.app address: `support`,
+ * `hello`, or anything else someone writes to — Resend receives for the
+ * whole domain, and each address gets its own inbox on the admin site.
+ * The named ones are listed (and shown) even when empty, in this order.
+ */
+export const KNOWN_MAILBOXES: Record<string, string> = {
+  support: 'AfroCoils Support',
+  hello: 'AfroCoils',
+  'no-reply': 'AfroCoils',
+}
+export type Mailbox = string
+
+/** What a mailbox may be called: the database checks the same pattern. */
+export const MAILBOX_PATTERN = /^[a-z0-9][a-z0-9._-]{0,63}$/
+
+export const mailboxAddress = (mailbox: Mailbox) => `${mailbox}@${MAIL_DOMAIN}`
+
+/**
+ * The mailbox a reply is sent from. Mail to no-reply@ is someone answering
+ * a code or a reminder; it is filed under no-reply, but answered from
+ * support@, so the conversation can carry on.
+ */
+export const replyMailbox = (mailbox: Mailbox): Mailbox => (mailbox === 'no-reply' ? 'support' : mailbox)
+
+/** `AfroCoils Support <support@afrocoils.app>`, for the From line. */
+export function mailboxFrom(mailbox: Mailbox): string {
+  const box = replyMailbox(mailbox)
+  return `${KNOWN_MAILBOXES[box] ?? 'AfroCoils'} <${mailboxAddress(box)}>`
+}
+
+/** The mailbox an address belongs to, or null if it is not ours. `support+x@` is `support`. */
+export function mailboxOf(address: string): Mailbox | null {
+  const bare = (/<([^>]+)>/.exec(address)?.[1] ?? address).trim().toLowerCase()
+  const at = bare.lastIndexOf('@')
+  if (at < 1 || bare.slice(at + 1) !== MAIL_DOMAIN) return null
+  const local = bare.slice(0, at).split('+')[0]!
+  return MAILBOX_PATTERN.test(local) ? local : null
+}
 
 function apiKey(): string {
   const key = env('RESEND_API_KEY')
