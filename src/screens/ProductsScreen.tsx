@@ -4,6 +4,7 @@ import SectionCrumb from '../components/SectionCrumb'
 import Icon from '../components/Icon'
 import ScreenFallback from '../components/ScreenFallback'
 import { useOpenParam, useScrollToOpened } from '../lib/deep-link'
+import { discoveryRanking } from '../lib/types'
 import { useHairProfile } from '../lib/profile-store'
 import { resolveLocStage } from '../lib/locs'
 import {
@@ -67,10 +68,11 @@ export default function ProductsScreen() {
           curlPattern: identity.curlPattern,
           scalpCondition: identity.scalpCondition,
           locStage: identity.hairType === 'Locs' ? locStage : undefined,
+          ...discoveryRanking(identity, profile.state),
         },
         preferences,
       ),
-    [identity, preferences, locStage],
+    [identity, profile.state, preferences, locStage],
   )
 
   const hiddenCount = PRODUCTS.length - ranked.length

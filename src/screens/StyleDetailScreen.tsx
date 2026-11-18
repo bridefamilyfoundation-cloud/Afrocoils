@@ -8,6 +8,7 @@ import ScreenFallback from '../components/ScreenFallback'
 import { CATEGORY_ICONS, STYLES, rankStyles, styleExclusion } from '../content/styles'
 import { deriveLengthBand } from '../lib/growth'
 import { resolveLocStage } from '../lib/locs'
+import { discoveryRanking } from '../lib/types'
 import { useHairProfile } from '../lib/profile-store'
 
 /**
@@ -36,8 +37,9 @@ export default function StyleDetailScreen() {
       curlPattern: identity.curlPattern,
       locStage: identity.hairType === 'Locs' ? locStage : undefined,
       lengthBand,
+      ...discoveryRanking(identity, profile.state),
     }),
-    [identity, locStage, lengthBand],
+    [identity, profile.state, locStage, lengthBand],
   )
 
   // Ranked as a set of one, so the "why this suits you" reasons come from

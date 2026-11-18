@@ -6,6 +6,7 @@ import SectionCrumb from '../components/SectionCrumb'
 import { useHairProfile } from '../lib/profile-store'
 import {
   POROSITY_MAX_SCORE,
+  POROSITY_SUMMARY,
   porosityFor,
   porosityQuestionsFor,
 } from '../lib/porosity'
@@ -15,7 +16,7 @@ import type { PorosityLevel } from '../lib/types'
  * Porosity self-assessment.
  *
  * The questions and the scoring live in lib/porosity.ts — the full hair
- * quiz runs the same five questions, and a second copy here would drift
+ * Hair Discovery runs the same five questions, and a second copy here would drift
  * from that one. This screen is the standalone route: the same test with
  * the long-form result and advice attached.
  */
@@ -28,8 +29,7 @@ const RESULTS: Record<
     label: 'Low porosity',
     icon: 'shield' as const,
     theme: 'bg-tertiary-fixed text-on-tertiary-fixed',
-    summary:
-      'Your cuticles lie flat and tight. Moisture struggles to get in — but once it is in, it stays.',
+    summary: POROSITY_SUMMARY.Low,
     advice: [
       'Apply product to warm, damp hair; gentle heat helps the cuticle open.',
       'Favour lightweight liquids and milks over heavy butters, which sit on top.',
@@ -41,8 +41,7 @@ const RESULTS: Record<
     label: 'Medium porosity',
     icon: 'check_circle' as const,
     theme: 'bg-secondary-fixed text-on-secondary-fixed',
-    summary:
-      'The easiest type to work with. Your cuticle takes moisture in readily and holds it a reasonable time.',
+    summary: POROSITY_SUMMARY.Medium,
     advice: [
       'Keep a balanced routine — moisture most weeks, protein occasionally.',
       'Deep condition every one to two weeks.',
@@ -53,8 +52,7 @@ const RESULTS: Record<
     label: 'High porosity',
     icon: 'water_drop' as const,
     theme: 'bg-primary-container text-on-primary-container',
-    summary:
-      'Your cuticles are raised, so water goes in fast and leaves just as fast. The work is in sealing, not soaking.',
+    summary: POROSITY_SUMMARY.High,
     advice: [
       'Seal after every wet application — the L.O.C. method exists for this.',
       'Use heavier butters and creams, especially in dry weather.',

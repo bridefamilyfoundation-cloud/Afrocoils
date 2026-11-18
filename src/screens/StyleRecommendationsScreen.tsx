@@ -7,6 +7,7 @@ import ScreenFallback from '../components/ScreenFallback'
 import { STYLES, rankStyles, styleExclusion } from '../content/styles'
 import { deriveLengthBand } from '../lib/growth'
 import { resolveLocStage } from '../lib/locs'
+import { discoveryRanking } from '../lib/types'
 import { useHairProfile } from '../lib/profile-store'
 import { PREFERENCE_LABELS, type CarePreferences } from '../lib/types'
 
@@ -21,8 +22,10 @@ import { PREFERENCE_LABELS, type CarePreferences } from '../lib/types'
  * The criteria panel is the point of the screen, not decoration. A
  * ranked list with no stated basis is indistinguishable from an
  * arbitrary one, and the honest answer here is narrower than a user
- * would assume: hair type excludes, length and two care preferences
- * rank, and **nothing else in the profile moves this list** — because
+ * would assume: hair type excludes; length, two care preferences and
+ * Hair Discovery's hair condition rank (condition through the category
+ * and `lowManipulation` every entry already declares); and **nothing
+ * else in the profile moves this list** — because
  * not one contributed entry declares a porosity, density or curl
  * pattern. Those three are real and they drive the product shelf and the
  * guides; claiming they rank styles would be a lie the screen could not
@@ -44,8 +47,9 @@ export default function StyleRecommendationsScreen() {
       curlPattern: identity.curlPattern,
       locStage: identity.hairType === 'Locs' ? locStage : undefined,
       lengthBand,
+      ...discoveryRanking(identity, profile.state),
     }),
-    [identity, locStage, lengthBand],
+    [identity, profile.state, locStage, lengthBand],
   )
 
   const ranked = useMemo(
@@ -75,7 +79,11 @@ export default function StyleRecommendationsScreen() {
     return counts
   }, [filterInput, preferences])
 
-  const on = (Object.keys(preferences) as (keyof CarePreferences)[]).filter(
+  const conditionText =
+    [profile.state.condition, profile.state.concerns?.join(', ')].filter(Boolean).join(' · ') ||
+    undefined
+
+  const on =(Object.keys(preferences) as (keyof CarePreferences)[]).filter(
     (key) => preferences[key],
   )
 
@@ -173,15 +181,38 @@ export default function StyleRecommendationsScreen() {
               silicone-free and protein-sensitive drop one entirely.
             </dd>
           </div>
+
+          <div>
+            <dt className="font-label-md text-label-md text-on-surface">
+              How your hair is doing{' '}
+              {conditionText ? (
+                <span className="rounded-full bg-secondary-container px-3 py-0.5 font-label-md text-caption text-on-secondary-container">
+                  {conditionText}
+                </span>
+              ) : (
+                <Link
+                  to="/quiz?step=hairCondition"
+                  className="font-label-md text-caption text-primary underline"
+                >
+                  not answered
+                </Link>
+              )}
+            </dt>
+            <dd className="font-body-md text-caption text-on-surface-variant">
+              From Hair Discovery. Breakage, damage, split ends or length that will not stay
+              lift protective and low-manipulation styles; tangling lifts low-manipulation
+              ones. It ranks, never excludes.
+            </dd>
+          </div>
         </dl>
 
         {/* Said plainly, because the alternative is a screen implying
             that filling in porosity will reorder this list. It will not
             — no contributed entry declares one. */}
         <p className="rounded-xl bg-surface-container p-md font-body-md text-caption text-on-surface-variant">
-          Your porosity, density, coil pattern and texture are <em>not</em> in this ranking.
-          No contributed style declares them yet, so they would change nothing here — the
-          first three do decide your{' '}
+          Your porosity, density, coil pattern and strand thickness are <em>not</em> in this
+          ranking. No contributed style declares them yet, so they would change nothing here.
+          They do decide your{' '}
           <Link to="/products" className="text-primary underline">
             product shelf
           </Link>{' '}
@@ -231,7 +262,7 @@ export default function StyleRecommendationsScreen() {
           <p className="mb-md font-body-md text-body-md text-on-secondary-container/90">
             {!identity.hairType
               ? 'Start with whether you have loose hair or locs — the two share almost no technique, so that one answer halves this list.'
-              : 'Log a length check on Growth, or turn on “prefer protective styles” — those are what this list reorders around today.'}
+              : 'Log a length check on Growth, tell Hair Discovery how your hair is doing, or turn on “prefer protective styles”. Those are what this list reorders around today.'}
           </p>
           <Link
             to={identity.hairType ? '/growth' : '/profile'}

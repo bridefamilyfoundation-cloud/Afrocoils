@@ -834,7 +834,7 @@ export function ask(query: string, ctx: AskContext): AskReply {
     })
   }
   if (!hairType && top.doc.hairTypes.length === 1) {
-    notes.push({ text: NOTES.noHairType, to: '/quiz', label: 'Take the hair quiz' })
+    notes.push({ text: NOTES.noHairType, to: '/quiz', label: 'Start Hair Discovery' })
   }
 
   let hit: AskHit = { doc: top.doc, score: top.score, quote: bestPassage(ix, top.doc, r) }

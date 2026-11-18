@@ -181,8 +181,8 @@ export default function HairCareScreen() {
         >
           <Icon name="science" className="shrink-0 text-primary" />
           <p className="flex-1 font-body-md text-caption text-on-surface-variant">
-            Not sure about any of them? The hair quiz asks about what you can see, and fills
-            in all three.
+            Not sure about any of them? Hair Discovery shows you what each looks like on Type
+            4 hair, and fills in all three.
           </p>
           <Icon name="arrow_forward" className="shrink-0 text-outline" />
         </Link>

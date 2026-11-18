@@ -78,7 +78,7 @@ export const TOUR_STEPS: TourStep[] = [
     path: '/profile',
     target: 'profile-heading',
     title: 'My Hair Profile',
-    body: 'Tell the app whether you have loose hair or locs and the rest follows. The card at the top shows what the app knows and what is still missing; tap any row to change it. The hair quiz fills it all in from what you can see on your own head.',
+    body: 'Hair Discovery fills this in, starting with your Type 4 coil pattern, with pictures and simple things to check on your own head. The card at the top shows what the app knows and what is still missing. Tap any hair answer to change it in Hair Discovery.',
   },
   {
     path: '/sos',

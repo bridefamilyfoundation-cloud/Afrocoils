@@ -5,12 +5,13 @@ import type {
   CareSchedule,
   HairIdentity,
   HairProfile,
+  HairState,
   HairTexture,
   MemberStatus,
   Membership,
   MyStyle,
 } from './types'
-import { CURL_PATTERNS, MEMBER_STATUSES, PROFILE_VERSION, defaultSchedules, isPlanId, parseFloor } from './types'
+import { CURL_PATTERNS, HAIR_CONCERNS, HAIR_CONDITIONS, SCALP_CONCERNS, MEMBER_STATUSES, PROFILE_VERSION, defaultSchedules, isPlanId, parseFloor } from './types'
 
 /**
  * Persistence for the hair profile.
@@ -81,7 +82,7 @@ function migrate(stored: unknown): HairProfile {
     // keys inside it.
     bio: { ...base.bio, ...s.bio },
     identity: migrateIdentity(base.identity, s.identity),
-    state: { ...base.state, ...s.state },
+    state: migrateState({ ...base.state, ...s.state }),
     preferences: { ...base.preferences, ...s.preferences },
     shelf: Array.isArray(s.shelf) ? s.shelf : base.shelf,
     lengthChecks: Array.isArray(s.lengthChecks) ? s.lengthChecks : base.lengthChecks,
@@ -212,7 +213,30 @@ function migrateIdentity(base: HairIdentity, stored: HairIdentity | undefined): 
   if (next.curlPattern !== undefined && !(CURL_PATTERNS as readonly string[]).includes(next.curlPattern)) {
     delete next.curlPattern
   }
+  // v11 → v12. Lists the profile maps over; anything that is not one of
+  // today's values is dropped rather than shown as a chip nobody can clear.
+  next.curlPatterns = onlyKnown(next.curlPatterns, CURL_PATTERNS)
+  next.scalpConcerns = onlyKnown(next.scalpConcerns, SCALP_CONCERNS)
+  if (next.curlPatterns === undefined) delete next.curlPatterns
+  if (next.scalpConcerns === undefined) delete next.scalpConcerns
   return next
+}
+
+function migrateState(state: HairState): HairState {
+  const next = { ...state }
+  if (next.condition !== undefined && !(HAIR_CONDITIONS as readonly string[]).includes(next.condition)) {
+    delete next.condition
+  }
+  next.concerns = onlyKnown(next.concerns, HAIR_CONCERNS)
+  if (next.concerns === undefined) delete next.concerns
+  return next
+}
+
+/** Keep the entries of a stored list that are still in its vocabulary. */
+function onlyKnown<T extends string>(list: unknown, allowed: readonly T[]): T[] | undefined {
+  if (!Array.isArray(list)) return undefined
+  const kept = list.filter((v): v is T => (allowed as readonly unknown[]).includes(v))
+  return kept.length > 0 ? [...new Set(kept)] : undefined
 }
 
 /** Fields added to MyStyle after the first build shipped. */

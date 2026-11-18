@@ -130,7 +130,7 @@ export const CONCEPTS: Record<string, string> = {
   // --- The app ---
   app: 'app|afrocoils|afro coils|afrocoil|afro coil|this app|screen|page|button|tab|menu|section|setting|settings',
   profile: 'profile|my profile|hair profile|my details|personal|my info',
-  quiz: 'quiz|hair quiz|what hair type|which hair type|my hair type|hair type|what type of hair|type of hair',
+  quiz: 'quiz|hair quiz|hair discovery|discovery|hair assessment|assessment|what hair type|which hair type|my hair type|hair type|what type of hair|type of hair',
   calendar:
     'calendar|routine|routines|schedule|scheduling|planner|plan|log|logging|track|tracking|history|due|next wash',
   reminder: 'reminder|reminders|remind|notify|notification|notifications|alert|alerts|alarm',
@@ -263,9 +263,9 @@ export const TOPICS: AskTopic[] = [
     id: 'quiz',
     title: 'Find out your hair type',
     answer:
-      'The hair quiz asks about what you can see on your own head and fills in your profile from it. Whether you have loose natural hair or locs is the one answer that changes most of the app.',
+      'Hair Discovery walks you through your coil pattern, porosity, density, strand thickness, scalp and hair condition, with a picture and something to check on your own head for each, and fills in your profile from it. Whether you have loose natural hair or locs is the one answer that changes most of the app.',
     route: '/quiz',
-    cta: 'Take the hair quiz',
+    cta: 'Start Hair Discovery',
     docs: 'start',
     keys: 'what is my hair type|which hair type am i|not sure what hair i have|curl type|curl pattern|what curl pattern|4c or 4b|quiz|hair test|identify my hair',
   },
@@ -273,7 +273,7 @@ export const TOPICS: AskTopic[] = [
     id: 'set-hair-type',
     title: 'Tell the app you have locs or loose hair',
     answer:
-      'Set your hair type on My Hair Profile, or take the hair quiz. Until the app knows, every list is generic; once it does, loose-hair technique is never shown to a loc wearer.',
+      'Set your hair type on My Hair Profile, or start Hair Discovery. Until the app knows, every list is generic; once it does, loose-hair technique is never shown to a loc wearer.',
     route: '/profile?open=hairType',
     cta: 'Open My Hair Profile',
     docs: 'start',

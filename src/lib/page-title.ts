@@ -39,7 +39,7 @@ const TITLES: Record<string, string> = {
   '/locs/styles': `Loc styles · ${SUFFIX}`,
   '/calendar': `Hair calendar · ${SUFFIX}`,
   '/profile': `My Hair Profile · ${SUFFIX}`,
-  '/quiz': `Hair quiz · ${SUFFIX}`,
+  '/quiz': `Hair Discovery · ${SUFFIX}`,
   '/porosity': `Porosity test · ${SUFFIX}`,
   '/products': `Products for coily hair and locs · ${SUFFIX}`,
   '/about': `About ${SUFFIX}`,

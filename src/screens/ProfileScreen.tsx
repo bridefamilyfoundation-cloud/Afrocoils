@@ -8,34 +8,18 @@ import ScreenFallback from '../components/ScreenFallback'
 import { useOpenParam, useScrollToOpened } from '../lib/deep-link'
 import { useHairProfile } from '../lib/profile-store'
 import { formatLocAge, resolveLocStage, retwistWeeks } from '../lib/locs'
-import { todayKey } from '../lib/calendar'
-import type {
-  CarePreferences,
-  Climate,
-  HairIdentity,
-  HairType,
-} from '../lib/types'
+import type { CarePreferences, Climate, HairCondition, HairIdentity } from '../lib/types'
 import {
   CLIMATES,
-  CURL_FAMILIES,
-  CURL_PATTERNS,
-  DENSITIES,
   ENFORCED_PREFERENCES,
-  HAIR_TEXTURES,
-  HAIR_TYPES,
-  LOC_METHODS,
   LOC_STAGES,
-  LOC_TYPES,
-  POROSITY_LEVELS,
   PREFERENCE_LABELS,
   RANKED_PREFERENCES,
-  SCALP_CONDITIONS,
-  curlPatternLabel,
   identityFieldsFor,
 } from '../lib/types'
 
 /**
- * My Hair Profile — answers first, editing one row at a time.
+ * My Hair Profile — answers first.
  *
  * This screen used to be every picker open at once: twenty-odd chip
  * groups, the quiz card and the full form competing for the same first
@@ -44,30 +28,29 @@ import {
  *
  *   1. who you are (BioCard: photo and name),
  *   2. the at-a-glance card — what the app knows, what is missing, and
- *      the quiz as the way to fill it in,
- *   3. grouped rows, each showing its value and opening its chips on tap
- *      (one open at a time),
+ *      Hair Discovery as the way to fill it in,
+ *   3. grouped rows, each showing its value: hair answers open their
+ *      section of Hair Discovery, the rest open their chips on tap (one
+ *      open at a time),
  *   4. two rows that are not hair facts — the product shelf and the
  *      membership — at the foot.
  *
- * Until hair type is set, the hair rows that hang off it are not shown:
- * the first question is the only one that matters, and the quiz asks it
- * anyway.
+ * Until hair type is set, the hair rows that hang off it are not shown.
  *
- * Every row has an id that `?open=<id>` opens (Ask, Hair Care, the
- * calendar and Locs World link straight to the field they mean). The
- * fields edited here are the same `identity` fields the quiz writes —
- * keep the rows in step with `identityFieldsFor()`.
+ * Every row has an id that `?open=<id>` scrolls to (Ask, Hair Care, the
+ * calendar and Locs World link straight to the field they mean).
+ *
+ * The hair answers are not edited here. Since 2026-11-18 Hair Discovery
+ * (`/quiz`) is the one place they are asked: each of those rows shows
+ * its answer and opens that section of Discovery, which returns here.
+ * What stays editable on this screen is what Discovery does not ask —
+ * the loc stage override, climate, hard water, the rules, the shelf and
+ * the membership. Keep the rows in step with `identityFieldsFor()`.
  */
 
 /* ------------------------------------------------------------------ *
  * Copy
  * ------------------------------------------------------------------ */
-
-const HAIR_TYPE_BLURB: Record<HairType, string> = {
-  'Loose Natural': 'Type 4 coils worn loose — 4A, 4B or 4C.',
-  Locs: 'Locs at any stage, from starter coils to rooted.',
-}
 
 const CLIMATE_HINT: Record<Climate, string> = {
   'Humid / tropical': 'Swelling, reversion and frizz. Sealing beats soaking.',
@@ -76,24 +59,23 @@ const CLIMATE_HINT: Record<Climate, string> = {
   Temperate: 'No strong seasonal pull in either direction.',
 }
 
-/** A trait picked from chips. `id` is the row id and the identity key. */
+/** A trait Hair Discovery asks. `id` is the row id, the identity key and the step id. */
 interface TraitField {
   id: keyof HairIdentity
   label: string
-  /** Short name for the "Still to add" buttons. */
+  /** Short name for the "Still to add" chips. */
   short: string
   icon: IconName
-  options: readonly string[]
-  /** What the trait is, and what it changes. Always shown when open. */
-  about: string
-  /** Where to go when the user cannot tell which chip is theirs. */
-  unsure: { to: string; label: string }
-  describe?: (value: string) => string
-  /** How the value reads on the closed row and the glance card. */
+  /** How the value reads on the glance card. */
   summary?: (value: string) => string
 }
 
-const quizFor = (step: string) => ({ to: `/quiz?step=${step}`, label: 'Not sure? Answer one question' })
+const CONDITION_SUMMARY: Record<HairCondition, string> = {
+  Healthy: 'Hair doing well',
+  Dry: 'Hair feeling dry',
+  Damaged: 'Some damage',
+  'Breakage-prone': 'Breaking easily',
+}
 
 function traitFields(locs: boolean): TraitField[] {
   return [
@@ -102,42 +84,14 @@ function traitFields(locs: boolean): TraitField[] {
       label: locs ? 'Coil pattern (under the locs)' : 'Coil pattern',
       short: 'coil pattern',
       icon: 'waves',
-      options: CURL_PATTERNS,
-      about: `All Type 4 — ${CURL_FAMILIES[0].name.toLowerCase()}. The letter is how tight the coil is, A being the loosest.`,
-      unsure: quizFor('curlPattern'),
-      describe: (v) => curlPatternLabel(v as (typeof CURL_PATTERNS)[number]),
     },
-    {
-      id: 'porosity',
-      label: 'Porosity',
-      short: 'porosity',
-      icon: 'science',
-      options: POROSITY_LEVELS,
-      about:
-        'How readily your hair takes water in and lets it go. Drives almost every product decision.',
-      unsure: { to: '/porosity', label: 'Not sure? Take the porosity test' },
-      summary: (v) => `${v} porosity`,
-    },
-    {
-      id: 'density',
-      label: 'Density',
-      short: 'density',
-      icon: 'grass',
-      options: DENSITIES,
-      about:
-        'How much hair is on your head, not how thick each strand is. Decides sectioning and product quantity.',
-      unsure: quizFor('density'),
-      summary: (v) => `${v} density`,
-    },
+    { id: 'porosity', label: 'Porosity', short: 'porosity', icon: 'science', summary: (v) => `${v} porosity` },
+    { id: 'density', label: 'Density', short: 'density', icon: 'grass', summary: (v) => `${v} density` },
     {
       id: 'texture',
-      label: 'Strand texture',
-      short: 'texture',
+      label: 'Strand thickness',
+      short: 'strand thickness',
       icon: 'linear_scale',
-      options: HAIR_TEXTURES,
-      about:
-        'How thick or wide one strand is — not how tightly it coils, and not how much of it you have.',
-      unsure: quizFor('texture'),
       summary: (v) => `${v} strands`,
     },
   ]
@@ -148,9 +102,6 @@ const SCALP_FIELD: TraitField = {
   label: 'Scalp',
   short: 'scalp',
   icon: 'spa',
-  options: SCALP_CONDITIONS,
-  about: 'How your scalp usually is between wash days. The product shelf and Ask read it.',
-  unsure: quizFor('scalpCondition'),
   summary: (v) => `${v} scalp`,
 }
 
@@ -197,16 +148,6 @@ export default function ProfileScreen() {
     if (next !== undefined) window.setTimeout(() => setChosen(null), 220)
   }
 
-  /**
-   * Hair type is never cleared by tapping again: half the app is shown
-   * or hidden by it, and a double-tap silently emptying it would drop
-   * the user back into a generic app with no explanation.
-   */
-  function setHairType(value: HairType) {
-    if (identity.hairType !== value) update({ identity: { ...identity, hairType: value } })
-    window.setTimeout(() => setChosen(null), 220)
-  }
-
   function setClimate(value: Climate) {
     update({ bio: { ...bio, climate: bio.climate === value ? undefined : value } })
   }
@@ -236,8 +177,27 @@ export default function ProfileScreen() {
   }
   for (const field of allTraits) {
     const value = identity[field.id] as string | undefined
-    if (value) known.push({ id: field.id, text: field.summary?.(value) ?? field.describe?.(value) ?? value })
+    if (value) known.push({ id: field.id, text: field.summary?.(value) ?? value })
   }
+  if (profile.state.condition) {
+    known.push({ id: 'hairCondition', text: CONDITION_SUMMARY[profile.state.condition] })
+  }
+  const coilValue = identity.curlPattern
+    ? [
+        identity.curlPattern,
+        ...(identity.curlPatterns ?? []).filter((p) => p !== identity.curlPattern),
+      ].join(' + ')
+    : undefined
+  const scalpValue =
+    [identity.scalpCondition, identity.scalpConcerns?.join(', ')].filter(Boolean).join(' · ') ||
+    undefined
+  const conditionValue =
+    [
+      profile.state.condition,
+      profile.state.concerns?.length ? `${profile.state.concerns.length} to watch` : undefined,
+    ]
+      .filter(Boolean)
+      .join(' · ') || undefined
 
   const LOC_SHORT: Partial<Record<keyof HairIdentity, string>> = {
     locType: 'loc type',
@@ -278,21 +238,22 @@ export default function ProfileScreen() {
         {empty ? (
           <>
             <h3 className="mb-xs font-headline-md text-body-lg font-bold text-on-surface">
-              Start with the hair quiz
+              Start with Hair Discovery
             </h3>
             <p className="mb-lg font-body-md text-body-md text-on-surface-variant">
-              A few questions about what you can see on your own head. It fills in
-              your hair details, and every answer can be changed later.
+              Simple pictures, a few questions and things to check on your own Type 4
+              hair. It fills in your hair details, and every answer can be changed later.
             </p>
             <Link
               to="/quiz"
               className="mb-md flex w-full items-center justify-center gap-sm rounded-full bg-secondary px-lg py-3 font-label-md text-label-md font-bold text-on-secondary transition-all active:scale-95"
             >
               <Icon name="auto_awesome" className="text-[18px]" />
-              Take the hair quiz
+              Start Hair Discovery
             </Link>
             <p className="text-center font-caption text-caption text-on-surface-variant">
-              Already know your hair? Choose your hair type below.
+              Every answer on this page comes from Hair Discovery, and each one can be
+              changed on its own.
             </p>
           </>
         ) : (
@@ -333,14 +294,13 @@ export default function ProfileScreen() {
                 <ul className="mb-lg flex flex-wrap gap-sm">
                   {missing.map((item) => (
                     <li key={item.id}>
-                      <button
-                        type="button"
-                        onClick={() => jump(item.id)}
+                      <Link
+                        to={`/quiz?step=${item.id}`}
                         className="flex items-center gap-xs rounded-full bg-surface-container-lowest px-md py-1.5 font-label-md text-label-md text-on-surface shadow-card transition-all active:scale-95"
                       >
                         <Icon name="add" className="text-[16px]" />
                         {item.text}
-                      </button>
+                      </Link>
                     </li>
                   ))}
                 </ul>
@@ -352,7 +312,7 @@ export default function ProfileScreen() {
               className="flex items-center gap-sm font-label-md text-label-md text-primary underline active:scale-95"
             >
               <Icon name="auto_awesome" className="text-[18px]" />
-              {complete ? 'Something changed? Retake the quiz' : 'Finish with the quiz'}
+              {complete ? 'Something changed? Run Hair Discovery again' : 'Finish with Hair Discovery'}
             </Link>
           </>
         )}
@@ -360,57 +320,15 @@ export default function ProfileScreen() {
 
       {/* ---- Your hair ------------------------------------------------- */}
       <RowGroup title="Your hair">
-        <Row
-          id="hairType"
-          icon="face_3"
-          label="Hair type"
-          value={identity.hairType}
-          open={open === 'hairType'}
-          onToggle={toggle}
-        >
-          <p className="mb-md font-body-md text-caption text-on-surface-variant">
-            This one changes the whole app — which styles you see, which guides, which
-            products, and what the calendar tracks.
-          </p>
-          <div className="grid grid-cols-1 gap-sm sm:grid-cols-2">
-            {HAIR_TYPES.map((type) => {
-              const selected = identity.hairType === type
-              return (
-                <button
-                  key={type}
-                  type="button"
-                  aria-pressed={selected}
-                  onClick={() => setHairType(type)}
-                  className={`flex flex-col rounded-2xl p-md text-left transition-all active:scale-[0.98] ${
-                    selected
-                      ? 'bg-inverse-surface text-inverse-on-surface'
-                      : 'bg-surface-container-lowest text-on-surface shadow-card'
-                  }`}
-                >
-                  <span className="mb-xs flex items-center gap-sm">
-                    <Icon name={type === 'Locs' ? 'grass' : 'waves'} filled={selected} />
-                    <span className="font-headline-md text-body-lg">{type}</span>
-                  </span>
-                  <span
-                    className={`font-body-md text-caption ${selected ? 'opacity-90' : 'text-on-surface-variant'}`}
-                  >
-                    {HAIR_TYPE_BLURB[type]}
-                  </span>
-                </button>
-              )
-            })}
-          </div>
-        </Row>
-
+        <AnswerRow id="hairType" icon="face_3" label="Hair type" value={identity.hairType} />
         {identity.hairType &&
           traits.map((field) => (
-            <TraitRow
+            <AnswerRow
               key={field.id}
-              field={field}
-              value={identity[field.id] as string | undefined}
-              open={open === field.id}
-              onToggle={toggle}
-              onSelect={(v) => setIdentity(field.id, v)}
+              id={field.id}
+              icon={field.icon}
+              label={field.label}
+              value={field.id === 'curlPattern' ? coilValue : (identity[field.id] as string | undefined)}
             />
           ))}
       </RowGroup>
@@ -421,35 +339,9 @@ export default function ProfileScreen() {
           title="Your locs"
           note="Method and stage decide how often to retwist and what you can safely style."
         >
-          <Row
-            id="locType"
-            icon="grass"
-            label="Loc type"
-            value={identity.locType}
-            open={open === 'locType'}
-            onToggle={toggle}
-          >
-            <Chips
-              options={LOC_TYPES}
-              value={identity.locType}
-              onSelect={(v) => setIdentity('locType', v)}
-            />
-          </Row>
-          <Row
-            id="locMethod"
-            icon="science"
-            label="Started with"
-            value={identity.locMethod}
-            open={open === 'locMethod'}
-            onToggle={toggle}
-          >
-            <Chips
-              options={LOC_METHODS}
-              value={identity.locMethod}
-              onSelect={(v) => setIdentity('locMethod', v)}
-            />
-          </Row>
-          <Row
+          <AnswerRow id="locType" icon="grass" label="Loc type" value={identity.locType} />
+          <AnswerRow id="locMethod" icon="science" label="Started with" value={identity.locMethod} />
+          <AnswerRow
             id="locStartISO"
             icon="calendar_month"
             label="Started on"
@@ -458,20 +350,7 @@ export default function ProfileScreen() {
                 ? `${formatLocAge(stageInfo.ageMonths)} in`
                 : identity.locStartISO?.slice(0, 10)
             }
-            open={open === 'locStartISO'}
-            onToggle={toggle}
-          >
-            <input
-              type="date"
-              max={todayKey()}
-              value={identity.locStartISO?.slice(0, 10) ?? ''}
-              onChange={(e) =>
-                update({ identity: { ...identity, locStartISO: e.target.value || undefined } })
-              }
-              aria-label="The date you started your locs"
-              className="w-full rounded-lg border-outline-variant bg-surface-container-low font-body-md text-body-md text-on-surface"
-            />
-          </Row>
+          />
           <Row
             id="locStage"
             icon="trending_up"
@@ -525,12 +404,11 @@ export default function ProfileScreen() {
           title="Scalp & surroundings"
           note="These change which products work. None of it leaves the phone."
         >
-          <TraitRow
-            field={SCALP_FIELD}
-            value={identity.scalpCondition}
-            open={open === 'scalpCondition'}
-            onToggle={toggle}
-            onSelect={(v) => setIdentity('scalpCondition', v)}
+          <AnswerRow
+            id={SCALP_FIELD.id}
+            icon={SCALP_FIELD.icon}
+            label={SCALP_FIELD.label}
+            value={scalpValue}
           />
           <Row
             id="climate"
@@ -556,6 +434,21 @@ export default function ProfileScreen() {
             detail="Limescale on the kettle and taps is the usual tell. It changes clarifying advice."
             on={bio.hardWater === true}
             onToggle={() => update({ bio: { ...bio, hardWater: !bio.hardWater } })}
+          />
+        </RowGroup>
+      )}
+
+      {/* ---- How it is doing: state, not identity ---------------------- */}
+      {identity.hairType && (
+        <RowGroup
+          title="How your hair is doing"
+          note="This one is meant to change. Update it whenever your hair does."
+        >
+          <AnswerRow
+            id="hairCondition"
+            icon="insights"
+            label="Hair condition"
+            value={conditionValue}
           />
         </RowGroup>
       )}
@@ -729,37 +622,44 @@ function Row({
   )
 }
 
-function TraitRow({
-  field,
+/**
+ * An answer Hair Discovery owns: its value, and the way into that one
+ * section of Discovery to change it. The profile stopped asking these
+ * questions itself on the owner's instruction (2026-11-18): one place
+ * asks, with pictures and something to check, so an answer means the
+ * same thing whoever gave it. The section returns here with the row in
+ * view.
+ */
+function AnswerRow({
+  id,
+  icon,
+  label,
   value,
-  open,
-  onToggle,
-  onSelect,
 }: {
-  field: TraitField
+  id: string
+  icon: IconName
+  label: string
   value: string | undefined
-  open: boolean
-  onToggle: (id: string) => void
-  onSelect: (value: string) => void
 }) {
   return (
-    <Row
-      id={field.id}
-      icon={field.icon}
-      label={field.label}
-      value={value && (field.describe?.(value) ?? value)}
-      open={open}
-      onToggle={onToggle}
-    >
-      <p className="mb-md font-body-md text-caption text-on-surface-variant">{field.about}</p>
-      <Chips options={field.options} value={value} onSelect={onSelect} describe={field.describe} />
+    <div id={`profile-${id}`} className="scroll-mt-24">
       <Link
-        to={field.unsure.to}
-        className="mt-md inline-block font-label-md text-caption text-primary underline"
+        to={`/quiz?step=${id}`}
+        aria-label={`${label}: ${value ?? 'not answered'}. Change it in Hair Discovery`}
+        className="flex w-full items-center gap-md px-lg py-md text-left transition-colors active:bg-surface-container-low"
       >
-        {field.unsure.label}
+        <Icon name={icon} className="shrink-0 text-primary" />
+        <span className="min-w-0 flex-1 font-body-md text-body-md text-on-surface">{label}</span>
+        <span
+          className={`max-w-[55%] truncate text-right font-label-md text-label-md ${
+            value ? 'text-on-surface' : 'text-secondary'
+          }`}
+        >
+          {value ?? 'Add'}
+        </span>
+        <Icon name="chevron_right" className="shrink-0 text-outline" />
       </Link>
-    </Row>
+    </div>
   )
 }
 

@@ -50,14 +50,16 @@ const SECTIONS: {
         <p>
           The one answer that changes most of the app is whether you have{' '}
           <strong>loose natural hair or locs</strong>. Until it knows, every list is
-          generic. Take the hair quiz, which asks about what you can see on your own head,
-          or set it directly on My Hair Profile. Everything else on the profile sharpens
-          results but is optional.
+          generic. Hair Discovery asks it first, then walks through your coil pattern,
+          porosity, density, strand thickness, scalp and how your hair is doing, each with a
+          picture and something to check on your own head. Or set it directly on My Hair
+          Profile. Everything else on the profile sharpens results but is optional, and
+          every Hair Discovery result is a guided best match, not a diagnosis.
         </p>
       </>
     ),
     links: [
-      { to: '/quiz', label: 'Take the hair quiz' },
+      { to: '/quiz', label: 'Start Hair Discovery' },
       { to: '/profile', label: 'My Hair Profile' },
     ],
   },
@@ -173,7 +175,7 @@ const SECTIONS: {
         </ul>
         <p>
           If you wear locs, a Locs World card appears under the doors. While your profile is
-          incomplete, a card at the foot of the page offers the hair quiz.
+          incomplete, a card at the foot of the page offers Hair Discovery.
         </p>
       </>
     ),
@@ -351,12 +353,14 @@ const SECTIONS: {
           None of it leaves your phone. Your name and photo sit at the top. Under them, a card
           shows what the app knows about your hair, how much is filled in, and what is still
           to add; tap anything on it to go to that answer. Below that, each answer is one row
-          showing its value. Tap a row to change it.
+          showing its value. Your hair answers come from Hair Discovery, and tapping one opens
+          that section of it, then brings you back. Everything else is changed right on the
+          row.
         </p>
         <ul>
           <li>
             <strong>Your hair</strong>: hair type first, then coil pattern, porosity, density
-            and strand texture. Until hair type is set, only that question shows.
+            and strand thickness. Until hair type is set, only that row shows.
           </li>
           <li>
             <strong>Your locs</strong> (loc wearers only): loc type, how they started, the
@@ -365,6 +369,10 @@ const SECTIONS: {
           <li>
             <strong>Scalp &amp; surroundings</strong>: scalp, climate ({list(CLIMATES)}) and
             whether you have hard water.
+          </li>
+          <li>
+            <strong>How your hair is doing</strong>: your hair condition right now, and the
+            concerns you are dealing with.
           </li>
           <li>
             <strong>Your rules</strong>: <em>Strict rules</em> ({list(ENFORCED)}) are always
@@ -377,14 +385,30 @@ const SECTIONS: {
           </li>
         </ul>
         <p>
-          The hair quiz fills in the same answers in plainer terms. Under a row you are unsure
-          of, <em>Not sure?</em> asks just that one question, or opens the porosity test.
+          Hair Discovery starts with your Type 4 coil pattern, then asks whether you wear it
+          loose or in locs, then the rest. Each of its six sections has two parts:{' '}
+          <em>Understand your hair</em>, which explains it and draws every possible result,
+          and <em>Try it at home</em>, a gentle DIY test (a coil pattern observation, a water
+          absorption test, a scalp visibility test, a single-strand test, a scalp observation
+          and a hair health check) with what you need, illustrated steps and a question about
+          what you saw, including <em>I&rsquo;m not sure</em>. The popular float test is shown
+          but not used, because it is not reliable on its own. It ends on a summary where any
+          answer can be edited. Coil pattern can
+          hold more than one pattern: the main one, which the app fits its advice to, and
+          any others on your head. Scalp takes any concerns you notice as well as its
+          overall picture, and <em>How your hair is doing</em> holds your hair condition and
+          what you are dealing with. That one is meant to change, so it never counts towards
+          a complete profile.
+        </p>
+        <p>
+          On loc wearers' profiles the loc stage is still changed on the row itself, because
+          it corrects an estimate rather than answering a question.
         </p>
       </>
     ),
     links: [
       { to: '/profile', label: 'My Hair Profile' },
-      { to: '/quiz', label: 'Hair quiz' },
+      { to: '/quiz', label: 'Hair Discovery' },
     ],
   },
   {
@@ -411,8 +435,17 @@ const SECTIONS: {
             order. Most styles still work on shorter hair.
           </li>
           <li>
+            <strong>How your hair is doing</strong>, from Hair Discovery, changes the order.
+            Breakage, damage, split ends or length that will not stay lift protective and
+            low-manipulation styles, and tangling lifts low-manipulation ones.
+          </li>
+          <li>
             <strong>Porosity, density and coil pattern</strong> do not rank styles yet, because
-            no style in the library has been tagged with them.
+            no style in the library has been tagged with them. They do rank products, along
+            with your scalp, the scalp concerns you ticked, your strand thickness (a lighter
+            leave-in for fine strands, a richer cream for coarse ones), dryness (moisture
+            products) and breakage (deep treatments). Each product shows up to two of the
+            reasons it matched.
           </li>
         </ul>
       </>

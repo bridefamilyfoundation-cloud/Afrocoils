@@ -3,11 +3,16 @@ import type {
   CarePreferences,
   CurlPattern,
   Density,
+  HairConcern,
+  HairCondition,
+  HairTexture,
   HairType,
   LocStage,
   PorosityLevel,
+  ScalpConcern,
   ScalpCondition,
 } from '../lib/types'
+import { feelsDry, fragileEnds } from '../lib/types'
 
 /**
  * The product library.
@@ -632,7 +637,28 @@ export interface ProductFilterInput {
   curlPattern?: CurlPattern
   scalpCondition?: ScalpCondition
   locStage?: LocStage
+  /** The rest of Hair Discovery's answers. All rank; none excludes. */
+  curlPatterns?: CurlPattern[]
+  texture?: HairTexture
+  scalpConcerns?: ScalpConcern[]
+  condition?: HairCondition
+  concerns?: HairConcern[]
 }
+
+/**
+ * Which scalp a concern points at, so a scalp product tagged for flaky
+ * scalps reaches someone who ticked "Flaking" without picking Flaky as
+ * their overall answer.
+ */
+const SCALP_CONCERN_SUITS: Record<ScalpConcern, ScalpCondition[]> = {
+  Itching: ['Flaky', 'Sensitive'],
+  Dryness: ['Dry'],
+  Oiliness: ['Oily'],
+  Flaking: ['Flaky'],
+  Tenderness: ['Sensitive'],
+}
+
+const MOISTURE_CATEGORIES: readonly ProductCategory[] = ['Leave-In', 'Cream & Butter', 'Deep Treatment']
 
 /**
  * Rank the library against the profile.
@@ -670,10 +696,45 @@ export function rankProducts(
       if (identity.curlPattern && product.suits?.curlPattern?.includes(identity.curlPattern)) {
         score += 2
         reasons.push(`suits ${identity.curlPattern}`)
+      } else {
+        const also = identity.curlPatterns?.find(
+          (p) => p !== identity.curlPattern && product.suits?.curlPattern?.includes(p),
+        )
+        if (also) {
+          score += 1
+          reasons.push(`suits your ${also}`)
+        }
       }
       if (identity.scalpCondition && product.suits?.scalp?.includes(identity.scalpCondition)) {
         score += 3
         reasons.push(`${identity.scalpCondition.toLowerCase()} scalp`)
+      } else {
+        const concern = identity.scalpConcerns?.find((c) =>
+          SCALP_CONCERN_SUITS[c].some((s) => product.suits?.scalp?.includes(s)),
+        )
+        if (concern) {
+          score += 2
+          reasons.push(`for scalp ${concern.toLowerCase()}`)
+        }
+      }
+      // Strand thickness: the weight of the product, in the words Hair
+      // Discovery uses ("heavy products weigh it down", "usually needs
+      // richer products").
+      if (identity.texture === 'Fine' && product.category === 'Leave-In') {
+        score += 1
+        reasons.push('light enough for fine strands')
+      }
+      if (identity.texture === 'Coarse' && product.category === 'Cream & Butter') {
+        score += 1
+        reasons.push('rich enough for coarse strands')
+      }
+      if (feelsDry(identity.condition, identity.concerns) && MOISTURE_CATEGORIES.includes(product.category)) {
+        score += 2
+        reasons.push('for dryness')
+      }
+      if (fragileEnds(identity.condition, identity.concerns) && product.category === 'Deep Treatment') {
+        score += 2
+        reasons.push('for breakage')
       }
       if (identity.locStage && product.suits?.locStage?.includes(identity.locStage)) {
         score += 3

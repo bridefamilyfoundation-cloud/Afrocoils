@@ -71,6 +71,17 @@ export const POROSITY_QUESTIONS: PorosityQuestion[] = [
 
 export const POROSITY_MAX_SCORE = POROSITY_QUESTIONS.length * 2
 
+/**
+ * One line per result, shown wherever a result is: the porosity test's
+ * result card and Hair Discovery's. One wording, so the two agree.
+ */
+export const POROSITY_SUMMARY: Record<PorosityLevel, string> = {
+  Low: 'Your cuticles lie flat and tight. Moisture struggles to get in — but once it is in, it stays.',
+  Medium:
+    'The easiest type to work with. Your cuticle takes moisture in readily and holds it a reasonable time.',
+  High: 'Your cuticles are raised, so water goes in fast and leaves just as fast. The work is in sealing, not soaking.',
+}
+
 /** Score bands. Pure, so the mapping can be read and checked on its own. */
 export function porosityFor(total: number): PorosityLevel {
   const ratio = total / POROSITY_MAX_SCORE

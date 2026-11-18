@@ -197,12 +197,14 @@ picture; this file is the short version of what to keep in mind when editing.
   Growth block) now resolve to `/care`. Do not reintroduce a screen at
   `/sos/care`.
 
-  Hair Care is a hub and must stay one. `identity` is written in exactly
-  two places — the quiz and the profile screen — and a third set of
-  pickers would be a third thing to keep in step with
-  `identityFieldsFor()`. The one exception is `hairType` alone, which
+  Hair Care is a hub and must stay one. The hair answers are asked in
+  exactly one place — Hair Discovery (`/quiz`) — and a second set of
+  pickers would be a second thing to keep in step with
+  `identityFieldsFor()`. The exceptions are `hairType` alone, which
   Locs World's "Loose or Loc’d?" opening (its owner-supplied copy, the
-  only writeup above the lookbook) sets the way the profile does. Its "know your hair" cards show the value the
+  only writeup above the lookbook) sets directly, and the profile's loc
+  stage override, which corrects an estimate rather than answering a
+  question. Its "know your hair" cards show the value the
   profile already holds and link to where it is set.
 
   **Hair SOS is also the front page.** One screen answers to `/`,
@@ -235,7 +237,7 @@ picture; this file is the short version of what to keep in mind when editing.
   Everything else belongs *inside* one of the six and is reached from it,
   never from the drawer or the tab bar: the care guides under Hair SOS;
   the porosity test, the product shelf and the calendar under Hair Care;
-  the user's own worn styles under Hair Growth; the hair quiz under My
+  the user's own worn styles under Hair Growth; Hair Discovery under My
   Hair Profile; community tips under About; contributing a style
   (`/styles/submit`) under Hair Styles.
   A screen that lost its tab (`/calendar`, `/products`) carries a
@@ -342,13 +344,23 @@ picture; this file is the short version of what to keep in mind when editing.
   the typed words only. Climate is a picker over
   `CLIMATES` rather than free text, which is why it is four coarse bands
   rather than a city.
-- The hair quiz (`src/lib/quiz.ts`, `/quiz`) and the pickers on the
-  profile screen write the same `identity` fields. The quiz asks in terms
-  of what a person can observe on their own head; the pickers assume they
-  already know the category. Keep both — and keep the quiz's step list
-  in step with `identityFieldsFor()`, or the completeness meter and the
-  quiz will disagree about what "done" means. The porosity questions and
-  scoring live in `src/lib/porosity.ts` because two screens run them.
+- **Hair Discovery (`src/lib/quiz.ts`, `/quiz`) is the only place the
+  hair answers are asked (decided 2026-11-18).** It replaced the
+  profile's pickers: each hair row on My Hair Profile shows its answer
+  and opens `/quiz?step=<id>`, which asks that one section and returns.
+  Type 4 comes first — the coil pattern is step one, loose or loc'd
+  step two (still the one step that cannot be skipped). Every section
+  has a drawing (`HairIllustrations.tsx`, inline SVG in palette tokens),
+  a "check for yourself" activity, and answers worded as a guided best
+  match, never a diagnosis; all of it is about Type 4 hair. Coil pattern
+  takes several (`curlPatterns`) plus the one covering most of the head
+  (`curlPattern`, the only one anything branches on); scalp takes
+  `scalpConcerns`; hair condition and its concerns live in `state`
+  because they change, and never count towards completeness. Keep the
+  identity steps in step with `identityFieldsFor()`, or the completeness
+  meter and Discovery will disagree about what "done" means. The
+  porosity questions, scoring and result lines live in
+  `src/lib/porosity.ts` because two screens run them.
 - Styles resolve four image slots each — `style-<id>-front|back|side|round`
   — through `styleAngles()` in `src/assets/imagery.ts`. Cards use
   `styleCover()`, which prefers the front shot and falls back through the
@@ -528,7 +540,12 @@ picture; this file is the short version of what to keep in mind when editing.
   The recommendations screen states the criteria it used, and that list
   has to stay true to `rankStyles`. Today it is: hair type (a hard
   exclusion), length band (derived from the last length check, ranks
-  only) and the care preferences. **Porosity, density and curl pattern
+  only), the care preferences, and Hair Discovery's hair condition —
+  `fragileEnds()` lifts Protective and `lowManipulation` styles,
+  tangling lifts `lowManipulation` ones, through fields every entry
+  already declares. Products also rank on strand thickness, scalp
+  concerns, dryness and breakage (`rankProducts`); every list reads
+  those answers through `discoveryRanking()`. **Porosity, density and curl pattern
   are deliberately named as *not* ranking**, because no contributed entry
   declares them — `suits.lengthBand` is the only soft signal any style in
   the library carries. If a contribution ever declares one, `rankStyles`

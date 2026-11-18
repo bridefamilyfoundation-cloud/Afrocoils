@@ -2,6 +2,8 @@ import type {
   CarePreferences,
   CurlPattern,
   Density,
+  HairConcern,
+  HairCondition,
   HairType,
   LengthBand,
   LocStage,
@@ -11,7 +13,7 @@ import type {
   StyleDifficulty,
 } from '../lib/types'
 import type { IconName } from '../components/icon-names'
-import { STYLE_CATEGORIES } from '../lib/types'
+import { STYLE_CATEGORIES, fragileEnds } from '../lib/types'
 
 /**
  * The style library.
@@ -739,6 +741,11 @@ export interface StyleFilterInput {
   locStage?: LocStage
   /** Derived from the latest length check, not asked. Ranks, never excludes. */
   lengthBand?: LengthBand
+  /** Every coil pattern on the head, from Hair Discovery. `curlPattern` is the main one. */
+  curlPatterns?: CurlPattern[]
+  /** Hair Discovery's "how is your hair doing". Ranks, never excludes. */
+  condition?: HairCondition
+  concerns?: HairConcern[]
 }
 
 /**
@@ -836,6 +843,16 @@ export function rankStyles(
       if (identity.curlPattern && style.suits?.curlPattern?.includes(identity.curlPattern)) {
         score += 2
         reasons.push(`suits ${identity.curlPattern}`)
+      } else {
+        // A pattern that grows on part of the head counts for less than
+        // the one that covers most of it.
+        const also = identity.curlPatterns?.find(
+          (p) => p !== identity.curlPattern && style.suits?.curlPattern?.includes(p),
+        )
+        if (also) {
+          score += 1
+          reasons.push(`suits your ${also}`)
+        }
       }
       if (identity.density && style.suits?.density?.includes(identity.density)) {
         score += 1
@@ -855,6 +872,18 @@ export function rankStyles(
       if (preferences.lowManipulation && style.lowManipulation) {
         score += 2
         reasons.push('low manipulation')
+      }
+      // Hair Discovery's condition answers. Breakage, damage and length
+      // that will not stay are the case for tucking the ends away and
+      // handling the hair less; tangling is the case for handling it less.
+      const fragile = fragileEnds(identity.condition, identity.concerns)
+      if (fragile && style.category === 'Protective') {
+        score += 2
+        reasons.push('protects fragile ends')
+      }
+      if ((fragile || identity.concerns?.includes('Tangling')) && style.lowManipulation) {
+        score += 1
+        reasons.push('less handling')
       }
 
       return { style, score, reasons }

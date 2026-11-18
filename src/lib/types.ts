@@ -142,6 +142,16 @@ export type Density = (typeof DENSITIES)[number]
 export type HairTexture = (typeof HAIR_TEXTURES)[number]
 export type ScalpCondition = (typeof SCALP_CONDITIONS)[number]
 
+/**
+ * Scalp concerns, as many as apply. `scalpCondition` is the overall
+ * picture the product shelf and Ask read; this is the detail under it,
+ * because an itchy scalp that also flakes is two things to know, not
+ * one category to squeeze into. Asked by Hair Discovery, edited on the
+ * profile, ranks and filters nothing.
+ */
+export const SCALP_CONCERNS = ['Itching', 'Dryness', 'Oiliness', 'Flaking', 'Tenderness'] as const
+export type ScalpConcern = (typeof SCALP_CONCERNS)[number]
+
 /** The family digit of a pattern — '4A' is a '4'. */
 export function curlFamily(pattern: CurlPattern): string {
   return pattern[0]
@@ -160,14 +170,25 @@ export function curlPatternLabel(pattern: CurlPattern): string {
 export interface HairIdentity {
   /** Undefined means the user has not chosen yet; treat as loose for safety. */
   hairType?: HairType
-  /** The shape of a strand — 4A, 4B or 4C. */
+  /**
+   * The shape of a strand — 4A, 4B or 4C. When more than one pattern
+   * grows on the head, this is the one that covers most of it, and it is
+   * the only one anything reads.
+   */
   curlPattern?: CurlPattern
+  /**
+   * Every pattern the user sees on their head, when it is more than one
+   * (a 4A crown over a 4C nape is common). Display only; `curlPattern`
+   * stays the single answer the rest of the app branches on.
+   */
+  curlPatterns?: CurlPattern[]
   porosity?: PorosityLevel
   /** How many strands there are. */
   density?: Density
   /** How wide one strand is. Independent of density and of coil pattern. */
   texture?: HairTexture
   scalpCondition?: ScalpCondition
+  scalpConcerns?: ScalpConcern[]
 
   /* Loc tier — only meaningful when hairType is 'Locs'. Kept rather than
      cleared when someone switches back to loose, so a person who takes
@@ -248,7 +269,77 @@ export interface HairBio {
 export const BALANCE_STATES = ['Needs protein', 'Balanced', 'Needs moisture'] as const
 export type BalanceState = (typeof BALANCE_STATES)[number]
 
+/**
+ * How the hair is doing right now, in Hair Discovery's four pictures.
+ * State rather than identity: it is meant to change, and it is the one
+ * answer worth re-asking as it goes stale.
+ */
+export const HAIR_CONDITIONS = ['Healthy', 'Dry', 'Damaged', 'Breakage-prone'] as const
+export type HairCondition = (typeof HAIR_CONDITIONS)[number]
+
+/**
+ * What the user is fighting with, as many as apply. Tangling and split
+ * ends are loose-hair problems — a loc is never detangled and has no
+ * ends to trim in that sense — so `hairConcernsFor` leaves them out for
+ * locs, the same hard fork as everywhere else.
+ */
+export const HAIR_CONCERNS = [
+  'Breakage',
+  'Dryness',
+  'Tangling',
+  'Shedding',
+  'Split ends',
+  'Length retention',
+] as const
+export type HairConcern = (typeof HAIR_CONCERNS)[number]
+
+const LOOSE_ONLY_CONCERNS: readonly HairConcern[] = ['Tangling', 'Split ends']
+
+/**
+ * Ends that need protecting: breakage, damage, split ends or length that
+ * will not stay. Read by `rankStyles` (protective and low-manipulation
+ * styles move up) and `rankProducts` (deep treatments move up). Ranks
+ * only, never excludes.
+ */
+export function fragileEnds(condition?: HairCondition, concerns?: readonly HairConcern[]): boolean {
+  return (
+    condition === 'Damaged' ||
+    condition === 'Breakage-prone' ||
+    (concerns ?? []).some((c) => c === 'Breakage' || c === 'Split ends' || c === 'Length retention')
+  )
+}
+
+/** Dry hair, by the overall answer or the concern. Moves moisture products up. */
+export function feelsDry(condition?: HairCondition, concerns?: readonly HairConcern[]): boolean {
+  return condition === 'Dry' || (concerns ?? []).includes('Dryness')
+}
+
+/**
+ * The Hair Discovery answers that rank styles and products beyond the
+ * core traits each screen already passes. One function so every list —
+ * Styles, the recommendations, Quick Hairstyle, a style's page, the
+ * product shelf and Ask — reads the same answers.
+ */
+export function discoveryRanking(identity: HairIdentity, state: HairState) {
+  return {
+    curlPatterns: identity.curlPatterns,
+    texture: identity.texture,
+    scalpConcerns: identity.scalpConcerns,
+    condition: state.condition,
+    concerns: state.concerns,
+  }
+}
+
+export function hairConcernsFor(hairType: HairType | undefined): readonly HairConcern[] {
+  return hairType === 'Locs'
+    ? HAIR_CONCERNS.filter((c) => !LOOSE_ONLY_CONCERNS.includes(c))
+    : HAIR_CONCERNS
+}
+
 export interface HairState {
+  /** Hair Discovery's last answer. See `HAIR_CONDITIONS`. */
+  condition?: HairCondition
+  concerns?: HairConcern[]
   balance?: BalanceState
   /** ISO date of the last wash day. Drives "how dirty is this hair" inference. */
   lastWashISO?: string
@@ -869,7 +960,7 @@ export interface BillingLinkResponse {
 }
 
 /** The persisted document. Versioned so migrations stay mechanical. */
-export const PROFILE_VERSION = 11
+export const PROFILE_VERSION = 12
 
 export interface HairProfile {
   version: number

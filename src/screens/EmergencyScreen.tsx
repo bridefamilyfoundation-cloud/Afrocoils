@@ -315,7 +315,7 @@ export default function EmergencyScreen() {
                 className="inline-flex items-center gap-sm rounded-full bg-primary px-xl py-3 font-label-md text-label-md text-on-primary transition-all active:scale-95"
               >
                 <Icon name="science" className="text-[18px]" />
-                {completeness === 0 ? 'Take the hair quiz' : 'Finish the quiz'}
+                {completeness === 0 ? 'Start Hair Discovery' : 'Finish Hair Discovery'}
               </Link>
             </section>
           )}

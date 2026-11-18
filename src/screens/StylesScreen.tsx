@@ -14,6 +14,7 @@ import {
   styleExclusion,
   styleHairTypes,
 } from '../content/styles'
+import { discoveryRanking } from '../lib/types'
 import { useHairProfile } from '../lib/profile-store'
 import { deriveLengthBand } from '../lib/growth'
 import { resolveLocStage } from '../lib/locs'
@@ -79,8 +80,9 @@ export default function StylesScreen() {
       // Stage only gates the loc styles, and only once we know it.
       locStage: identity.hairType === 'Locs' ? locStage : undefined,
       lengthBand,
+      ...discoveryRanking(identity, profile.state),
     }),
-    [identity, locStage, lengthBand],
+    [identity, profile.state, locStage, lengthBand],
   )
 
   const ranked = useMemo(

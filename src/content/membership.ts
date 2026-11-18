@@ -12,5 +12,5 @@ export const MEMBER_SECTIONS: { icon: IconName; title: string; body: string }[] 
   { icon: 'spa', title: 'Hair Care', body: 'Porosity, your routine, a care calendar with reminders, and the product shelf.' },
   { icon: 'show_chart', title: 'Hair Growth', body: 'Length checks, how much you are keeping, and when you reach each milestone.' },
   { icon: 'waves', title: 'Locs World', body: 'Every chapter on starting and caring for locs, and the loc lookbook.' },
-  { icon: 'face_3', title: 'My Hair Profile', body: 'The hair quiz, and everything above fitted to your hair.' },
+  { icon: 'face_3', title: 'My Hair Profile', body: 'Hair Discovery, and everything above fitted to your hair.' },
 ]

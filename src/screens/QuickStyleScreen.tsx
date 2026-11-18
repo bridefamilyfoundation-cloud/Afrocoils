@@ -7,6 +7,7 @@ import SectionCrumb from '../components/SectionCrumb'
 import { CATEGORY_ICONS, STYLES, rankStyles } from '../content/styles'
 import { deriveLengthBand } from '../lib/growth'
 import { isLocs, resolveLocStage } from '../lib/locs'
+import { discoveryRanking } from '../lib/types'
 import { useHairProfile } from '../lib/profile-store'
 import { TIME_BANDS, type TimeBand } from '../lib/types'
 
@@ -40,6 +41,7 @@ export default function QuickStyleScreen() {
           // Derived from the last length check rather than asked for, and
           // it ranks rather than excludes.
           lengthBand: deriveLengthBand(profile.lengthChecks),
+          ...discoveryRanking(profile.identity, profile.state),
         },
         profile.preferences,
       ),
