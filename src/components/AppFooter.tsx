@@ -26,6 +26,9 @@ export default function AppFooter({ locked = false }: { locked?: boolean }) {
         <p className="font-caption text-caption text-on-surface-variant">
           AfroCoils — Celebrating Every Coil.
         </p>
+        <p className="font-caption text-caption text-on-surface-variant">
+          A product of Crown Space Limited.
+        </p>
       </div>
 
       <nav className="flex flex-wrap justify-center gap-lg">

@@ -11,14 +11,12 @@
   "download": "download/AfroCoils-0.2.0-12.apk",
   "notes": [],
   "bundle": {
-    "code": 14,
+    "code": 15,
     "minVersionCode": 12,
-    "bytes": 4530064,
-    "sha256": "807c17cbaacc77443fab046c5045d0f9609b27c3fc4c9beb42522db470f86dc0",
-    "released": "2026-11-13",
-    "url": "https://runhkccoeyxfgsfrzezn.supabase.co/storage/v1/object/public/releases/bundles/14.zip",
-    "notes": [
-      "Privacy policy: mail to any afrocoils.app address is kept so we can answer it"
-    ]
+    "bytes": 4530218,
+    "sha256": "8e81e6c52cf3065bc757bdeb922a4e5a4dbabc9c2602dc6832813975e690d636",
+    "released": "2026-11-18",
+    "url": "https://runhkccoeyxfgsfrzezn.supabase.co/storage/v1/object/public/releases/bundles/15.zip",
+    "notes": []
   }
 }

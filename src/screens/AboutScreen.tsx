@@ -56,6 +56,13 @@ const ABOUT: { heading: string; body: string | string[] }[] = [
     body: 'Our mission is to make natural hair care simpler, more accessible, and more personalised, helping women feel more confident in understanding, caring for, and styling their hair.',
   },
   {
+    heading: 'Who makes AfroCoils',
+    body: [
+      'AfroCoils is a product of Crown Space Limited.',
+      'AfroCoils is an independent product brand under Crown Space Limited, with its own name and its own purpose: caring for Type 4 natural hair.',
+    ],
+  },
+  {
     heading: 'Your hair data stays on your device',
     body: 'Your hair profile, your length checks, your calendar and your photos are stored on this phone and nowhere else, and none of it is tied to your membership. Your membership is your email: we hold it, whether it is paid up and the record of your payments, and Paystack holds your card. While you are signed in the app checks now and then that the membership is still paid, sending your sign-in token and nothing else. It also asks our website whether a newer version is out, which carries nothing about you — see Updates below.',
   },
@@ -176,6 +183,9 @@ export default function AboutScreen() {
       <section className="mb-2xl flex flex-col items-center gap-sm text-center">
         <p className="font-caption text-caption text-on-surface-variant">
           AfroCoils, version {VERSION}
+        </p>
+        <p className="font-caption text-caption text-on-surface-variant">
+          AfroCoils is a product of Crown Space Limited.
         </p>
         <nav className="flex flex-wrap justify-center gap-lg">
           <Link to="/legal/privacy" className="font-body-md text-body-md text-primary underline">
