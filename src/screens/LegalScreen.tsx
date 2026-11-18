@@ -15,8 +15,9 @@ import Icon from '../components/Icon'
  * below has a file behind it.
  *
  * Terms carry what the code decides — what membership is, how it renews
- * and ends — and list what is still a decision (the legal entity, the
- * jurisdiction, the refund policy) rather than inventing it: drafted
+ * and ends — and name who runs it (Crown Space Limited, confirmed by the
+ * owner 2026-11-18) — and list what is still a decision (its registered
+ * address, the jurisdiction, the refund policy) rather than inventing it: drafted
  * clauses look finished and tend to ship. Contact is written: the
  * support address exists.
  *
@@ -28,7 +29,7 @@ import Icon from '../components/Icon'
 
 /** What the owner still has to supply before this is a publishable policy. */
 const OUTSTANDING = [
-  'The legal entity that operates AfroCoils, and its registered address',
+  'Crown Space Limited’s registered address',
   'The governing jurisdiction',
   'How long a lapsed member’s email and payment records are kept',
   'An effective date, set when it is first published',
@@ -52,6 +53,19 @@ function PrivacyPolicy() {
           carries nothing about you, and you can switch it off too.
         </p>
       </section>
+
+      <Article title="Who we are">
+        <p>
+          AfroCoils is a product of Crown Space Limited, and an independent product brand
+          under it. &ldquo;We&rdquo; and &ldquo;us&rdquo; in this policy mean Crown Space
+          Limited, which runs AfroCoils and is responsible for the information described
+          here. Write to{' '}
+          <a href="mailto:support@afrocoils.app" className="text-primary underline">
+            support@afrocoils.app
+          </a>{' '}
+          about anything in it.
+        </p>
+      </Article>
 
       <Article title="What the app stores, and where">
         <p>
@@ -294,7 +308,7 @@ function Article({ title, children }: { title: string; children: React.ReactNode
 
 /** What the Terms still need, as decisions rather than drafted clauses. */
 const TERMS_OUTSTANDING = [
-  'The legal entity that runs AfroCoils, its registered address and the governing law',
+  'Crown Space Limited’s registered address, and the governing law',
   'The refund policy for a period already paid for, including a 6-month or annual plan cancelled early',
   'Liability limits and warranty disclaimers',
   'Ownership and licensing of contributed photos and write-ups',
@@ -304,6 +318,14 @@ const TERMS_OUTSTANDING = [
 function Terms() {
   return (
     <>
+      <Article title="Who you are agreeing with">
+        <p>
+          AfroCoils is a product of Crown Space Limited, and an independent product brand
+          under it. These terms are between you and Crown Space Limited, which runs AfroCoils;
+          &ldquo;we&rdquo; and &ldquo;us&rdquo; below mean Crown Space Limited.
+        </p>
+      </Article>
+
       <Article title="Membership">
         <p>
           Every feature of AfroCoils is for members. A membership belongs to one email
