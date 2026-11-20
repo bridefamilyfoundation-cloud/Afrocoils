@@ -9,7 +9,7 @@ import type { IconName } from '../components/Icon'
 export const MEMBER_SECTIONS: { icon: IconName; title: string; body: string }[] = [
   { icon: 'emergency_home', title: 'Hair SOS', body: 'Quick styles by the time you have, and help when something is wrong.' },
   { icon: 'auto_awesome', title: 'Hair Styles', body: 'The style library with step-by-step methods, and picks for your hair.' },
-  { icon: 'spa', title: 'Hair Care', body: 'Porosity, your routine, a care calendar with reminders, and the product shelf.' },
+  { icon: 'spa', title: 'Hair Care', body: 'The AfroCoils Hair Guide and starter kit, porosity, a care calendar with reminders, and the product shelf.' },
   { icon: 'show_chart', title: 'Hair Growth', body: 'Length checks, how much you are keeping, and when you reach each milestone.' },
   { icon: 'waves', title: 'Locs World', body: 'Every chapter on starting and caring for locs, and the loc lookbook.' },
   { icon: 'face_3', title: 'My Hair Profile', body: 'Hair Discovery, and everything above fitted to your hair.' },

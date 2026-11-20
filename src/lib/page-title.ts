@@ -34,6 +34,7 @@ const TITLES: Record<string, string> = {
   '/styles/submit': `Contribute a style · ${SUFFIX}`,
   '/styles/submit/thanks': `Thank you · ${SUFFIX}`,
   '/care': `Hair Care · ${SUFFIX}`,
+  '/care/guide': `The AfroCoils Hair Guide · ${SUFFIX}`,
   '/growth': `Hair Growth · ${SUFFIX}`,
   '/locs': `Locs World · ${SUFFIX}`,
   '/locs/styles': `Loc styles · ${SUFFIX}`,

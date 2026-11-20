@@ -64,8 +64,8 @@ picture; this file is the short version of what to keep in mind when editing.
   the lock or the gate changes: a fresh install and a rolled-back push
   both land on the APK's own bundle.
 - **Every feature is for paying members (decided 2026-11-05).** A phone
-  without a paid membership shows the front page — the collage, the
-  title, and "Inside AfroCoils", the six sections *described* from
+  without a paid membership shows the front page — the question on its
+  faded photos, and "Inside AfroCoils", the six sections *described* from
   `content/membership.ts`, not linked — plus `/join` and the legal
   pages. Nothing else: no drawer, no tab bar, no Ask, no tour.
   `AppLayout`'s `lockedCanOpen()` is the one gate; every other address
@@ -212,6 +212,18 @@ picture; this file is the short version of what to keep in mind when editing.
   Growth block) now resolve to `/care`. Do not reintroduce a screen at
   `/sos/care`.
 
+  **The AfroCoils Hair Guide (`/care/guide`, added 2026-11-20)** is
+  the owner's 4C education guide and starter kit, carried word for word
+  in `src/content/hair-guide.ts` (the only edits: "curl" → "coil", and
+  the blank notes table dropped for the calendar). It opens from the
+  first card on Hair Care, is a chapter accordion honouring
+  `?open=<chapter>`, and Ask quotes it as kind `handbook` (paragraphs
+  and boxed notes only — tables are searchable, never quoted). Its
+  loose-hair chapters are hidden from loc wearers with a line saying
+  so. Its stance — the float test is unreliable, oil does not hydrate,
+  LCO and LOC are methods rather than rules — is the app's stance:
+  don't let a guide or an answer contradict it.
+
   Hair Care is a hub and must stay one. The hair answers are asked in
   exactly one place — Hair Discovery (`/quiz`) — and a second set of
   pickers would be a second thing to keep in step with
@@ -223,9 +235,14 @@ picture; this file is the short version of what to keep in mind when editing.
   profile already holds and link to where it is set.
 
   **Hair SOS is also the front page.** One screen answers to `/`,
-  `/home` and `/sos`: a collage of three library photos, the title and
-  one line fill the first viewport with Get Started at its foot, and the three doors are
-  directly below, where Get Started scrolls to rather than navigates.
+  `/home` and `/sos`. Since 2026-11-20 (on request) the first viewport
+  is the question — "What's your emergency?" on a frosted-glass panel,
+  with a heartbeat pulse and trace (`.sos-beat`, `.sos-ring`,
+  `.sos-trace` in `index.css`, all off under reduced motion) and the
+  three library photos faded and blurred behind it as a backdrop. Get
+  Started goes straight to Hair Care (`/care`); "Need a quick style?"
+  scrolls to the doors directly below, where Quick Hairstyle is. A
+  locked phone gets "Explore more features" in the same place.
   These were two screens — a wordless cover outside `AppLayout`, then
   the triage — which spent a tap per launch on an app people reach for
   mid-problem, and left the drawer with a "Home" that was none of the

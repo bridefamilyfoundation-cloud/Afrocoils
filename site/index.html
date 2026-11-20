@@ -176,14 +176,14 @@
                   <span class="absolute left-0 top-1 h-full w-[3px] rounded-full bg-outline-variant/40"><span class="step-bar block h-full w-full rounded-full bg-secondary"></span></span>
                   <p class="mb-sm font-label-md text-label-md uppercase tracking-[0.16em] text-on-surface-variant">01 · Hair SOS</p>
                   <h3 class="mb-md font-headline-lg text-[30px] font-semibold leading-tight text-primary">It opens on the rescue.</h3>
-                  <p class="max-w-md font-body-lg text-body-lg text-on-surface-variant">Every launch lands on Hair SOS: the title, one button, and the way in right beneath it. People reach for this app mid-problem far more often than they browse it, so it doesn&rsquo;t make you browse.</p>
+                  <p class="max-w-md font-body-lg text-body-lg text-on-surface-variant">Every launch lands on Hair SOS and one question: what&rsquo;s your emergency? One button goes straight into Hair Care, with Quick Hairstyle right beneath it. People reach for this app mid-problem far more often than they browse it, so it doesn&rsquo;t make you browse.</p>
                   <div class="mt-lg lg:hidden" data-slot="front"></div>
                 </div>
               </li>
               <li class="step lg:flex lg:min-h-[72vh] lg:items-center" data-step="doors">
                 <div class="relative pl-lg">
                   <span class="absolute left-0 top-1 h-full w-[3px] rounded-full bg-outline-variant/40"><span class="step-bar block h-full w-full rounded-full bg-secondary"></span></span>
-                  <p class="mb-sm font-label-md text-label-md uppercase tracking-[0.16em] text-on-surface-variant">02 · What&rsquo;s your emergency?</p>
+                  <p class="mb-sm font-label-md text-label-md uppercase tracking-[0.16em] text-on-surface-variant">02 · Two ways in</p>
                   <h3 class="mb-md font-headline-lg text-[30px] font-semibold leading-tight text-primary">Two doors. That&rsquo;s the whole triage.</h3>
                   <p class="max-w-md font-body-lg text-body-lg text-on-surface-variant"><strong class="font-semibold text-on-surface">Quick Hairstyle</strong> when you have somewhere to be. <strong class="font-semibold text-on-surface">Hair Care</strong> when you want to know what your hair is and what it needs. A short list is what makes it triage rather than a menu.</p>
                   <div class="mt-lg lg:hidden" data-slot="doors"></div>
@@ -203,7 +203,7 @@
                   <span class="absolute left-0 top-1 h-full w-[3px] rounded-full bg-outline-variant/40"><span class="step-bar block h-full w-full rounded-full bg-secondary"></span></span>
                   <p class="mb-sm font-label-md text-label-md uppercase tracking-[0.16em] text-on-surface-variant">04 · Hair Care</p>
                   <h3 class="mb-md font-headline-lg text-[30px] font-semibold leading-tight text-primary">Know your hair, then look after it.</h3>
-                  <p class="max-w-md font-body-lg text-body-lg text-on-surface-variant">A five-question porosity test, your density, coil pattern and texture. Then a care calendar that works out what&rsquo;s due next, a product shelf filtered to your profile and your water &mdash; and when something&rsquo;s wrong, the Quick Hair Check starts from the symptom.</p>
+                  <p class="max-w-md font-body-lg text-body-lg text-on-surface-variant">The AfroCoils Hair Guide to start from, with the beginner starter kit. A five-question porosity test, your density, coil pattern and texture. Then a care calendar that works out what&rsquo;s due next, a product shelf filtered to your profile and your water &mdash; and when something&rsquo;s wrong, the Quick Hair Check starts from the symptom.</p>
                   <div class="mt-lg lg:hidden" data-slot="care"></div>
                 </div>
               </li>
@@ -516,25 +516,27 @@
     <template id="screens">
       <div class="screen flex flex-col" data-screen="front">
         <div data-appbar></div>
-        <!-- The collage is placeholder tiles, not the app's photos: no style
+        <!-- The backdrop is placeholder tiles, not the app's photos: no style
              photograph appears on this page (see CLAUDE.md). -->
-        <div class="flex min-h-0 flex-1 flex-col overflow-hidden px-5 pt-2">
-          <div class="relative grid h-[44%] grid-cols-[1.4fr_1fr] grid-rows-2 gap-1.5">
-            <svg class="absolute -left-1.5 -top-1.5 z-10 h-6 w-6 text-tertiary" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c.6 6.4 5.6 11.4 12 12-6.4.6-11.4 5.6-12 12-.6-6.4-5.6-11.4-12-12C6.4 11.4 11.4 6.4 12 0Z" /></svg>
-            <div class="tile row-span-2 rounded-2xl"></div>
-            <div class="tile rounded-xl"></div>
-            <div class="tile rounded-xl"></div>
-          </div>
-          <div class="mt-5 flex items-start justify-between gap-2">
-            <div>
-              <p class="font-display-lg text-[34px] font-extrabold leading-[1.05] tracking-tight text-tertiary">Hair<br /><span class="inline-flex items-center gap-1.5"><span class="text-on-surface-variant">SOS</span><svg class="h-6 w-6" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c.6 6.4 5.6 11.4 12 12-6.4.6-11.4 5.6-12 12-.6-6.4-5.6-11.4-12-12C6.4 11.4 11.4 6.4 12 0Z" /></svg></span></p>
-              <p class="mt-2 max-w-[13rem] text-[12px] leading-snug text-on-surface-variant">Quick styles and real care, for the moment your hair can&rsquo;t wait.</p>
+        <div class="flex min-h-0 flex-1 flex-col overflow-hidden px-4 pb-3 pt-1">
+          <div class="relative flex flex-1 flex-col justify-end overflow-hidden rounded-[26px] shadow-card">
+            <div class="absolute inset-0 grid grid-cols-[1.4fr_1fr] grid-rows-2 gap-1 opacity-50 blur-[2px]">
+              <div class="tile row-span-2"></div>
+              <div class="tile"></div>
+              <div class="tile"></div>
             </div>
-            <img data-brand="hero" class="w-[38%] shrink-0 object-contain" alt="" />
-          </div>
-          <div class="mt-auto flex items-center justify-between pb-3">
-            <span class="flex items-center gap-1"><span class="h-1 w-1 rounded-full bg-outline-variant"></span><span class="h-1 w-1 rounded-full bg-outline-variant"></span><span class="h-1 w-4 rounded-full bg-tertiary"></span></span>
-            <span class="flex items-center gap-2.5 rounded-full bg-inverse-surface py-1 pl-4 pr-1 text-[13px] font-semibold text-inverse-on-surface shadow-float">Get Started<span class="grid h-8 w-8 place-items-center rounded-full bg-secondary text-on-secondary"><svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><use href="#i-arrow" /></svg></span></span>
+            <div class="absolute inset-0 bg-gradient-to-b from-surface-container-low/25 via-surface-container-low/45 to-surface-container-low/90"></div>
+            <svg class="absolute left-3 top-3 h-5 w-5 text-tertiary" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c.6 6.4 5.6 11.4 12 12-6.4.6-11.4 5.6-12 12-.6-6.4-5.6-11.4-12-12C6.4 11.4 11.4 6.4 12 0Z" /></svg>
+            <div class="relative m-1.5 rounded-[22px] bg-surface-container-lowest/45 p-4 ring-1 ring-surface-container-lowest/70 backdrop-blur-xl">
+              <div class="flex items-center gap-2">
+                <span class="relative grid h-8 w-8 place-items-center"><span class="sos-ring absolute inset-0 rounded-full bg-secondary/40"></span><span class="sos-beat relative grid h-8 w-8 place-items-center rounded-full bg-secondary text-[9px] font-bold tracking-wider text-on-secondary">SOS</span></span>
+                <span class="text-[9.5px] font-semibold uppercase tracking-[0.2em] text-on-surface">Hair SOS</span>
+              </div>
+              <p class="mt-2.5 font-display-lg text-[28px] font-extrabold leading-[1.05] tracking-tight text-tertiary">What&rsquo;s your emergency?</p>
+              <svg class="my-2 h-6 w-full text-secondary" viewBox="0 0 300 40" preserveAspectRatio="none"><path class="sos-trace" d="M0 22 H96 L108 22 L116 8 L126 36 L138 2 L150 30 L158 22 H300" pathLength="1" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" /></svg>
+              <p class="max-w-[13rem] text-[11.5px] leading-snug text-on-surface-variant">Quick styles and real care, for the moment your hair can&rsquo;t wait.</p>
+              <span class="mt-3 inline-flex items-center gap-2.5 rounded-full bg-inverse-surface py-1 pl-4 pr-1 text-[13px] font-semibold text-inverse-on-surface shadow-float">Get Started<span class="grid h-8 w-8 place-items-center rounded-full bg-secondary text-on-secondary"><svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><use href="#i-arrow" /></svg></span></span>
+            </div>
           </div>
         </div>
         <div data-nav="0"></div>
@@ -543,8 +545,8 @@
       <div class="screen flex flex-col" data-screen="doors">
         <div data-appbar></div>
         <div class="min-h-0 flex-1 overflow-hidden px-5 pt-6 text-center">
-          <p class="font-headline-lg text-[24px] font-semibold leading-tight text-primary">What&rsquo;s Your Emergency?</p>
-          <p class="mx-auto mt-2 text-[12.5px] leading-snug text-on-surface-variant">Two ways in. Everything behind them is written down and on this phone, so it works with no signal.</p>
+          <p class="font-headline-lg text-[24px] font-semibold leading-tight text-primary">Two ways in</p>
+          <p class="mx-auto mt-2 text-[12.5px] leading-snug text-on-surface-variant">Everything behind them is written down and on this phone, so it works with no signal.</p>
           <div class="mt-5 space-y-3 text-left">
             <div class="flex items-center gap-3 rounded-2xl bg-primary-container p-4 text-on-primary-container"><svg class="h-7 w-7 shrink-0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><use href="#i-clock" /></svg><span class="flex-1"><span class="block font-headline-md text-[17px]">Quick Hairstyle</span><span class="block text-[11.5px] leading-snug opacity-90">You have somewhere to be. Pick the time you have and see what fits it.</span></span></div>
             <div class="flex items-center gap-3 rounded-2xl bg-secondary-container p-4 text-on-secondary-container"><svg class="h-7 w-7 shrink-0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><use href="#i-leaf" /></svg><span class="flex-1"><span class="block font-headline-md text-[17px]">Hair Care</span><span class="block text-[11.5px] leading-snug opacity-90">Know your hair, build a routine, and find the products and styles that suit it.</span></span></div>
@@ -569,19 +571,19 @@
         <div data-appbar></div>
         <div class="min-h-0 flex-1 overflow-hidden px-5">
           <p class="font-headline-lg text-[24px] font-semibold text-primary">Hair Care</p>
-          <p class="mt-1 text-[12px] leading-snug text-on-surface-variant">What your hair is, what it needs on a schedule, and what to put on it.</p>
+          <div class="mt-3 flex items-center gap-2.5 rounded-xl bg-inverse-surface p-2 text-inverse-on-surface"><span class="grid h-6 w-6 place-items-center rounded-full bg-secondary text-on-secondary"><svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2"><use href="#i-leaf" /></svg></span><span class="flex-1 text-[12.5px] font-semibold">The AfroCoils Hair Guide</span></div>
           <p class="mt-3 text-[10px] font-semibold uppercase tracking-widest text-primary">A · Know your hair</p>
-          <div class="mt-2 grid grid-cols-2 gap-2">
-            <div class="rounded-xl bg-surface-container-lowest p-2.5"><p class="text-[10px] text-on-surface-variant">Hair porosity</p><p class="font-headline-md text-[14px] font-semibold text-on-surface">Low</p></div>
-            <div class="rounded-xl bg-surface-container-lowest p-2.5"><p class="text-[10px] text-on-surface-variant">Hair density</p><p class="font-headline-md text-[14px] font-semibold text-on-surface">Medium</p></div>
-            <div class="rounded-xl bg-surface-container-lowest p-2.5"><p class="text-[10px] text-on-surface-variant">Coil pattern</p><p class="font-headline-md text-[14px] font-semibold text-on-surface">4C · Coily</p></div>
-            <div class="rounded-xl bg-surface-container-lowest p-2.5"><p class="text-[10px] text-on-surface-variant">Hair texture</p><p class="font-headline-md text-[14px] font-semibold text-on-surface">Fine</p></div>
+          <div class="mt-1.5 grid grid-cols-4 gap-1.5">
+            <div class="rounded-xl bg-surface-container-lowest p-1.5"><p class="text-[8.5px] text-on-surface-variant">Porosity</p><p class="font-headline-md text-[11.5px] font-semibold text-on-surface">Low</p></div>
+            <div class="rounded-xl bg-surface-container-lowest p-1.5"><p class="text-[8.5px] text-on-surface-variant">Density</p><p class="font-headline-md text-[11.5px] font-semibold text-on-surface">Medium</p></div>
+            <div class="rounded-xl bg-surface-container-lowest p-1.5"><p class="text-[8.5px] text-on-surface-variant">Coil</p><p class="font-headline-md text-[11.5px] font-semibold text-on-surface">4C</p></div>
+            <div class="rounded-xl bg-surface-container-lowest p-1.5"><p class="text-[8.5px] text-on-surface-variant">Texture</p><p class="font-headline-md text-[11.5px] font-semibold text-on-surface">Fine</p></div>
           </div>
-          <div class="mt-3 space-y-2">
-            <div class="flex items-center gap-2.5 rounded-xl bg-surface-container-lowest p-2.5"><span class="grid h-7 w-7 place-items-center rounded-lg bg-secondary-container text-[11px] font-bold text-on-secondary-container">B</span><span class="flex-1 text-[12.5px] font-semibold text-on-surface">Hair routine</span><svg class="h-4 w-4 text-outline" fill="none" stroke="currentColor" stroke-width="2"><use href="#i-calendar" /></svg></div>
-            <div class="flex items-center gap-2.5 rounded-xl bg-surface-container-lowest p-2.5"><span class="grid h-7 w-7 place-items-center rounded-lg bg-secondary-container text-[11px] font-bold text-on-secondary-container">C</span><span class="flex-1 text-[12.5px] font-semibold text-on-surface">Product recommendations</span><svg class="h-4 w-4 text-outline" fill="none" stroke="currentColor" stroke-width="2"><use href="#i-bag" /></svg></div>
-            <div class="flex items-center gap-2.5 rounded-xl bg-surface-container-lowest p-2.5"><span class="grid h-7 w-7 place-items-center rounded-lg bg-secondary-container text-[11px] font-bold text-on-secondary-container">D</span><span class="flex-1 text-[12.5px] font-semibold text-on-surface">Hairstyle recommendations</span><svg class="h-4 w-4 text-outline" fill="none" stroke="currentColor" stroke-width="2"><use href="#i-spark" /></svg></div>
-            <div class="flex items-center gap-2.5 rounded-xl bg-primary-container p-2.5 text-on-primary-container"><span class="grid h-7 w-7 place-items-center rounded-lg bg-white/25 text-[11px] font-bold">E</span><span class="flex-1 text-[12.5px] font-semibold">Something is wrong</span><svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2"><use href="#i-sos" /></svg></div>
+          <div class="mt-2.5 space-y-1.5">
+            <div class="flex items-center gap-2.5 rounded-xl bg-surface-container-lowest p-2"><span class="grid h-6 w-6 place-items-center rounded-lg bg-secondary-container text-[11px] font-bold text-on-secondary-container">B</span><span class="flex-1 whitespace-nowrap text-[11.5px] font-semibold text-on-surface">Hair routine</span><svg class="h-4 w-4 text-outline" fill="none" stroke="currentColor" stroke-width="2"><use href="#i-calendar" /></svg></div>
+            <div class="flex items-center gap-2.5 rounded-xl bg-surface-container-lowest p-2"><span class="grid h-6 w-6 place-items-center rounded-lg bg-secondary-container text-[11px] font-bold text-on-secondary-container">C</span><span class="flex-1 whitespace-nowrap text-[11.5px] font-semibold text-on-surface">Product recommendations</span><svg class="h-4 w-4 text-outline" fill="none" stroke="currentColor" stroke-width="2"><use href="#i-bag" /></svg></div>
+            <div class="flex items-center gap-2.5 rounded-xl bg-surface-container-lowest p-2"><span class="grid h-6 w-6 place-items-center rounded-lg bg-secondary-container text-[11px] font-bold text-on-secondary-container">D</span><span class="flex-1 whitespace-nowrap text-[11.5px] font-semibold text-on-surface">Hairstyle recommendations</span><svg class="h-4 w-4 text-outline" fill="none" stroke="currentColor" stroke-width="2"><use href="#i-spark" /></svg></div>
+            <div class="flex items-center gap-2.5 rounded-xl bg-primary-container p-2 text-on-primary-container"><span class="grid h-6 w-6 place-items-center rounded-lg bg-white/25 text-[11px] font-bold">E</span><span class="flex-1 whitespace-nowrap text-[11.5px] font-semibold">Something is wrong</span><svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2"><use href="#i-sos" /></svg></div>
           </div>
         </div>
         <div data-nav="-1"></div>

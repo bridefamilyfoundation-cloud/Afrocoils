@@ -54,10 +54,10 @@ const RESULTS: Record<
     theme: 'bg-primary-container text-on-primary-container',
     summary: POROSITY_SUMMARY.High,
     advice: [
-      'Seal after every wet application — the L.O.C. method exists for this.',
+      'After water and a leave-in, a cream or a little oil can help moisture stay — LOC (oil, then cream) is a good order to try first.',
       'Use heavier butters and creams, especially in dry weather.',
       'Protein treatments help fill the gaps in the cuticle; monthly is a fair start.',
-      'Sleep in satin. Cotton pulls out overnight everything you sealed in.',
+      'Sleep in satin. It cuts the overnight friction that roughs up the cuticle.',
     ],
   },
 }

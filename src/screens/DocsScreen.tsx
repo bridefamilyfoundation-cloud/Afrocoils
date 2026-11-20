@@ -161,8 +161,9 @@ const SECTIONS: {
     body: (
       <>
         <p>
-          The front page, for when your hair needs sorting now. It asks “What’s your
-          emergency?” and offers two ways in.
+          The front page, for when your hair needs sorting now. It opens on one question,
+          “What’s your emergency?”, and <strong>Get Started</strong> takes you straight to Hair
+          Care. Below it are the two ways in.
         </p>
         <ul>
           <li>
@@ -229,6 +230,14 @@ const SECTIONS: {
         <p>What your hair is, what it needs on a schedule, and what to put on it.</p>
         <ul>
           <li>
+            <strong>The AfroCoils Hair Guide</strong>, at the top, is the foundation guide for 4C
+            and other tightly coiled hair: what your hair is, wash day, moisture and oils,
+            protecting it, styling with less stress, a routine you can keep, choosing products,
+            the beginner starter kit, your first wash day, troubleshooting and a glossary. One
+            chapter opens at a time. If your profile says locs, the loose-hair chapters are left
+            out and it says so.
+          </li>
+          <li>
             <strong>Know your hair</strong>: porosity, density, coil pattern and texture. Each
             card shows what your profile already holds. Porosity has its own short test; the
             others are set on your profile.
@@ -260,6 +269,7 @@ const SECTIONS: {
     ),
     links: [
       { to: '/care', label: 'Hair Care' },
+      { to: '/care/guide', label: 'The AfroCoils Hair Guide' },
       { to: '/porosity', label: 'Porosity test' },
       { to: '/calendar', label: 'Hair routine' },
       { to: '/products', label: 'Products' },

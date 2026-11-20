@@ -264,7 +264,7 @@ export const PRODUCTS: Product[] = [
     suits: { porosity: ['Low', 'Medium'], density: ['Low', 'Medium'] },
     siliconeFree: true,
     containsProtein: false,
-    note: 'Light enough that fine, low-porosity hair does not go flat under it. The first layer of a L.O.C. routine.',
+    note: 'Light enough that fine, low-porosity hair does not go flat under it. The first layer after water, whether you layer LOC or LCO.',
   },
   {
     id: 'mielle-pomegranate-leave-in',

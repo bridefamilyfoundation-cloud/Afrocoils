@@ -136,6 +136,27 @@ export default function HairCareScreen() {
         </p>
       </section>
 
+      {/* The owner's foundation guide, above everything: it is the
+          reading behind every card below — what the traits mean, how
+          wash day goes, what to buy and what to skip. */}
+      <Link
+        to="/care/guide"
+        data-tour="care-guide"
+        className="mb-2xl flex items-center gap-md rounded-xl bg-inverse-surface p-lg text-inverse-on-surface shadow-card transition-all active:scale-[0.98]"
+      >
+        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-secondary text-on-secondary">
+          <Icon name="menu_book" />
+        </div>
+        <div className="min-w-0 flex-1">
+          <h3 className="font-headline-md text-body-lg font-bold">The AfroCoils Hair Guide</h3>
+          <p className="font-body-md text-caption text-inverse-on-surface/85">
+            Understand your hair. Care for your hair. Style your hair. The foundation for 4C
+            hair, with the beginner starter kit and your first wash day.
+          </p>
+        </div>
+        <Icon name="arrow_forward" className="shrink-0" />
+      </Link>
+
       {/* A — know your hair */}
       <section className="mb-2xl">
         <h3 className="mb-md font-headline-md text-body-lg font-bold text-on-surface">

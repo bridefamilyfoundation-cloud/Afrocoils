@@ -69,42 +69,43 @@ export const GUIDES: Guide[] = [
     badge: 'Urgent Care',
     icon: 'water_drop',
     summary:
-      'When your coils feel like straw, the L.O.C. method rebuilds moisture in layers rather than piling on product. Bring back the bounce in about twenty minutes.',
+      'When your coils feel like straw, water and a leave-in bring the moisture back, and a cream or a little oil helps it stay. Layering a little at a time — the LOC or LCO method — works better than piling on product. Bring back the bounce in about twenty minutes.',
     minutes: 20,
     theme: 'bg-primary-fixed text-primary',
     toolsAndProducts: [
       'Spray bottle of water',
-      'Leave-in conditioner (the "L")',
-      'Light oil — jojoba or grapeseed (the "O")',
-      'Leave-in cream or butter (the "C")',
+      'Leave-in conditioner',
+      'Leave-in cream or butter (if your hair needs it)',
+      'Light oil — jojoba or grapeseed (optional)',
       'Wide-tooth comb',
       'Satin scarf or bonnet',
     ],
     steps: [
       {
         title: 'Rehydrate first',
-        body: 'Mist section by section until the hair is genuinely damp, not just misted on the surface. Dry hair cannot absorb product — water is the actual moisturiser, everything after it is there to keep the water in.',
+        body: 'Mist section by section until the hair is genuinely damp — not dripping, and not just misted on the surface. Water is the actual moisturiser. Everything after it conditions the strand and helps the water stay.',
       },
       {
         title: 'Liquid — leave-in on damp hair',
         body: 'Work a leave-in through each section with your fingers while it is still wet. Rake it through rather than raking it in; you want even coverage from root to tip.',
       },
       {
-        title: 'Oil — seal the cuticle',
-        body: 'A few drops of a light oil, emulsified between your palms, smoothed down the length. This slows water loss. Go light: oil on its own does not moisturise, it only seals what is already there.',
+        title: 'Cream, oil, or both — only if you need them',
+        body: 'A cream or butter on the mid-lengths and ends, the oldest and driest parts of the strand, if the leave-in alone is not enough. A few drops of a light oil, warmed between your palms and smoothed down the length, if you want more slip. Oil does not hydrate on its own; it lubricates and can slow water loss. Skip the scalp.',
       },
       {
-        title: 'Cream — lock it in',
-        body: 'Finish with a cream or butter on the mid-lengths and ends, which are the oldest and driest parts of the strand. Skip the scalp.',
+        title: 'LOC or LCO: pick an order and test it',
+        body: 'Cream then oil (LCO) or oil then cream (LOC): neither is a rule. Use one order for several wash days and compare softness, tangling, buildup and drying time before you change it.',
       },
       {
         title: 'Style low-tension and cover',
-        body: 'Twist or band into two to four sections and let it air dry. Sleep in satin — cotton wicks out everything you just put in.',
+        body: 'Twist or band into two to four sections and let it air dry. Sleep in a satin bonnet, scarf or pillowcase to cut the friction that tangles and dries the ends.',
       },
     ],
     cautions: [
       'If hair feels dry and also snaps easily, it may need protein rather than more moisture. Add a protein treatment before repeating this.',
-      'Reversing the order (oil before water) seals dryness in. The sequence is the whole point.',
+      'Water and a leave-in always come first. Oil on dry hair only coats the dryness.',
+      'If your hair feels coated, sticky or heavy, you are using too much. Take a layer away rather than adding one.',
     ],
     // Raking product through sections and re-twisting them is loose-hair
     // technique. Locs get their own dryness guide below.

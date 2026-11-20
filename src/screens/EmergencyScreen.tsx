@@ -18,9 +18,14 @@ import { useHairProfile } from '../lib/profile-store'
  * Splitting them meant every launch spent a tap on a page with one
  * target, on an app people reach for mid-problem, and left the drawer
  * with a "Home" that was not any of the sections. They are one page now:
- * the illustration and Get Started fill the first screen, the three
- * doors are directly below, and Get Started scrolls rather than
- * navigates.
+ * the question fills the first screen and the doors are directly below.
+ *
+ * Since 2026-11-20 (on request) the first screen *is* the question —
+ * "What's your emergency?" on a frosted-glass panel, a heartbeat pulse
+ * and trace (`.sos-beat`, `.sos-trace` in index.css, off under reduced
+ * motion), and the library photos faded behind it as a backdrop. Get
+ * Started goes straight to Hair Care; "Need a quick style?" scrolls to
+ * the doors, where Quick Hairstyle is.
  *
  * It sits *inside* `AppLayout`, unlike the old front page. Landing
  * somewhere with no app bar and no tab bar meant the only way into
@@ -50,12 +55,9 @@ import { useHairProfile } from '../lib/profile-store'
  * Keep it short either way. A triage screen with six options is a menu,
  * and a menu is the thing this replaced.
  *
- * The first screen follows the reference mockup adopted in October 2026:
- * a collage of three library photos, the title large and left-aligned,
- * one line under it, and Get Started as a dark pill. The photos are the
- * generated ones the library already ships (see the images README), and
- * they are decoration — hidden from screen readers and not links, so the
- * first screen still has one target.
+ * The photos are the generated ones the library already ships (see the
+ * images README), and they are decoration — hidden from screen readers
+ * and not links, so the first screen still has one main target.
  */
 
 /** Three library entries whose front shots carry the collage, tall one first. */
@@ -103,70 +105,106 @@ export default function EmergencyScreen() {
 
   return (
     <>
-      {/* The hero takes the first screen. The height is the viewport less
-          the app bar above and the tab bar below, so Get Started lands at
-          the foot of what you can see rather than under it. */}
-      <section className="flex min-h-[calc(100svh-13rem)] flex-col pb-lg">
-        <div aria-hidden className="relative grid h-[42svh] max-h-[26rem] min-h-[15rem] grid-cols-[1.4fr_1fr] grid-rows-2 gap-sm">
-          <Sparkle className="absolute -left-2 -top-2 z-10 h-9 w-9 text-tertiary" />
-          {COLLAGE.map((id, i) => {
-            const style = STYLES.find((s) => s.id === id)
-            return (
-              <PrototypeImage
-                key={id}
-                slot={styleCover(id, style?.name ?? '')}
-                seed={id}
-                rounded={i === 0 ? 'rounded-3xl' : 'rounded-2xl'}
-                className={`h-full w-full object-cover object-top shadow-card ${i === 0 ? 'row-span-2' : ''}`}
-              />
-            )
-          })}
-        </div>
-
-        {/* The full logo sits in the space the left-aligned title leaves,
-            so it costs the first screen no height. Decoration, like the
-            collage: the app bar already names the app. */}
-        <div className="mt-xl flex flex-1 items-start justify-between gap-md">
-          <div>
-            <h1 className="font-display-lg text-display-lg text-tertiary">
-              Hair
-              <br />
-              <span className="inline-flex items-center gap-sm">
-                <span className="text-on-surface-variant">SOS</span>
-                <Sparkle className="h-8 w-8 text-tertiary" />
-              </span>
-            </h1>
-            <p className="mt-md max-w-[16rem] font-body-md text-body-md text-on-surface-variant">
-              Quick styles and real care, for the moment your hair can&rsquo;t wait.
-            </p>
+      {/* The hero takes the first screen: the question, on frosted glass,
+          over the library's photos faded into a background. The height is
+          the viewport less the app bar above and the tab bar below, so the
+          button lands at the foot of what you can see. */}
+      <section className="relative mb-lg flex min-h-[calc(100svh-13rem)] flex-col justify-end overflow-hidden rounded-[2rem] shadow-card">
+        {/* The collage, now a backdrop: decoration, hidden from screen
+            readers and not links, so the first screen keeps one target.
+            It drifts very slowly, which is most of what makes the glass
+            read as glass. */}
+        <div aria-hidden className="absolute inset-0">
+          <div className="sos-glow grid h-full w-full grid-cols-[1.4fr_1fr] grid-rows-2 gap-1 opacity-50 blur-[3px] saturate-[0.85]">
+            {COLLAGE.map((id, i) => {
+              const style = STYLES.find((s) => s.id === id)
+              return (
+                <PrototypeImage
+                  key={id}
+                  slot={styleCover(id, style?.name ?? '')}
+                  seed={id}
+                  rounded="rounded-none"
+                  className={`h-full w-full object-cover object-top ${i === 0 ? 'row-span-2' : ''}`}
+                />
+              )
+            })}
           </div>
-          <AfroMark variant="hero" className="w-[38%] max-w-[10rem] shrink-0" />
+          <div className="absolute inset-0 bg-gradient-to-b from-surface-container-low/25 via-surface-container-low/45 to-surface-container-low/90" />
         </div>
 
-        {/* Scrolls rather than navigates — the doors are on this page.
-            The dots are the mockup's and are only decoration: there is
-            one screen here, not a carousel. */}
-        <div className="mt-xl flex items-center justify-between gap-md">
-          <span aria-hidden className="flex items-center gap-1.5">
-            <span className="h-1.5 w-1.5 rounded-full bg-outline-variant" />
-            <span className="h-1.5 w-1.5 rounded-full bg-outline-variant" />
-            <span className="h-1.5 w-6 rounded-full bg-tertiary" />
-          </span>
-          {open ? (
-            <button
-              type="button"
-              onClick={() => doors.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
-              className="flex items-center gap-md rounded-full bg-inverse-surface py-1.5 pl-lg pr-1.5 font-label-md text-body-md font-semibold text-inverse-on-surface shadow-float transition-all active:scale-95"
-            >
-              Get Started
-              <span className="flex h-11 w-11 items-center justify-center rounded-full bg-secondary text-on-secondary">
-                <Icon name="arrow_forward" />
+        <Sparkle className="absolute left-md top-md h-8 w-8 text-tertiary opacity-80" />
+
+        <div className="relative m-sm rounded-[1.6rem] bg-surface-container-lowest/45 p-lg ring-1 ring-surface-container-lowest/70 backdrop-blur-xl">
+          <div className="mb-md flex items-center justify-between gap-md">
+            <span className="flex items-center gap-sm">
+              {/* The heartbeat: the mark beats twice and rests, the ring
+                  spreads once per beat. */}
+              <span aria-hidden className="relative flex h-11 w-11 items-center justify-center">
+                <span className="sos-ring absolute inset-0 rounded-full bg-secondary/40" />
+                <span className="sos-beat relative flex h-11 w-11 items-center justify-center rounded-full bg-secondary font-label-md text-caption font-bold tracking-wider text-on-secondary">
+                  SOS
+                </span>
               </span>
-            </button>
+              <span className="font-label-md text-caption uppercase tracking-[0.2em] text-on-surface">
+                Hair SOS
+              </span>
+            </span>
+            <AfroMark variant="mark" className="w-10 shrink-0 opacity-90" />
+          </div>
+
+          <h1 className="font-display-lg text-display-lg leading-[1.05] text-tertiary">
+            What&rsquo;s your emergency?
+          </h1>
+
+          {/* The trace. pathLength="1" lets one dash cover the whole line
+              whatever its drawn length, so the CSS can draw it 0 → 1. */}
+          <svg
+            aria-hidden
+            viewBox="0 0 300 40"
+            preserveAspectRatio="none"
+            className="my-md h-10 w-full text-secondary"
+          >
+            <path
+              d="M0 22 H96 L108 22 L116 8 L126 36 L138 2 L150 30 L158 22 H300"
+              pathLength="1"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="sos-trace"
+            />
+          </svg>
+
+          <p className="mb-lg max-w-[18rem] font-body-md text-body-md text-on-surface-variant">
+            Quick styles and real care, for the moment your hair can&rsquo;t wait.
+          </p>
+
+          {/* Members go straight to Hair Care — knowing your hair and what
+              to do about it. Quick Hairstyle is the second door, below. */}
+          {open ? (
+            <div className="flex flex-wrap items-center justify-between gap-md">
+              <Link
+                to="/care"
+                className="flex items-center gap-md rounded-full bg-inverse-surface py-1.5 pl-lg pr-1.5 font-label-md text-body-md font-semibold text-inverse-on-surface shadow-float transition-all active:scale-95"
+              >
+                Get Started
+                <span className="flex h-11 w-11 items-center justify-center rounded-full bg-secondary text-on-secondary">
+                  <Icon name="arrow_forward" />
+                </span>
+              </Link>
+              <button
+                type="button"
+                onClick={() => doors.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
+                className="font-label-md text-caption text-primary underline underline-offset-4"
+              >
+                Need a quick style?
+              </button>
+            </div>
           ) : (
             <Link
               to="/join"
-              className="flex items-center gap-md rounded-full bg-inverse-surface py-1.5 pl-lg pr-1.5 font-label-md text-body-md font-semibold text-inverse-on-surface shadow-float transition-all active:scale-95"
+              className="inline-flex items-center gap-md rounded-full bg-inverse-surface py-1.5 pl-lg pr-1.5 font-label-md text-body-md font-semibold text-inverse-on-surface shadow-float transition-all active:scale-95"
             >
               Explore more features
               <span className="flex h-11 w-11 items-center justify-center rounded-full bg-secondary text-on-secondary">
@@ -231,11 +269,11 @@ export default function EmergencyScreen() {
           {/* scroll-mt clears the fixed app bar when Get Started lands here. */}
           <section ref={doors} className="mb-xl mt-2xl scroll-mt-24 text-center">
             <h2 className="mb-sm font-headline-lg text-headline-lg text-on-background">
-              What&rsquo;s Your Emergency?
+              Two ways in
             </h2>
             <p className="mx-auto max-w-md font-body-md text-on-surface-variant">
-              Two ways in. Everything behind them is written down and on this phone, so it
-              works with no signal.
+              Everything behind them is written down and on this phone, so it works with no
+              signal.
             </p>
           </section>
 

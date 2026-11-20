@@ -493,6 +493,10 @@ const PRIOR: Record<AskKind, number> = {
   answer: 1.3,
   concern: 1.15,
   guide: 1.1,
+  // The owner's foundation guide: general where a care guide is a fix
+  // and an answer is a reply, so both lead when they fit and the guide
+  // answers what they do not.
+  handbook: 0.8,
   'loc-section': 1,
   topic: 1,
   faq: 0.95,

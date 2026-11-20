@@ -469,6 +469,16 @@ export const TOPICS: AskTopic[] = [
     keys: 'quick hairstyle|quick style|no time to do my hair|fast style|style in minutes|running late',
   },
   {
+    id: 'hair-guide',
+    title: 'The AfroCoils Hair Guide',
+    answer:
+      'The AfroCoils Hair Guide, at the top of Hair Care, is the foundation for 4C and other tightly coiled hair: understanding your hair, wash day, moisture and oils, protection, styling, a routine you can keep, choosing products, the beginner starter kit and your first wash day.',
+    route: '/care/guide',
+    cta: 'Open the Hair Guide',
+    docs: 'care',
+    keys: 'hair guide|the guide|4c guide|education guide|beginner guide|afrocoils guide|foundation guide|where is the guide',
+  },
+  {
     id: 'hair-check',
     title: 'Start from what is wrong',
     answer:
@@ -494,7 +504,7 @@ export const TOPICS: AskTopic[] = [
     route: '/profile?open=membership',
     cta: 'Open My Hair Profile',
     docs: 'membership',
-    keys: 'my membership|my subscription|cancel my subscription|cancel membership|stop paying|change my card|update my card|renew|renewal|sign out|log out|new phone|sign in on another phone|how much is it|price|paystack|refund|free trial|my trial|trial ends|when does my trial end|plans|my plan|change my plan|switch plan|6 months|six months|annual plan|yearly plan|when does my membership end|expiry|expires|bank transfer|pay by transfer|pay without a card|no card|my receipt|payment receipt|transfer receipt|payment not approved|payment pending',
+    keys: 'my membership|my subscription|cancel my subscription|cancel membership|stop paying|change my card|update my card|renew|renewal|sign out|log out|new phone|sign in on another phone|how much is it|how much does it cost|what does it cost|cost of membership|price|paystack|refund|free trial|my trial|trial ends|when does my trial end|plans|my plan|change my plan|switch plan|6 months|six months|annual plan|yearly plan|when does my membership end|expiry|expires|bank transfer|pay by transfer|pay without a card|no card|my receipt|payment receipt|transfer receipt|payment not approved|payment pending',
   },
   {
     id: 'terms',

@@ -195,6 +195,40 @@ export function PorosityArt({ level }: { level: PorosityLevel }) {
 }
 
 /* ------------------------------------------------------------------ *
+ * The strand: the cuticle side on, then the three layers in section.
+ * The Hair Guide's "The hair strand, simply explained". The paragraph
+ * beside it names the layers, so the labels here are for the eye only.
+ * ------------------------------------------------------------------ */
+
+export function StrandArt() {
+  const scales = Array.from({ length: 6 }, (_, i) => {
+    const x = 10 + i * 10
+    return `M${x} 52 Q${x + 6} 36 ${x + 13} 40 L${x + 13} 52 Z`
+  })
+  const label = 'fill-on-surface-variant font-label-md'
+  return (
+    <Frame viewBox="0 0 160 90">
+      <rect x="8" y="40" width="68" height="18" rx="9" className="fill-tertiary-fixed-dim stroke-on-surface" strokeWidth="1.2" />
+      {scales.map((d) => (
+        <path key={d} d={d} strokeWidth="1.1" strokeLinejoin="round" className="fill-tertiary-fixed stroke-on-surface" />
+      ))}
+      <text x="8" y="74" fontSize="7" className={label}>
+        Cuticle, side on
+      </text>
+      <circle cx="122" cy="44" r="26" strokeWidth="1.2" className="fill-tertiary-fixed stroke-on-surface" />
+      <circle cx="122" cy="44" r="17" strokeWidth="1" className="fill-tertiary-fixed-dim stroke-on-surface" />
+      <circle cx="122" cy="44" r="6" strokeWidth="1" strokeDasharray="2 1.5" className="fill-surface-container-lowest stroke-on-surface" />
+      <text x="104" y="84" fontSize="7" className={label}>
+        Cross-section
+      </text>
+      <text x="96" y="12" fontSize="6.5" className={label}>
+        cuticle · cortex · medulla
+      </text>
+    </Frame>
+  )
+}
+
+/* ------------------------------------------------------------------ *
  * Density: looking down at a part
  * ------------------------------------------------------------------ */
 

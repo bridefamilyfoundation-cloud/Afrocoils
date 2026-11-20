@@ -2,6 +2,7 @@ import { KNOWLEDGE, type ForYou } from '../../content/answers'
 import { TOPICS } from '../../content/ask'
 import { FAQS, faqText } from '../../content/faq'
 import { GUIDES, guideHairTypes } from '../../content/guides'
+import { HAIR_GUIDE, chapterHairTypes } from '../../content/hair-guide'
 import { HAIR_CHECK } from '../../content/hair-check'
 import { LOC_CARE } from '../../content/loc-care'
 import { LOC_STYLES } from '../../content/loc-styles'
@@ -27,6 +28,7 @@ import { sentences } from './text'
 export type AskKind =
   | 'answer'
   | 'guide'
+  | 'handbook'
   | 'concern'
   | 'loc-section'
   | 'style'
@@ -137,6 +139,61 @@ function guides(): AskDoc[] {
     ],
     points: [{ label: 'The steps', items: guide.steps.map((s) => s.title), ordered: true }],
   }))
+}
+
+/**
+ * The AfroCoils Hair Guide, one record per section.
+ *
+ * Paragraphs and boxed notes are the quotable passages; lists are shown
+ * beneath as the lists they are. Tables are searchable but never quoted —
+ * a row is three fragments, and joining them would be composing an
+ * answer. A section that is only a table (the glossary, the
+ * troubleshooting grid) therefore has nothing to quote and is left out;
+ * the record for the chapter's other sections still lands there.
+ */
+function handbook(): AskDoc[] {
+  return HAIR_GUIDE.flatMap((chapter) =>
+    chapter.sections.flatMap((section, i): AskDoc[] => {
+      const title = section.heading ?? chapter.title
+      const passages: AskPassage[] = []
+      const points: AskPoints[] = []
+      const searchable: string[] = []
+      let caution: string | undefined
+      for (const block of section.blocks) {
+        if (block.kind === 'text') passages.push({ text: block.text })
+        else if (block.kind === 'callout' && block.tone === 'caution') caution = block.text
+        else if (block.kind === 'callout') passages.push({ text: block.text, label: block.title })
+        else if (block.kind === 'list') {
+          points.push({ label: title, items: block.items, ordered: block.ordered })
+          searchable.push(...block.items)
+        } else if (block.kind === 'table') searchable.push(...block.rows.flat())
+        else if (block.kind === 'sequence') searchable.push(...block.steps)
+      }
+      if (passages.length === 0 && caution) passages.push({ text: caution })
+      if (passages.length === 0) return []
+      const number = chapter.number === undefined ? '' : `${chapter.number}. `
+      return [
+        {
+          id: `handbook:${chapter.id}:${i}`,
+          kind: 'handbook',
+          title,
+          source: `The AfroCoils Hair Guide · ${number}${chapter.title}`,
+          route: `/care/guide?open=${chapter.id}`,
+          cta: 'Open in the Hair Guide',
+          hairTypes: chapterHairTypes(chapter),
+          caution: passages.some((p) => p.text === caution) ? undefined : caution,
+          fields: {
+            title,
+            keys: [chapter.title, '4C hair guide', ...(chapter.keys?.split('|') ?? [])].join('. '),
+            lead: passages[0].text,
+            body: [...passages.slice(1).map((p) => p.text), ...searchable, caution ?? ''].join('. '),
+          },
+          passages,
+          points,
+        },
+      ]
+    }),
+  )
 }
 
 function concerns(): AskDoc[] {
@@ -367,6 +424,7 @@ export function corpus(): AskDoc[] {
     ...answers(),
     ...concerns(),
     ...guides(),
+    ...handbook(),
     ...locSections(),
     ...styles(),
     ...locStyles(),

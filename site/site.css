@@ -265,6 +265,35 @@
   }
 }
 
+/* The front-page heartbeat, as in the app (src/index.css). */
+.sos-beat {
+  animation: sos-beat 1.8s ease-in-out infinite;
+  transform-origin: center;
+}
+.sos-ring {
+  animation: sos-ring 1.8s ease-out infinite;
+}
+.sos-trace {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: sos-trace 3.6s cubic-bezier(0.45, 0, 0.25, 1) infinite;
+}
+@keyframes sos-beat {
+  0%, 40%, 100% { transform: scale(1); }
+  10% { transform: scale(1.12); }
+  20% { transform: scale(0.98); }
+  30% { transform: scale(1.07); }
+}
+@keyframes sos-ring {
+  0% { transform: scale(0.85); opacity: 0.55; }
+  70%, 100% { transform: scale(1.9); opacity: 0; }
+}
+@keyframes sos-trace {
+  0% { stroke-dashoffset: 1; opacity: 1; }
+  55% { stroke-dashoffset: 0; opacity: 1; }
+  85%, 100% { stroke-dashoffset: 0; opacity: 0; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -280,7 +309,8 @@
     opacity: 1;
     transform: none;
   }
-  .draw {
+  .draw,
+  .sos-trace {
     stroke-dashoffset: 0;
   }
   html {

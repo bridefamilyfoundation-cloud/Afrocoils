@@ -126,17 +126,17 @@ export const KNOWLEDGE: KnowledgeEntry[] = [
     question: 'Should I use the LOC or the LCO method?',
     asks: 'loc or lco|lco or loc|which goes first oil or cream|oil or cream first|cream or oil first|liquid oil cream|liquid cream oil|which order do i put products|what order products|leave in oil cream order|layering products',
     answer:
-      'Both start with water and a leave-in. The difference is whether the oil goes before or after the cream. LOC (oil then cream) seals harder and suits hair that loses moisture fast. LCO (cream then oil) is lighter and suits hair that gets weighed down.',
+      'Both start with water and a leave-in. The difference is whether the oil goes before or after the cream, and neither order is a rule. Many people find LOC (oil then cream) feels richer, and LCO (cream then oil) lighter. The right one is the one your hair responds to.',
     steps: [
-      'Always start on soaking wet hair. The water is the moisture.',
-      'L: a leave-in, worked through each section.',
-      'Then oil and cream, in the order that suits your porosity.',
-      'Try one order for two or three wash days before you judge it.',
+      'Start on clean, damp hair, not dripping. The water is the moisture.',
+      'L: a modest amount of leave-in, worked through each section.',
+      'Then cream and oil only if you need them, in either order. You may not need both.',
+      'Use one order for several wash days before you judge it.',
     ],
     forYou: [
       {
         when: { porosity: 'Low' },
-        text: 'For your low porosity hair, start with LCO and use very little oil. Heavy sealing on hair that already resists water just leaves product sitting on top.',
+        text: 'For your low porosity hair, LCO with very little oil is a good place to start. Heavy layers on hair that already resists water just leave product sitting on top.',
       },
       {
         when: { porosity: 'Medium' },
@@ -144,7 +144,7 @@ export const KNOWLEDGE: KnowledgeEntry[] = [
       },
       {
         when: { porosity: 'High' },
-        text: 'For your high porosity hair, use LOC. The cream on the outside does the heavy sealing your hair needs to keep water in.',
+        text: 'For your high porosity hair, LOC is a good place to start: a cream on the outside can help hair that loses its moisture feel quickly. Put conditioning and gentle handling first.',
       },
       {
         when: { texture: 'Fine' },
@@ -159,11 +159,11 @@ export const KNOWLEDGE: KnowledgeEntry[] = [
     question: 'Does oil moisturise my hair?',
     asks: 'does oil moisturise|is oil a moisturiser|oil my hair every day|oiling my scalp|does coconut oil moisturise|should i oil my hair|hair oil dry',
     answer:
-      'No. Oil seals in moisture that’s already there. Oil on dry hair just coats the dryness. Put water on first, then a little oil to slow the water leaving.',
+      'No. Water is what hydrates hair. Oil lubricates the strand and can help slow water loss, but oil on dry hair just coats the dryness. Put water on first, then a little oil if your hair needs it.',
     steps: [
       'Water or a water-based leave-in first, always.',
       'A few drops of a light oil rubbed between your palms, then smoothed down the length.',
-      'Oil the scalp only if it’s dry, and only lightly. Oiling a healthy scalp every day feeds buildup.',
+      'Scalp oil is optional. A dry-feeling scalp does not automatically need it; if you use it, keep it light and stop if it itches. Oiling a healthy scalp every day feeds buildup.',
     ],
     forYou: [
       {
@@ -231,7 +231,7 @@ export const KNOWLEDGE: KnowledgeEntry[] = [
     answer:
       'High porosity hair has gaps in its cuticle, from genetics, heat, colour or wear. It takes water in quickly and lets it straight back out. You need to seal hard and fill the gaps with protein.',
     steps: [
-      'Use richer creams and butters on the ends, after the oil (the LOC order).',
+      'Richer creams and butters on the ends often suit it. LOC (oil, then cream) is a good order to try first.',
       'Do a protein treatment about once a month to patch the cuticle.',
       'Finish wash day with a cool rinse so the cuticle lies flat.',
       'Keep heat to a minimum. Every pass opens the cuticle further.',
@@ -531,7 +531,7 @@ export const KNOWLEDGE: KnowledgeEntry[] = [
   {
     id: 'shrinkage',
     question: 'How do I stop shrinkage?',
-    asks: 'shrinkage stole my length|shrinkage took my length|how to stop shrinkage|reduce shrinkage|my hair shrinks|stretch my hair|stretch without heat|banding|african threading|my hair looks so short',
+    asks: 'shrinkage stole my length|shrinkage took my length|how to stop shrinkage|reduce shrinkage|my hair shrinks|shrinks so much|shrink so much|so much shrinkage|my coils shrink|stretch my hair|stretch without heat|banding|african threading|my hair looks so short',
     answer:
       'Shrinkage is a sign of healthy, elastic hair. Hair that doesn’t shrink is often damaged. You can’t stop it, but you can stretch it without heat when you want length on show.',
     steps: [

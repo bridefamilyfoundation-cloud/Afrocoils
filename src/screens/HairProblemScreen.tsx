@@ -73,7 +73,7 @@ export default function HairProblemScreen() {
             <p className="mb-lg font-body-md text-body-md text-on-primary-fixed-variant">
               {locs
                 ? 'Locs dry out from the inside where you cannot see it, and reaching for more product usually makes it worse. Water first.'
-                : 'When your coils feel like straw, it’s time for the L.O.C. method intensive. Bring back the bounce in 20 minutes.'}
+                : 'When your coils feel like straw, water and a leave-in come first, then a little cream or oil if you need it. Bring back the bounce in 20 minutes.'}
             </p>
             <button
               type="button"

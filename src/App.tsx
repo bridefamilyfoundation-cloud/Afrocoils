@@ -20,6 +20,7 @@ const HairProblemScreen = lazy(() => import('./screens/HairProblemScreen'))
 const LocCareScreen = lazy(() => import('./screens/LocCareScreen'))
 const LocStylesScreen = lazy(() => import('./screens/LocStylesScreen'))
 const HairCareScreen = lazy(() => import('./screens/HairCareScreen'))
+const HairGuideScreen = lazy(() => import('./screens/HairGuideScreen'))
 const StylesScreen = lazy(() => import('./screens/StylesScreen'))
 const StyleRecommendationsScreen = lazy(() => import('./screens/StyleRecommendationsScreen'))
 const ThankYouScreen = lazy(() => import('./screens/ThankYouScreen'))
@@ -83,6 +84,7 @@ export default function App() {
             <Route path="/calendar" element={<CalendarScreen />} />
             <Route path="/profile" element={<ProfileScreen />} />
             <Route path="/care" element={<HairCareScreen />} />
+            <Route path="/care/guide" element={<HairGuideScreen />} />
             <Route path="/growth" element={<GrowthScreen />} />
             {/* Locs World is a section of its own, not a chapter of Hair
                 Care: locs are a different thing to own, and filing them

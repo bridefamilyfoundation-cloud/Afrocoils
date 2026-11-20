@@ -269,6 +269,17 @@ export const CASES: AskCase[] = [
   { q: 'can i use rice water on my hair', hair: L, never: ['answer:dandruff'] },
   { q: 'what is the weather today', none: true },
 
+  // --- The AfroCoils Hair Guide (added 2026-11-20) ---
+  { q: 'what does 4c mean', expect: ['handbook:understand:0'] },
+  { q: 'starter kit for beginners', hair: L, expect: ['handbook:starter-kit*'] },
+  { q: 'what do I need to start my natural hair journey', hair: L, expect: ['handbook:*'] },
+  { q: 'does oil hydrate hair', expect: ['handbook:moisture-layering:1', 'handbook:oils*'] },
+  { q: 'is coconut oil good for my hair', expect: ['handbook:oils*'] },
+  { q: 'first wash day walkthrough', hair: L, expect: ['handbook:first-wash-day*', 'guide:wash-day'] },
+  { q: 'protective style vs low manipulation style', hair: L, expect: ['handbook:protect*'] },
+  { q: 'how do I know my routine is working', hair: L, expect: ['handbook:routine*'] },
+  { q: 'starter kit for beginners', hair: X, never: ['handbook:starter-kit*'] },
+
   // --- Small talk and nothing ---
   { q: 'hello', chat: true },
   { q: 'thank you', chat: true },
