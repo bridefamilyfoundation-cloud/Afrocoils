@@ -224,6 +224,17 @@ picture; this file is the short version of what to keep in mind when editing.
   LCO and LOC are methods rather than rules — is the app's stance:
   don't let a guide or an answer contradict it.
 
+  **Hair Education (`/care/learn`, `/care/learn/:lesson`, added
+  2026-11-20)** is the guide's teaching chapters read as lessons, one to
+  a screen with Previous and Next, from the second card on Hair Care.
+  It holds no prose: `content/hair-education.ts` lists chapter ids
+  (`LESSON_IDS`) and every lesson is looked up in `hair-guide.ts`, so
+  the two pages cannot disagree — edit the guide, never the lesson. Both
+  draw blocks through `components/HairGuideBlock.tsx`. It filters by
+  hair type exactly as the guide does, and its last step points on to
+  the guide's starter kit (Locs World for loc wearers). Ask still quotes
+  the guide; the page has its own `hair-education` topic.
+
   Hair Care is a hub and must stay one. The hair answers are asked in
   exactly one place — Hair Discovery (`/quiz`) — and a second set of
   pickers would be a second thing to keep in step with

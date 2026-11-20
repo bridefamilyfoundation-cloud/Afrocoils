@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import { getGuide } from '../content/guides'
+import { HAIR_EDUCATION_TITLE, lessonById } from '../content/hair-education'
 import { STYLES } from '../content/styles'
 
 /**
@@ -35,6 +36,7 @@ const TITLES: Record<string, string> = {
   '/styles/submit/thanks': `Thank you · ${SUFFIX}`,
   '/care': `Hair Care · ${SUFFIX}`,
   '/care/guide': `The AfroCoils Hair Guide · ${SUFFIX}`,
+  '/care/learn': `${HAIR_EDUCATION_TITLE} · ${SUFFIX}`,
   '/growth': `Hair Growth · ${SUFFIX}`,
   '/locs': `Locs World · ${SUFFIX}`,
   '/locs/styles': `Loc styles · ${SUFFIX}`,
@@ -54,7 +56,7 @@ const TITLES: Record<string, string> = {
 }
 
 /**
- * The title for a path, including the two routes whose title is content.
+ * The title for a path, including the three routes whose title is content.
  *
  * Pure and exported so it can be read and tested on its own, rather than
  * only observable by mounting a screen and inspecting the document.
@@ -67,6 +69,11 @@ export function titleForPath(pathname: string): string {
     ? getGuide(pathname.slice('/guide/'.length))
     : undefined
   if (guide) return `${guide.title} · ${SUFFIX}`
+
+  if (pathname.startsWith('/care/learn/')) {
+    const lesson = lessonById(pathname.slice('/care/learn/'.length))
+    if (lesson) return `${lesson.title} · ${HAIR_EDUCATION_TITLE} · ${SUFFIX}`
+  }
 
   if (pathname.startsWith('/styles/')) {
     const style = STYLES.find((s) => s.id === pathname.slice('/styles/'.length))

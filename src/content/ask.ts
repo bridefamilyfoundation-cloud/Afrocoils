@@ -479,6 +479,16 @@ export const TOPICS: AskTopic[] = [
     keys: 'hair guide|the guide|4c guide|education guide|beginner guide|afrocoils guide|foundation guide|where is the guide',
   },
   {
+    id: 'hair-education',
+    title: 'Hair Education',
+    answer:
+      'Hair Education, under Hair Care, teaches what 4C hair is and why it behaves the way it does, in short lessons from the AfroCoils Hair Guide: your hair and its strand, porosity and the other traits, shrinkage and breakage, washing, moisture and oils, protecting it, and a glossary. One lesson to a screen, with Previous and Next.',
+    route: '/care/learn',
+    cta: 'Open Hair Education',
+    docs: 'care',
+    keys: 'hair education|educate me|learn about my hair|learn about 4c hair|hair lessons|lessons|teach me about my hair|hair school|hair class|learn hair care',
+  },
+  {
     id: 'hair-check',
     title: 'Start from what is wrong',
     answer:

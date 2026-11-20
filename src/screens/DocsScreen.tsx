@@ -238,6 +238,14 @@ const SECTIONS: {
             out and it says so.
           </li>
           <li>
+            <strong>Hair Education</strong>, just under it, is the guide&rsquo;s teaching
+            chapters as lessons, one to a screen with Previous and Next: how to use the guide,
+            understanding your hair, the traits that shape a routine, shrinkage and breakage,
+            washing, moisture and layering, oils, protecting your hair and the glossary. The
+            words are the guide&rsquo;s own. If your profile says locs, the loose-hair lessons
+            are left out and it says so.
+          </li>
+          <li>
             <strong>Know your hair</strong>: porosity, density, coil pattern and texture. Each
             card shows what your profile already holds. Porosity has its own short test; the
             others are set on your profile.
@@ -270,6 +278,7 @@ const SECTIONS: {
     links: [
       { to: '/care', label: 'Hair Care' },
       { to: '/care/guide', label: 'The AfroCoils Hair Guide' },
+      { to: '/care/learn', label: 'Hair Education' },
       { to: '/porosity', label: 'Porosity test' },
       { to: '/calendar', label: 'Hair routine' },
       { to: '/products', label: 'Products' },

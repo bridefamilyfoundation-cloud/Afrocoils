@@ -60,7 +60,7 @@ export const TOUR_STEPS: TourStep[] = [
     path: '/care',
     target: 'care-heading',
     title: 'Hair Care',
-    body: 'The AfroCoils Hair Guide to start from, then your porosity, density, coil pattern and texture, a routine with reminders, a product shelf, and "Something is wrong" for when it is.',
+    body: 'The AfroCoils Hair Guide and the lessons in Hair Education to start from, then your porosity, density, coil pattern and texture, a routine with reminders, a product shelf, and "Something is wrong" for when it is.',
   },
   {
     path: '/growth',

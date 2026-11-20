@@ -279,6 +279,10 @@ export const CASES: AskCase[] = [
   { q: 'protective style vs low manipulation style', hair: L, expect: ['handbook:protect*'] },
   { q: 'how do I know my routine is working', hair: L, expect: ['handbook:routine*'] },
   { q: 'starter kit for beginners', hair: X, never: ['handbook:starter-kit*'] },
+  // Hair Education, the guide's teaching chapters as lessons.
+  { q: 'hair education', hair: L, expect: ['topic:hair-education'], top: true },
+  { q: 'teach me about my hair', hair: L, expect: ['topic:hair-education'] },
+  { q: 'hair lessons', hair: X, expect: ['topic:hair-education'] },
 
   // --- Small talk and nothing ---
   { q: 'hello', chat: true },

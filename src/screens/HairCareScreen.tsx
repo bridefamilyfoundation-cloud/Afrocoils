@@ -142,7 +142,7 @@ export default function HairCareScreen() {
       <Link
         to="/care/guide"
         data-tour="care-guide"
-        className="mb-2xl flex items-center gap-md rounded-xl bg-inverse-surface p-lg text-inverse-on-surface shadow-card transition-all active:scale-[0.98]"
+        className="mb-sm flex items-center gap-md rounded-xl bg-inverse-surface p-lg text-inverse-on-surface shadow-card transition-all active:scale-[0.98]"
       >
         <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-secondary text-on-secondary">
           <Icon name="menu_book" />
@@ -155,6 +155,26 @@ export default function HairCareScreen() {
           </p>
         </div>
         <Icon name="arrow_forward" className="shrink-0" />
+      </Link>
+
+      {/* Hair Education: the guide's teaching chapters, one lesson to a
+          screen. Beside the guide rather than inside it, because learning
+          from the start and looking one thing up are different jobs. */}
+      <Link
+        to="/care/learn"
+        data-tour="care-learn"
+        className="mb-2xl flex items-center gap-md rounded-xl bg-surface-container-lowest p-lg shadow-card transition-all active:scale-[0.98]"
+      >
+        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-secondary-container text-on-secondary-container">
+          <Icon name="school" />
+        </div>
+        <div className="min-w-0 flex-1">
+          <h3 className="font-headline-md text-body-lg font-bold text-on-surface">Hair Education</h3>
+          <p className="font-body-md text-caption text-on-surface-variant">
+            What 4C hair is and why it behaves the way it does, in short lessons, one at a time.
+          </p>
+        </div>
+        <Icon name="arrow_forward" className="shrink-0 text-outline" />
       </Link>
 
       {/* A — know your hair */}
