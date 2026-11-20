@@ -11,14 +11,15 @@
   "download": "download/AfroCoils-0.2.0-12.apk",
   "notes": [],
   "bundle": {
-    "code": 17,
+    "code": 18,
     "minVersionCode": 12,
-    "bytes": 4546762,
-    "sha256": "43e1ed1f85f929d8e51dd422c9280a7bb9d444ad4d4a79816d939da0d3ec4d0e",
+    "bytes": 4565525,
+    "sha256": "79e01a7b7501842c56ba77b3f3352c03db94058f924f613ea90368a95ed77eee",
     "released": "2026-11-20",
-    "url": "https://runhkccoeyxfgsfrzezn.supabase.co/storage/v1/object/public/releases/bundles/17.zip",
+    "url": "https://runhkccoeyxfgsfrzezn.supabase.co/storage/v1/object/public/releases/bundles/18.zip",
     "notes": [
-      "Pay by bank transfer: send your receipt from the app and your plan opens once it's approved"
+      "The AfroCoils Hair Guide: the 4C education guide and starter kit, inside Hair Care",
+      "A new front page: what's your emergency?"
     ]
   }
 }
