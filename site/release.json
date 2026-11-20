@@ -11,15 +11,14 @@
   "download": "download/AfroCoils-0.2.0-12.apk",
   "notes": [],
   "bundle": {
-    "code": 16,
+    "code": 17,
     "minVersionCode": 12,
-    "bytes": 4542209,
-    "sha256": "fb9fe426e21a67d8988b7bfdc27013b20bf39ec8475cfd25bb829c4184f46a2e",
-    "released": "2026-11-18",
-    "url": "https://runhkccoeyxfgsfrzezn.supabase.co/storage/v1/object/public/releases/bundles/16.zip",
+    "bytes": 4546762,
+    "sha256": "43e1ed1f85f929d8e51dd422c9280a7bb9d444ad4d4a79816d939da0d3ec4d0e",
+    "released": "2026-11-20",
+    "url": "https://runhkccoeyxfgsfrzezn.supabase.co/storage/v1/object/public/releases/bundles/17.zip",
     "notes": [
-      "Hair Discovery: learn about your Type 4 hair and try simple tests at home",
-      "Your Hair Profile answers now shape your style and product recommendations"
+      "Pay by bank transfer: send your receipt from the app and your plan opens once it's approved"
     ]
   }
 }
