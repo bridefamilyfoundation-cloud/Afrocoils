@@ -11,15 +11,14 @@
   "download": "download/AfroCoils-0.2.0-12.apk",
   "notes": [],
   "bundle": {
-    "code": 18,
+    "code": 19,
     "minVersionCode": 12,
-    "bytes": 4565525,
-    "sha256": "79e01a7b7501842c56ba77b3f3352c03db94058f924f613ea90368a95ed77eee",
+    "bytes": 4567899,
+    "sha256": "84e1802dec8eb0f9a9dcfde20b7cba094f06eac2b01fc8d328369d19a913af40",
     "released": "2026-11-20",
-    "url": "https://runhkccoeyxfgsfrzezn.supabase.co/storage/v1/object/public/releases/bundles/18.zip",
+    "url": "https://runhkccoeyxfgsfrzezn.supabase.co/storage/v1/object/public/releases/bundles/19.zip",
     "notes": [
-      "The AfroCoils Hair Guide: the 4C education guide and starter kit, inside Hair Care",
-      "A new front page: what's your emergency?"
+      "Hair Education: learn what 4C hair is and why it behaves the way it does, one lesson at a time, in Hair Care"
     ]
   }
 }
