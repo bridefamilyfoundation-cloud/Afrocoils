@@ -959,6 +959,103 @@ export interface BillingLinkResponse {
   url: string
 }
 
+/* ------------------------------------------------------------------ *
+ * Paying by bank transfer (added 2026-11-20)
+ *
+ * The member pays into the company account from their own bank, then
+ * sends a screenshot of the receipt (`billing/transfer`). A person
+ * checks it against the bank statement on the admin site; approving
+ * opens the plan and emails the member, rejecting emails the reason.
+ * The receipt is checked and rebuilt by `scanJpeg` and kept in a
+ * private bucket, never in the database, and deleted 90 days after the
+ * decision. The bank account and the prices are set on the admin site.
+ * ------------------------------------------------------------------ */
+
+export const TRANSFER_STATUSES = ['Pending', 'Approved', 'Rejected'] as const
+export type TransferStatus = (typeof TRANSFER_STATUSES)[number]
+
+/** The receipt's byte ceiling, the same as a style photograph's. */
+export const MAX_RECEIPT_BYTES = 4 * 1024 * 1024
+/** How far back a transfer can have been made. Older than this is a support email, not a form. */
+export const TRANSFER_MAX_AGE_DAYS = 30
+/** Receipt images are deleted this many days after the decision. */
+export const RECEIPT_KEEP_DAYS = 90
+
+/** The name on the account paid from: letters (any script), spaces and . ' - only. */
+export const SENDER_NAME_PATTERN = /^[\p{L}][\p{L} .'-]{1,79}$/u
+/** The bank's reference or session id, as the receipt prints it. */
+export const BANK_REFERENCE_PATTERN = /^[A-Za-z0-9 /_-]{1,60}$/
+
+/** Collapse runs of whitespace and trim: what both sides validate. */
+export function tidyText(value: string): string {
+  return value.replace(/\s+/g, ' ').trim()
+}
+
+/** `YYYY-MM-DD` that is a real calendar day. */
+export function isDayKey(value: unknown): value is string {
+  if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return false
+  const [y, m, d] = value.split('-').map(Number) as [number, number, number]
+  const date = new Date(Date.UTC(y, m - 1, d))
+  return date.getUTCFullYear() === y && date.getUTCMonth() === m - 1 && date.getUTCDate() === d
+}
+
+/**
+ * Whether `paidOn` is a day a transfer could have been made: not after
+ * `today` (allowing a day for time zones) and not more than
+ * `TRANSFER_MAX_AGE_DAYS` before it.
+ */
+export function plausiblePaidOn(paidOn: string, today: Date = new Date()): boolean {
+  if (!isDayKey(paidOn)) return false
+  const at = Date.parse(`${paidOn}T00:00:00Z`)
+  const now = today.getTime()
+  return at <= now + 86_400_000 && at >= now - (TRANSFER_MAX_AGE_DAYS + 1) * 86_400_000
+}
+
+/** The account to pay into. */
+export interface BankAccount {
+  bankName: string
+  accountName: string
+  accountNumber: string
+}
+
+/** One transfer as its member sees it. */
+export interface TransferSummary {
+  id: string
+  plan: PlanId
+  amount: number
+  currency: string
+  status: TransferStatus
+  submittedISO: string
+  reviewedISO: string | null
+  /** Why it was rejected, written by the reviewer. Only on a rejection. */
+  note: string | null
+}
+
+/** POST billing/transfer-info (Bearer token). */
+export interface TransferInfoResponse {
+  /** Null: paying by transfer is switched off, or no account is set. */
+  account: BankAccount | null
+  /** The plans that can be paid by transfer, at their transfer price. */
+  plans: PlanOffer[]
+  /** This member's most recent transfer, if any. */
+  latest: TransferSummary | null
+}
+
+/** POST billing/transfer (Bearer token). Every field is checked again on the server. */
+export interface TransferRequest {
+  /** The phone's id for this submission, so a retry is not a second one. */
+  clientId: string
+  plan: PlanId
+  /** The name on the account the money came from. */
+  senderName: string
+  /** `YYYY-MM-DD`, the day the transfer was made. */
+  paidOn: string
+  /** The bank's reference or session id, if the receipt shows one. */
+  bankReference?: string
+  /** The receipt screenshot, JPEG, base64. */
+  receiptBase64: string
+}
+
 /** The persisted document. Versioned so migrations stay mechanical. */
 export const PROFILE_VERSION = 12
 

@@ -8,7 +8,8 @@ import Icon from '../components/Icon'
  * Privacy is written out in full, because it can be: the app's data
  * behaviour is small enough to describe exactly — one document on the
  * device, a membership by email (decided 2026-11-05: every feature is
- * for paying members), payment on Paystack's page, one optional upload,
+ * for paying members), payment on Paystack's page or by bank transfer
+ * with a receipt a person checks (added 2026-11-20), one optional upload,
  * Ask questions shared anonymously (on by default, switched off on
  * About), one version check that carries nothing. A policy is only worth
  * writing when it can be checked against the code, and every claim
@@ -43,7 +44,9 @@ function PrivacyPolicy() {
         <p className="font-body-md text-body-md text-on-surface-variant">
           AfroCoils is for members, and your membership is your email address. We hold that
           email, whether and until when it is paid up, and the record of your payments; the
-          card itself is handled by Paystack and never reaches us. Everything you enter about
+          card itself is handled by Paystack and never reaches us. If you pay by bank transfer
+          instead, we keep the receipt picture you send until 90 days after we have checked
+          it. Everything you enter about
           your hair — your profile, length history, calendar, photographs and saved styles —
           stays on your own device and is never uploaded, and none of it is linked to your
           email. Besides signing in and paying, two things leave your phone: the questions you
@@ -108,10 +111,24 @@ function PrivacyPolicy() {
           number, so our server can ask Paystack whether it went through.
         </p>
         <p>
+          <strong>Paying by bank transfer.</strong> You can instead pay into our bank account
+          from your own bank and send us, from the app, a picture of the receipt together with
+          the name on the account you paid from, the day you paid and, if you give it, the
+          bank&rsquo;s reference. A person on our team compares it with our bank statement and
+          approves or rejects it. The picture is checked before it is kept — anything that is
+          not a plain picture is refused — and what is kept is rebuilt from the picture alone,
+          without the hidden details a phone writes into one. It is stored privately, seen
+          only by the people who check payments, and deleted 90 days after the decision. The
+          name, day, reference, plan, amount and decision are kept as the record of that
+          payment, along with a fingerprint of the picture so the same receipt cannot be used
+          twice. A plan paid this way does not renew by itself.
+        </p>
+        <p>
           <strong>Reminder emails.</strong> We email you, from no-reply@afrocoils.app, the day
           before your free trial ends, three days before a plan renews or ends, and once when
-          your access has ended. We keep a note of the last reminder sent so nobody gets one
-          twice. These are about your membership and nothing else.
+          your access has ended. If you pay by bank transfer we also email you once when it is
+          approved, or, if it is not, why. We keep a note of the last reminder sent so nobody
+          gets one twice. These are about your membership and nothing else.
         </p>
         <p>
           <strong>Staying signed in.</strong> While you are signed in, the app asks our server
@@ -208,8 +225,9 @@ function PrivacyPolicy() {
             and replies to you, and nothing about your hair is stored with it.
           </li>
           <li>
-            No third-party SDKs that observe your use of the app. Paying happens on
-            Paystack&rsquo;s page in your browser, not inside the app.
+            No third-party SDKs that observe your use of the app. Paying by card happens on
+            Paystack&rsquo;s page in your browser, not inside the app; paying by bank transfer
+            happens in your own bank&rsquo;s app.
           </li>
           <li>
             No AI features. Nothing you enter is sent to a model, because the app makes no
@@ -221,7 +239,8 @@ function PrivacyPolicy() {
       <Article title="Device permissions">
         <p>
           <strong>Camera and photo library</strong> — only when you add a photograph to one
-          of your own styles or to a submission. The app never opens the camera on its own.
+          of your own styles or to a submission, or attach a bank transfer receipt. The app
+          never opens the camera on its own, and a receipt is not saved on your phone.
         </p>
         <p>
           <strong>Notifications</strong> — only if you turn on a reminder in the care
@@ -232,9 +251,10 @@ function PrivacyPolicy() {
 
       <Article title="Who else is involved">
         <p>
-          Our server runs on Supabase. Shared Ask questions, and submissions with their
-          photographs, are held there; submissions until a person has reviewed them, questions
-          for up to twelve months. Supabase processes that data on our behalf and for no other
+          Our server runs on Supabase. Shared Ask questions, submissions with their
+          photographs, and bank transfer receipts are held there; submissions until a person
+          has reviewed them, questions for up to twelve months, receipt pictures until 90 days
+          after they are checked. Supabase processes that data on our behalf and for no other
           purpose. Like any server it sees your connection&rsquo;s IP address; ours uses it
           only to limit how many requests one address can make, holds it for a few minutes
           for that, and never stores it with a question or a submission. The version check
@@ -253,7 +273,7 @@ function PrivacyPolicy() {
       <Article title="Children">
         <p>
           The app is not directed at children under 13, and membership is for adults who can
-          pay by card. Ask questions are anonymous. A submission should be made by the
+          pay for it. Ask questions are anonymous. A submission should be made by the
           person whose hair and photographs it is, or by their parent or guardian.
         </p>
       </Article>
@@ -332,6 +352,18 @@ function Terms() {
           address, confirmed with a code we send to it, and is paid as a subscription by
           card through Paystack on one of three plans — Monthly, 6 Months or Annual — at the
           price shown for each before you pay. The longer plans cost less per month.
+        </p>
+        <p>
+          <strong>Paying by bank transfer.</strong> You can also pay for a plan by transferring
+          the exact amount shown for it into the account shown in the app, then sending us the
+          receipt from the app. The plan opens when a person has matched your receipt to the
+          payment on our bank statement, usually within one working day, and we email you when
+          it does. It runs for the plan&rsquo;s length from that day, or from the end of the
+          period you have already paid for if that is later. It does not renew by itself: we
+          email you three days before it ends, and you pay again to carry on. If we cannot
+          match a receipt to a payment, we email you why; a receipt that has been altered, or
+          that has already been used, is refused, and a membership opened by one can be
+          ended.
         </p>
         <p>
           <strong>Free trial.</strong> A new member can use every section free for three

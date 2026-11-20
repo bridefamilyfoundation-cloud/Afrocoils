@@ -89,7 +89,22 @@ picture; this file is the short version of what to keep in mind when editing.
   webhook *or* from `transaction/verify` on the checkout's reference
   (`_shared/membership.ts`), recorded once by `recordCharge()`. Every
   price lives in its Paystack plan, never in code — the savings on
-  `/join` are computed from those prices. Reminders are service mail
+  `/join` are computed from those prices. **Bank transfer is the second
+  way to pay (added 2026-11-20):** `/join`'s `BankTransfer` shows the
+  account and the plan's transfer price (both set on the admin site, in
+  `transfer_settings`, never in code), and sends the payer's name, the
+  day, an optional bank reference and a receipt picture to
+  `billing/transfer`. The receipt never goes in the database: it passes
+  `scanJpeg()` and the rebuilt bytes go to the private
+  `payment-receipts` bucket; the `transfers` row holds the path and the
+  SHA-256, and the image is deleted `RECEIPT_KEEP_DAYS` (90) after the
+  decision by the daily run. Every field is validated on both sides from
+  the patterns in `types.ts`, and the amount is always the server's. A
+  person approves on the admin site (`_shared/transfers.ts`, a
+  compare-and-set on `Pending`), which extends `paid_until` from the
+  later of now and the current end, writes a `payments` row with
+  `method: 'transfer'` and emails the member; rejecting emails the
+  reason. A transfer plan never renews by itself. Reminders are service mail
   only, sent once each by the daily `billing/reminders` run (pg_cron)
   and mirrored by `MembershipNotice` in the app; adding a kind of email
   is a privacy-policy sentence first. An earlier one-off "AfroCoils Plus" with

@@ -1,4 +1,4 @@
-import type { AdminSessionResponse, MemberStatus, PlanId } from '../../src/lib/types'
+import type { AdminSessionResponse, MemberStatus, PlanId, TransferStatus } from '../../src/lib/types'
 
 /**
  * The admin site's only connection: the `auth` and `admin` Edge
@@ -78,6 +78,7 @@ export interface Overview {
   open: number
   unread: number
   unanswered: number
+  transfers: number
 }
 
 export interface MemberRow {
@@ -107,6 +108,42 @@ export interface PaymentRow {
   reversed_at: string | null
   reversal: 'refund' | 'chargeback' | null
   reversed_amount: number | null
+  method: 'paystack' | 'transfer'
+}
+
+/** A bank transfer, with its receipt signed for ten minutes (null once deleted). */
+export interface TransferRow {
+  id: string
+  email: string
+  plan: PlanId
+  amount: number
+  currency: string
+  sender_name: string
+  paid_on: string
+  bank_reference: string | null
+  receipt_url: string | null
+  receipt_sha256: string
+  status: TransferStatus
+  submitted_at: string
+  reviewed_at: string | null
+  reviewed_by: string | null
+  reviewer_note: string | null
+  receipt_deleted_at: string | null
+  member_paid_until: string | null
+}
+
+/** The bank account and transfer prices (kobo). */
+export interface TransferSettings {
+  enabled: boolean
+  bank_name: string
+  account_name: string
+  account_number: string
+  currency: string
+  price_monthly: number | null
+  price_biannual: number | null
+  price_annual: number | null
+  updated_at: string
+  updated_by: string | null
 }
 
 /** One @afrocoils.app address and its conversations. */

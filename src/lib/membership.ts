@@ -8,6 +8,9 @@ import type {
   PlanOffer,
   PlanPrice,
   RequestCodeRequest,
+  TransferInfoResponse,
+  TransferRequest,
+  TransferSummary,
   VerifyCodeRequest,
 } from './types'
 import { MEMBERSHIP_GRACE_DAYS, PLANS, accessOpen, formatAmount, membershipOpen, parseFloor, trialOpen } from './types'
@@ -106,6 +109,20 @@ export async function checkoutUrl(token: string, plan: PlanId): Promise<string> 
 
 export function startTrial(token: string): Promise<MembershipResponse> {
   return call<MembershipResponse>('billing/trial', { token }).then(heard)
+}
+
+/** The account to pay into, the transfer prices, and this member's latest transfer. */
+export function transferInfo(token: string): Promise<TransferInfoResponse> {
+  return call<TransferInfoResponse>('billing/transfer-info', { token })
+}
+
+/**
+ * Send a bank transfer receipt for a person to check. The server
+ * re-checks every field and the image itself; a retry with the same
+ * `clientId` answers with the first one rather than sending it twice.
+ */
+export function sendTransfer(token: string, body: TransferRequest): Promise<TransferSummary> {
+  return call<TransferSummary>('billing/transfer', { token, body })
 }
 
 export async function manageUrl(token: string): Promise<string> {

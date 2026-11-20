@@ -194,8 +194,44 @@ const NOTICE: Record<NoticeKind, (d: NoticeDetails) => { subject: string; lines:
   }),
 }
 
-export function noticeMail(to: string, kind: NoticeKind, details: NoticeDetails): OutgoingMail {
-  const { subject, lines } = NOTICE[kind](details)
+/**
+ * The two answers to a bank transfer, sent when an admin decides it:
+ * approved (the plan is open, and until when) or not approved (the
+ * reviewer's reason). Service mail, like the notices above, and named
+ * in the privacy policy.
+ */
+export interface TransferDecision {
+  approved: boolean
+  planLabel: string
+  /** "₦7,500". */
+  amount: string
+  /** The day they paid, written out. */
+  paidOn: string
+  /** Approved: the day access runs to, written out. */
+  until?: string
+  /** Rejected: why, in the reviewer's words. */
+  reason?: string
+}
+
+export function transferMail(to: string, d: TransferDecision): OutgoingMail {
+  const subject = d.approved
+    ? 'Your AfroCoils payment is confirmed'
+    : 'We couldn’t confirm your AfroCoils payment'
+  const lines = d.approved
+    ? [
+        `We’ve received your bank transfer of ${d.amount} made on ${d.paidOn}, and your ${d.planLabel} membership is now active${d.until ? ` until ${d.until}` : ''}.`,
+        'Open the app and it unlocks by itself; if it is already open, close it and open it again. A plan paid by transfer does not renew on its own: we email you three days before it ends, and you can pay again in the app.',
+        'Keep your bank receipt as your proof of payment.',
+      ]
+    : [
+        `We looked at the bank transfer receipt you sent for the ${d.planLabel} plan (${d.amount}, paid on ${d.paidOn}) and could not match it to a payment into our account.`,
+        `The reason: ${d.reason ?? 'not given'}`,
+        'If you did pay, send the receipt again from the app (My Hair Profile → Membership → Choose a plan → Pay by bank transfer), or reply to this email with the details and we’ll sort it out. If no money left your account, nothing more is needed.',
+      ]
+  return composeNotice(to, subject, lines)
+}
+
+function composeNotice(to: string, subject: string, lines: string[]): OutgoingMail {
   const footer = 'AfroCoils — Celebrating Every Coil.'
   const text = [...lines, footer, 'Questions? Reply to support@afrocoils.app.'].join('\n\n')
   const html = `<!doctype html><html><body style="margin:0;background:#E8D5C0;font-family:Arial,Helvetica,sans-serif;color:#5A2108">
@@ -206,6 +242,11 @@ ${lines.map((line) => `<p style="margin:0 0 16px;font-size:14px;line-height:1.5"
 <p style="margin:0;font-size:13px;color:#7a4a32">${escape(footer)}<br>Questions? Write to <a href="mailto:support@afrocoils.app" style="color:#E2583E">support@afrocoils.app</a>.</p>
 </td></tr></table></td></tr></table></body></html>`
   return { from: FROM_NOREPLY, to, subject, text, html, replyTo: 'support@afrocoils.app' }
+}
+
+export function noticeMail(to: string, kind: NoticeKind, details: NoticeDetails): OutgoingMail {
+  const { subject, lines } = NOTICE[kind](details)
+  return composeNotice(to, subject, lines)
 }
 
 /* ------------------------------------------------------------------ *

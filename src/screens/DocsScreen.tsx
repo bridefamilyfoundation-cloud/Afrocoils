@@ -487,7 +487,8 @@ const SECTIONS: {
         </p>
         <p>
           Your membership is your email address. Signing in sends it, then the code; paying
-          happens on Paystack&rsquo;s page; and while you are signed in the app checks at
+          happens on Paystack&rsquo;s page, or by bank transfer with a picture of the receipt,
+          which is deleted 90 days after it is checked; and while you are signed in the app checks at
           most twice a day that the membership is still paid, sending only your sign-in token.
           Beyond that, three things leave the phone. The questions you type into Ask, sent
           anonymously (the words and what Ask answered, nothing from your profile, not your
@@ -525,6 +526,17 @@ const SECTIONS: {
           browser. Come back to the app and it opens by itself once the payment is through;
           I&rsquo;ve paid &mdash; check again asks straight away. On a new phone, sign in with
           the same email and skip the payment.
+        </p>
+        <p>
+          No card? Pay by bank transfer, on the same screen: choose a plan, transfer the
+          exact amount shown to the account shown (each has a Copy button), then fill in the
+          name on the account you paid from, the day, the bank&rsquo;s reference if the
+          receipt has one, and attach a screenshot of the receipt. A person checks it against
+          the bank statement, usually within one working day; until then the screen says it
+          is being checked. We email you when it is approved and the app opens by itself, or
+          email you why if it is not, and you can send it again. A plan paid by transfer runs
+          from the day it is approved, or from the end of the time you have already paid
+          for, and does not renew by itself.
         </p>
         <p>
           The Membership row at the foot of My Hair Profile shows the email, the plan, its

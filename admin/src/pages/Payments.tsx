@@ -7,7 +7,7 @@ import { useLoad } from './useLoad'
 const money = (amount: number, currency: string) =>
   new Intl.NumberFormat('en-NG', { style: 'currency', currency }).format(amount / 100)
 
-/** Successful Paystack charges, from the webhook, with any refund or chargeback the webhook reported since. */
+/** Successful Paystack charges (from the webhook, with any refund or chargeback reported since) and approved bank transfers. */
 export default function Payments({ api }: PageProps) {
   const [email, setEmail] = useState('')
   const [filter, setFilter] = useState('')
@@ -42,7 +42,7 @@ export default function Payments({ api }: PageProps) {
       <p className="mb-md text-sm text-on-surface-variant">
         {data?.length ?? '…'} payments
         {[...totals].map(([currency, amount]) => ` · ${money(amount, currency)}`)} (latest 500).
-        Refunds and disputes are made in the Paystack dashboard. A full refund or a lost
+        Bank transfers appear here once approved under Bank transfers. Card refunds and disputes are made in the Paystack dashboard. A full refund or a lost
         chargeback on a member&rsquo;s latest payment ends their access; anything else leaves a
         note on the member.
       </p>
@@ -53,6 +53,7 @@ export default function Payments({ api }: PageProps) {
               <th className="p-sm">Paid</th>
               <th className="p-sm">Email</th>
               <th className="p-sm">Amount</th>
+              <th className="p-sm">How</th>
               <th className="p-sm">Reference</th>
             </tr>
           </thead>
@@ -72,6 +73,7 @@ export default function Payments({ api }: PageProps) {
                     </span>
                   )}
                 </td>
+                <td className="p-sm text-xs">{p.method === 'transfer' ? 'Bank transfer' : 'Card'}</td>
                 <td className="p-sm font-mono text-xs">{p.reference}</td>
               </tr>
             ))}

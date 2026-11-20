@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { Link, Navigate, useNavigate } from 'react-router-dom'
+import BankTransfer from '../components/BankTransfer'
 import Icon from '../components/Icon'
 import { MEMBER_SECTIONS } from '../content/membership'
 import {
@@ -40,6 +41,10 @@ import { PLANS, TRIAL_DAYS, formatAmount, type PlanId, type PlanOffer } from '..
  *    worked out from those prices. Paying happens on Paystack's own page
  *    in the browser. Coming back to the app checks again
  *    (MembershipSync), and so does "I've paid".
+ * 4. **Or bank transfer** (`BankTransfer`, added 2026-11-20): pay into
+ *    the company account, send the receipt, and a person approves it on
+ *    the admin site, which opens the plan and emails the member. Shown
+ *    open when the card plans cannot be loaded.
  *
  * A member on the trial, or on a plan that will not renew, reaches this
  * screen from the reminder banner or My Hair Profile to choose a plan;
@@ -65,6 +70,7 @@ export default function JoinScreen() {
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [note, setNote] = useState<string | null>(null)
+  const [byTransfer, setByTransfer] = useState(false)
   const codeInput = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
@@ -151,7 +157,7 @@ export default function JoinScreen() {
       const now = toMembership(response)
       if (autoRenews(now)) return
       if (hasAccess(now) && membership && !hasAccess(membership)) navigate('/sos', { replace: true })
-      else setNote('No payment on this email yet. Paystack can take a minute to confirm it — try again shortly.')
+      else setNote('No payment on this email yet. Paystack can take a minute to confirm a card payment, and a bank transfer opens the app once a person has approved it.')
     })
 
   const signOut = () => {
@@ -420,6 +426,34 @@ export default function JoinScreen() {
           </p>
         )}
       </section>
+
+      {step === 'pay' && membership && (
+        <section aria-labelledby="transfer" className="mb-xl rounded-2xl bg-surface-container-lowest p-lg shadow-card">
+          <h2 id="transfer" className="mb-xs flex items-center gap-sm font-headline-md text-body-lg font-bold text-on-surface">
+            <Icon name="account_balance" className="text-[22px]" />
+            Pay by bank transfer
+          </h2>
+          {byTransfer || offers === null || offers?.length === 0 ? (
+            <div className="mt-md">
+              <BankTransfer token={membership.token} email={membership.email} onRecheck={recheck} busyOutside={busy} />
+            </div>
+          ) : (
+            <>
+              <p className="mb-md font-body-md text-caption text-on-surface-variant">
+                No card? Transfer from your bank app and send us the receipt. A person checks it and
+                your plan opens once it&rsquo;s approved. A plan paid this way doesn&rsquo;t renew by itself.
+              </p>
+              <button
+                type="button"
+                onClick={() => setByTransfer(true)}
+                className="flex w-full items-center justify-center gap-sm rounded-full bg-surface-container-high py-3 font-label-md text-label-md font-bold text-on-surface transition-all active:scale-95"
+              >
+                Pay by bank transfer instead
+              </button>
+            </>
+          )}
+        </section>
+      )}
 
       <section aria-labelledby="included" className="mb-xl">
         <h2 id="included" className="mb-md font-headline-md text-body-lg font-bold text-on-surface">

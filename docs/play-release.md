@@ -99,7 +99,9 @@ Most rejections happen here, not in the build.
 **Privacy policy URL — mandatory, must be live before the listing is.** The
 hair profile, photos, growth history and calendar stay on the device. What
 leaves it: the member's email (signing in, `auth`), a status check carrying
-only the sign-in token, payment on Paystack's page, the questions typed into
+only the sign-in token, payment on Paystack's page or a bank transfer receipt
+(a picture, with the payer's name, the day and the bank reference, kept until
+90 days after a person checks it), the questions typed into
 Ask, sent anonymously while sharing is on (on by default, off under About), and
 a community style submission, which the user starts deliberately and which
 carries the photographs and text they wrote. Say exactly that.
@@ -122,7 +124,13 @@ first Play upload.
   shared with Paystack and Resend as processors only, linked to the user,
   deletable on request to support@afrocoils.app. Encrypted in transit.
 - **Financial info → Purchase history**: the Paystack payment record (amount,
-  date, reference). No card data — Paystack holds it.
+  date, reference). No card data — Paystack holds it. For a bank transfer:
+  the name on the paying account, the day, the bank reference and the plan,
+  linked to the user, not shared, kept as the payment record.
+- **Photos and videos → Photos**: a bank transfer receipt picture, collected
+  only when the user pays by transfer, linked to the user, not shared,
+  processed for *Account management*, deleted 90 days after review. (A Play
+  build that uses Play Billing would drop bank transfer, and this line.)
 
 - **App activity → Other user-generated content** (and **In-app search
   history**): the Ask question text, collected, not shared with third parties,

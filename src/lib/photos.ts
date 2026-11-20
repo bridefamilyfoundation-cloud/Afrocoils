@@ -108,6 +108,39 @@ export async function capturePhoto(source: PhotoSource): Promise<string> {
   return storeBase64(base64)
 }
 
+/**
+ * Pick or photograph a bank transfer receipt, for sending once.
+ *
+ * Unlike `capturePhoto` nothing is written to disk and nothing goes on
+ * the profile: the bytes are held by the screen until they are sent, and
+ * dropped with it. The plugin re-encodes to JPEG at these dimensions, so
+ * a PNG screenshot arrives as a JPEG the server's check accepts. 1800px
+ * keeps a tall banking screenshot legible.
+ */
+export async function pickReceipt(source: PhotoSource): Promise<string> {
+  try {
+    const photo = await Camera.getPhoto({
+      source: source === 'camera' ? CameraSource.Camera : CameraSource.Photos,
+      resultType: CameraResultType.Base64,
+      quality: 85,
+      width: 1800,
+      height: 1800,
+      correctOrientation: true,
+      allowEditing: false,
+    })
+    if (!photo.base64String) throw new PhotoError('The picture came back empty. Try again.')
+    return photo.base64String
+  } catch (error) {
+    if (error instanceof PhotoError) throw error
+    if (isCancellation(error)) throw new PhotoError('Cancelled', true)
+    throw new PhotoError(
+      source === 'camera'
+        ? 'Could not open the camera. Check the app has camera permission.'
+        : 'Could not open your photos. Check the app has photo permission.',
+    )
+  }
+}
+
 /** Write base64 JPEG bytes into the photo store and return the filename. */
 async function storeBase64(base64: string): Promise<string> {
   await ensureFolder()

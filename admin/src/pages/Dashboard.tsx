@@ -6,6 +6,7 @@ import { useLoad } from './useLoad'
 export default function Dashboard({ api, go }: PageProps) {
   const { data, error } = useLoad(() => api.get<Overview>('overview'), 'overview')
   const tiles: { label: string; value?: number; page: PageName }[] = [
+    { label: 'Bank transfers to check', value: data?.transfers, page: 'transfers' },
     { label: 'Members with access', value: data?.paying, page: 'members' },
     { label: 'Members ever', value: data?.members, page: 'members' },
     { label: 'Unread mail', value: data?.unread, page: 'inbox' },

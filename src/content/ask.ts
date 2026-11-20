@@ -490,11 +490,11 @@ export const TOPICS: AskTopic[] = [
     id: 'membership',
     title: 'Your membership',
     answer:
-      'Your membership is your email. New members can try it free for three days with no card, then choose Monthly, 6 Months or Annual; the longer plans cost less per month. My Hair Profile shows your plan, when it started and when it renews or ends; Choose a plan is there while you are on the trial or a plan that won’t renew, and Manage or cancel opens Paystack’s page to change the card or cancel. The app stays open to the end of the period you paid for, and we email you before a trial ends and before a plan renews or ends. On a new phone, sign in with the same email. Sign out is there too, and leaves your hair profile on the phone.',
+      'Your membership is your email. New members can try it free for three days with no card, then choose Monthly, 6 Months or Annual; the longer plans cost less per month. Pay by card on Paystack’s page, or by bank transfer: send the receipt from the Choose a plan screen and the plan opens once a person has checked it, and does not renew by itself. My Hair Profile shows your plan, when it started and when it renews or ends; Choose a plan is there while you are on the trial or a plan that won’t renew, and Manage or cancel opens Paystack’s page to change the card or cancel. The app stays open to the end of the period you paid for, and we email you before a trial ends and before a plan renews or ends. On a new phone, sign in with the same email. Sign out is there too, and leaves your hair profile on the phone.',
     route: '/profile?open=membership',
     cta: 'Open My Hair Profile',
     docs: 'membership',
-    keys: 'my membership|my subscription|cancel my subscription|cancel membership|stop paying|change my card|update my card|renew|renewal|sign out|log out|new phone|sign in on another phone|how much is it|price|paystack|refund|free trial|my trial|trial ends|when does my trial end|plans|my plan|change my plan|switch plan|6 months|six months|annual plan|yearly plan|when does my membership end|expiry|expires',
+    keys: 'my membership|my subscription|cancel my subscription|cancel membership|stop paying|change my card|update my card|renew|renewal|sign out|log out|new phone|sign in on another phone|how much is it|price|paystack|refund|free trial|my trial|trial ends|when does my trial end|plans|my plan|change my plan|switch plan|6 months|six months|annual plan|yearly plan|when does my membership end|expiry|expires|bank transfer|pay by transfer|pay without a card|no card|my receipt|payment receipt|transfer receipt|payment not approved|payment pending',
   },
   {
     id: 'terms',

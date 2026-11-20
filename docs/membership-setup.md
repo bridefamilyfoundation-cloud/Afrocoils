@@ -78,6 +78,34 @@ lowest priority points. Wait for Resend to show every record as verified.
 4. Settings → Preferences: make sure subscription emails to customers are on
    (Paystack's own receipts and renewal notices).
 
+## 3b. Bank transfer (you, on the admin site)
+
+Members can also pay by transferring into the company account and sending
+a picture of the receipt from `/join`; a person approves it on the admin
+site. Nothing to configure outside the admin site, and no secret:
+
+1. `npm run db:push` (migration 0009: `transfer_settings`, `transfers`,
+   `payments.method`, the private `payment-receipts` bucket), then
+   `npm run backend:deploy` (the `billing` and `admin` functions).
+2. Admin site → **Bank transfers** → *Account and prices*: the bank, the
+   account name, the account number and a price per plan in naira (an
+   empty price is a plan not offered by transfer). Tick *Offer bank
+   transfer in the app* and save. These prices are separate from the
+   Paystack plans, so keep the two in step by hand.
+3. Ship the app side with `npm run ota:publish` (web only; the camera
+   permission it uses is already in the APK).
+
+**Reviewing.** Bank transfers → Pending, oldest first. Match each receipt
+to a credit on the bank statement (amount, day, name, reference) before
+approving: a screenshot can be edited, and the statement is the proof.
+*Approve* opens the plan from the later of today and the member's current
+end date, records the payment (Payments, "Bank transfer") and emails them.
+*Reject* needs a reason, which is emailed to them; they can send again.
+One pending transfer per member; a receipt that was approved once cannot
+be sent again. Receipt images are deleted by the daily run 90 days after
+the decision; the record stays. A transfer approved by mistake is undone
+with *Revoke* on Members.
+
 ## 4. Secrets and deploy
 
 From PowerShell, with the AfroCoils token (see the memory note on the

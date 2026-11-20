@@ -16,6 +16,14 @@ import { db, getMember, laterOf, saveMember } from '../_shared/members.ts'
 import { appendNote, closeAccess } from '../_shared/membership.ts'
 import { insert, insertReturning, patch, select, signedPhotoUrl } from '../_shared/supabase.ts'
 import { bearer, normalEmail } from '../_shared/token.ts'
+import {
+  TransferRefusal,
+  approveTransfer,
+  listTransfers,
+  readSettings,
+  rejectTransfer,
+  saveSettings,
+} from '../_shared/transfers.ts'
 
 /**
  * What the admin site (admin/, at admin.afrocoils.app) reads and writes.
@@ -35,6 +43,10 @@ import { bearer, normalEmail } from '../_shared/token.ts'
  * POST reply {thread, text}           answer from the mailbox it came to
  * POST compose {to, subject, text, mailbox}
  * POST thread-status {thread, status}
+ * GET  transfers?status=              bank transfers, receipts signed for ten minutes
+ * POST transfer {id, action, note}     approve | reject (note required, emailed)
+ * GET  transfer-settings               the bank account and transfer prices
+ * POST transfer-settings {...}         change them
  * GET  submissions?review=            the style queue, photos signed for an hour
  * POST submission {id, review, note}
  * GET  questions?outcome=&reviewed=   the Ask log
@@ -89,15 +101,16 @@ async function count(table: string, filter: string): Promise<number> {
 
 async function overview() {
   const openFrom = new Date(Date.now() - MEMBERSHIP_GRACE_DAYS * 86_400_000).toISOString()
-  const [members, paying, pending, open, unread, unanswered] = await Promise.all([
+  const [members, paying, pending, open, unread, unanswered, transfers] = await Promise.all([
     count('members', 'select=email'),
     count('members', `select=email&paid_until=gt.${openFrom}`),
     count('submissions', 'select=id&review=eq.Pending'),
     count('support_messages', 'select=id&direction=eq.in&status=eq.open'),
     count('support_messages', 'select=id&direction=eq.in&read=eq.false'),
     count('ask_questions', 'select=id&outcome=eq.none&reviewed=eq.false'),
+    count('transfers', 'select=id&status=eq.Pending'),
   ])
-  return { members, paying, pending, open, unread, unanswered }
+  return { members, paying, pending, open, unread, unanswered, transfers }
 }
 
 /* ------------------------------------------------------------------ *
@@ -333,6 +346,18 @@ async function threadStatus(body: Record<string, unknown>) {
 }
 
 /* ------------------------------------------------------------------ *
+ * Bank transfers
+ * ------------------------------------------------------------------ */
+
+async function decideTransfer(body: Record<string, unknown>, by: string) {
+  const id = text(body.id, 60)
+  const note = text(body.note, 500)
+  if (body.action === 'approve') return approveTransfer(id, by, note)
+  if (body.action === 'reject') return rejectTransfer(id, by, note)
+  throw new Refusal(400, 'Approve or reject')
+}
+
+/* ------------------------------------------------------------------ *
  * Style submissions
  * ------------------------------------------------------------------ */
 
@@ -421,6 +446,8 @@ serve(async (req) => {
       else if (route === 'thread') result = await thread(url)
       else if (route === 'submissions') result = await listSubmissions(url)
       else if (route === 'questions') result = await listQuestions(url)
+      else if (route === 'transfers') result = await listTransfers(url.searchParams.get('status') ?? 'Pending')
+      else if (route === 'transfer-settings') result = await readSettings()
       else throw new Refusal(404, 'Not found')
     } else if (req.method === 'POST') {
       const body = await input(req)
@@ -430,13 +457,17 @@ serve(async (req) => {
       else if (route === 'thread-status') result = await threadStatus(body)
       else if (route === 'submission') result = await reviewSubmission(body, by)
       else if (route === 'questions') result = await markQuestions(body)
+      else if (route === 'transfer') result = await decideTransfer(body, by)
+      else if (route === 'transfer-settings') result = await saveSettings(body, by)
       else throw new Refusal(404, 'Not found')
     } else {
       throw new Refusal(405, 'Method not allowed')
     }
     return jsonResponse(result, 200, origin)
   } catch (error) {
-    if (error instanceof Refusal) return jsonResponse({ error: error.message }, error.status, origin)
+    if (error instanceof Refusal || error instanceof TransferRefusal) {
+      return jsonResponse({ error: error.message }, error.status, origin)
+    }
     console.error(`[admin] ${route} failed`, error)
     return jsonResponse({ error: error instanceof Error ? error.message.slice(0, 300) : 'Failed' }, 500, origin)
   }

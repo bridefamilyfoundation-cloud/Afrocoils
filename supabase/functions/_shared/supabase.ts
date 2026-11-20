@@ -235,6 +235,14 @@ export async function rpc<T>(
 export const PHOTO_BUCKET = env('SUPABASE_PHOTO_BUCKET') || 'submission-photos'
 
 /**
+ * The bucket bank-transfer receipts go into (migration 0009). Private
+ * like the photo bucket, and separate from it: a receipt is a financial
+ * document with a name and an account on it, kept 90 days after its
+ * decision rather than for as long as a style is in review.
+ */
+export const RECEIPT_BUCKET = 'payment-receipts'
+
+/**
  * Upload one object and return the path it can be read back by.
  *
  * The path, not a URL. The bucket is private — these are photographs of
@@ -254,9 +262,10 @@ export async function uploadObject(
   path: string,
   bytes: Uint8Array,
   contentType: string,
+  bucket: string = PHOTO_BUCKET,
 ): Promise<string> {
   const response = await fetch(
-    `${config.url}/storage/v1/object/${PHOTO_BUCKET}/${encodeURI(path)}`,
+    `${config.url}/storage/v1/object/${bucket}/${encodeURI(path)}`,
     {
       method: 'POST',
       headers: {
@@ -268,7 +277,7 @@ export async function uploadObject(
       body: bytes,
     },
   )
-  if (!response.ok) throw await failure(response, `Upload to ${PHOTO_BUCKET}`)
+  if (!response.ok) throw await failure(response, `Upload to ${bucket}`)
   return path
 }
 
@@ -284,9 +293,10 @@ export async function signedPhotoUrl(
   config: SupabaseConfig,
   path: string,
   expiresInSeconds = 3600,
+  bucket: string = PHOTO_BUCKET,
 ): Promise<string> {
   const response = await fetch(
-    `${config.url}/storage/v1/object/sign/${PHOTO_BUCKET}/${encodeURI(path)}`,
+    `${config.url}/storage/v1/object/sign/${bucket}/${encodeURI(path)}`,
     {
       method: 'POST',
       headers: { ...authHeaders(config), 'Content-Type': 'application/json' },
@@ -306,9 +316,10 @@ export async function signedPhotoUrl(
 export async function removeObjects(
   config: SupabaseConfig,
   paths: string[],
+  bucket: string = PHOTO_BUCKET,
 ): Promise<void> {
   if (paths.length === 0) return
-  const response = await fetch(`${config.url}/storage/v1/object/${PHOTO_BUCKET}`, {
+  const response = await fetch(`${config.url}/storage/v1/object/${bucket}`, {
     method: 'DELETE',
     headers: { ...authHeaders(config), 'Content-Type': 'application/json' },
     body: JSON.stringify({ prefixes: paths }),

@@ -1,18 +1,40 @@
-import type { BillingLinkResponse, MembershipResponse, PlanId } from '../../../src/lib/types.ts'
+import type {
+  BillingLinkResponse,
+  MembershipResponse,
+  PlanId,
+  TransferInfoResponse,
+  TransferSummary,
+} from '../../../src/lib/types.ts'
 import {
+  BANK_REFERENCE_PATTERN,
+  MAX_RECEIPT_BYTES,
   MEMBERSHIP_GRACE_DAYS,
   PLANS,
+  SENDER_NAME_PATTERN,
+  TRANSFER_MAX_AGE_DAYS,
   TRIAL_DAYS,
   formatAmount,
   isPlanId,
   membershipOpen,
+  plausiblePaidOn,
+  tidyText,
   trialOpen,
 } from '../../../src/lib/types.ts'
 import { BodyTooLarge, readJson, readText } from '../_shared/body.ts'
 import { corsHeaders, jsonResponse } from '../_shared/cors.ts'
 import { noticeMail, sendMail, type NoticeKind } from '../_shared/email.ts'
 import { env, serve } from '../_shared/env.ts'
-import { checkLimits, limitResponse } from '../_shared/limits.ts'
+import { scanJpeg } from '../_shared/image-scan.ts'
+import { checkKeyLimit, checkLimits, limitResponse } from '../_shared/limits.ts'
+import {
+  accountOf,
+  latestTransfer,
+  pruneReceipts,
+  readSettings,
+  toSummary,
+  transferPlans,
+  type TransferRow,
+} from '../_shared/transfers.ts'
 import {
   appendNote,
   autoRenewing,
@@ -32,7 +54,7 @@ import {
   startCheckout,
   verifyPaystackSignature,
 } from '../_shared/paystack.ts'
-import { select, upsert } from '../_shared/supabase.ts'
+import { RECEIPT_BUCKET, insertReturning, removeObjects, select, uploadObject, upsert } from '../_shared/supabase.ts'
 import { bearer } from '../_shared/token.ts'
 
 /**
@@ -52,7 +74,12 @@ import { bearer } from '../_shared/token.ts'
  *   so Paystack does not retry an event we have already handled.
  * - `POST billing/reminders` is the daily run (pg_cron, migration 0006),
  *   believed only with `x-cron-secret`: the trial-ending, ending,
- *   renewing and ended emails, each sent once.
+ *   renewing and ended emails, each sent once, and deleting receipt
+ *   images 90 days after their decision.
+ * - `POST billing/transfer-info` (member token) answers the bank account,
+ *   the plans at their transfer price and the member's latest transfer.
+ * - `POST billing/transfer` (member token) sends a bank transfer receipt
+ *   for a person to approve on the admin site (migration 0009).
  *
  * Set the webhook URL in the Paystack dashboard (Settings → API Keys &
  * Webhooks) to `https://<ref>.supabase.co/functions/v1/billing/webhook`.
@@ -154,6 +181,194 @@ async function manage(req: Request, origin?: string): Promise<Response> {
   }
   const url = await manageLink(member.paystack_subscription)
   return jsonResponse({ url } satisfies BillingLinkResponse, 200, origin)
+}
+
+/* ------------------------------------------------------------------ *
+ * Bank transfer
+ * ------------------------------------------------------------------ */
+
+/** The account, the plans at their transfer price, and this member's latest transfer. */
+async function transferInfo(req: Request, origin?: string): Promise<Response> {
+  const session = await bearer(req, 'member')
+  if (!session) return jsonResponse({ error: 'Sign in with your email first.' }, 401, origin)
+  const [settings, latest] = await Promise.all([readSettings(), latestTransfer(session.sub)])
+  return jsonResponse(
+    {
+      account: accountOf(settings),
+      plans: transferPlans(settings),
+      latest: latest ? toSummary(latest) : null,
+    } satisfies TransferInfoResponse,
+    200,
+    origin,
+  )
+}
+
+/** Base64 of the receipt plus a few hundred bytes of fields, and nothing bigger is read. */
+const MAX_TRANSFER_BODY = Math.ceil((MAX_RECEIPT_BYTES * 4) / 3) + 8 * 1024
+const BASE64 = /^[A-Za-z0-9+/]+={0,2}$/
+const CLIENT_ID = /^[A-Za-z0-9_-]{1,100}$/
+
+interface ValidTransfer {
+  clientId: string
+  plan: PlanId
+  senderName: string
+  paidOn: string
+  bankReference: string | null
+  receipt: Uint8Array
+}
+
+/**
+ * Every field of `TransferRequest`, checked as if the screen did not
+ * exist: a public endpoint cannot trust the form that usually calls it.
+ * Text is tidied, capped and held to a character set; the date has to
+ * be a real day in the last 30; the receipt has to decode, fit under the
+ * byte ceiling and start like a JPEG before `scanJpeg` looks at the rest.
+ */
+function validTransfer(raw: unknown): ValidTransfer | string {
+  if (typeof raw !== 'object' || raw === null || Array.isArray(raw)) return 'Expected a form.'
+  const b = raw as Record<string, unknown>
+
+  const clientId = typeof b.clientId === 'string' ? b.clientId : ''
+  if (!CLIENT_ID.test(clientId)) return 'Something went wrong with the form. Close it and try again.'
+
+  if (!isPlanId(b.plan)) return 'Choose Monthly, 6 Months or Annual.'
+
+  const senderName = typeof b.senderName === 'string' ? tidyText(b.senderName) : ''
+  if (!SENDER_NAME_PATTERN.test(senderName)) {
+    return 'Enter the name on the account you paid from: letters and spaces, 2 to 80 characters.'
+  }
+
+  const paidOn = typeof b.paidOn === 'string' ? b.paidOn : ''
+  if (!plausiblePaidOn(paidOn)) {
+    return `Enter the day you made the transfer: today or within the last ${TRANSFER_MAX_AGE_DAYS} days.`
+  }
+
+  let bankReference: string | null = null
+  if (b.bankReference !== undefined && b.bankReference !== null && b.bankReference !== '') {
+    const ref = typeof b.bankReference === 'string' ? tidyText(b.bankReference) : ''
+    if (!BANK_REFERENCE_PATTERN.test(ref)) {
+      return 'The reference can only hold letters, numbers, spaces and / _ -, up to 60 characters.'
+    }
+    bankReference = ref
+  }
+
+  const encoded = typeof b.receiptBase64 === 'string' ? b.receiptBase64 : ''
+  const data = encoded.startsWith('data:') ? encoded.slice(encoded.indexOf(',') + 1) : encoded
+  if (!data || !BASE64.test(data)) return 'Attach a picture of your receipt.'
+  if (Math.floor((data.length * 3) / 4) > MAX_RECEIPT_BYTES + 2) return 'That picture is too large. Use a screenshot.'
+  let receipt: Uint8Array
+  try {
+    receipt = Uint8Array.from(atob(data), (c) => c.charCodeAt(0))
+  } catch {
+    return 'Attach a picture of your receipt.'
+  }
+  if (receipt.length === 0 || receipt.length > MAX_RECEIPT_BYTES) return 'That picture is too large. Use a screenshot.'
+  if (!(receipt[0] === 0xff && receipt[1] === 0xd8 && receipt[2] === 0xff)) {
+    return 'The receipt has to be a picture (a screenshot or a photo), not a PDF or another file.'
+  }
+
+  return { clientId, plan: b.plan, senderName, paidOn, bankReference, receipt }
+}
+
+/**
+ * Send a transfer for approval.
+ *
+ * The receipt never goes to the database. It is checked by `scanJpeg`
+ * (malformed files, absurd sizes, script or a second file hidden in it
+ * are refused) and rebuilt from the picture alone, and the *rebuilt*
+ * bytes go to the private receipt bucket; the row holds only the path
+ * and the fingerprint.
+ */
+async function transfer(req: Request, origin?: string): Promise<Response> {
+  const session = await bearer(req, 'member')
+  if (!session) return jsonResponse({ error: 'Sign in with your email first.' }, 401, origin)
+  const email = session.sub
+
+  // Ten tries a day per member (typos included), on top of the per-IP limit.
+  if (!(await checkKeyLimit(`transfer:${email}`, 10, 86_400))) {
+    return jsonResponse({ error: 'Too many receipts today. Try again tomorrow, or write to support@afrocoils.app.' }, 429, origin)
+  }
+
+  let raw: unknown
+  try {
+    raw = await readJson(req, MAX_TRANSFER_BODY)
+  } catch (error) {
+    if (error instanceof BodyTooLarge) {
+      return jsonResponse({ error: 'That picture is too large. Use a screenshot.' }, 413, origin)
+    }
+    return jsonResponse({ error: 'Expected a form.' }, 400, origin)
+  }
+  const input = validTransfer(raw)
+  if (typeof input === 'string') return jsonResponse({ error: input }, 400, origin)
+
+  // The same submission arriving again after a lost response: answer
+  // with what was stored, and store nothing new.
+  const [again] = await select<TransferRow>(db(), 'transfers', `client_id=eq.${encodeURIComponent(input.clientId)}&limit=1`)
+  if (again) {
+    if (again.email !== email) return jsonResponse({ error: 'Something went wrong with the form. Close it and try again.' }, 409, origin)
+    return jsonResponse(toSummary(again) satisfies TransferSummary, 200, origin)
+  }
+
+  const settings = await readSettings()
+  const offer = transferPlans(settings).find((p) => p.id === input.plan)
+  if (!offer) {
+    return jsonResponse({ error: `The ${PLANS[input.plan].label} plan can’t be paid by transfer just now. Choose another.` }, 409, origin)
+  }
+
+  const member = await getMember(email)
+  if (autoRenewing(member)) {
+    return jsonResponse({ error: 'You already have a plan that renews by itself, so there is nothing to pay.' }, 409, origin)
+  }
+  const latest = await latestTransfer(email)
+  if (latest?.status === 'Pending') {
+    return jsonResponse({ error: 'Your last receipt is still being checked. We’ll email you as soon as it is.' }, 409, origin)
+  }
+
+  const verdict = await scanJpeg(input.receipt)
+  if (!verdict.ok) {
+    console.warn(`[billing] receipt refused by the image check: ${verdict.reason}`)
+    return jsonResponse(
+      { error: 'That picture didn’t pass our security check. Take a fresh screenshot of the receipt and attach that.' },
+      422,
+      origin,
+    )
+  }
+
+  const [seen] = await select<{ id: string }>(
+    db(),
+    'transfers',
+    `receipt_sha256=eq.${verdict.sha256}&status=neq.Rejected&select=id&limit=1`,
+  )
+  if (seen) return jsonResponse({ error: 'This receipt has already been sent.' }, 409, origin)
+
+  const id = `trf_${crypto.randomUUID()}`
+  const key = `${id}.jpg`
+  await uploadObject(db(), key, verdict.bytes, 'image/jpeg', RECEIPT_BUCKET)
+  try {
+    const row = await insertReturning<TransferRow>(db(), 'transfers', {
+      id,
+      client_id: input.clientId,
+      email,
+      plan: input.plan,
+      amount: offer.amount,
+      currency: offer.currency,
+      sender_name: input.senderName,
+      paid_on: input.paidOn,
+      bank_reference: input.bankReference,
+      receipt_key: key,
+      receipt_sha256: verdict.sha256,
+    })
+    console.log(`[billing] transfer ${id} waiting for review (${verdict.width}x${verdict.height}, ${verdict.stripped} bytes stripped)`)
+    return jsonResponse(toSummary(row!) satisfies TransferSummary, 201, origin)
+  } catch (error) {
+    // Nothing points at the image now: take it back out.
+    await removeObjects(db(), [key], RECEIPT_BUCKET).catch((e) => console.error('[billing] receipt cleanup failed', e))
+    // A unique index lost a race: a second pending transfer, or the same receipt.
+    if (error instanceof Error && error.message.includes('(409)')) {
+      return jsonResponse({ error: 'This receipt, or another of yours, is already waiting to be checked.' }, 409, origin)
+    }
+    throw error
+  }
 }
 
 /* ------------------------------------------------------------------ */
@@ -389,8 +604,13 @@ async function reminders(req: Request): Promise<Response> {
       console.error(`[billing] ${notice.kind} reminder failed`, error)
     }
   }
-  console.log(`[billing] reminders: ${sent} sent of ${rows.length} checked`)
-  return jsonResponse({ checked: rows.length, sent }, 200)
+  // Receipt images 90 days past their decision go too (the row stays).
+  const pruned = await pruneReceipts().catch((error) => {
+    console.error('[billing] receipt pruning failed', error)
+    return 0
+  })
+  console.log(`[billing] reminders: ${sent} sent of ${rows.length} checked; ${pruned} old receipts deleted`)
+  return jsonResponse({ checked: rows.length, sent, pruned }, 200)
 }
 
 /* ------------------------------------------------------------------ */
@@ -412,6 +632,8 @@ serve(async (req) => {
     if (route === 'checkout') return await checkout(req, origin)
     if (route === 'trial') return await trial(req, origin)
     if (route === 'manage') return await manage(req, origin)
+    if (route === 'transfer-info') return await transferInfo(req, origin)
+    if (route === 'transfer') return await transfer(req, origin)
     return jsonResponse({ error: 'Not found' }, 404, origin)
   } catch (error) {
     console.error(`[billing] ${route} failed`, error)

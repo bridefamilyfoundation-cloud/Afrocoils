@@ -64,7 +64,7 @@ const ABOUT: { heading: string; body: string | string[] }[] = [
   },
   {
     heading: 'Your hair data stays on your device',
-    body: 'Your hair profile, your length checks, your calendar and your photos are stored on this phone and nowhere else, and none of it is tied to your membership. Your membership is your email: we hold it, whether it is paid up and the record of your payments, and Paystack holds your card. While you are signed in the app checks now and then that the membership is still paid, sending your sign-in token and nothing else. It also asks our website whether a newer version is out, which carries nothing about you — see Updates below.',
+    body: 'Your hair profile, your length checks, your calendar and your photos are stored on this phone and nowhere else, and none of it is tied to your membership. Your membership is your email: we hold it, whether it is paid up and the record of your payments, and Paystack holds your card. A bank transfer receipt you send is kept privately for checking and deleted 90 days after the decision. While you are signed in the app checks now and then that the membership is still paid, sending your sign-in token and nothing else. It also asks our website whether a newer version is out, which carries nothing about you — see Updates below.',
   },
   {
     heading: 'Nothing you read is generated',

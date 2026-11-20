@@ -7,11 +7,13 @@ import Members from './pages/Members'
 import Payments from './pages/Payments'
 import Questions from './pages/Questions'
 import Submissions from './pages/Submissions'
+import Transfers from './pages/Transfers'
 import { Button, Card, Problem, input } from './ui'
 
 const PAGES = {
   dashboard: { label: 'Overview', Page: Dashboard },
   members: { label: 'Members', Page: Members },
+  transfers: { label: 'Bank transfers', Page: Transfers },
   payments: { label: 'Payments', Page: Payments },
   inbox: { label: 'Mail', Page: Inbox },
   submissions: { label: 'Style submissions', Page: Submissions },
