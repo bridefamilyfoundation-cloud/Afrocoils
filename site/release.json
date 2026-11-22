@@ -1,27 +1,29 @@
 {
   "version": "0.2.0",
-  "versionCode": 12,
+  "versionCode": 14,
   "packageId": "com.afrocoils.app",
   "minSdk": 24,
   "minAndroid": "7.0",
-  "bytes": 9115331,
-  "sha256": "4098bf0376adc2ed5fe4df3d48d0d557c5f312682ae4b1b0b55d4e7017b7ef4c",
-  "released": "2026-11-12",
-  "url": "https://runhkccoeyxfgsfrzezn.supabase.co/storage/v1/object/public/releases/apk/AfroCoils-0.2.0-12.apk",
-  "download": "download/AfroCoils-0.2.0-12.apk",
-  "notes": [],
+  "bytes": 9157900,
+  "sha256": "3cb89a5c0692974ef708239acd37f159d303e6604fd4857e82998ad223b0122f",
+  "released": "2026-11-22",
+  "url": "https://runhkccoeyxfgsfrzezn.supabase.co/storage/v1/object/public/releases/apk/AfroCoils-0.2.0-14.apk",
+  "download": "download/AfroCoils-0.2.0-14.apk",
+  "notes": [
+    "After paying by card, your browser brings you straight back to the app"
+  ],
   "bundle": {
-    "code": 20,
+    "code": 21,
     "minVersionCode": 12,
-    "bytes": 4572337,
-    "sha256": "29c2b05b6be52b1a0069f0f71d7f91d5382a7281774c3701cbb916b562d2bfd0",
+    "bytes": 4573232,
+    "sha256": "30fc00bd69d63b306f5acb3e33d82c98d24f6bbf9280a77b343956921e40dc24",
     "released": "2026-11-22",
-    "url": "https://runhkccoeyxfgsfrzezn.supabase.co/storage/v1/object/public/releases/bundles/20.zip",
+    "url": "https://runhkccoeyxfgsfrzezn.supabase.co/storage/v1/object/public/releases/bundles/21.zip",
     "notes": [
-      "Back takes you to where you were in the style library, and filters stay as you set them",
-      "Styles you share are sent as soon as you submit them",
-      "Care schedules you switch off can be switched back on, and your first length check can be in cm",
-      "Clearer steps for paying, including bank transfer and fixing a failed card"
+      "Withdrawing a style you sent now takes it out of our review queue too",
+      "Sharing one of your own styles brings its photos with it",
+      "Paying by card early can no longer waste time you have already paid for",
+      "Ask remembers your questions whichever way you open it"
     ]
   }
 }
