@@ -30,6 +30,24 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 
+            <!--
+                Coming back from Paystack. After a payment the browser is
+                sent to `afrocoils://joined` (the billing function's
+                `return` route), which opens this activity, so the member
+                lands back in the app without switching to it by hand.
+                Nothing is read from the link: the app only takes it as
+                the moment to ask the server whether the payment is
+                through (MembershipSync). A copy of the app from before
+                this filter existed stays in the browser, on the page that
+                says to go back to the app.
+            -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="afrocoils" android:host="joined" />
+            </intent-filter>
+
         </activity>
 
         <provider

@@ -87,7 +87,23 @@ picture; this file is the short version of what to keep in mind when editing.
   otherwise at most every 12h); a 401 signs out, and signing out never
   touches the hair profile. A payment is believed from the signed
   webhook *or* from `transaction/verify` on the checkout's reference
-  (`_shared/membership.ts`), recorded once by `recordCharge()`. Every
+  (`_shared/membership.ts`), recorded once by `recordCharge()`. A card
+  plan runs from the day it is paid, so checkout is refused, on the
+  phone and the server (`cardTooEarly()` in `types.ts`), while more
+  than a day of paid time is left: bought earlier it would add nothing.
+  The grace days cover the wait, and a transfer, which adds on, can be
+  sent at any time. Making card charges add on instead means charges
+  become the only thing that moves `paid_until` (the subscription
+  events and `refreshMember` set it too today, and would double-count):
+  do it with Paystack in test mode, not blind. After paying, Paystack
+  sends the browser to `billing/return`, which redirects to
+  `afrocoils://joined` (an intent link limited to this package, falling
+  back to `site/public/joined.html`); the manifest's intent filter
+  opens the app and `MembershipSync` takes being opened that way as the
+  cue to check. The link carries nothing and the route reads nothing: a
+  payment is still only believed from the webhook or the verify call.
+  The filter is native, so only APK build 14 onward comes back by
+  itself. Every
   price lives in its Paystack plan, never in code — the savings on
   `/join` are computed from those prices. **Bank transfer is the second
   way to pay (added 2026-11-20):** `/join`'s `BankTransfer` shows the
@@ -251,7 +267,8 @@ picture; this file is the short version of what to keep in mind when editing.
   with a heartbeat pulse and trace (`.sos-beat`, `.sos-ring`,
   `.sos-trace` in `index.css`, all off under reduced motion) and the
   three library photos faded and blurred behind it as a backdrop. Get
-  Started goes straight to Hair Care (`/care`); "Need a quick style?"
+  Started goes straight to Hair Care (`/care`), or to Locs World for
+  a profile that says locs; "Need a quick style?"
   scrolls to the doors directly below, where Quick Hairstyle is. A
   locked phone gets "Explore more features" in the same place.
   These were two screens — a wordless cover outside `AppLayout`, then
@@ -340,8 +357,9 @@ picture; this file is the short version of what to keep in mind when editing.
     (`lib/ask/share.ts`), while `askSharing` is on — never on a re-render
     or when back replays it, and never with anything from the profile.
     Nothing is stored on the phone: on `/ask` the question lives in the
-    URL and the Earlier list in memory, and the sheet's conversation is
-    gone when the app closes.
+    URL, and the session's questions (`lib/ask/session.ts`, one list
+    shared by the sheet and `/ask`) are in memory and gone when the app
+    closes.
   - **The learning loop has a person in it.** `npm run ask:study` pulls
     the queue, re-runs each question through today's Ask and reports
     the unanswered backlog (most asked first, with `cases.ts` lines), the
@@ -436,8 +454,14 @@ picture; this file is the short version of what to keep in mind when editing.
   says nothing is uploaded in the background. Every write to
   `submissions` after an `await` uses the functional `update((current)
   => …)`, because a slow send holding a stale list would drop or
-  resurrect rows. A `Sent` row can only be *removed from the phone*;
-  the copy says so and names support for the server's. A half-filled
+  resurrect rows. Withdrawing a `Sent` row asks the server first
+  (`submissions/withdraw`, the submission's own id and nothing else):
+  a `Pending` one is deleted there, photographs then row; a reviewed
+  one is left alone and the screen says to write to support; and if
+  the server cannot be reached nothing is deleted on the phone either.
+  The privacy policy has the sentence for it. Sharing from My Styles
+  copies its photographs (`copyPhoto`) — copies, because each owner
+  deletes its own files. A half-filled
   form survives leaving the screen (in memory), and `draftPhotos` on
   the profile lists its files so an abandoned one is cleaned up.
 

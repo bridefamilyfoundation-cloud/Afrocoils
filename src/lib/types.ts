@@ -822,6 +822,26 @@ export type MemberStatus = (typeof MEMBER_STATUSES)[number]
  */
 export const MEMBERSHIP_GRACE_DAYS = 3
 
+/**
+ * How close to the end of a paid period a card plan can be bought.
+ *
+ * A card plan runs from the day it is paid (`recordCharge`), so one
+ * bought while paid time is still running adds nothing for those days:
+ * with six months left on a transfer plan, a monthly card charge bought
+ * nothing at all. Checkout is refused, on both sides, until the paid
+ * period is within this many days of ending. Nobody is locked out by
+ * waiting, because the grace days keep the app open past the end, and
+ * a bank transfer, which adds on, can be sent at any time.
+ */
+export const CARD_EARLY_DAYS = 1
+
+/** Whether a card plan bought at `now` would overlap paid time that is still running. */
+export function cardTooEarly(paidUntilISO: string | null | undefined, now: Date = new Date()): boolean {
+  if (!paidUntilISO) return false
+  const until = Date.parse(paidUntilISO)
+  return Number.isFinite(until) && until - now.getTime() > CARD_EARLY_DAYS * 86_400_000
+}
+
 /** Whether a paid-until date still opens the app at `now`. The paid half of the rule, on both sides. */
 export function membershipOpen(paidUntilISO: string | null | undefined, now: Date = new Date()): boolean {
   if (!paidUntilISO) return false
@@ -979,6 +999,17 @@ export interface AdminSessionResponse {
   token: string
   expiresISO: string
 }
+
+/**
+ * The link that brings a member back into the app after paying:
+ * `afrocoils://joined`. The Android manifest declares it, the billing
+ * function's `return` route sends the browser to it, and the app treats
+ * being opened by it as the moment to check the membership. It carries
+ * nothing.
+ */
+export const RETURN_SCHEME = 'afrocoils'
+export const RETURN_HOST = 'joined'
+export const APP_PACKAGE = 'com.afrocoils.app'
 
 /** POST billing/checkout and billing/manage (Bearer token): a Paystack page to open in the browser. */
 export interface BillingLinkResponse {
@@ -1234,6 +1265,21 @@ export interface SubmissionRequest {
   rightsConfirmed: boolean
   /** The device's own id, echoed back so it can match the reply to a row. */
   clientId: string
+}
+
+/** POST submissions/withdraw: take back a style that was sent and has not been reviewed yet. */
+export interface WithdrawSubmissionRequest {
+  /** The id the phone gave the submission when it sent it. Nothing else is sent. */
+  clientId: string
+}
+
+export interface WithdrawSubmissionResponse {
+  /**
+   * True: the submission and its photographs are gone from the server
+   * (or were never there). False: a person has already reviewed it, so
+   * it is not the phone's to delete any more.
+   */
+  withdrawn: boolean
 }
 
 export interface SubmissionResponse {

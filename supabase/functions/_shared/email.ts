@@ -174,7 +174,7 @@ const NOTICE: Record<NoticeKind, (d: NoticeDetails) => { subject: string; lines:
     subject: `Your AfroCoils membership ends on ${d.date}`,
     lines: [
       `Your ${d.planLabel ? `${d.planLabel} ` : ''}membership is not set to renew, and ends on ${d.date}.`,
-      'To keep the app open, choose a plan in the app before then: My Hair Profile → Membership → Choose a plan.',
+      'To keep the app open, choose a plan in the app: My Hair Profile → Membership → Choose a plan. Paying by bank transfer now adds on to the time you have. A card plan can be started from the day this one ends, and the app stays open three more days so there is no gap.',
       'Your hair profile, history and photos stay on your phone either way.',
     ],
   }),

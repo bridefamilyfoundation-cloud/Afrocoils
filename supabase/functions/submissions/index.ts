@@ -1,4 +1,8 @@
-import type { SubmissionRequest, SubmissionResponse } from '../../../src/lib/types.ts'
+import type {
+  SubmissionRequest,
+  SubmissionResponse,
+  WithdrawSubmissionResponse,
+} from '../../../src/lib/types.ts'
 import {
   HAIR_TYPES,
   MAX_PHOTOS_PER_SUBMISSION,
@@ -19,6 +23,7 @@ import {
   putPhoto,
   putSubmission,
   removePhotos,
+  removeSubmission,
   storeIsDurable,
 } from '../_shared/store.ts'
 
@@ -351,8 +356,56 @@ async function POST(req: Request): Promise<Response> {
   }
 }
 
+/**
+ * `POST submissions/withdraw` `{ clientId }`: the contributor taking a
+ * sent style back before anyone has reviewed it.
+ *
+ * The id is the one the phone made up when it queued the submission and
+ * the only thing it sends; knowing it is what shows the request comes
+ * from the phone that submitted. A pending submission is deleted,
+ * photographs first and then the row. One that has been reviewed is a
+ * decision a person made, and is left alone: the answer says so and the
+ * app points at support. An id that matches nothing answers the same as
+ * a successful withdrawal, so a retry after a lost response is harmless
+ * and the route says nothing about which ids exist.
+ */
+async function WITHDRAW(req: Request): Promise<Response> {
+  const origin = req.headers.get('origin') ?? undefined
+  const limit = await checkLimits(req, 'submissions')
+  if (!limit.allowed) return limitResponse(limit, origin)
+
+  let raw: unknown
+  try {
+    raw = await readJson(req, 1024)
+  } catch {
+    return jsonResponse({ error: 'Invalid request' }, 400, origin)
+  }
+  const clientId =
+    typeof raw === 'object' && raw !== null ? (raw as { clientId?: unknown }).clientId : undefined
+  if (typeof clientId !== 'string' || !CLIENT_ID.test(clientId)) {
+    return jsonResponse({ error: 'Invalid request' }, 400, origin)
+  }
+
+  try {
+    const held = await findSubmissionByClientId(clientId)
+    if (held && held.review !== 'Pending') {
+      return jsonResponse({ withdrawn: false } satisfies WithdrawSubmissionResponse, 200, origin)
+    }
+    if (held) {
+      await removePhotos(held.photoKeys)
+      await removeSubmission(held.id)
+      console.log(`[submissions] ${held.id} withdrawn by its contributor`)
+    }
+    return jsonResponse({ withdrawn: true } satisfies WithdrawSubmissionResponse, 200, origin)
+  } catch (error) {
+    console.error('[submissions] withdraw failed', error)
+    return jsonResponse({ error: 'Could not withdraw that just now. Try again in a moment.' }, 502, origin)
+  }
+}
+
 serve((req) => {
   if (req.method === 'OPTIONS') return OPTIONS(req)
+  if (req.method === 'POST' && new URL(req.url).pathname.endsWith('/withdraw')) return WITHDRAW(req)
   if (req.method === 'POST') return POST(req)
   return jsonResponse({ error: 'Method not allowed' }, 405, req.headers.get('origin') ?? undefined)
 })

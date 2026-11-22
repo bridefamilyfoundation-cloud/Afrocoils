@@ -197,7 +197,10 @@ function PrivacyPolicy() {
           Nothing else in your profile goes with a submission. Your name, your avatar, your length
           history, your calendar and your saved styles are not part of a submission. A
           submission is stored on your device first and only sent afterwards, so nothing is
-          uploaded in the background and a failed send costs you nothing.
+          uploaded in the background and a failed send costs you nothing. If you withdraw a
+          submission that has been sent and not yet reviewed, the app sends that
+          submission&rsquo;s own reference, and nothing else, so we can delete it and its
+          photographs from our server.
         </p>
       </Article>
 
@@ -385,9 +388,11 @@ function Terms() {
           year, from the date you paid — at the plan&rsquo;s price, until you cancel. We email
           you three days before it renews. Cancel any time from My Hair Profile (Manage or
           cancel opens Paystack&rsquo;s page for your subscription). Cancelling stops the next
-          charge; the app stays open to the end of the period you have already paid for. To
-          change plan, cancel the current one and choose the new one; it starts the day you
-          pay for it.
+          charge; the app stays open to the end of the period you have already paid for, and
+          for three days after. To change plan, cancel the current one and choose the new
+          one. A card plan starts the day you pay for it, so it can be started once the
+          period you have paid for is ending; a plan paid by bank transfer adds on to the
+          time you have and can be paid at any point.
         </p>
         <p>
           If a renewal fails, Paystack tries the card again, and the app stays open for three

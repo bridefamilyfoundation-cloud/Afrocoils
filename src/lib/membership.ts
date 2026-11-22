@@ -248,7 +248,7 @@ export function expiryNotice(membership: Membership | undefined, now: Date = new
   if (autoRenews(membership, now) || daysLeft(until, now) > 3) return null
   return {
     tone: daysLeft(until, now) <= 1 ? 'warn' : 'info',
-    text: `Your membership ends on ${longDate(until)} and won’t renew. Choose a plan to keep AfroCoils open.`,
+    text: `Your membership ends on ${longDate(until)} and won’t renew. Renew by bank transfer now, or by card from that day, to keep AfroCoils open.`,
     action: 'choose',
   }
 }

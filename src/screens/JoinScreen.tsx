@@ -9,7 +9,6 @@ import {
   autoRenews,
   checkStatus,
   checkoutUrl,
-  daysLeft,
   hasAccess,
   longDate,
   manageUrl,
@@ -24,7 +23,15 @@ import {
   verifyCode,
 } from '../lib/membership'
 import { useHairProfile } from '../lib/profile-store'
-import { PLANS, TRIAL_DAYS, formatAmount, type PlanId, type PlanOffer } from '../lib/types'
+import {
+  MEMBERSHIP_GRACE_DAYS,
+  PLANS,
+  TRIAL_DAYS,
+  cardTooEarly,
+  formatAmount,
+  type PlanId,
+  type PlanOffer,
+} from '../lib/types'
 
 /**
  * `/join` — registration, the free trial, choosing a plan, paying and
@@ -226,9 +233,11 @@ export default function JoinScreen() {
   const endsISO = membership && open ? accessEndsISO(membership) : null
   const offer = offers?.find((o) => o.id === chosen)
   // Paid time still to run on a plan that will not renew. A card plan
-  // starts the day it is paid (members.ts, `recordCharge`), so buying one
-  // now adds nothing until that time is nearly up; a transfer adds on.
-  const paidLeft = membership && onPaidTime(membership) && !autoRenews(membership) ? daysLeft(membership.paidUntilISO) : 0
+  // starts the day it is paid (members.ts, `recordCharge`), so one bought
+  // now would add nothing for those days: the card button waits until
+  // the period is nearly over, and the server refuses the same way. A
+  // transfer adds on, so that way to pay is open throughout.
+  const tooEarly = !!membership && !autoRenews(membership) && cardTooEarly(membership.paidUntilISO)
   const showManage = needsManage || (!!membership && membership.status === 'attention' && membership.card !== false)
 
   const heading =
@@ -374,11 +383,13 @@ export default function JoinScreen() {
                 support@afrocoils.app and we&rsquo;ll help you join.
               </p>
             )}
-            {paidLeft > 3 && (
+            {tooEarly && (
               <p className="mb-md rounded-xl bg-secondary-fixed/40 p-md font-body-md text-caption text-on-surface">
                 You are already paid up until {longDate(membership!.paidUntilISO!)}. A card plan
-                starts the day you pay, so subscribing today adds nothing to that. Wait until
-                nearer the date, or pay by bank transfer, which adds on to the time you have.
+                starts the day you pay, so paying by card today would add nothing to that. You
+                can start one from that day, and the app stays open {MEMBERSHIP_GRACE_DAYS} days
+                past it, so there is no gap. To pay sooner, use bank transfer below: it adds on
+                to the time you have.
               </p>
             )}
             {showManage && (
@@ -453,7 +464,7 @@ export default function JoinScreen() {
               {offer ? PLANS[offer.id].duration.replace(/^1 /, '') : 'period'} at the plan&rsquo;s
               price until you cancel. Cancel any time from My Hair Profile; you keep access to the
               end of the period you paid for. We email you before a plan renews.
-              {endsISO && (
+              {endsISO && !tooEarly && (
                 <>
                   {' '}
                   You are open until {longDate(endsISO)}; a plan you choose now starts the day you pay.
@@ -463,7 +474,7 @@ export default function JoinScreen() {
             <button
               type="button"
               onClick={pay}
-              disabled={busy || !offer}
+              disabled={busy || !offer || tooEarly}
               className="mb-sm flex w-full items-center justify-center gap-sm rounded-full bg-secondary py-4 font-label-md text-body-lg font-bold text-on-secondary shadow-card transition-all active:scale-95 disabled:opacity-60"
             >
               <Icon name="open_in_new" className="text-[20px]" />
@@ -530,7 +541,7 @@ export default function JoinScreen() {
             <Icon name="account_balance" className="text-[22px]" />
             Pay by bank transfer
           </h2>
-          {byTransfer || offers === null || offers?.length === 0 ? (
+          {byTransfer || tooEarly || offers === null || offers?.length === 0 ? (
             <div className="mt-md">
               <BankTransfer token={membership.token} email={membership.email} onRecheck={recheck} busyOutside={busy} />
             </div>

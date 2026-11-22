@@ -7,11 +7,11 @@ import UserPhoto from '../components/UserPhoto'
 import ScreenFallback from '../components/ScreenFallback'
 import { CATEGORY_ICONS } from '../content/styles'
 import { newEventId } from '../lib/calendar'
-import { capturePhoto, deletePhoto, PhotoError, photosAvailable } from '../lib/photos'
+import { capturePhoto, copyPhoto, deletePhoto, PhotoError, photosAvailable } from '../lib/photos'
 import { useHairProfile } from '../lib/profile-store'
 import { useBackDismiss } from '../lib/back-button'
 import { SubmissionError, sendSubmission } from '../lib/submissions'
-import { apiConfigured } from '../lib/api'
+import { apiConfigured, withdrawStyle } from '../lib/api'
 import { isNative } from '../native/shell'
 import type { HairType, StyleSubmission } from '../lib/types'
 import {
@@ -268,6 +268,42 @@ function SubmitStyleForm() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  /*
+   * Shared from My Styles: bring its photographs too. Copies, not the
+   * same files: the logged style and the submission each delete their
+   * own when they go. Only on a fresh form, never over a draft that was
+   * put back.
+   */
+  const seeded = useRef(false)
+  useEffect(() => {
+    if (seeded.current || kept || !seed || seed.photos.length === 0) return
+    seeded.current = true
+    let left = false
+    setBusy(true)
+    void Promise.all(seed.photos.slice(0, MAX_PHOTOS_PER_SUBMISSION).map((path) => copyPhoto(path)))
+      .then((copies) => {
+        const made = copies.filter((path): path is string => path !== undefined)
+        // Gone before the copies landed: nothing will ever point at them.
+        if (left) {
+          for (const path of made) void deletePhoto(path)
+          return
+        }
+        if (made.length === 0) return
+        const next = [...pending.current, ...made].slice(0, MAX_PHOTOS_PER_SUBMISSION)
+        setPhotos(next)
+        update({ draftPhotos: next })
+      })
+      .finally(() => !left && setBusy(false))
+    return () => {
+      left = true
+      // So a remount (React's development double-mount) copies again
+      // rather than keeping the copies this run just deleted.
+      seeded.current = false
+    }
+    // Once, for the style the form was opened from.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   /** The profile's list of photographs only this form points at. */
   function recordDraftPhotos(next: string[]) {
     update({ draftPhotos: next.length > 0 ? next : undefined })
@@ -360,8 +396,33 @@ function SubmitStyleForm() {
     })
   }
 
+  /** What happened to the last withdrawal, when it needs saying. */
+  const [withdrawNote, setWithdrawNote] = useState<string | null>(null)
+
   async function withdraw(submission: StyleSubmission) {
     setConfirming(null)
+    setWithdrawNote(null)
+    /*
+     * A sent style is in the review queue, so withdrawing it starts
+     * there. If the server cannot be reached nothing is deleted: removing
+     * the phone's copy alone would leave the style waiting for review
+     * with no way left to take it back.
+     */
+    if (submission.status === 'Sent' && canSend) {
+      try {
+        const withdrawn = await withdrawStyle(submission.id)
+        if (!withdrawn) {
+          setWithdrawNote(
+            `${submission.name} has already been reviewed, so it could only be removed from this phone. To have it taken down, write to support@afrocoils.app with the style’s name.`,
+          )
+        }
+      } catch {
+        setWithdrawNote(
+          `Couldn’t reach the library, so ${submission.name} was not withdrawn. Try again when you have a connection.`,
+        )
+        return
+      }
+    }
     // Files first, then the record — the same order MyStyles uses. The
     // other way round strands bytes on disk with nothing pointing at them.
     await Promise.all(submission.photos.map((path) => deletePhoto(path)))
@@ -551,6 +612,11 @@ function SubmitStyleForm() {
         <h2 className="mb-md font-headline-md text-body-lg font-bold text-on-surface">
           Your submissions
         </h2>
+        {withdrawNote && (
+          <p role="status" className="mb-md rounded-xl bg-surface-container p-md font-body-md text-caption text-on-surface">
+            {withdrawNote}
+          </p>
+        )}
         {submissions.length === 0 ? (
           <p className="font-body-md text-body-md text-on-surface-variant">
             Nothing submitted yet.
@@ -602,7 +668,7 @@ function SubmitStyleForm() {
                     <button
                       type="button"
                       onClick={() => setConfirming(s.id)}
-                      aria-label={s.status === 'Sent' ? `Remove ${s.name} from this phone` : `Withdraw ${s.name}`}
+                      aria-label={`Withdraw ${s.name}`}
                       className="-m-2 flex h-12 w-12 shrink-0 items-center justify-center rounded-full text-outline active:scale-90"
                     >
                       <Icon name="delete" />
@@ -650,12 +716,12 @@ function SubmitStyleForm() {
                 {confirming === s.id && (
                   <div className="mt-md rounded-xl bg-surface-container p-md">
                     <p className="mb-sm font-body-md text-caption text-on-surface-variant">
-                      {s.status === 'Sent' ? 'This removes' : 'Withdrawing deletes'} {s.name}
+                      Withdrawing deletes {s.name}
                       {s.photos.length > 0
                         ? ` and its ${s.photos.length} photograph${s.photos.length === 1 ? '' : 's'}`
                         : ''}
                       {s.status === 'Sent'
-                        ? ' from this phone only. It has already been sent, so the copy waiting for review stays: to withdraw that too, write to support@afrocoils.app with the style’s name.'
+                        ? ' from this phone and takes it out of our review queue. There is no undo.'
                         : '. There is no undo.'}
                     </p>
                     <div className="flex flex-wrap gap-sm">
@@ -664,7 +730,7 @@ function SubmitStyleForm() {
                         onClick={() => void withdraw(s)}
                         className="rounded-full bg-error px-lg py-2 font-label-md text-caption text-on-error active:scale-95"
                       >
-                        {s.status === 'Sent' ? 'Remove from this phone' : `Withdraw${s.photos.length > 0 ? ', photos and all' : ''}`}
+                        Withdraw{s.photos.length > 0 ? ', photos and all' : ''}
                       </button>
                       <button
                         type="button"

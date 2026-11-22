@@ -6,7 +6,9 @@
     <meta name="robots" content="noindex" />
     <title>Payment received · AfroCoils</title>
     <!--
-      Where Paystack sends someone after paying (PAYSTACK_CALLBACK_URL).
+      Where someone lands after paying when the browser cannot open the
+      app by itself (the billing function's `return` route redirects into
+      the app first, and falls back to this page; PAYSTACK_CALLBACK_URL).
       Static on purpose: it trusts nothing in its query string and says
       nothing it cannot know. The app finds out from the billing webhook,
       not from this page.
@@ -17,6 +19,7 @@
       h1 { margin: 0 0 0.75rem; font-size: 1.6rem; color: #3F1708; }
       p { margin: 0 0 1rem; line-height: 1.55; }
       a { color: #E2583E; font-weight: 700; }
+      a.back { display: block; margin: 0 0 1rem; padding: 0.9rem 1rem; border-radius: 999px; background: #E2583E; color: #fff; text-align: center; text-decoration: none; }
       .small { font-size: 0.9rem; opacity: 0.85; }
     </style>
   </head>
@@ -24,6 +27,9 @@
     <main>
       <h1>Thank you.</h1>
       <p>Your payment is with Paystack. Go back to the AfroCoils app: it opens by itself once the payment is through, usually within a minute.</p>
+      <!-- An Android intent link: opens the app where it can, and comes
+           back to this page where it cannot. No script on this page. -->
+      <a class="back" href="intent://joined#Intent;scheme=afrocoils;package=com.afrocoils.app;S.browser_fallback_url=https%3A%2F%2Fafrocoils.app%2Fjoined.html;end">Return to AfroCoils</a>
       <p>If it is still locked after a few minutes, tap <strong>I&rsquo;ve paid &mdash; check again</strong> on the Become a member screen.</p>
       <p class="small">Something wrong? Write to <a href="mailto:support@afrocoils.app">support@afrocoils.app</a> from the email you paid with.</p>
     </main>

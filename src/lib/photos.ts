@@ -227,6 +227,24 @@ export async function deletePhoto(path: string): Promise<void> {
 }
 
 /**
+ * A second file holding the same picture, and its filename.
+ *
+ * For handing a photograph to a second owner: a style logged under My
+ * Styles and the submission made from it each delete their own files
+ * when they go, so they cannot share one. Undefined when the original
+ * is gone.
+ */
+export async function copyPhoto(path: string): Promise<string | undefined> {
+  const base64 = await readPhotoBase64(path)
+  if (!base64) return undefined
+  try {
+    return await storeBase64(base64)
+  } catch {
+    return undefined
+  }
+}
+
+/**
  * Whether picking photos is available at all.
  *
  * False in a desktop browser without the plugin's web shim, where the

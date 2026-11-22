@@ -146,7 +146,9 @@ POSTs to `auth` when signing in and on a status check (on open and on return,
 at most every twelve hours while paid), a POST to `billing` when the user taps
 Subscribe or Manage, a POST to `questions` each time a question is asked in Ask
 (while sharing is on, never with the token), a POST to `submissions` only when
-the user taps Share, plus a GET of the
+the user taps Share (and one to `submissions/withdraw`, carrying that
+submission's own reference and nothing else, when they withdraw a sent style),
+plus a GET of the
 public `latest.json` in the Supabase `releases` bucket on open (the update
 check, `src/lib/updates.ts`).
 That GET sends no user data and no identifier, so it declares nothing — but say

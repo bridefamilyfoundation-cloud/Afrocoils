@@ -17,6 +17,7 @@
 import {
   PHOTO_BUCKET,
   insert,
+  remove,
   removeObjects,
   select,
   supabaseConfig,
@@ -101,6 +102,11 @@ export async function findSubmissionByClientId(clientId: string): Promise<Stored
     `client_id=eq.${encodeURIComponent(clientId)}&limit=1`,
   )
   return rows[0] ? fromRow(rows[0]) : null
+}
+
+/** Delete a submission's row. Its photographs go first (`removePhotos`), the same order the device uses. */
+export async function removeSubmission(id: string): Promise<void> {
+  await remove(config(), 'submissions', `id=eq.${encodeURIComponent(id)}`)
 }
 
 /* ------------------------------------------------------------------ *

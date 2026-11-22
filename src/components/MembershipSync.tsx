@@ -1,13 +1,20 @@
 import { useEffect, useRef } from 'react'
+import { App } from '@capacitor/app'
+import { Capacitor } from '@capacitor/core'
 import {
   MembershipError,
   checkStatus,
   checkoutRecentlyOpened,
   dueForCheck,
   hasAccess,
+  markCheckoutOpened,
   toMembership,
 } from '../lib/membership'
 import { useHairProfile } from '../lib/profile-store'
+import { RETURN_HOST, RETURN_SCHEME } from '../lib/types'
+
+/** Whether the app was opened by the link Paystack's return route sends the browser to. */
+const isReturn = (url: string | undefined) => url?.startsWith(`${RETURN_SCHEME}://${RETURN_HOST}`) === true
 
 /**
  * Keeps the phone's copy of the membership current. Draws nothing.
@@ -51,7 +58,27 @@ export default function MembershipSync() {
     void check(true)
     const onVisible = () => document.visibilityState === 'visible' && void check(true)
     document.addEventListener('visibilitychange', onVisible)
-    return () => document.removeEventListener('visibilitychange', onVisible)
+
+    /*
+     * Opened by the return link: someone has just paid. That is the same
+     * signal as coming back after opening a checkout, and it has to be
+     * given here because the app may have been closed in the meantime,
+     * which loses the in-memory note that a checkout was opened. Nothing
+     * is read from the link beyond the fact of it.
+     */
+    const returned = (url: string | undefined) => {
+      if (!isReturn(url)) return
+      markCheckoutOpened()
+      void check(true)
+    }
+    const native = Capacitor.isNativePlatform()
+    if (native) void App.getLaunchUrl().then((launch) => returned(launch?.url)).catch(() => undefined)
+    const listener = native ? App.addListener('appUrlOpen', ({ url }) => returned(url)) : undefined
+
+    return () => {
+      document.removeEventListener('visibilitychange', onVisible)
+      void listener?.then((handle) => handle.remove())
+    }
   }, [ready, update])
 
   return null

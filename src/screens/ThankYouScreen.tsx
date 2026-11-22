@@ -85,10 +85,10 @@ export default function ThankYouScreen() {
             You can change your mind
           </h3>
           <p className="font-body-md text-body-md text-on-surface-variant">
-            Until it has been sent, withdraw it from the bottom of the Share a style screen;
-            that deletes its photographs from this phone as well as the entry. Once it has
-            been sent, write to support@afrocoils.app with the style&rsquo;s name and we will
-            take it out of the review queue.
+            Withdraw it from the bottom of the Share a style screen. That deletes its
+            photographs from this phone as well as the entry, and if it has already been sent
+            it takes it out of our review queue too. Once a person has reviewed it, write to
+            support@afrocoils.app with the style&rsquo;s name instead.
           </p>
         </div>
       </section>

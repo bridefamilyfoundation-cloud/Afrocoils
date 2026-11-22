@@ -1,4 +1,10 @@
-import type { AskQuestionRequest, SubmissionRequest, SubmissionResponse } from './types'
+import type {
+  AskQuestionRequest,
+  SubmissionRequest,
+  SubmissionResponse,
+  WithdrawSubmissionRequest,
+  WithdrawSubmissionResponse,
+} from './types'
 
 /**
  * The app's network calls that carry anything the user wrote.
@@ -67,6 +73,25 @@ export async function submitStyle(
   })
   if (!response.ok) throw new ApiError(await readError(response))
   return (await response.json()) as SubmissionResponse
+}
+
+/**
+ * Take a sent style back out of the review queue.
+ *
+ * Sends the submission's own id and nothing else. Answers whether the
+ * server's copy is gone: false means a person has already reviewed it.
+ * Throws when the server could not be reached, so the caller keeps the
+ * row rather than deleting the phone's copy of something still queued
+ * for review.
+ */
+export async function withdrawStyle(clientId: string): Promise<boolean> {
+  const response = await fetch(`${BASE_URL}/submissions/withdraw`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ clientId } satisfies WithdrawSubmissionRequest),
+  })
+  if (!response.ok) throw new ApiError(await readError(response))
+  return ((await response.json()) as WithdrawSubmissionResponse).withdrawn
 }
 
 /**

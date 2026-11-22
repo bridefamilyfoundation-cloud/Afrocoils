@@ -14,6 +14,12 @@
     identical to the server being down. Release builds reach the deployed
     functions over https and are unaffected by any of this.
 -->
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
-    <application android:usesCleartextTraffic="true" />
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+    <!-- `tools:replace`: the main manifest now states `false` outright, and
+         without this the two values are a merge conflict that fails every
+         debug build. -->
+    <application
+        android:usesCleartextTraffic="true"
+        tools:replace="android:usesCleartextTraffic" />
 </manifest>

@@ -29,7 +29,7 @@ const TITLES: Record<string, string> = {
   '/home': `${SUFFIX} — Hair SOS for type 4 hair`,
   '/sos': `${SUFFIX} — Hair SOS for type 4 hair`,
   '/sos/quick': `Quick hairstyles by the time you have · ${SUFFIX}`,
-  '/sos/problem': `Hair problems and care guides · ${SUFFIX}`,
+  '/sos/problem': `Hair Problem · ${SUFFIX}`,
   '/styles': `Hair Styles · ${SUFFIX}`,
   '/styles/recommended': `Hairstyle recommendations for your hair · ${SUFFIX}`,
   '/styles/submit': `Contribute a style · ${SUFFIX}`,

@@ -28,6 +28,8 @@ export default function BioCard() {
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string>()
   const [editingName, setEditingName] = useState(false)
+  // Removing deletes the file, so the link asks once before it does.
+  const [confirmRemove, setConfirmRemove] = useState(false)
 
   async function pickPhoto() {
     setError(undefined)
@@ -49,6 +51,7 @@ export default function BioCard() {
 
   async function removePhoto() {
     const previous = bio.photo
+    setConfirmRemove(false)
     update({ bio: { ...bio, photo: undefined } })
     if (previous) await deletePhoto(previous)
   }
@@ -116,15 +119,29 @@ export default function BioCard() {
           </button>
         )}
 
-        {bio.photo && (
-          <button
-            type="button"
-            onClick={removePhoto}
-            className="mb-xs font-caption text-caption text-outline underline"
-          >
-            Remove photo
-          </button>
-        )}
+        {bio.photo &&
+          (confirmRemove ? (
+            <span className="mb-xs flex items-center gap-sm font-caption text-caption">
+              <button type="button" onClick={removePhoto} className="text-error underline">
+                Yes, remove it
+              </button>
+              <button
+                type="button"
+                onClick={() => setConfirmRemove(false)}
+                className="text-outline underline"
+              >
+                Keep it
+              </button>
+            </span>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setConfirmRemove(true)}
+              className="mb-xs font-caption text-caption text-outline underline"
+            >
+              Remove photo
+            </button>
+          ))}
 
         {error && (
           <p className="mb-xs font-caption text-caption text-primary" role="alert">

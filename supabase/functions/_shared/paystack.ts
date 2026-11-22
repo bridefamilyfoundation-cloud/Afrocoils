@@ -100,6 +100,21 @@ export async function planOffers(): Promise<PlanOffer[]> {
  * Checkout and verification
  * ------------------------------------------------------------------ */
 
+/** The page that says "go back to the app", for a browser that cannot open it. */
+export function returnFallback(): string {
+  return env('PAYSTACK_CALLBACK_URL') || 'https://afrocoils.app/joined.html'
+}
+
+/**
+ * Where Paystack sends the browser after a payment: the billing
+ * function's `return` route, which redirects into the app. Falls back
+ * to the static page when the function's own address is unknown.
+ */
+function returnUrl(): string {
+  const base = env('SUPABASE_URL')
+  return base ? `${base.replace(/\/$/, '')}/functions/v1/billing/return` : returnFallback()
+}
+
 /**
  * A Paystack checkout page that subscribes `email` to `plan`. The
  * amount is required by the API and overridden by the plan's own. The
@@ -116,7 +131,7 @@ export async function startCheckout(email: string, plan: PlanId): Promise<{ url:
       email,
       amount: price?.amount ?? 100,
       plan: code,
-      callback_url: env('PAYSTACK_CALLBACK_URL') || 'https://afrocoils.app/joined.html',
+      callback_url: returnUrl(),
       channels: ['card'],
       metadata: { source: 'afrocoils-app', plan },
     }),

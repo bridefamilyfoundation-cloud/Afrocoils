@@ -44,7 +44,8 @@ const SECTIONS: {
     body: (
       <>
         <p>
-          The app opens on Hair SOS. Get Started goes to Hair Care, and &ldquo;Need a quick
+          The app opens on Hair SOS. Get Started goes to Hair Care (Locs World if your
+          profile says locs), and &ldquo;Need a quick
           style?&rdquo; scrolls down to the two doors; nothing else is needed to use it.
         </p>
         <p>
@@ -487,10 +488,11 @@ const SECTIONS: {
           When you tap submit, your submission is saved on this phone, listed on the Share a
           style screen as Queued, and sent straight away. If there is no signal it stays
           queued, and its row has a &ldquo;Send to the library&rdquo; button for when you are
-          back online; nothing is sent later without that tap. You can withdraw it until it
-          is sent. Once sent, a person reads it before anything is published, and removing it
-          from the screen only removes your copy: write to support@afrocoils.app to take a
-          sent style out of the review queue.
+          back online; nothing is sent later without that tap. Once sent, a person reads it
+          before anything is published. You can withdraw it from the same screen: that
+          deletes it from this phone and, if it was sent and has not been reviewed yet, from
+          our review queue too. Sharing one of your own styles from My Styles brings its
+          photos with it.
         </p>
       </>
     ),

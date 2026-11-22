@@ -122,7 +122,7 @@ npx supabase secrets set --project-ref runhkccoeyxfgsfrzezn `
   PAYSTACK_PLAN_BIANNUAL=<PLN_…> `
   PAYSTACK_PLAN_ANNUAL=<PLN_…> `
   CRON_SECRET=<48 random characters> `
-  PAYSTACK_CALLBACK_URL=https://afrocoils.app/joined.html `
+  PAYSTACK_CALLBACK_URL=https://afrocoils.app/joined.html `   # the fallback page; see "Coming back from Paystack"
   ADMIN_EMAILS=<your email>,<anyone else>
 npm run db:push          # 0005: members, login_codes, payments, support_messages
                          # 0006: plans, trials, pending checkouts, the daily reminder job
@@ -145,6 +145,25 @@ Generate `AUTH_SECRET` (and `CRON_SECRET`) with
 Changing it signs every phone out (their next status check answers 401);
 keep it stable. None of these values belongs in an `.env` file, the repo or
 anything `VITE_`-prefixed.
+
+## Coming back from Paystack
+
+After a payment Paystack sends the browser to the billing function's
+`return` route (`…/functions/v1/billing/return`; the checkout sets this
+itself, there is nothing to configure). That route redirects to
+`afrocoils://joined`, which opens the app, and the app asks the server
+straight away whether the payment is through.
+
+Opening the app this way needs a copy that declares the link: APK build
+14 or later (the intent filter in `AndroidManifest.xml`). An older copy,
+or a desktop browser, lands on `afrocoils.app/joined.html` instead, the
+page that says to go back to the app, with a "Return to AfroCoils"
+button. `PAYSTACK_CALLBACK_URL`, if set, is that fallback page.
+
+To test: pay with a test card on a phone with build 14+ and watch the
+browser hand back to the app. If the browser stays on the thank-you
+page, tap the button; a browser that blocks the automatic hand-off still
+honours the tap.
 
 ## 5. admin.afrocoils.app (you, once)
 

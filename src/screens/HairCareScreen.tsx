@@ -71,7 +71,7 @@ const ROUTES: {
     icon: 'warning',
     letter: 'E',
     title: 'Something is wrong',
-    body: 'Dryness, an itchy scalp, buildup, breakage. Start from the symptom and read what it usually is.',
+    body: 'Dryness, an itchy scalp, buildup, breakage. Opens Hair Problem: start from the symptom and read what it usually is.',
   },
 ]
 

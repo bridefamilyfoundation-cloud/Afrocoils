@@ -7,12 +7,16 @@ import type {
 } from '../../../src/lib/types.ts'
 import {
   BANK_REFERENCE_PATTERN,
+  APP_PACKAGE,
   MAX_RECEIPT_BYTES,
   MEMBERSHIP_GRACE_DAYS,
   PLANS,
+  RETURN_HOST,
+  RETURN_SCHEME,
   SENDER_NAME_PATTERN,
   TRANSFER_MAX_AGE_DAYS,
   TRIAL_DAYS,
+  cardTooEarly,
   formatAmount,
   isPlanId,
   membershipOpen,
@@ -51,6 +55,7 @@ import {
   planCodeFor,
   planIdFor,
   planPrice,
+  returnFallback,
   startCheckout,
   verifyPaystackSignature,
 } from '../_shared/paystack.ts'
@@ -115,6 +120,19 @@ async function checkout(req: Request, origin?: string): Promise<Response> {
           'You already have a plan that renews by itself. To switch plans, cancel it first under Manage or cancel, then choose the new one.',
       },
       409,
+      origin,
+    )
+  }
+  // A card plan starts the day it is paid. Bought while paid time is
+  // still running it would add nothing for those days, so it waits
+  // until that time is nearly up (`CARD_EARLY_DAYS`). 400, not 409: the
+  // phone reads 409 here as "a card subscription is still live".
+  if (cardTooEarly(member?.paid_until)) {
+    return jsonResponse(
+      {
+        error: `You are already paid up until ${longDate(member!.paid_until!)}. A card plan starts the day you pay, so it can be started from that day; the app stays open three days past it. To pay sooner, use bank transfer, which adds on to the time you have.`,
+      },
+      400,
       origin,
     )
   }
@@ -613,14 +631,46 @@ async function reminders(req: Request): Promise<Response> {
   return jsonResponse({ checked: rows.length, sent, pruned }, 200)
 }
 
+/* ------------------------------------------------------------------ *
+ * Coming back from Paystack
+ * ------------------------------------------------------------------ */
+
+/**
+ * `GET billing/return`: where Paystack sends the browser once a payment
+ * is made. It answers with a redirect into the app, so the member is
+ * back where they started without finding the app again by hand.
+ *
+ * The redirect is an Android intent link for `afrocoils://joined`,
+ * limited to this app's package, with the "go back to the app" page as
+ * its fallback: a browser that cannot open the app (a copy from before
+ * the link existed, or a desktop) shows that page instead, which is
+ * what everyone saw before.
+ *
+ * It trusts nothing and records nothing. Paystack adds the payment's
+ * reference to the address; it is not read here, because the phone
+ * finds out about the payment from the webhook and the status check,
+ * never from a link someone could type.
+ */
+function returnToApp(): Response {
+  const fallback = returnFallback()
+  const intent =
+    `intent://${RETURN_HOST}#Intent;scheme=${RETURN_SCHEME};package=${APP_PACKAGE};` +
+    `S.browser_fallback_url=${encodeURIComponent(fallback)};end`
+  return new Response(null, {
+    status: 302,
+    headers: { Location: intent, 'Cache-Control': 'no-store', 'Referrer-Policy': 'no-referrer' },
+  })
+}
+
 /* ------------------------------------------------------------------ */
 
 serve(async (req) => {
   const origin = req.headers.get('origin') ?? undefined
+  const route = new URL(req.url).pathname.split('/').pop()
+  if (req.method === 'GET' && route === 'return') return returnToApp()
   if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers: corsHeaders(origin) })
   if (req.method !== 'POST') return jsonResponse({ error: 'Method not allowed' }, 405, origin)
 
-  const route = new URL(req.url).pathname.split('/').pop()
   try {
     // Paystack and the scheduler are not rate-limited by IP: a burst of
     // real events must not be refused. Their secrets keep everyone else out.

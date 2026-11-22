@@ -3,6 +3,7 @@ import { AskReplyView, Suggestions } from './AskReplyView'
 import Icon from './Icon'
 import { EXAMPLES, OPENER, OPENER_SUB, SHARING_LINE } from '../content/ask'
 import { ask } from '../lib/ask/engine'
+import { askSession, clearAskSession, recordAsk } from '../lib/ask/session'
 import { shareAsked } from '../lib/ask/share'
 import { useBackDismiss } from '../lib/back-button'
 import { resolveLocStage } from '../lib/locs'
@@ -29,10 +30,6 @@ import { useHairProfile } from '../lib/profile-store'
  * pointed at is what you see — the thread is still there next time.
  */
 
-/** This session's questions, oldest first. In memory only. */
-const thread: { id: number; q: string }[] = []
-let nextId = 1
-const MAX_TURNS = 8
 
 export default function AskSheet({
   open,
@@ -44,7 +41,12 @@ export default function AskSheet({
   /** The button that opened the sheet, which gets focus back on close. */
   opener: RefObject<HTMLButtonElement | null>
 }) {
-  const [turns, setTurns] = useState(() => [...thread])
+  const [turns, setTurns] = useState(askSession)
+  // The session is shared with `/ask`, so it can have grown while this
+  // sheet was closed: pick it up each time the sheet opens.
+  useEffect(() => {
+    if (open) setTurns(askSession())
+  }, [open])
   const [draft, setDraft] = useState('')
   const input = useRef<HTMLInputElement>(null)
   const latest = useRef<HTMLDivElement>(null)
@@ -58,7 +60,7 @@ export default function AskSheet({
     document.body.style.overflow = 'hidden'
     // An empty thread is waiting for a question; one with answers is
     // waiting to be read, and a keyboard over it would hide the answer.
-    if (thread.length === 0) input.current?.focus()
+    if (askSession().length === 0) input.current?.focus()
     return () => {
       document.removeEventListener('keydown', onKey)
       document.body.style.overflow = previous
@@ -92,10 +94,8 @@ export default function AskSheet({
       input.current?.focus()
       return
     }
-    thread.push({ id: nextId++, q })
     shareAsked(q, ask(q, ctx), profile.askSharing)
-    if (thread.length > MAX_TURNS) thread.splice(0, thread.length - MAX_TURNS)
-    setTurns([...thread])
+    setTurns(recordAsk(q))
     setDraft('')
     // Close the keyboard so the answer is visible rather than under it.
     input.current?.blur()
@@ -107,7 +107,7 @@ export default function AskSheet({
   }
 
   function clear() {
-    thread.length = 0
+    clearAskSession()
     setTurns([])
     input.current?.focus()
   }

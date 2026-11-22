@@ -184,8 +184,11 @@ export default function EmergencyScreen() {
               to do about it. Quick Hairstyle is the second door, below. */}
           {open ? (
             <div className="flex flex-wrap items-center justify-between gap-md">
+              {/* A loc wearer's reference is Locs World, not general care:
+                  filing locs under Hair Care is how loose-hair technique
+                  ends up in front of someone it would damage. */}
               <Link
-                to="/care"
+                to={locs ? '/locs' : '/care'}
                 className="flex items-center gap-md rounded-full bg-inverse-surface py-1.5 pl-lg pr-1.5 font-label-md text-body-md font-semibold text-inverse-on-surface shadow-float transition-all active:scale-95"
               >
                 Get Started

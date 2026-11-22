@@ -4,6 +4,7 @@ import { AskReplyView, Suggestions } from '../components/AskReplyView'
 import Icon from '../components/Icon'
 import { EXAMPLES, OPENER, OPENER_SUB, SHARING_LINE } from '../content/ask'
 import { ask, type AskReply } from '../lib/ask/engine'
+import { earlierAsks, recordAsk } from '../lib/ask/session'
 import { shareAsked } from '../lib/ask/share'
 import { resolveLocStage } from '../lib/locs'
 import { useHairProfile } from '../lib/profile-store'
@@ -26,15 +27,6 @@ import { useHairProfile } from '../lib/profile-store'
  * field) land on.
  */
 
-/** This session's questions, newest first. In memory only — never written to the profile. */
-const earlier: string[] = []
-
-function remember(q: string) {
-  const i = earlier.findIndex((e) => e.toLowerCase() === q.toLowerCase())
-  if (i >= 0) earlier.splice(i, 1)
-  earlier.unshift(q)
-  earlier.length = Math.min(earlier.length, 6)
-}
 
 export default function AskScreen() {
   const { profile } = useHairProfile()
@@ -59,7 +51,9 @@ export default function AskScreen() {
   const reply = useMemo<AskReply | undefined>(() => (q ? ask(q, ctx) : undefined), [q, ctx])
 
   useEffect(() => {
-    if (q) remember(q)
+    // The same session the floating sheet shows, so a question asked
+    // here is in its thread and the other way round.
+    if (q) recordAsk(q)
   }, [q])
 
   function submit(text: string) {
@@ -80,7 +74,7 @@ export default function AskScreen() {
   }
 
   const examples = EXAMPLES[identity.hairType ?? 'unknown']
-  const previous = earlier.filter((e) => e !== q)
+  const previous = earlierAsks(q)
 
   return (
     <>
