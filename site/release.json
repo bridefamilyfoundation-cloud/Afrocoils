@@ -13,17 +13,14 @@
     "After paying by card, your browser brings you straight back to the app"
   ],
   "bundle": {
-    "code": 21,
-    "minVersionCode": 12,
-    "bytes": 4573232,
-    "sha256": "30fc00bd69d63b306f5acb3e33d82c98d24f6bbf9280a77b343956921e40dc24",
+    "code": 22,
+    "minVersionCode": 14,
+    "bytes": 4689879,
+    "sha256": "c13b22560921ce6695781c374bb11d94cc2df15816d3f77e4170efe7d50a63ab",
     "released": "2026-11-22",
-    "url": "https://runhkccoeyxfgsfrzezn.supabase.co/storage/v1/object/public/releases/bundles/21.zip",
+    "url": "https://runhkccoeyxfgsfrzezn.supabase.co/storage/v1/object/public/releases/bundles/22.zip",
     "notes": [
-      "Withdrawing a style you sent now takes it out of our review queue too",
-      "Sharing one of your own styles brings its photos with it",
-      "Paying by card early can no longer waste time you have already paid for",
-      "Ask remembers your questions whichever way you open it"
+      "Meet the Founder: Rachel Ehigocho Majerison's story, on the About page"
     ]
   }
 }
