@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import Icon from '../components/Icon'
 import { FAQS, type Faq } from '../content/faq'
@@ -43,6 +43,11 @@ export default function FaqScreen() {
     const i = FAQS.findIndex((faq) => faq.id === requested)
     return i >= 0 ? i : 0
   })
+  // Ask's sheet can link here while this screen is already showing.
+  useEffect(() => {
+    const i = FAQS.findIndex((faq) => faq.id === requested)
+    if (i >= 0) setOpen(i)
+  }, [requested])
   useScrollToOpened(requested && FAQS.some((faq) => faq.id === requested) ? `faq-q-${requested}` : null)
 
   return (
@@ -52,7 +57,7 @@ export default function FaqScreen() {
           Frequently asked questions
         </h2>
         <p className="mx-auto max-w-md font-body-md text-body-md text-on-surface-variant">
-          Five things worth knowing before you rely on this app.
+          {FAQS.length} things worth knowing before you rely on this app.
         </p>
       </section>
 

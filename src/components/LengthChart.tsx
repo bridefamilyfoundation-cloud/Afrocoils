@@ -75,12 +75,16 @@ export default function LengthChart({
     <figure className="m-0">
       <svg
         viewBox={`0 0 ${VIEW_W} ${PLOT_H + AXIS_H}`}
-        className="w-full touch-none"
+        // Vertical swipes still scroll the page; only the tap is the chart's.
+        className="w-full touch-pan-y"
         role="img"
         aria-label={`Length over time. ${points
           .map((p) => `${formatLength(p.check.overall, unit)} on ${new Date(p.check.dateISO).toLocaleDateString()}`)
           .join('; ')}`}
-        onPointerLeave={() => setActive(null)}
+        // A finger lifting is also a pointer leaving, which used to clear
+        // the reading the tap had just asked for. Only a mouse moving away
+        // clears it; on touch it stays until another point is tapped.
+        onPointerLeave={(e) => e.pointerType === 'mouse' && setActive(null)}
         onPointerDown={(e) => {
           // Nearest point by x rather than requiring a hit on the 8px dot —
           // a fingertip cannot land on a dot that size.

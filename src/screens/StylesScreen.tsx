@@ -1,5 +1,5 @@
-import { useMemo, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { useMemo } from 'react'
+import { Link, useSearchParams } from 'react-router-dom'
 import { styleCover } from '../assets/imagery'
 import Icon from '../components/Icon'
 import PrototypeImage from '../components/PrototypeImage'
@@ -14,6 +14,7 @@ import {
   styleExclusion,
   styleHairTypes,
 } from '../content/styles'
+import { LOC_STYLES } from '../content/loc-styles'
 import { discoveryRanking } from '../lib/types'
 import { useHairProfile } from '../lib/profile-store'
 import { deriveLengthBand } from '../lib/growth'
@@ -63,8 +64,24 @@ const OCCASION_FILTERS: Occasion[] = OCCASIONS.filter((o) =>
 
 export default function StylesScreen() {
   const { profile, update, ready } = useHairProfile()
-  const [active, setActive] = useState<Filter>('All')
-  const [occasion, setOccasion] = useState<Occasion | undefined>()
+  /*
+   * Both filters live in the address (`?cat=…&for=…`). As component
+   * state they were lost on opening a style, so back returned to the
+   * whole library scrolled to a position that belonged to the filtered
+   * one.
+   */
+  const [params, setParams] = useSearchParams()
+  const asked = params.get('cat')
+  const active: Filter = FILTERS.find((f) => f === asked) ?? 'All'
+  const occasion: Occasion | undefined = OCCASION_FILTERS.find((o) => o === params.get('for'))
+  const filter = (cat: Filter, on: Occasion | undefined) => {
+    const next = new URLSearchParams()
+    if (cat !== 'All') next.set('cat', cat)
+    if (on) next.set('for', on)
+    setParams(next, { replace: true })
+  }
+  const setActive = (cat: Filter) => filter(cat, occasion)
+  const setOccasion = (on: Occasion | undefined) => filter(active, on)
 
   const { savedStyles, identity, preferences, lengthChecks } = profile
   const locStage = resolveLocStage(identity).stage
@@ -248,22 +265,24 @@ export default function StylesScreen() {
             </h3>
           </div>
           <p className="mb-md font-body-md text-body-md text-on-secondary-container/90">
-            Every style here was contributed by someone who wears it, and nobody has
-            contributed a loc style so far. The app will not pad the shelf with loose-hair
-            technique to hide that — on locs most of it does damage.
+            Every style on this shelf comes with a method written by someone who wears it,
+            and nobody has written one up for locs so far. The app will not pad the shelf
+            with loose-hair technique to hide that — on locs most of it does damage. The loc
+            looks themselves are in the Loc Lookbook: {LOC_STYLES.length} of them, pictured
+            front, back and side.
           </p>
           <div className="flex flex-wrap gap-sm">
             <Link
-              to="/styles/submit"
+              to="/locs/styles"
               className="inline-block rounded-full bg-on-secondary-container px-lg py-2 font-label-md text-label-md text-secondary-container transition-all active:scale-95"
             >
-              Contribute the first one
+              Open the Loc Lookbook
             </Link>
             <Link
-              to="/sos"
+              to="/styles/submit?hair=Locs"
               className="inline-block rounded-full border border-on-secondary-container/40 px-lg py-2 font-label-md text-label-md text-on-secondary-container transition-all active:scale-95"
             >
-              Loc guides in Hair SOS
+              Write up a loc style
             </Link>
           </div>
         </section>
@@ -364,10 +383,7 @@ export default function StylesScreen() {
             </p>
             <button
               type="button"
-              onClick={() => {
-                setActive('All')
-                setOccasion(undefined)
-              }}
+              onClick={() => filter('All', undefined)}
               className="rounded-full bg-surface-container-high px-lg py-2 font-label-md text-label-md text-on-surface active:scale-95"
             >
               Clear filters

@@ -1,5 +1,5 @@
-import { useMemo, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { useMemo } from 'react'
+import { Link, useSearchParams } from 'react-router-dom'
 import { styleCover } from '../assets/imagery'
 import Icon from '../components/Icon'
 import PrototypeImage from '../components/PrototypeImage'
@@ -26,7 +26,13 @@ import { TIME_BANDS, type TimeBand } from '../lib/types'
 export default function QuickStyleScreen() {
   const { profile } = useHairProfile()
   const locs = isLocs(profile.identity)
-  const [band, setBand] = useState<TimeBand>(TIME_BANDS[0])
+  // The time picked lives in the address (`?t=1`), not in component
+  // state: opening a style and coming back used to reset it to the first
+  // band, so the list you returned to was not the one you left.
+  const [params, setParams] = useSearchParams()
+  const band: TimeBand = TIME_BANDS[Number(params.get('t'))] ?? TIME_BANDS[0]
+  const setBand = (next: TimeBand) =>
+    setParams({ t: `${TIME_BANDS.indexOf(next)}` }, { replace: true })
 
   const fits = useMemo(
     () =>
@@ -121,9 +127,25 @@ export default function QuickStyleScreen() {
         <section className="mb-2xl rounded-2xl bg-surface-container p-xl">
           <p className="font-body-md text-body-md text-on-surface-variant">
             {locs
-              ? 'The style library is contributed by the people who wore each look, and nothing in it is a loc style yet — so there is nothing to put here. Hair Problem has the guides written for locs.'
+              ? 'The style library is contributed by the people who wore each look, and nothing in it is a loc style yet — so there is nothing to time here. The loc looks are in the Loc Lookbook, and Locs World has the guides written for locs.'
               : `Nothing in the library lands in ${band.label}. Try another slot.`}
           </p>
+          {locs && (
+            <div className="mt-md flex flex-wrap gap-sm">
+              <Link
+                to="/locs/styles"
+                className="rounded-full bg-primary px-lg py-2 font-label-md text-label-md text-on-primary active:scale-95"
+              >
+                Open the Loc Lookbook
+              </Link>
+              <Link
+                to="/locs"
+                className="rounded-full border border-outline-variant px-lg py-2 font-label-md text-label-md text-on-surface active:scale-95"
+              >
+                Locs World
+              </Link>
+            </div>
+          )}
         </section>
       )}
 

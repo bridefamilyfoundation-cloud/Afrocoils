@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { Link, Navigate, useParams } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
 import Icon from '../components/Icon'
 import ScreenHeader from '../components/ScreenHeader'
 import SectionCrumb from '../components/SectionCrumb'
@@ -10,6 +10,7 @@ import { deriveLengthBand } from '../lib/growth'
 import { resolveLocStage } from '../lib/locs'
 import { discoveryRanking } from '../lib/types'
 import { useHairProfile } from '../lib/profile-store'
+import NotFoundScreen from './NotFoundScreen'
 
 /**
  * One style, at full size.
@@ -62,7 +63,8 @@ export default function StyleDetailScreen() {
   )
 
   if (!ready) return <ScreenFallback />
-  if (!style) return <Navigate to="/styles" replace />
+  // An id that matches nothing is a wrong address, and says so.
+  if (!style) return <NotFoundScreen />
 
   const saved = savedStyles.includes(style.id)
   const excluded = exclusion !== undefined
@@ -140,7 +142,7 @@ export default function StyleDetailScreen() {
           {saved ? 'Saved' : 'Save this style'}
         </button>
         <Link
-          to="/growth"
+          to={`/growth?log=${encodeURIComponent(style.name)}`}
           className="flex items-center justify-center gap-sm rounded-full border border-outline-variant px-lg py-3 font-label-md text-label-md text-on-surface active:scale-95"
         >
           <Icon name="add_photo_alternate" className="text-[18px]" />

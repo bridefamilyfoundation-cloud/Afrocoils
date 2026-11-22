@@ -366,7 +366,8 @@ picture; this file is the short version of what to keep in mind when editing.
   Quick Hair Check, Products and My Hair Profile honour it
   (the profile's ids are its row ids — `density`, `climate`, `rules`,
   `membership` — and `/quiz?step=<id>` asks one question and returns
-  there).
+  to whichever screen opened it: the profile, a Hair Care trait card, a
+  lesson, the recommendations list).
 - Screens live in `src/screens/`, shared UI in `src/components/`.
 - **Hair type is the fork above everything.** `identity.hairType` is
   `'Loose Natural' | 'Locs'`, and styles, guides, products, the calendar's
@@ -427,6 +428,18 @@ picture; this file is the short version of what to keep in mind when editing.
   required claim, not fine print — see the images README for why.
   Withdrawing one deletes its photo files *before* the profile write,
   the same order `MyStyles` uses.
+
+  **Tapping submit sends it (since 2026-11-22).** The row is written
+  `Queued`, then `sendSubmission` runs at once and flips it to `Sent`
+  on a 200; on any failure it stays `Queued` with its "Send to the
+  library" button. It is never retried on its own later — the policy
+  says nothing is uploaded in the background. Every write to
+  `submissions` after an `await` uses the functional `update((current)
+  => …)`, because a slow send holding a stale list would drop or
+  resurrect rows. A `Sent` row can only be *removed from the phone*;
+  the copy says so and names support for the server's. A half-filled
+  form survives leaving the screen (in memory), and `draftPhotos` on
+  the profile lists its files so an abandoned one is cleaned up.
 
   **The form is short on purpose:** style name (shown, not asked, when
   `?name=` picked it), description, photos, credits, plus hair type when

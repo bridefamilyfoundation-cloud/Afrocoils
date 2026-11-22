@@ -78,6 +78,10 @@ export default function CalendarScreen() {
   // Back closes the log sheet rather than leaving the calendar under it.
   useBackDismiss(logging, () => setLogging(false))
   const [showSchedules, setShowSchedules] = useState(false)
+  // Deleting a logged entry takes its note with it and moves the next
+  // due date, so the bin asks once before it does.
+  const [confirmRemove, setConfirmRemove] = useState<string | null>(null)
+  useBackDismiss(confirmRemove !== null, () => setConfirmRemove(null))
   const [permission, setPermission] = useState<PermissionState>('unavailable')
 
   useEffect(() => {
@@ -115,6 +119,14 @@ export default function CalendarScreen() {
   }
 
   function logEvent(type: CareEventType, date: string, note?: string) {
+    // Nothing is logged ahead of time: a future entry would push the
+    // next due date out by a cadence that has not happened.
+    if (date > today) return
+    // A second tap on Done is the same wash, not a second one.
+    if (!note?.trim() && profile.careEvents.some((e) => e.type === type && e.date === date)) {
+      setLogging(false)
+      return
+    }
     const event: CareEvent = {
       id: newEventId(),
       type,
@@ -128,6 +140,7 @@ export default function CalendarScreen() {
 
   function removeEvent(id: string) {
     update({ careEvents: profile.careEvents.filter((e) => e.id !== id) })
+    setConfirmRemove(null)
   }
 
   function patchSchedule(type: CareEventType, patch: Partial<CareSchedule>) {
@@ -155,6 +168,19 @@ export default function CalendarScreen() {
   }
 
   if (!ready) return <ScreenFallback />
+
+  /*
+   * Schedules that are switched off. `deriveDue` leaves them out, which
+   * is right for the list of what is coming up and was wrong for the
+   * list you adjust: the Tracking/Off switch lived on a row that
+   * vanished the moment it was turned off, so nothing could be turned
+   * back on, and the four that start off (protein, clarify, scalp
+   * treatment, trim) could never be turned on at all.
+   */
+  const off: DueStatus[] = profile.schedules
+    .filter((schedule) => !schedule.enabled)
+    .map((schedule) => ({ schedule }))
+  const rows = showSchedules ? [...due, ...off] : due.slice(0, 4)
 
   const availableTypes = CARE_EVENT_TYPES.filter((type) => {
     if (locs) return !LOOSE_ONLY_EVENTS.includes(type)
@@ -191,24 +217,26 @@ export default function CalendarScreen() {
           </button>
         </div>
 
-        {due.length === 0 ? (
+        {rows.length === 0 ? (
           <EmptyCard
             icon="calendar_month"
-            title="No schedule yet"
+            title={off.length > 0 ? 'Nothing is being tracked' : 'No schedule yet'}
             body={
-              profile.identity.hairType
-                ? 'Log something below and the app will start tracking when it is next due.'
-                : 'Tell us whether you have loose hair or locs and the calendar sets itself up around it.'
+              !profile.identity.hairType
+                ? 'Tell us whether you have loose hair or locs and the calendar sets itself up around it.'
+                : off.length > 0
+                  ? 'Every schedule is switched off. Tap Adjust above to turn one back on.'
+                  : 'Log something below and the app will start tracking when it is next due.'
             }
             action={
               profile.identity.hairType
                 ? undefined
-                : { to: '/profile?open=hairType', label: 'Set your hair type' }
+                : { to: '/quiz?step=hairType', label: 'Set your hair type' }
             }
           />
         ) : (
           <ul className="space-y-sm">
-            {due.slice(0, showSchedules ? due.length : 4).map((status) => (
+            {rows.map((status) => (
               <DueRow
                 key={status.schedule.type}
                 status={status}
@@ -301,13 +329,16 @@ export default function CalendarScreen() {
                 <span className="flex-1 font-body-md text-body-md text-on-surface">
                   {type} due
                 </span>
-                <button
-                  type="button"
-                  onClick={() => logEvent(type, selected)}
-                  className="rounded-full bg-primary px-md py-1 font-label-md text-caption text-on-primary active:scale-95"
-                >
-                  Log it
-                </button>
+                {/* Only a day that has arrived can be logged. */}
+                {selected <= today && (
+                  <button
+                    type="button"
+                    onClick={() => logEvent(type, selected)}
+                    className="rounded-full bg-primary px-md py-1 font-label-md text-caption text-on-primary active:scale-95"
+                  >
+                    Log it
+                  </button>
+                )}
               </li>
             ))}
           </ul>
@@ -328,14 +359,33 @@ export default function CalendarScreen() {
                     </p>
                   )}
                 </div>
-                <button
-                  type="button"
-                  onClick={() => removeEvent(event.id)}
-                  aria-label={`Delete ${event.type}`}
-                  className="shrink-0 p-1 text-outline active:scale-90"
-                >
-                  <Icon name="delete" className="text-[18px]" />
-                </button>
+                {confirmRemove === event.id ? (
+                  <span className="flex shrink-0 items-center gap-xs">
+                    <button
+                      type="button"
+                      onClick={() => removeEvent(event.id)}
+                      className="rounded-full bg-error px-md py-1 font-label-md text-caption text-on-error active:scale-95"
+                    >
+                      Delete
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setConfirmRemove(null)}
+                      className="rounded-full bg-surface-container-high px-md py-1 font-label-md text-caption text-on-surface active:scale-95"
+                    >
+                      Keep
+                    </button>
+                  </span>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => setConfirmRemove(event.id)}
+                    aria-label={`Delete ${event.type}`}
+                    className="shrink-0 p-1 text-outline active:scale-90"
+                  >
+                    <Icon name="delete" className="text-[18px]" />
+                  </button>
+                )}
               </li>
             ))}
           </ul>
@@ -349,7 +399,8 @@ export default function CalendarScreen() {
 
         {logging ? (
           <LogForm
-            date={selected}
+            // A future day is selected to see what falls due, not to log on.
+            date={selected > today ? today : selected}
             types={availableTypes}
             onCancel={() => setLogging(false)}
             onSave={logEvent}
@@ -494,6 +545,14 @@ function DueRow({
   const { schedule, dueKey, overdueDays } = status
   const overdue = overdueDays !== undefined && overdueDays > 0
   const dueToday = overdueDays === 0
+  /*
+   * The cadence as typed. It used to be written to the profile on every
+   * keystroke with anything unreadable turned into 1, so clearing "7"
+   * to type "10" snapped to 1 and saved 110. The box now holds whatever
+   * is being typed; only a whole number from 1 to 365 is saved, and
+   * leaving the box puts the saved value back.
+   */
+  const [every, setEvery] = useState(`${schedule.everyDays}`)
 
   return (
     <li
@@ -519,7 +578,9 @@ function DueRow({
         <div className="min-w-0 flex-1">
           <p className="font-body-md text-body-md text-on-surface">{schedule.type}</p>
           <p className="font-caption text-caption text-on-surface-variant">
-            {!dueKey
+            {!schedule.enabled
+              ? 'Off'
+              : !dueKey
               ? 'Log it once to start tracking'
               : overdue
                 ? `${overdueDays} day${overdueDays === 1 ? '' : 's'} overdue`
@@ -531,13 +592,15 @@ function DueRow({
           </p>
         </div>
 
-        <button
-          type="button"
-          onClick={onLog}
-          className="shrink-0 rounded-full border border-primary px-md py-1 font-label-md text-caption text-primary active:scale-95"
-        >
-          Done
-        </button>
+        {schedule.enabled && (
+          <button
+            type="button"
+            onClick={onLog}
+            className="shrink-0 rounded-full border border-primary px-md py-1 font-label-md text-caption text-primary active:scale-95"
+          >
+            Done
+          </button>
+        )}
       </div>
 
       {editing && (
@@ -548,10 +611,14 @@ function DueRow({
               type="number"
               min={1}
               max={365}
-              value={schedule.everyDays}
-              onChange={(e) =>
-                onPatch({ everyDays: Math.min(365, Math.max(1, Number(e.target.value) || 1)) })
-              }
+              inputMode="numeric"
+              value={every}
+              onChange={(e) => {
+                setEvery(e.target.value)
+                const days = Number(e.target.value)
+                if (Number.isInteger(days) && days >= 1 && days <= 365) onPatch({ everyDays: days })
+              }}
+              onBlur={() => setEvery(`${schedule.everyDays}`)}
               className="w-16 rounded-lg border-outline-variant bg-surface-container-low py-1 font-body-md text-caption text-on-surface"
             />
             days
@@ -582,7 +649,7 @@ function DueRow({
               }`}
             >
               <Icon name="notifications" filled={schedule.reminder} className="text-[14px]" />
-              {schedule.reminder ? `Remind at ${schedule.reminderTime}` : 'Remind me'}
+              {schedule.reminder ? `Remind at ${schedule.reminderTime || '09:00'}` : 'Remind me'}
             </button>
           )}
 
@@ -590,7 +657,8 @@ function DueRow({
             <input
               type="time"
               value={schedule.reminderTime}
-              onChange={(e) => onPatch({ reminderTime: e.target.value })}
+              // A cleared time is not a time: keep the last one.
+              onChange={(e) => e.target.value && onPatch({ reminderTime: e.target.value })}
               aria-label={`Reminder time for ${schedule.type}`}
               className="rounded-lg border-outline-variant bg-surface-container-low py-1 font-body-md text-caption text-on-surface"
             />

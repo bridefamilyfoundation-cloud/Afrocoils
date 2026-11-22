@@ -245,6 +245,7 @@ export async function membershipFor(email: string): Promise<MembershipResponse> 
     periodStartISO: iso(member?.period_start),
     trialEndsISO,
     renews: !choosing,
+    card: !!member?.paystack_subscription,
     trialAvailable: open ? false : await trialAvailable(email, member),
     price: !open && monthly ? { amount: monthly.amount, currency: monthly.currency, interval: 'monthly' } : undefined,
     plans,

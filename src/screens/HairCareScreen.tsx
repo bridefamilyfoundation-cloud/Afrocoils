@@ -20,9 +20,9 @@ import { curlFamilyOf, curlPatternLabel } from '../lib/types'
  * are separate again.
  *
  * Every card here opens a screen that already exists. This is a hub, not
- * a fifth copy of the profile pickers — `identity` is written in exactly
- * two places (the quiz and the profile screen), and adding a third would
- * be a third thing to keep in step with `identityFieldsFor()`.
+ * a second set of pickers: the hair answers are asked in exactly one
+ * place, Hair Discovery, and each trait card opens its one question
+ * there (`/quiz?step=<id>`), which returns here when it is answered.
  */
 
 /** B, C, D and E. A is the four traits below, which need the profile read. */
@@ -97,7 +97,7 @@ export default function HairCareScreen() {
     {
       label: 'Hair density',
       value: identity.density,
-      to: '/profile?open=density',
+      to: '/quiz?step=density',
       action: identity.density ? 'Change it' : 'Set it',
       note: 'How much hair is on your head, not how thick each strand is. Decides sectioning and product quantity.',
     },
@@ -106,14 +106,14 @@ export default function HairCareScreen() {
       value:
         identity.curlPattern &&
         `${curlPatternLabel(identity.curlPattern)} · ${curlFamilyOf(identity.curlPattern)?.name ?? ''}`.trim(),
-      to: '/profile?open=curlPattern',
+      to: '/quiz?step=curlPattern',
       action: identity.curlPattern ? 'Change it' : 'Set it',
       note: 'The shape of your Type 4 coil — 4A, 4B or 4C. It still matters with locs: it decides how fast they bud and shrink.',
     },
     {
       label: 'Hair texture',
       value: identity.texture,
-      to: '/profile?open=texture',
+      to: '/quiz?step=texture',
       action: identity.texture ? 'Change it' : 'Set it',
       note: 'How thick or wide a single strand is. Fine strands are weighed down by heavy products; coarse ones usually need them.',
     },
@@ -223,7 +223,7 @@ export default function HairCareScreen() {
           <Icon name="science" className="shrink-0 text-primary" />
           <p className="flex-1 font-body-md text-caption text-on-surface-variant">
             Not sure about any of them? Hair Discovery shows you what each looks like on Type
-            4 hair, and fills in all three.
+            4 hair, and fills in all four.
           </p>
           <Icon name="arrow_forward" className="shrink-0 text-outline" />
         </Link>

@@ -1,6 +1,25 @@
-import { Link, Navigate, useParams } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
 import ScreenHeader from '../components/ScreenHeader'
 import Icon from '../components/Icon'
+import NotFoundScreen from './NotFoundScreen'
+import { hasAccess } from '../lib/membership'
+import { useHairProfile } from '../lib/profile-store'
+
+/**
+ * A link to a members' screen from a page a non-member can read. Locked,
+ * it is drawn as plain words: the policy is linked from the join screen
+ * before anyone has paid, and a link that bounces back to that screen
+ * with no explanation reads as broken.
+ */
+function MemberLink({ to, children }: { to: string; children: React.ReactNode }) {
+  const { profile } = useHairProfile()
+  if (!hasAccess(profile.membership)) return <>{children}</>
+  return (
+    <Link to={to} className="text-primary underline">
+      {children}
+    </Link>
+  )
+}
 
 /**
  * The footer documents.
@@ -161,19 +180,13 @@ function PrivacyPolicy() {
           never sell them or use them for advertising. They are kept for up to twelve months
           and then deleted. Because they are anonymous, we cannot find or delete one
           particular person&rsquo;s questions, so if you would rather not share, switch it
-          off under{' '}
-          <Link to="/about" className="text-primary underline">
-            About
-          </Link>{' '}
+          off under <MemberLink to="/about">About</MemberLink>{' '}
           — Ask works exactly the same either way, on your phone, and the line under the
           question box tells you whether sharing is on.
         </p>
         <p>
           <strong>A style you submit</strong> through{' '}
-          <Link to="/styles/submit" className="text-primary underline">
-            Share a style
-          </Link>
-          . When you tap submit, the write-up you typed, the photographs you attached, the
+          <MemberLink to="/styles/submit">Share a style</MemberLink>. When you tap submit, the write-up you typed, the photographs you attached, the
           credit name you chose and your confirmation that the images are yours to give are
           sent to our server so a person can review them for the library. Each photograph is
           checked there before it is kept: anything that is not a plain photo is refused, and
@@ -204,11 +217,7 @@ function PrivacyPolicy() {
           itself comes as a new version to download instead, which your phone asks you to
           confirm. Nothing downloads or installs unless you tap. The update component reports
           nothing back to anyone: no statistics, no crash reports. Turn the check off, or
-          run it by hand, under{' '}
-          <Link to="/about" className="text-primary underline">
-            About
-          </Link>
-          .
+          run it by hand, under <MemberLink to="/about">About</MemberLink>.
         </p>
       </Article>
 
@@ -485,5 +494,7 @@ export default function LegalScreen() {
     )
   }
 
-  return <Navigate to="/sos" replace />
+  // An address that is not one of the three documents is a wrong
+  // address, and says so.
+  return <NotFoundScreen />
 }

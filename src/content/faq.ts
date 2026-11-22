@@ -61,8 +61,10 @@ export const FAQS: Faq[] = [
     q: 'Why are there no loc styles in the library?',
     keys: 'no styles for locs|styles page is empty|empty style library|where are the loc styles',
     a: [
-      'Because nobody has contributed one yet. Every entry was written up by the person who wore it, and the app will not pad the shelf with loose-hair technique to hide the gap — on locs most of it does damage, since a loc is meant to be matted and cannot be detangled or re-set. Loc wearers do get the full care guides, which are written separately for them. If you wear locs, the shelf is waiting for ',
-      { to: '/styles/submit', label: 'the first contribution' },
+      'Because nobody has contributed one yet. Every entry was written up by the person who wore it, and the app will not pad the shelf with loose-hair technique to hide the gap — on locs most of it does damage, since a loc is meant to be matted and cannot be detangled or re-set. Loc wearers do get the full care guides, which are written separately for them, and the loc looks themselves are pictured in ',
+      { to: '/locs/styles', label: 'the Loc Lookbook' },
+      '. If you wear locs, the shelf is waiting for ',
+      { to: '/styles/submit?hair=Locs', label: 'the first written-up method' },
       '.',
     ],
   },
@@ -71,7 +73,7 @@ export const FAQS: Faq[] = [
     q: 'I set my porosity — why did the recommendations not change?',
     keys: 'recommendations did not change|porosity not working|why does porosity not matter',
     a: [
-      'Because no style in the library declares a porosity yet, so there is nothing for yours to match against. The ranking today uses hair type (which excludes outright), the length band derived from your last length check, and your care preferences — and the ',
+      'Because no style in the library declares a porosity yet, so there is nothing for yours to match against. The ranking today uses hair type (which excludes outright), the length band derived from your last length check, your care preferences and what Hair Discovery knows about your hair’s condition — and the ',
       { to: '/styles/recommended', label: 'recommendations screen' },
       ' says so rather than implying otherwise. Porosity is not wasted: it decides your product shelf and which care guides you are shown.',
     ],
@@ -83,7 +85,7 @@ export const FAQS: Faq[] = [
     a: [
       'It is saved on your device first and marked ',
       { em: 'Queued' },
-      ', then sent. If the send fails it stays queued and goes later, so a bad connection never costs you the write-up. Nothing is published automatically: every submission waits for a person to read it, because it carries your claim that the photographs are yours to give. You can withdraw one at any time, and doing so deletes its photos from the device too.',
+      ', then sent straight away. If the send fails it stays queued, so a bad connection never costs you the write-up; send it again from its row on the Share a style screen. Nothing is published automatically: every submission waits for a person to read it, because it carries your claim that the photographs are yours to give. You can withdraw one until it has been sent, which deletes its photos from the device too. After that, removing it only removes your copy — write to support@afrocoils.app to take it out of the review queue.',
     ],
   },
 ]

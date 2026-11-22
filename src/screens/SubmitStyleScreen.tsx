@@ -14,7 +14,12 @@ import { SubmissionError, sendSubmission } from '../lib/submissions'
 import { apiConfigured } from '../lib/api'
 import { isNative } from '../native/shell'
 import type { HairType, StyleSubmission } from '../lib/types'
-import { HAIR_TYPES, MAX_PHOTOS_PER_SUBMISSION } from '../lib/types'
+import {
+  HAIR_TYPES,
+  MAX_PHOTOS_PER_SUBMISSION,
+  SUBMISSION_CREDIT_MAX,
+  SUBMISSION_NAME_MAX,
+} from '../lib/types'
 
 /**
  * Offering a style to the community library.
@@ -108,6 +113,26 @@ export default function SubmitStyleScreen() {
   return <SubmitStyleForm />
 }
 
+/**
+ * The form as it was left, in memory only.
+ *
+ * Leaving this screen used to throw the write-up away and delete every
+ * photograph taken for it, with no warning: Android back, a tab, the
+ * crumb. Now the form is put back as it was when the same form is opened
+ * again in this session. The photographs' filenames are also kept on the
+ * profile (`draftPhotos`) so that if the app is closed instead, the next
+ * visit can delete the files nothing points at any more.
+ */
+interface Draft {
+  key: string
+  name: string
+  hairType: HairType
+  note: string
+  credit: string
+  photos: string[]
+}
+let draft: Draft | null = null
+
 function SubmitStyleForm() {
   const navigate = useNavigate()
   const { profile, update } = useHairProfile()
@@ -127,14 +152,20 @@ function SubmitStyleForm() {
   // not a suggestion to edit.
   const chosen = askedName && !seed ? askedName : undefined
 
-  const [name, setName] = useState(seed?.name ?? askedName ?? '')
+  // Which form this is: a draft is only put back into the form it was
+  // written in, never into one seeded for a different style.
+  const draftKey = `${params.get('from') ?? ''}|${askedName ?? ''}|${askedHair ?? ''}`
+  const kept = draft?.key === draftKey ? draft : null
+
+  const [name, setName] = useState(kept?.name ?? seed?.name ?? askedName ?? '')
   const [hairType, setHairType] = useState<HairType>(
-    askedHair ?? profile.identity.hairType ?? 'Loose Natural',
+    kept?.hairType ?? askedHair ?? profile.identity.hairType ?? 'Loose Natural',
   )
-  const [note, setNote] = useState(seed?.notes ?? '')
-  const [credit, setCredit] = useState(profile.bio.name ?? '')
+  const [note, setNote] = useState(kept?.note ?? seed?.notes ?? '')
+  const [credit, setCredit] = useState(kept?.credit ?? profile.bio.name ?? '')
+  // Never restored: the claim is made at the moment of submitting.
   const [rights, setRights] = useState(false)
-  const [photos, setPhotos] = useState<string[]>([])
+  const [photos, setPhotos] = useState<string[]>(kept?.photos ?? [])
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
   // Withdrawing deletes the photographs off the disk as well as the
@@ -168,11 +199,13 @@ function SubmitStyleForm() {
     setSendError(null)
     try {
       const sent = await sendSubmission(submission)
-      // Read from the store rather than the closure: sending is slow
-      // enough that the list can have changed underneath it.
-      update({
-        submissions: profile.submissions.map((s) => (s.id === sent.id ? sent : s)),
-      })
+      // Built from the profile as it is now, not from this render's
+      // copy: sending is slow enough that the list can have changed
+      // underneath it, and writing the old list back would drop a style
+      // submitted meanwhile or bring back one that was withdrawn.
+      update((current) => ({
+        submissions: current.submissions.map((s) => (s.id === sent.id ? sent : s)),
+      }))
     } catch (error) {
       setSendError({
         id: submission.id,
@@ -206,12 +239,39 @@ function SubmitStyleForm() {
    */
   const pending = useRef<string[]>([])
   pending.current = photos
-  useEffect(
-    () => () => {
-      for (const path of pending.current) void deletePhoto(path)
-    },
-    [],
-  )
+  const form = useRef<Draft>({ key: draftKey, name, hairType, note, credit, photos })
+  form.current = { key: draftKey, name, hairType, note, credit, photos }
+  /** Set by `submit`: a submitted form has nothing left to put back. */
+  const submitted = useRef(false)
+
+  useEffect(() => {
+    // Photographs left by a draft that is gone: another form's, or one
+    // from before the app was last closed. Files first, then the record.
+    const stale = draft && draft.key !== draftKey ? draft.photos : []
+    const orphaned = (profile.draftPhotos ?? []).filter((path) => !pending.current.includes(path))
+    const dead = [...new Set([...stale, ...orphaned])]
+    if (draft && draft.key !== draftKey) draft = null
+    if (dead.length > 0) {
+      void Promise.all(dead.map((path) => deletePhoto(path))).then(() =>
+        update({ draftPhotos: pending.current.length > 0 ? pending.current : undefined }),
+      )
+    }
+    return () => {
+      // Leaving keeps the form. `submit` empties `pending` first, so a
+      // submitted form leaves nothing behind to restore.
+      const left = form.current
+      const worthKeeping =
+        !submitted.current && (pending.current.length > 0 || left.note.trim().length > 0)
+      draft = worthKeeping ? { ...left, photos: pending.current } : null
+    }
+    // Once, on arrival: this is about what was left behind before now.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  /** The profile's list of photographs only this form points at. */
+  function recordDraftPhotos(next: string[]) {
+    update({ draftPhotos: next.length > 0 ? next : undefined })
+  }
 
   const { submissions } = profile
   const described = note.trim().length >= MIN_DESCRIPTION
@@ -222,7 +282,9 @@ function SubmitStyleForm() {
     setBusy(true)
     setError(null)
     try {
-      setPhotos([...photos, await capturePhoto(source)])
+      const next = [...photos, await capturePhoto(source)]
+      setPhotos(next)
+      recordDraftPhotos(next)
     } catch (err) {
       if (err instanceof PhotoError && err.cancelled) return
       setError(err instanceof PhotoError ? err.message : 'Could not add that photo.')
@@ -232,15 +294,17 @@ function SubmitStyleForm() {
   }
 
   async function removePhoto(path: string) {
-    setPhotos(photos.filter((p) => p !== path))
+    const next = photos.filter((p) => p !== path)
+    setPhotos(next)
     await deletePhoto(path)
+    recordDraftPhotos(next)
   }
 
   function submit() {
     if (!canSubmit) return
     const submission: StyleSubmission = {
       id: `sub-${newEventId()}`,
-      name: name.trim(),
+      name: name.trim().slice(0, SUBMISSION_NAME_MAX),
       // Carried over, not asked: what the user already logged for this
       // style under My styles is free detail for the reviewer.
       category: seed?.category,
@@ -251,18 +315,37 @@ function SubmitStyleForm() {
       needs: [],
       steps: [],
       photos,
-      credit: credit.trim() || undefined,
+      credit: credit.trim().slice(0, SUBMISSION_CREDIT_MAX) || undefined,
       rightsConfirmed: rights,
       status: 'Queued',
       createdISO: new Date().toISOString(),
     }
-    update({ submissions: [submission, ...submissions] })
+    // The submission owns the photographs now, so they stop being a draft's.
+    update((current) => ({ submissions: [submission, ...current.submissions], draftPhotos: undefined }))
+
+    // Sent straight away, because tapping submit is the moment the
+    // contributor chose to send it. It used to stay queued until they
+    // came back and found a second button, which most never did. The row
+    // is written as `Queued` first and only becomes `Sent` once the
+    // server holds a copy; on any failure it stays queued, with the
+    // button below to try again.
+    if (canSend) {
+      void sendSubmission(submission)
+        .then((sent) =>
+          update((current) => ({
+            submissions: current.submissions.map((s) => (s.id === sent.id ? sent : s)),
+          })),
+        )
+        .catch(() => undefined)
+    }
 
     // Ownership moves to the submission here, and the ref is what
     // records that — see the comment on `pending` above. This assignment
     // is the one that matters; the `setPhotos` below is only so the form
     // reads correctly if it somehow survives the navigation.
     pending.current = []
+    submitted.current = true
+    draft = null
     setPhotos([])
     setName('')
     setNote('')
@@ -272,7 +355,9 @@ function SubmitStyleForm() {
     // than a green tick in the same weight as a validation message, and
     // the thank-you page is where "a person reads this before anything
     // is published" belongs — after the work, not as a hurdle before it.
-    navigate('/styles/submit/thanks', { state: { name: submission.name } })
+    navigate('/styles/submit/thanks', {
+      state: { name: submission.name, id: submission.id, lookbook: Boolean(chosen && askedHair === 'Locs') },
+    })
   }
 
   async function withdraw(submission: StyleSubmission) {
@@ -280,7 +365,7 @@ function SubmitStyleForm() {
     // Files first, then the record — the same order MyStyles uses. The
     // other way round strands bytes on disk with nothing pointing at them.
     await Promise.all(submission.photos.map((path) => deletePhoto(path)))
-    update({ submissions: submissions.filter((s) => s.id !== submission.id) })
+    update((current) => ({ submissions: current.submissions.filter((s) => s.id !== submission.id) }))
   }
 
   const canPick = photosAvailable()
@@ -318,6 +403,7 @@ function SubmitStyleForm() {
             <input
               value={name}
               onChange={(e) => setName(e.target.value)}
+              maxLength={SUBMISSION_NAME_MAX}
               placeholder="Curved part afro bun"
               className={inputClass}
             />
@@ -409,6 +495,7 @@ function SubmitStyleForm() {
         <input
           value={credit}
           onChange={(e) => setCredit(e.target.value)}
+          maxLength={SUBMISSION_CREDIT_MAX}
           placeholder="Your name or handle"
           className={inputClass}
         />
@@ -456,7 +543,8 @@ function SubmitStyleForm() {
       {/* One line, where the decision is made — the long version is in
           the FAQ and the privacy policy. */}
       <p className="mb-2xl text-center font-caption text-caption text-on-surface-variant">
-        Saved on this phone first, then sent for a person to review before anything is added.
+        Saved on this phone, then sent straight away for a person to review before anything is
+        added. With no signal it stays queued below until you send it.
       </p>
 
       <section className="mb-2xl mt-2xl">
@@ -510,11 +598,11 @@ function SubmitStyleForm() {
                         : 'Sent — waiting for a reviewer'}
                     </span>
                   </div>
-                  {confirming !== s.id && (
+                  {confirming !== s.id && sendingId !== s.id && (
                     <button
                       type="button"
                       onClick={() => setConfirming(s.id)}
-                      aria-label={`Withdraw ${s.name}`}
+                      aria-label={s.status === 'Sent' ? `Remove ${s.name} from this phone` : `Withdraw ${s.name}`}
                       className="-m-2 flex h-12 w-12 shrink-0 items-center justify-center rounded-full text-outline active:scale-90"
                     >
                       <Icon name="delete" />
@@ -562,11 +650,13 @@ function SubmitStyleForm() {
                 {confirming === s.id && (
                   <div className="mt-md rounded-xl bg-surface-container p-md">
                     <p className="mb-sm font-body-md text-caption text-on-surface-variant">
-                      Withdrawing deletes {s.name}
+                      {s.status === 'Sent' ? 'This removes' : 'Withdrawing deletes'} {s.name}
                       {s.photos.length > 0
                         ? ` and its ${s.photos.length} photograph${s.photos.length === 1 ? '' : 's'}`
                         : ''}
-                      . There is no undo.
+                      {s.status === 'Sent'
+                        ? ' from this phone only. It has already been sent, so the copy waiting for review stays: to withdraw that too, write to support@afrocoils.app with the style’s name.'
+                        : '. There is no undo.'}
                     </p>
                     <div className="flex flex-wrap gap-sm">
                       <button
@@ -574,7 +664,7 @@ function SubmitStyleForm() {
                         onClick={() => void withdraw(s)}
                         className="rounded-full bg-error px-lg py-2 font-label-md text-caption text-on-error active:scale-95"
                       >
-                        Withdraw{s.photos.length > 0 ? ', photos and all' : ''}
+                        {s.status === 'Sent' ? 'Remove from this phone' : `Withdraw${s.photos.length > 0 ? ', photos and all' : ''}`}
                       </button>
                       <button
                         type="button"

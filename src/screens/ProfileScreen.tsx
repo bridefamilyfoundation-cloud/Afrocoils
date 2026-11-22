@@ -15,6 +15,7 @@ import {
   LOC_STAGES,
   PREFERENCE_LABELS,
   RANKED_PREFERENCES,
+  identityAnswered,
   identityFieldsFor,
 } from '../lib/types'
 
@@ -206,7 +207,7 @@ export default function ProfileScreen() {
   }
   const missing: { id: string; text: string }[] = identity.hairType
     ? fields
-        .filter((f) => identity[f] === undefined)
+        .filter((f) => !identityAnswered(identity, f))
         .map((f) => ({
           id: f,
           text: allTraits.find((t) => t.id === f)?.short ?? LOC_SHORT[f] ?? f,
@@ -398,18 +399,24 @@ export default function ProfileScreen() {
         </RowGroup>
       )}
 
-      {/* ---- Scalp & surroundings -------------------------------------- */}
-      {identity.hairType && (
+      {/* ---- Scalp & surroundings --------------------------------------
+          Always drawn: climate and water are about where you live, not
+          about your hair, and Ask links straight to the climate row. Only
+          the scalp question waits for a hair type, like the other hair
+          answers. */}
+      {(
         <RowGroup
           title="Scalp & surroundings"
           note="These change which products work. None of it leaves the phone."
         >
-          <AnswerRow
-            id={SCALP_FIELD.id}
-            icon={SCALP_FIELD.icon}
-            label={SCALP_FIELD.label}
-            value={scalpValue}
-          />
+          {identity.hairType && (
+            <AnswerRow
+              id={SCALP_FIELD.id}
+              icon={SCALP_FIELD.icon}
+              label={SCALP_FIELD.label}
+              value={scalpValue}
+            />
+          )}
           <Row
             id="climate"
             icon="explore"

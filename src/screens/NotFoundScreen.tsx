@@ -20,7 +20,7 @@ const WAYS_OUT: { to: string; icon: IconName; label: string; body: string }[] = 
     to: '/sos',
     icon: 'emergency_home',
     label: 'Hair SOS',
-    body: 'Quick hairstyles, hair care, and what to do when something is wrong.',
+    body: 'The front page: quick hairstyles, and the way into Hair Care.',
   },
   {
     to: '/styles',
@@ -32,7 +32,7 @@ const WAYS_OUT: { to: string; icon: IconName; label: string; body: string }[] = 
     to: '/growth',
     icon: 'show_chart',
     label: 'Growth',
-    body: 'Length checks, retention and the care calendar.',
+    body: 'Length checks, retention and the styles you have worn.',
   },
   {
     to: '/profile',

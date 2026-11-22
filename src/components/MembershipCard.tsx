@@ -7,8 +7,10 @@ import {
   autoRenews,
   daysLeft,
   hasAccess,
+  hasCard,
   longDate,
   manageUrl,
+  markCheckoutOpened,
   onTrial,
   openExternal,
 } from '../lib/membership'
@@ -86,7 +88,11 @@ export default function MembershipCard({ embedded = false }: { embedded?: boolea
     setBusy(true)
     setError(null)
     try {
-      openExternal(await manageUrl(membership.token))
+      const url = await manageUrl(membership.token)
+      // Coming back from Paystack's page asks the server straight away,
+      // so a cancellation shows without waiting for the next check.
+      markCheckoutOpened()
+      openExternal(url)
     } catch (e) {
       setError(e instanceof MembershipError ? e.message : 'Couldn’t open Paystack. Try again in a moment.')
     } finally {
@@ -127,7 +133,7 @@ export default function MembershipCard({ embedded = false }: { embedded?: boolea
         ))}
       </dl>
 
-      {membership.status === 'attention' && (
+      {membership.status === 'attention' && hasCard(membership) && (
         <p className="mb-md rounded-xl bg-error-container p-md font-body-md text-caption text-on-error-container">
           Your last renewal didn&rsquo;t go through. Paystack will try the card again; check it under
           Manage or cancel.
@@ -144,7 +150,7 @@ export default function MembershipCard({ embedded = false }: { embedded?: boolea
             Choose a plan
           </Link>
         )}
-        {membership.plan && (
+        {hasCard(membership) && (
           <button
             type="button"
             onClick={() => void manage()}

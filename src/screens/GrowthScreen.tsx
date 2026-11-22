@@ -119,6 +119,7 @@ export default function GrowthScreen() {
       {logging && (
         <LogLengthCheck
           unit={lengthUnit}
+          onUnit={setUnit}
           hasPrevious={hasData}
           onSave={saveCheck}
           onCancel={() => setLogging(false)}

@@ -167,6 +167,7 @@ function validMembership(value: unknown): Membership | undefined {
     trialEndsISO: typeof m.trialEndsISO === 'string' ? m.trialEndsISO : null,
     // Older documents predate the flag; their status was only ever a Paystack one.
     renews: typeof m.renews === 'boolean' ? m.renews : m.status === 'active',
+    ...(typeof m.card === 'boolean' ? { card: m.card } : {}),
     checkedISO: typeof m.checkedISO === 'string' ? m.checkedISO : new Date(0).toISOString(),
   }
 }

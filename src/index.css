@@ -222,3 +222,9 @@
   from { transform: scale(1.08) translate3d(0, 0, 0); }
   to { transform: scale(1.16) translate3d(-2%, -1.5%, 0); }
 }
+
+/* The on-screen keyboard is up (set by native/shell.ts): the tab bar and
+   the Ask button would sit on top of the form being typed into. */
+.keyboard-open .keyboard-hides {
+  display: none;
+}

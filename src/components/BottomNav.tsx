@@ -62,7 +62,7 @@ export default function BottomNav() {
   return (
     <nav
       data-tour="tab-bar"
-      className="app-chrome fixed inset-x-0 bottom-0 z-50 flex justify-center px-gutter pb-[calc(0.75rem+var(--safe-bottom))]"
+      className="app-chrome keyboard-hides fixed inset-x-0 bottom-0 z-50 flex justify-center px-gutter pb-[calc(0.75rem+var(--safe-bottom))]"
     >
       <div className="flex w-full max-w-md items-center justify-between gap-xs rounded-full bg-inverse-surface p-1.5 shadow-float">
         {TABS.map(({ to, icon, label, also }) => {

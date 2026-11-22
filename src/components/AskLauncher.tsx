@@ -42,7 +42,7 @@ export default function AskLauncher() {
           aria-label="Ask AfroCoils a question"
           aria-haspopup="dialog"
           data-tour="ask-button"
-          className="app-chrome fixed right-gutter z-50 flex h-12 items-center gap-xs rounded-full bg-secondary px-lg text-on-secondary shadow-float transition-all active:scale-90"
+          className="app-chrome keyboard-hides fixed right-gutter z-50 flex h-12 items-center gap-xs rounded-full bg-secondary px-lg text-on-secondary shadow-float transition-all active:scale-90"
           // Just clear of the tab bar (60px pill + 12px inset).
           style={{ bottom: 'calc(5rem + var(--safe-bottom))' }}
         >

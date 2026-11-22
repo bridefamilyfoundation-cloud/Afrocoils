@@ -170,6 +170,17 @@ export default function BankTransfer({ token, email, onRecheck, busyOutside }: P
 
   return (
     <form onSubmit={submit} noValidate>
+      {latest?.status === 'Approved' && (
+        <div role="status" className="mb-md rounded-xl bg-secondary-fixed/40 p-md font-body-md text-caption text-on-surface">
+          <p className="font-bold">
+            Your last transfer was approved{latest.reviewedISO ? ` on ${longDate(latest.reviewedISO)}` : ''}.
+          </p>
+          <p className="mt-xs">
+            {PLANS[latest.plan].label}, {formatAmount(latest.amount, latest.currency)}. There is nothing more
+            to send for it; the form below is for paying again when that plan is ending.
+          </p>
+        </div>
+      )}
       {latest?.status === 'Rejected' && (
         <div className="mb-md rounded-xl bg-error-container p-md font-body-md text-caption text-on-error-container">
           <p className="font-bold">Your last receipt wasn&rsquo;t approved.</p>

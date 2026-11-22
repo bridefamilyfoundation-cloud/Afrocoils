@@ -41,7 +41,10 @@ export default function HairProblemScreen() {
 
   return (
     <>
-      <SectionCrumb to="/sos" label="Hair SOS" />
+      {/* Hair Care is where this screen is opened from (card E). It used
+          to say Hair SOS, which no longer has a door here, so the crumb
+          led to a page with no way back. */}
+      <SectionCrumb to="/care" label="Hair Care" />
 
       <section className="mb-xl">
         <h2 className="mb-sm font-headline-lg text-headline-lg text-on-background">

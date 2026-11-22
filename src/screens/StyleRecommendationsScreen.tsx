@@ -259,16 +259,25 @@ export default function StyleRecommendationsScreen() {
           {/* What this says has to be what the ranking actually does.
               Length and the two style preferences are the signals that
               exist, so they are the ones offered. */}
+          {/* For locs the list is empty because the library has no loc
+              entries, and nothing on the profile changes that: say so and
+              point at the lookbook rather than at a length check. */}
           <p className="mb-md font-body-md text-body-md text-on-secondary-container/90">
             {!identity.hairType
-              ? 'Start with whether you have loose hair or locs — the two share almost no technique, so that one answer halves this list.'
-              : 'Log a length check on Growth, tell Hair Discovery how your hair is doing, or turn on “prefer protective styles”. Those are what this list reorders around today.'}
+              ? 'Start with whether you have loose hair or locs — the two share almost no technique, so that one answer decides what this list can show.'
+              : identity.hairType === 'Locs'
+                ? 'Every style in the library is written for loose hair so far, so there is nothing here to rank for locs yet. The loc looks are in the Loc Lookbook.'
+                : 'Log a length check on Growth, tell Hair Discovery how your hair is doing, or turn on “prefer protective styles”. Those are what this list reorders around today.'}
           </p>
           <Link
-            to={identity.hairType ? '/growth' : '/profile'}
+            to={!identity.hairType ? '/quiz?step=hairType' : identity.hairType === 'Locs' ? '/locs/styles' : '/growth'}
             className="inline-block rounded-full bg-on-secondary-container px-lg py-2 font-label-md text-label-md text-secondary-container transition-all active:scale-95"
           >
-            {identity.hairType ? 'Log a length check' : 'Set your hair type'}
+            {!identity.hairType
+              ? 'Set your hair type'
+              : identity.hairType === 'Locs'
+                ? 'Open the Loc Lookbook'
+                : 'Log a length check'}
           </Link>
         </section>
       )}

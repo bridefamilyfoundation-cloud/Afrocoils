@@ -219,6 +219,20 @@ export function identityFieldsFor(hairType: HairType | undefined): (keyof HairId
     : shared
 }
 
+/**
+ * Whether one of those fields has been answered.
+ *
+ * One rule for the meter, the profile's "still to add" list and Hair
+ * Discovery. The scalp step takes an overall condition *or* the things
+ * noticed, so someone who ticked "Itching, Flaking" has answered it:
+ * counting only `scalpCondition` left the meter stuck below 100% beside
+ * a row that showed the answer.
+ */
+export function identityAnswered(identity: HairIdentity, field: keyof HairIdentity): boolean {
+  if (identity[field] !== undefined) return true
+  return field === 'scalpCondition' && (identity.scalpConcerns?.length ?? 0) > 0
+}
+
 /* ------------------------------------------------------------------ *
  * Bio tier — who is asking
  *
@@ -876,6 +890,10 @@ export interface PlanOffer {
   currency: string
 }
 
+/** The longest style name and credit the submissions route keeps; the form holds to the same. */
+export const SUBMISSION_NAME_MAX = 80
+export const SUBMISSION_CREDIT_MAX = 60
+
 /** What the phone remembers about its member. Absent: signed out. */
 export interface Membership {
   email: string
@@ -892,6 +910,12 @@ export interface Membership {
   trialEndsISO: string | null
   /** Whether a Paystack subscription will charge again by itself. */
   renews: boolean
+  /**
+   * Whether there is a Paystack card subscription to manage. Absent on
+   * answers from before the field existed; a plan paid by bank transfer
+   * has none, and "Manage or cancel" has nothing to open for it.
+   */
+  card?: boolean
   /** When the server last answered. */
   checkedISO: string
 }
@@ -929,6 +953,8 @@ export interface MembershipResponse {
   trialEndsISO?: string | null
   /** A Paystack subscription that will charge again by itself. */
   renews?: boolean
+  /** Whether a Paystack card subscription exists, renewing or not: what "Manage or cancel" opens. */
+  card?: boolean
   /** Whether this address can still start its free trial. */
   trialAvailable?: boolean
   /**
@@ -1080,6 +1106,12 @@ export interface HairProfile {
   schedules: CareSchedule[]
   /** Styles the user has offered to the community library. */
   submissions: StyleSubmission[]
+  /**
+   * Photographs taken for a style that has not been submitted yet. Only
+   * the filenames, so that files left by a form nobody finished can be
+   * found and deleted (`SubmitStyleScreen`).
+   */
+  draftPhotos?: string[]
   /** Raw porosity questionnaire result, kept so the test can show its working. */
   porosityTest?: { score: number; max: number; takenISO: string }
   /** Whether to check for a newer APK, and which one was declined. */

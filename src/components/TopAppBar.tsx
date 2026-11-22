@@ -49,7 +49,7 @@ export default function TopAppBar({ onOpenMenu }: { onOpenMenu?: () => void }) {
           to="/join"
           className="justify-self-end rounded-full bg-surface-container-lowest px-md py-2 font-label-md text-caption font-bold text-primary shadow-card transition-all active:scale-95"
         >
-          Sign in
+          {profile.membership ? 'Choose a plan' : 'Sign in'}
         </Link>
       ) : (
         <div className="flex items-center gap-sm justify-self-end">

@@ -254,11 +254,23 @@ export default function EmergencyScreen() {
               Explore more features
               <Icon name="arrow_forward" className="text-[20px]" />
             </Link>
+            {/* Signed in and locked is not "already a member? sign in". */}
             <p className="mt-md font-body-md text-caption text-on-surface-variant">
-              Already a member?{' '}
-              <Link to="/join" className="text-primary underline">
-                Sign in with your email
-              </Link>
+              {profile.membership ? (
+                <>
+                  Signed in as {profile.membership.email}.{' '}
+                  <Link to="/join" className="text-primary underline">
+                    Choose a plan
+                  </Link>
+                </>
+              ) : (
+                <>
+                  Already a member?{' '}
+                  <Link to="/join" className="text-primary underline">
+                    Sign in with your email
+                  </Link>
+                </>
+              )}
             </p>
           </div>
         </>
@@ -266,7 +278,7 @@ export default function EmergencyScreen() {
 
       {open && (
         <>
-          {/* scroll-mt clears the fixed app bar when Get Started lands here. */}
+          {/* scroll-mt clears the fixed app bar when “Need a quick style?” lands here. */}
           <section ref={doors} className="mb-xl mt-2xl scroll-mt-24 text-center">
             <h2 className="mb-sm font-headline-lg text-headline-lg text-on-background">
               Two ways in

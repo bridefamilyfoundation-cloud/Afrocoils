@@ -12,7 +12,7 @@ import { deriveDue } from './calendar'
 import { anyReminders, cancelAll, syncReminders } from './notifications'
 import { emptyProfile, ensureSchedules, loadProfile, saveProfile } from './storage'
 import type { HairProfile } from './types'
-import { identityFieldsFor } from './types'
+import { identityAnswered, identityFieldsFor } from './types'
 
 /**
  * The hair profile, available app-wide.
@@ -29,11 +29,19 @@ interface ProfileContextValue {
   profile: HairProfile
   /** False until the first read from disk resolves. */
   ready: boolean
-  /** Merge a partial update into the profile and persist. */
-  update: (patch: Partial<HairProfile>) => void
+  /**
+   * Merge a partial update into the profile and persist. Pass a function
+   * when the patch is built from the profile and the caller has awaited
+   * something first: it is given the profile as it is *now*, not as it
+   * was when the caller rendered, so a slow send cannot write back a list
+   * that changed underneath it.
+   */
+  update: (patch: ProfilePatch) => void
   /** How much of the identity tier is complete, 0–1. Drives onboarding nudges. */
   completeness: number
 }
+
+export type ProfilePatch = Partial<HairProfile> | ((current: HairProfile) => Partial<HairProfile>)
 
 const ProfileContext = createContext<ProfileContextValue | null>(null)
 
@@ -58,11 +66,11 @@ export function HairProfileProvider({ children }: { children: ReactNode }) {
     }
   }, [])
 
-  const update = useCallback((patch: Partial<HairProfile>) => {
+  const update = useCallback((patch: ProfilePatch) => {
     setProfile((prev) => {
       const next: HairProfile = {
         ...prev,
-        ...patch,
+        ...(typeof patch === 'function' ? patch(prev) : patch),
         updatedISO: new Date().toISOString(),
       }
       if (loaded.current) void saveProfile(next)
@@ -114,7 +122,7 @@ export function HairProfileProvider({ children }: { children: ReactNode }) {
     // wearer is never asked to fill in fields that do not apply to them,
     // so their meter must not be permanently stuck below 100%.
     const fields = identityFieldsFor(profile.identity.hairType)
-    const filled = fields.filter((f) => profile.identity[f] !== undefined).length
+    const filled = fields.filter((f) => identityAnswered(profile.identity, f)).length
 
     // Hair type is itself one of the answers, and the one everything else
     // hangs off — an unanswered profile reads as 0%, not as "a fifth done".

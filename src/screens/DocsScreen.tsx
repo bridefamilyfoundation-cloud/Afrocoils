@@ -44,16 +44,16 @@ const SECTIONS: {
     body: (
       <>
         <p>
-          The app opens on Hair SOS. Get Started scrolls down to the two doors; nothing else
-          is needed to use it.
+          The app opens on Hair SOS. Get Started goes to Hair Care, and &ldquo;Need a quick
+          style?&rdquo; scrolls down to the two doors; nothing else is needed to use it.
         </p>
         <p>
           The one answer that changes most of the app is whether you have{' '}
           <strong>loose natural hair or locs</strong>. Until it knows, every list is
-          generic. Hair Discovery asks it first, then walks through your coil pattern,
-          porosity, density, strand thickness, scalp and how your hair is doing, each with a
-          picture and something to check on your own head. Or set it directly on My Hair
-          Profile. Everything else on the profile sharpens results but is optional, and
+          generic. Hair Discovery asks it second, straight after your coil pattern, then
+          walks through porosity, density, strand thickness, scalp and how your hair is
+          doing, each with a picture and something to check on your own head. The Hair type
+          row on My Hair Profile opens that one question on its own. Everything else on the profile sharpens results but is optional, and
           every Hair Discovery result is a guided best match, not a diagnosis.
         </p>
       </>
@@ -247,8 +247,8 @@ const SECTIONS: {
           </li>
           <li>
             <strong>Know your hair</strong>: porosity, density, coil pattern and texture. Each
-            card shows what your profile already holds. Porosity has its own short test; the
-            others are set on your profile.
+            card shows what your profile already holds. Porosity has its own short test; each
+            of the others opens its one question in Hair Discovery and brings you back.
           </li>
           <li>
             <strong>Hair routine</strong> is the calendar. Log wash days, deep conditioning,
@@ -484,10 +484,13 @@ const SECTIONS: {
           anything else the library needs.
         </p>
         <p>
-          There is no community server yet. Your submission is saved on this phone, listed on
-          the Share a style screen, and waits there until there is somewhere to send it.
-          Nothing is uploaded in the background, and you can withdraw it until it is sent.
-          Once sent, a person reads it before anything is published.
+          When you tap submit, your submission is saved on this phone, listed on the Share a
+          style screen as Queued, and sent straight away. If there is no signal it stays
+          queued, and its row has a &ldquo;Send to the library&rdquo; button for when you are
+          back online; nothing is sent later without that tap. You can withdraw it until it
+          is sent. Once sent, a person reads it before anything is published, and removing it
+          from the screen only removes your copy: write to support@afrocoils.app to take a
+          sent style out of the review queue.
         </p>
       </>
     ),

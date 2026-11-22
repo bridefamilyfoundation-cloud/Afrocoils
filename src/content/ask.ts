@@ -273,9 +273,9 @@ export const TOPICS: AskTopic[] = [
     id: 'set-hair-type',
     title: 'Tell the app you have locs or loose hair',
     answer:
-      'Set your hair type on My Hair Profile, or start Hair Discovery. Until the app knows, every list is generic; once it does, loose-hair technique is never shown to a loc wearer.',
-    route: '/profile?open=hairType',
-    cta: 'Open My Hair Profile',
+      'Hair Discovery asks whether you wear your hair loose or in locs; the Hair type row on My Hair Profile opens that one question. Until the app knows, every list is generic; once it does, loose-hair technique is never shown to a loc wearer.',
+    route: '/quiz?step=hairType',
+    cta: 'Answer it now',
     docs: 'start',
     keys: 'change my hair type|set my hair type|switch to locs|i have locs now|i took my locs out|update my profile|edit my profile|change profile',
   },
@@ -352,7 +352,7 @@ export const TOPICS: AskTopic[] = [
     id: 'recommendations',
     title: 'How recommendations work',
     answer:
-      'Nothing is generated. The app filters and ranks the content it already has, on your phone, using your profile: hair type is a hard filter, enforced care preferences remove clashing styles, and your latest length check only changes the order.',
+      'Nothing is generated. The app filters and ranks the content it already has, on your phone, using your profile: hair type is a hard filter, enforced care preferences remove clashing styles, and your latest length check and what Hair Discovery knows about your hair’s condition only change the order.',
     route: '/styles/recommended',
     cta: 'See styles recommended for you',
     docs: 'ranking',
@@ -382,7 +382,7 @@ export const TOPICS: AskTopic[] = [
     id: 'contribute',
     title: 'Share a style with the library',
     answer:
-      'Share a style from Hair Styles, or from one of your own under My styles. Give it a name, a category, the hair type it is for, the steps and your photos, and confirm that the photos are yours to give.',
+      'Share a style from Hair Styles, or from one of your own under My styles. Give it a name, say which hair it is for, describe it in your own words, add your photos and how you want to be credited, and confirm that the photos are yours to give.',
     route: '/styles/submit',
     cta: 'Share a style',
     docs: 'contribute',
@@ -589,7 +589,7 @@ export const NOT_UNDERSTOOD =
  * today — the tips collected on About. There is no feed, and this does
  * not pretend there is one.
  */
-export const COMMUNITY = { to: '/about', label: 'Still stuck? See what the community says' } as const
+export const COMMUNITY = { to: '/about?open=tips', label: 'Still stuck? See what the community says' } as const
 
 /** Said under the box, every time the box is shown, while sharing is on. */
 export const SHARING_LINE =
@@ -633,7 +633,7 @@ export const SMALL_TALK: { match: string; reply: string }[] = [
     match:
       'who are you|what are you|are you ai|are you an ai|are you a bot|are you a robot|are you human|are you real|are you chatgpt|is this ai|is this chatgpt|what can you do|what do you do|how do you work|help',
     reply:
-      'I’m Ask. I’m not AI and I don’t make answers up: everything I show you was written by people for AfroCoils and matched to your hair profile on your phone. Your question is shared anonymously, with nothing about you, so the team can write the answers people are missing — you can turn that off in About.',
+      'I’m Ask. I’m not AI and I don’t make answers up: everything I show you was written by people for AfroCoils and matched to your hair profile on your phone. The line under the question box says whether your question is shared, anonymously and with nothing about you, so the team can write the answers people are missing — you can switch that on or off in About.',
   },
 ]
 

@@ -1,8 +1,8 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { todayKey } from '../lib/calendar'
 import { fromDisplay, newCheckId } from '../lib/growth'
 import type { LengthCheck, LengthUnit, Section } from '../lib/types'
-import { SECTIONS } from '../lib/types'
+import { LENGTH_UNITS, SECTIONS } from '../lib/types'
 import Icon from './Icon'
 
 /**
@@ -23,11 +23,19 @@ const SECTION_LABELS: Record<Section, string> = {
 
 export default function LogLengthCheck({
   unit,
+  onUnit,
   hasPrevious,
   onSave,
   onCancel,
 }: {
   unit: LengthUnit
+  /**
+   * Change the unit, from the form itself. The switch used to exist only
+   * beside the chart, which is drawn once there is a check to chart, so
+   * a first measurement taken in centimetres could only be typed as
+   * inches.
+   */
+  onUnit: (unit: LengthUnit) => void
   /** Whether there is an earlier check for a trim to have happened since. */
   hasPrevious: boolean
   onSave: (check: LengthCheck) => void
@@ -40,6 +48,13 @@ export default function LogLengthCheck({
   const [note, setNote] = useState('')
   const [showSections, setShowSections] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  // The button that opens this can be several screens below where the
+  // form is drawn, so the form brings itself into view.
+  const root = useRef<HTMLElement>(null)
+  useEffect(() => {
+    root.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }, [])
 
   function submit() {
     const value = Number.parseFloat(overall)
@@ -94,8 +109,30 @@ export default function LogLengthCheck({
     'w-full rounded-xl border-none bg-surface-container-lowest px-md py-3 font-body-md text-body-md text-on-surface focus:ring-2 focus:ring-primary/20'
 
   return (
-    <section className="mb-2xl rounded-2xl border border-outline-variant/30 bg-surface-container p-lg">
-      <h3 className="mb-lg font-headline-md text-headline-md text-primary">Log a length check</h3>
+    <section
+      ref={root}
+      className="mb-2xl scroll-mt-28 rounded-2xl border border-outline-variant/30 bg-surface-container p-lg"
+    >
+      <div className="mb-lg flex items-center justify-between gap-md">
+        <h3 className="font-headline-md text-headline-md text-primary">Log a length check</h3>
+        <div className="flex gap-xs" role="group" aria-label="Measure in">
+          {LENGTH_UNITS.map((u) => (
+            <button
+              key={u}
+              type="button"
+              aria-pressed={unit === u}
+              onClick={() => onUnit(u)}
+              className={`rounded-full px-md py-1 font-label-md text-caption transition-colors active:scale-95 ${
+                unit === u
+                  ? 'bg-inverse-surface text-inverse-on-surface'
+                  : 'bg-surface-container-lowest text-on-surface shadow-card'
+              }`}
+            >
+              {u}
+            </button>
+          ))}
+        </div>
+      </div>
 
       <div className="space-y-md">
         <div>

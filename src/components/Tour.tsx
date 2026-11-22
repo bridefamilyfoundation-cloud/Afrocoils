@@ -284,11 +284,31 @@ export default function Tour() {
           </div>
         ) : last ? (
           <div className="flex flex-col gap-sm">
+            {/* Hair type is the fork above everything, and until now a
+                new member could finish the tour without ever being asked
+                it. With no answer yet, the tour ends on the way to give
+                one; Done is still there for someone mid-problem. */}
+            {!profile.identity.hairType && (
+              <button
+                ref={primary}
+                type="button"
+                onClick={() => {
+                  finish()
+                  navigate('/quiz')
+                }}
+                className="flex w-full items-center justify-center gap-sm rounded-full bg-primary py-3 font-label-md text-label-md text-on-primary transition-all active:scale-95"
+              >
+                <Icon name="science" className="text-[18px]" />
+                Start Hair Discovery
+              </button>
+            )}
             <button
-              ref={primary}
+              ref={profile.identity.hairType ? primary : undefined}
               type="button"
               onClick={finish}
-              className="w-full rounded-full bg-primary py-3 font-label-md text-label-md text-on-primary transition-all active:scale-95"
+              className={`w-full rounded-full py-3 font-label-md text-label-md transition-all active:scale-95 ${
+                profile.identity.hairType ? 'bg-primary text-on-primary' : 'border border-outline-variant text-on-surface'
+              }`}
             >
               Done
             </button>

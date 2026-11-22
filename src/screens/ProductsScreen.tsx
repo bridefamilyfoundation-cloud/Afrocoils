@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import SectionCrumb from '../components/SectionCrumb'
 import Icon from '../components/Icon'
@@ -45,6 +45,11 @@ export default function ProductsScreen() {
   const [active, setActive] = useState<Filter>(() =>
     PRODUCT_CATEGORIES.find((c) => c === requested) ?? 'All',
   )
+  // Ask's sheet can link here while this screen is already showing.
+  useEffect(() => {
+    const category = PRODUCT_CATEGORIES.find((c) => c === requested)
+    if (category) setActive(category)
+  }, [requested])
   useScrollToOpened(
     requested === 'avoid'
       ? 'products-avoid'
@@ -186,7 +191,7 @@ export default function ProductsScreen() {
             this shelf halves in size and doubles in usefulness.
           </p>
           <Link
-            to="/profile"
+            to="/quiz?step=hairType"
             className="inline-block rounded-full bg-on-secondary-container px-lg py-2 font-label-md text-label-md text-secondary-container active:scale-95"
           >
             Set your hair type
@@ -282,7 +287,7 @@ export default function ProductsScreen() {
           what you already have before anything you would need to buy.
         </p>
         <Link
-          to="/profile"
+          to="/profile?open=shelf"
           className="inline-block rounded-full bg-on-primary-container px-2xl py-3 font-label-md text-label-md text-primary-container active:scale-95"
         >
           See your shelf

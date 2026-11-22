@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { version } from '../../package.json'
 import Icon from '../components/Icon'
 import ScreenHeader from '../components/ScreenHeader'
+import { useOpenParam, useScrollToOpened } from '../lib/deep-link'
 import { useHairProfile } from '../lib/profile-store'
 import {
   checkForUpdates,
@@ -64,7 +65,7 @@ const ABOUT: { heading: string; body: string | string[] }[] = [
   },
   {
     heading: 'Your hair data stays on your device',
-    body: 'Your hair profile, your length checks, your calendar and your photos are stored on this phone and nowhere else, and none of it is tied to your membership. Your membership is your email: we hold it, whether it is paid up and the record of your payments, and Paystack holds your card. A bank transfer receipt you send is kept privately for checking and deleted 90 days after the decision. While you are signed in the app checks now and then that the membership is still paid, sending your sign-in token and nothing else. It also asks our website whether a newer version is out, which carries nothing about you — see Updates below.',
+    body: 'Your hair profile, your length checks, your calendar and your photos are stored on this phone and nowhere else, and none of it is tied to your membership. Your membership is your email: we hold it, whether it is paid up and the record of your payments, and Paystack holds your card. A bank transfer receipt you send is kept privately for checking and deleted 90 days after the decision. While you are signed in the app checks now and then that the membership is still paid, sending your sign-in token and nothing else. It also asks our update server whether a newer version is out, which carries nothing about you — see Updates below.',
   },
   {
     heading: 'Nothing you read is generated',
@@ -94,12 +95,13 @@ const TIPS = [
   },
   {
     title: 'Protein and moisture are a balance, not a ladder',
-    body: 'Dry and snapping usually means protein. Mushy and over-elastic means too much protein. Both feel like "damage".',
+    body: 'Limp, mushy and over-elastic when wet usually means it needs protein. Rough, straw-like and brittle usually means it needs moisture. Both get called "dry", which is why they are confused.',
     tag: 'Balance',
   },
 ]
 
 export default function AboutScreen() {
+  useScrollToOpened(useOpenParam() === 'tips' ? 'about-tips' : null)
   return (
     <>
       <ScreenHeader title="About" subtitle="What AfroCoils is, and what it does with your data." />
@@ -125,7 +127,10 @@ export default function AboutScreen() {
         </p>
       </section>
 
-      <section className="mb-2xl">
+      {/* `?open=tips` lands here: it is where Ask's "see what the
+          community says" points, and the top of this page is about the
+          app, not the tips. */}
+      <section id="about-tips" className="mb-2xl scroll-mt-28">
         <h2 className="mb-md font-headline-md text-body-lg font-bold text-on-surface">
           Things worth knowing
         </h2>
@@ -330,8 +335,8 @@ function UpdatesSection() {
           </div>
 
           <p className="font-caption text-caption text-on-surface-variant">
-            The check asks the AfroCoils website which version is newest. It sends nothing from
-            your profile and no identifier — the website sees what any website sees, your
+            The check asks our update server which version is newest. It sends nothing from
+            your profile and no identifier — the server sees what any server sees, your
             connection&rsquo;s IP address. Nothing downloads unless you tap Download.
           </p>
         </>

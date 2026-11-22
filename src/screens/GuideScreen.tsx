@@ -1,16 +1,68 @@
-import { Navigate, useParams } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
 import Icon from '../components/Icon'
+import ScreenFallback from '../components/ScreenFallback'
 import ScreenHeader from '../components/ScreenHeader'
 import SectionCrumb from '../components/SectionCrumb'
-import { getGuide } from '../content/guides'
+import { getGuide, guidesFor } from '../content/guides'
+import { useHairProfile } from '../lib/profile-store'
+import NotFoundScreen from './NotFoundScreen'
 
 /** Renders any care guide from src/content/guides.ts. */
 export default function GuideScreen() {
   const { slug } = useParams()
   const guide = getGuide(slug)
+  const { profile, ready } = useHairProfile()
 
-  // Unknown slug: send the user somewhere real rather than showing an error.
-  if (!guide) return <Navigate to="/sos" replace />
+  // An address that matches no guide is a wrong address, and says so.
+  if (!guide) return <NotFoundScreen />
+  if (!ready) return <ScreenFallback />
+
+  /*
+   * The same hard filter every list applies, on the page itself. The
+   * lists never offer a loose-hair guide to a loc wearer, but an address
+   * can still be reached: history from before the hair type changed, a
+   * link someone shared. Loose-hair technique on locs does damage, so the
+   * method is not shown; what is shown says why and where to go.
+   */
+  const hairType = profile.identity.hairType
+  if (hairType && !guidesFor(hairType).some((g) => g.slug === guide.slug)) {
+    const locs = hairType === 'Locs'
+    return (
+      <>
+        <SectionCrumb to="/sos/problem" label="Hair Problem" />
+        <ScreenHeader title={guide.title} />
+        <section className="mb-2xl rounded-2xl bg-secondary-container p-lg text-on-secondary-container">
+          <div className="mb-sm flex items-center gap-sm">
+            <Icon name="info" />
+            <h2 className="font-headline-md text-headline-md">
+              Written for {locs ? 'loose hair' : 'locs'}
+            </h2>
+          </div>
+          <p className="mb-md font-body-md text-body-md opacity-90">
+            Your profile says {locs ? 'locs' : 'loose natural hair'}, and this guide is not written
+            for that.{' '}
+            {locs ? 'On locs, most loose-hair technique does damage, so it is not shown here.' : ''}
+          </p>
+          <div className="flex flex-wrap gap-sm">
+            <Link
+              to="/sos/problem"
+              className="rounded-full bg-on-secondary-container px-lg py-2 font-label-md text-label-md text-secondary-container active:scale-95"
+            >
+              Guides for your hair
+            </Link>
+            {locs && (
+              <Link
+                to="/locs"
+                className="rounded-full border border-on-secondary-container/40 px-lg py-2 font-label-md text-label-md active:scale-95"
+              >
+                Locs World
+              </Link>
+            )}
+          </div>
+        </section>
+      </>
+    )
+  }
 
   return (
     <>

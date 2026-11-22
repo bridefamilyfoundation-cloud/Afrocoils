@@ -1,4 +1,7 @@
 import { useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
+import { useBackDismiss } from '../lib/back-button'
+import { useScrollToOpened } from '../lib/deep-link'
 import { Link } from 'react-router-dom'
 import Icon from './Icon'
 import UserPhoto from './UserPhoto'
@@ -24,7 +27,13 @@ export default function MyStyles() {
   const { profile, update } = useHairProfile()
   const { myStyles } = profile
 
-  const [adding, setAdding] = useState(false)
+  // `?log=<name>`: "Log it" on a library style lands here with the form
+  // open and the name filled in, not at the top of Growth with nothing.
+  const [params] = useSearchParams()
+  const logName = params.get('log')?.trim().slice(0, 60) || undefined
+  useScrollToOpened(logName ? 'my-styles' : null)
+
+  const [adding, setAdding] = useState(logName !== undefined)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -89,7 +98,7 @@ export default function MyStyles() {
   }
 
   return (
-    <section className="mb-2xl">
+    <section id="my-styles" className="mb-2xl scroll-mt-28">
       <div className="mb-xs flex items-center justify-between">
         <h3 className="font-headline-md text-body-lg font-bold text-on-surface">
           My Styles
@@ -116,7 +125,9 @@ export default function MyStyles() {
         </p>
       )}
 
-      {adding && <AddStyleForm onCancel={() => setAdding(false)} onSave={addStyle} />}
+      {adding && (
+        <AddStyleForm initialName={logName} onCancel={() => setAdding(false)} onSave={addStyle} />
+      )}
 
       {myStyles.length === 0 && !adding ? (
         <button
@@ -176,6 +187,8 @@ function StyleRow({
   onDelete: () => void
 }) {
   const [confirming, setConfirming] = useState(false)
+  // Back cancels an armed delete rather than leaving Growth with it armed.
+  useBackDismiss(confirming, () => setConfirming(false))
   const canPick = photosAvailable()
   const full = style.photos.length >= MAX_PHOTOS_PER_STYLE
 
@@ -298,9 +311,11 @@ function StyleRow({
               Worn today
             </button>
 
-            {/* The obvious moment to contribute: you have already named it,
-                timed it and photographed it. The submit screen reads the
-                id and seeds itself, so it is not typed a second time. */}
+            {/* The obvious moment to contribute: you have already named
+                and described it. The submit screen reads the id and seeds
+                the name and notes, so they are not typed a second time.
+                The photographs are not carried over: a submission owns
+                its files, and these belong to this row. */}
             <Link
               to={`/styles/submit?from=${style.id}`}
               className="flex items-center gap-xs rounded-full bg-surface-container-high px-lg py-2 font-label-md text-caption text-on-surface active:scale-95"
@@ -344,9 +359,11 @@ function StyleRow({
 }
 
 function AddStyleForm({
+  initialName,
   onCancel,
   onSave,
 }: {
+  initialName?: string
   onCancel: () => void
   onSave: (draft: {
     name: string
@@ -355,7 +372,7 @@ function AddStyleForm({
     notes?: string
   }) => void
 }) {
-  const [name, setName] = useState('')
+  const [name, setName] = useState(initialName ?? '')
   const [category, setCategory] = useState<StyleCategory | undefined>()
   const [minutes, setMinutes] = useState('')
   const [notes, setNotes] = useState('')

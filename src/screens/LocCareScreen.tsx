@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { hasLocLook, slot as imageSlot } from '../assets/imagery'
 import Icon from '../components/Icon'
@@ -72,8 +72,10 @@ function StageStrip({ identity }: { identity: HairIdentity }) {
           </li>
         ))}
       </ol>
+      {/* With a stage, the row that corrects it; without one, the
+          question that works it out. */}
       <Link
-        to="/profile?open=locStage"
+        to={stage ? '/profile?open=locStage' : '/quiz?step=locStartISO'}
         className="mt-sm flex items-center gap-xs font-caption text-caption text-inverse-primary"
       >
         {stage
@@ -112,10 +114,52 @@ function FirstQuestion() {
   const { profile, update } = useHairProfile()
   const navigate = useNavigate()
   const current = profile.identity.hairType
+  /*
+   * Changing an answer already given is asked twice. Hair type is the
+   * fork above everything: one stray tap here used to re-file the whole
+   * app and drop the other type's care schedules and reminders, with
+   * nothing saying it had happened. A first answer is still one tap.
+   */
+  const [switching, setSwitching] = useState<HairType | null>(null)
 
-  function choose(type: HairType) {
+  function apply(type: HairType) {
+    setSwitching(null)
     if (current !== type) update({ identity: { ...profile.identity, hairType: type } })
     if (type === 'Loose Natural') navigate('/care')
+  }
+
+  function choose(type: HairType) {
+    if (current && current !== type) setSwitching(type)
+    else apply(type)
+  }
+
+  if (switching) {
+    return (
+      <div role="alertdialog" aria-label="Change hair type" className="mt-lg rounded-2xl bg-inverse-on-surface/10 p-md text-inverse-on-surface">
+        <p className="mb-md font-body-md text-body-md">
+          Your profile says {current === 'Locs' ? 'locs' : 'loose natural hair'}. Change it to{' '}
+          {switching === 'Locs' ? 'locs' : 'loose natural hair'}? Styles, guides and products
+          follow this answer, and the care schedules that only fit your current hair type are
+          removed.
+        </p>
+        <div className="flex flex-wrap gap-sm">
+          <button
+            type="button"
+            onClick={() => apply(switching)}
+            className="rounded-full bg-secondary px-lg py-2 font-label-md text-label-md font-bold text-on-secondary active:scale-95"
+          >
+            Yes, change it
+          </button>
+          <button
+            type="button"
+            onClick={() => setSwitching(null)}
+            className="rounded-full bg-inverse-on-surface/15 px-lg py-2 font-label-md text-label-md text-inverse-on-surface active:scale-95"
+          >
+            Keep it as it is
+          </button>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -268,6 +312,10 @@ export default function LocCareScreen() {
   const requested = useOpenParam()
   const shown = requested && LOC_CARE.some((c) => c.id === requested) ? requested : null
   const [open, setOpen] = useState<string | null>(shown)
+  // Ask's sheet can link here while this screen is already showing.
+  useEffect(() => {
+    if (shown) setOpen(shown)
+  }, [shown])
   useScrollToOpened(shown ? `loc-row-${shown}` : null)
   const locs = isLocs(profile.identity)
   const pending = outlineCount()

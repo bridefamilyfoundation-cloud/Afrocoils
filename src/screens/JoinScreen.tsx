@@ -9,9 +9,12 @@ import {
   autoRenews,
   checkStatus,
   checkoutUrl,
+  daysLeft,
   hasAccess,
   longDate,
+  manageUrl,
   markCheckoutOpened,
+  onPaidTime,
   onTrial,
   openExternal,
   planValue,
@@ -56,12 +59,20 @@ import { PLANS, TRIAL_DAYS, formatAmount, type PlanId, type PlanOffer } from '..
 
 type Step = 'email' | 'code' | 'pay'
 
+/**
+ * The address a code was last sent to, in memory only. Opening the
+ * Terms from this screen unmounts the form; coming back should still be
+ * the code box, not the email box and a second code that cancels the
+ * first.
+ */
+let codeSentTo = ''
+
 export default function JoinScreen() {
   const { profile, update } = useHairProfile()
   const navigate = useNavigate()
   const membership = profile.membership
-  const [step, setStep] = useState<Step>(membership ? 'pay' : 'email')
-  const [email, setEmail] = useState(membership?.email ?? '')
+  const [step, setStep] = useState<Step>(membership ? 'pay' : codeSentTo ? 'code' : 'email')
+  const [email, setEmail] = useState(membership?.email ?? codeSentTo)
   const [code, setCode] = useState('')
   // undefined: not asked yet; null: could not be read.
   const [offers, setOffers] = useState<PlanOffer[] | null | undefined>(undefined)
@@ -71,6 +82,10 @@ export default function JoinScreen() {
   const [error, setError] = useState<string | null>(null)
   const [note, setNote] = useState<string | null>(null)
   const [byTransfer, setByTransfer] = useState(false)
+  // Checkout was refused because a card subscription is still live on
+  // Paystack's side: the way forward is its manage page, and My Hair
+  // Profile, where that button usually is, is locked.
+  const [needsManage, setNeedsManage] = useState(false)
   const codeInput = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
@@ -115,9 +130,12 @@ export default function JoinScreen() {
     event?.preventDefault()
     void run(async () => {
       await requestCode(email.trim())
+      codeSentTo = email.trim()
       setCode('')
       setStep('code')
-      setNote(`We sent a six-digit code to ${email.trim()}. It can take a minute; check spam too.`)
+      setNote(
+        `We sent a six-digit code to ${email.trim()}. It can take a minute; check spam too. If you ask for another, only the newest one works.`,
+      )
     })
   }
 
@@ -125,6 +143,7 @@ export default function JoinScreen() {
     event.preventDefault()
     void run(async () => {
       const response = await verifyCode(email.trim(), code)
+      codeSentTo = ''
       take(response)
       // Signing in on a new phone with access already: straight in.
       if (hasAccess(toMembership(response))) navigate('/sos', { replace: true })
@@ -143,25 +162,56 @@ export default function JoinScreen() {
   const pay = () =>
     void run(async () => {
       if (!membership) return
-      const url = await checkoutUrl(membership.token, chosen)
+      let url: string
+      try {
+        url = await checkoutUrl(membership.token, chosen)
+      } catch (e) {
+        if (e instanceof MembershipError && e.status === 409) setNeedsManage(true)
+        throw e
+      }
       markCheckoutOpened()
       openExternal(url)
       setNote('Finish paying on the Paystack page, then come back here. The app opens by itself once the payment is through.')
     })
 
+  const manage = () =>
+    void run(async () => {
+      if (!membership) return
+      const url = await manageUrl(membership.token)
+      markCheckoutOpened()
+      openExternal(url)
+      setNote('Update the card or cancel on the Paystack page, then come back here and tap “I’ve paid — check again”.')
+    })
+
   const recheck = () =>
     void run(async () => {
       if (!membership) return
-      const response = await checkStatus(membership.token)
+      let response: Awaited<ReturnType<typeof checkStatus>>
+      try {
+        response = await checkStatus(membership.token)
+      } catch (e) {
+        // The token is no good any more: back to the email step rather
+        // than an error over a screen that cannot act on it.
+        if (e instanceof MembershipError && e.status === 401) signOut()
+        throw e
+      }
       take(response)
       const now = toMembership(response)
       if (autoRenews(now)) return
-      if (hasAccess(now) && membership && !hasAccess(membership)) navigate('/sos', { replace: true })
-      else setNote('No payment on this email yet. Paystack can take a minute to confirm a card payment, and a bank transfer opens the app once a person has approved it.')
+      // A payment is new paid time: the app opening for the first time,
+      // or a later end than the phone knew, which is how a transfer
+      // approved during the trial, or before a plan ran out, shows.
+      const was = membership.paidUntilISO ? Date.parse(membership.paidUntilISO) : 0
+      const is = now.paidUntilISO ? Date.parse(now.paidUntilISO) : 0
+      const paid = onPaidTime(now) && is > was
+      if (paid || (hasAccess(now) && !hasAccess(membership))) navigate('/sos', { replace: true })
+      else setNote('No new payment on this email yet. Paystack can take a minute to confirm a card payment, and a bank transfer opens the app once a person has approved it.')
     })
 
-  const signOut = () => {
+  function signOut() {
     update({ membership: undefined })
+    codeSentTo = ''
+    setNeedsManage(false)
     setStep('email')
     setCode('')
     setOffers(undefined)
@@ -175,6 +225,11 @@ export default function JoinScreen() {
   const lapsed = !open && !!membership && (membership.paidUntilISO !== null || membership.trialEndsISO !== null)
   const endsISO = membership && open ? accessEndsISO(membership) : null
   const offer = offers?.find((o) => o.id === chosen)
+  // Paid time still to run on a plan that will not renew. A card plan
+  // starts the day it is paid (members.ts, `recordCharge`), so buying one
+  // now adds nothing until that time is nearly up; a transfer adds on.
+  const paidLeft = membership && onPaidTime(membership) && !autoRenews(membership) ? daysLeft(membership.paidUntilISO) : 0
+  const showManage = needsManage || (!!membership && membership.status === 'attention' && membership.card !== false)
 
   const heading =
     step !== 'pay'
@@ -276,7 +331,17 @@ export default function JoinScreen() {
               {busy ? 'Checking…' : 'Confirm'}
             </button>
             <div className="flex justify-between gap-md font-body-md text-caption">
-              <button type="button" onClick={() => setStep('email')} className="text-on-surface-variant underline">
+              <button
+                type="button"
+                onClick={() => {
+                  codeSentTo = ''
+                  setNote(null)
+                  setError(null)
+                  setCode('')
+                  setStep('email')
+                }}
+                className="text-on-surface-variant underline"
+              >
                 Use a different email
               </button>
               <button type="button" onClick={() => sendCode()} disabled={busy} className="text-primary underline">
@@ -295,11 +360,43 @@ export default function JoinScreen() {
             {offers === undefined && (
               <p className="mb-md font-body-md text-body-md text-on-surface-variant">Checking the plans…</p>
             )}
-            {(offers === null || offers?.length === 0) && (
+            {offers === null && (
               <p className="mb-md rounded-xl bg-surface-container p-md font-body-md text-caption text-on-surface">
                 The plans couldn&rsquo;t be loaded just now. Check your connection, then tap
                 &ldquo;Check again&rdquo; below.
               </p>
+            )}
+            {/* Loaded, and none on offer: not a connection problem, and
+                saying it is sends someone to check a signal that is fine. */}
+            {offers?.length === 0 && (
+              <p className="mb-md rounded-xl bg-surface-container p-md font-body-md text-caption text-on-surface">
+                Paying by card isn&rsquo;t open yet. Pay by bank transfer below, or write to
+                support@afrocoils.app and we&rsquo;ll help you join.
+              </p>
+            )}
+            {paidLeft > 3 && (
+              <p className="mb-md rounded-xl bg-secondary-fixed/40 p-md font-body-md text-caption text-on-surface">
+                You are already paid up until {longDate(membership!.paidUntilISO!)}. A card plan
+                starts the day you pay, so subscribing today adds nothing to that. Wait until
+                nearer the date, or pay by bank transfer, which adds on to the time you have.
+              </p>
+            )}
+            {showManage && (
+              <div className="mb-md rounded-xl bg-error-container p-md font-body-md text-caption text-on-error-container">
+                <p className="mb-sm">
+                  There is still a card subscription on this email with Paystack. Update its card
+                  there, or cancel it and then choose a plan here.
+                </p>
+                <button
+                  type="button"
+                  onClick={manage}
+                  disabled={busy}
+                  className="flex items-center gap-xs rounded-full bg-on-error-container px-md py-2 font-label-md text-label-md font-bold text-error-container transition-all active:scale-95 disabled:opacity-60"
+                >
+                  <Icon name="open_in_new" className="text-[18px]" />
+                  Manage my card on Paystack
+                </button>
+              </div>
             )}
 
             {offers && offers.length > 0 && (

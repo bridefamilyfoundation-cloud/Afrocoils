@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { Navigate, Outlet, useLocation, useNavigationType } from 'react-router-dom'
 import AppFooter from './AppFooter'
 import AskLauncher from './AskLauncher'
@@ -48,23 +48,55 @@ export default function AppLayout() {
   const navigationType = useNavigationType()
   const offsets = useRef(new Map<string, number>())
 
+  /*
+   * Which screen a scroll event belongs to.
+   *
+   * The position used to be read once more as the old screen was torn
+   * down. By then the new screen was already in the document, and if it
+   * was shorter the browser had clamped the scroll to its height: the
+   * fourteenth row of the library was remembered as wherever a style's
+   * page happened to end, and back landed there. Now positions are only
+   * ever recorded from scroll events, and this ref is moved to the new
+   * path in a layout effect, in the same commit that swaps the screens
+   * and before the browser can report the clamp, so that event is filed
+   * under the screen that caused it.
+   */
+  const scrolling = useRef(pathname)
+  useLayoutEffect(() => {
+    scrolling.current = pathname
+  }, [pathname])
+
+  useEffect(() => {
+    const remember = () => offsets.current.set(scrolling.current, window.scrollY)
+    window.addEventListener('scroll', remember, { passive: true })
+    return () => window.removeEventListener('scroll', remember)
+  }, [])
+
+  // Read through a ref: the effect below is about arriving at a screen,
+  // and must not run again when a filter on that screen rewrites its own
+  // query string (a REPLACE on the same path), which would throw the
+  // page back to the top under the chip that was just tapped.
+  const arrivedBy = useRef(navigationType)
+  arrivedBy.current = navigationType
+
   useEffect(() => {
     const saved = offsets.current.get(pathname)
-    if (navigationType === 'POP' && saved !== undefined) {
-      // After the restored screen has laid out, or there is nothing to
-      // scroll to yet and the browser clamps this to zero.
-      requestAnimationFrame(() => window.scrollTo(0, saved))
-    } else {
+    if (arrivedBy.current !== 'POP' || saved === undefined) {
       window.scrollTo(0, 0)
+      return
     }
-
-    const remember = () => offsets.current.set(pathname, window.scrollY)
-    window.addEventListener('scroll', remember, { passive: true })
-    return () => {
-      remember()
-      window.removeEventListener('scroll', remember)
+    // After the restored screen has laid out, or there is nothing to
+    // scroll to yet and the browser clamps this to zero. A screen that
+    // is still filling in gets a few frames to grow tall enough.
+    let frame = 0
+    let tries = 0
+    const restore = () => {
+      window.scrollTo(0, saved)
+      if (Math.abs(window.scrollY - saved) > 2 && ++tries < 20) frame = requestAnimationFrame(restore)
     }
-  }, [pathname, navigationType])
+    frame = requestAnimationFrame(restore)
+    return () => cancelAnimationFrame(frame)
+  }, [pathname])
 
   // Nothing is decided until the profile has been read: an empty profile
   // is signed out, and a member must not be bounced to the join screen

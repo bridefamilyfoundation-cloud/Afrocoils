@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type ReactNode } from 'react'
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import Icon from '../components/Icon'
 import ScreenHeader from '../components/ScreenHeader'
@@ -131,15 +131,29 @@ type Phase = 'intro' | 'step' | 'summary'
 export default function QuizScreen() {
   const { profile, update, ready, completeness } = useHairProfile()
   const navigate = useNavigate()
-  const [params] = useSearchParams()
+  const [params, setParams] = useSearchParams()
 
   const { identity, state } = profile
   const steps = useMemo(() => quizStepsFor(identity.hairType), [identity.hairType])
   const only = params.get('step')
   const single = only ? steps.find((s) => s.id === only) : undefined
 
-  const [phase, setPhase] = useState<Phase>('intro')
-  const [index, setIndex] = useState(0)
+  /*
+   * Where you are, kept in the address (`?at=<step id>` or `?at=summary`)
+   * rather than in component state. The summary links out to Hair
+   * Problem and to the styles list; as state, coming back from either
+   * showed the intro again, with the summary reachable only by stepping
+   * through every question a second time.
+   */
+  const at = params.get('at')
+  const found = at ? steps.findIndex((s) => s.id === at) : -1
+  const phase: Phase = at === 'summary' ? 'summary' : found >= 0 ? 'step' : 'intro'
+  const index = Math.max(0, found)
+  const go = (to: number | 'summary' | 'intro') =>
+    setParams(
+      to === 'intro' ? {} : { at: to === 'summary' ? 'summary' : (steps[to]?.id ?? 'summary') },
+      { replace: true },
+    )
   // Opened from the summary's Edit: Continue goes back there, not onward.
   const [editing, setEditing] = useState(false)
 
@@ -161,30 +175,44 @@ export default function QuizScreen() {
     update({ state: { ...state, ...patch } })
   }
 
+  // One answer advances after a short beat; a second tap inside that
+  // beat must not advance twice and skip the next question unseen.
+  const advancing = useRef<number | undefined>(undefined)
+  useEffect(() => () => window.clearTimeout(advancing.current), [])
+
   function next() {
-    if (single) navigate(`/profile?open=${single.id}`, { replace: true })
-    else if (editing) {
+    if (single) {
+      /*
+       * Back to whoever asked. One question is opened from the profile,
+       * from Hair Care's trait cards, from a lesson and from the
+       * recommendations list; it used to finish on the profile whichever
+       * it was. With no history behind it (the address was opened
+       * directly) the profile row is still the sensible place to land.
+       */
+      const depth = (window.history.state as { idx?: number } | null)?.idx ?? 0
+      if (depth > 0) navigate(-1)
+      else navigate(`/profile?open=${single.id}`, { replace: true })
+    } else if (editing) {
       setEditing(false)
-      setPhase('summary')
-    } else if (index >= steps.length - 1) setPhase('summary')
-    else setIndex((i) => i + 1)
+      go('summary')
+    } else if (index >= steps.length - 1) go('summary')
+    else go(index + 1)
   }
 
   function back() {
     if (single) navigate(-1)
     else if (editing) {
       setEditing(false)
-      setPhase('summary')
-    } else if (index === 0) setPhase('intro')
-    else setIndex((i) => i - 1)
+      go('summary')
+    } else if (index === 0) go('intro')
+    else go(index - 1)
   }
 
   function edit(id: string) {
-    const at = steps.findIndex((s) => s.id === id)
-    if (at < 0) return
-    setIndex(at)
+    const target = steps.findIndex((s) => s.id === id)
+    if (target < 0) return
     setEditing(true)
-    setPhase('step')
+    go(target)
   }
 
   if (!ready) return <ScreenFallback />
@@ -193,10 +221,7 @@ export default function QuizScreen() {
     return (
       <Intro
         returning={completeness > 0}
-        onStart={() => {
-          setIndex(0)
-          setPhase('step')
-        }}
+        onStart={() => go(0)}
       />
     )
   }
@@ -213,7 +238,8 @@ export default function QuizScreen() {
     setIdentity({ [step.field]: value })
     // A beat before advancing, so the selection is visible rather than the
     // screen simply changing under the tap.
-    window.setTimeout(next, 220)
+    window.clearTimeout(advancing.current)
+    advancing.current = window.setTimeout(next, 220)
   }
 
   const answered = (() => {
@@ -411,8 +437,11 @@ export default function QuizScreen() {
           {editing ? 'Summary' : 'Back'}
         </button>
 
+        {/* A step that cannot be skipped still needs a way on once it
+            has an answer: someone re-running Discovery to change a later
+            question would otherwise have to re-tap the same card. */}
         {step.kind === 'choice' ? (
-          step.optional && (
+          (step.optional || answered) && (
             <button
               type="button"
               onClick={next}
@@ -496,7 +525,7 @@ function Intro({ returning, onStart }: { returning: boolean; onStart: () => void
         to="/profile"
         className="mb-xl flex w-full items-center justify-center gap-sm rounded-full bg-surface-container-lowest px-lg py-3 font-label-md text-label-md text-on-surface shadow-card transition-all active:scale-95"
       >
-        Already know your hair? Fill in your profile yourself
+        See what your profile already holds
       </Link>
 
       <p className="mb-2xl text-center font-caption text-caption text-outline">

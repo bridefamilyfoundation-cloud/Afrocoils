@@ -95,7 +95,8 @@ function bodyFor(type: CareEventType, overdue: boolean): string {
 function fireAt(dueKey: string, reminderTime: string): Date | null {
   const [hours, minutes] = reminderTime.split(':').map(Number)
   const at = parseKey(dueKey)
-  at.setHours(hours || 9, minutes || 0, 0, 0)
+  // `||` would read midnight's 0 as missing and fire at nine.
+  at.setHours(Number.isFinite(hours) ? hours! : 9, Number.isFinite(minutes) ? minutes! : 0, 0, 0)
   // A due date in the past still deserves a nudge, but not at a moment
   // that has already gone — bring it to the next occurrence of that time.
   if (at.getTime() <= Date.now()) {

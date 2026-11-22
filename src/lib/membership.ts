@@ -140,13 +140,31 @@ export function toMembership(response: MembershipResponse): Membership {
     periodStartISO: response.periodStartISO ?? null,
     trialEndsISO: response.trialEndsISO ?? null,
     renews: response.renews ?? (response.status === 'active' && membershipOpen(response.paidUntilISO)),
+    ...(typeof response.card === 'boolean' ? { card: response.card } : {}),
     checkedISO: new Date().toISOString(),
   }
 }
 
+/**
+ * The moment access is judged at: the phone's clock, but never earlier
+ * than the server's last answer. A clock set back (by hand, or a flat
+ * battery) would otherwise hold a lapsed membership open for as long as
+ * it stayed wrong. A clock that is right is never before `checkedISO`,
+ * so this costs a real member nothing.
+ */
+function judgedAt(membership: Membership, now: Date): Date {
+  const checked = Date.parse(membership.checkedISO)
+  return Number.isFinite(checked) && checked > now.getTime() ? new Date(checked) : now
+}
+
 /** Whether this phone opens the app. Signed out, never paid and lapsed are all no; a live trial is yes. */
 export function hasAccess(membership: Membership | undefined, now: Date = new Date()): boolean {
-  return membership !== undefined && accessOpen(membership, now)
+  return membership !== undefined && accessOpen(membership, judgedAt(membership, now))
+}
+
+/** Whether there is a card subscription for "Manage or cancel" to open. Older answers did not say: any plan counts. */
+export function hasCard(membership: Membership | undefined): boolean {
+  return membership !== undefined && (membership.card ?? membership.plan !== null)
 }
 
 /** Paid time (with its grace days) is what holds the app open. */
@@ -212,7 +230,9 @@ export function expiryNotice(membership: Membership | undefined, now: Date = new
   const until = membership.paidUntilISO!
   if (Date.parse(until) <= now.getTime()) {
     const lock = longDate(new Date(Date.parse(until) + MEMBERSHIP_GRACE_DAYS * 86_400_000).toISOString())
-    if (membership.status === 'attention' || membership.status === 'active') {
+    // Only a card subscription has a renewal to retry. A plan paid by
+    // bank transfer is `active` too, and has simply ended.
+    if (hasCard(membership) && (membership.renews || membership.status === 'attention')) {
       return {
         tone: 'warn',
         text: `Your renewal hasn’t gone through yet. Paystack retries the card; the app stays open until ${lock}.`,
@@ -222,7 +242,7 @@ export function expiryNotice(membership: Membership | undefined, now: Date = new
     return { tone: 'warn', text: `Your membership has ended. The app stays open until ${lock}; choose a plan to carry on.`, action: 'choose' }
   }
 
-  if (membership.status === 'attention') {
+  if (membership.status === 'attention' && hasCard(membership)) {
     return { tone: 'warn', text: 'Your last renewal didn’t go through. Check the card under Manage or cancel.', action: 'manage' }
   }
   if (autoRenews(membership, now) || daysLeft(until, now) > 3) return null
@@ -270,7 +290,10 @@ export function checkoutRecentlyOpened(now: number = Date.now()): boolean {
 /** Whether it is time to ask the server again. */
 export function dueForCheck(membership: Membership, now: Date = new Date()): boolean {
   const checked = Date.parse(membership.checkedISO)
-  return !Number.isFinite(checked) || now.getTime() - checked > RECHECK_HOURS * 3_600_000
+  if (!Number.isFinite(checked)) return true
+  // A clock behind the last answer is a clock that was moved: ask again.
+  const since = now.getTime() - checked
+  return since < 0 || since > RECHECK_HOURS * 3_600_000
 }
 
 /** "₦2,500 a month", from the plan Paystack holds. */

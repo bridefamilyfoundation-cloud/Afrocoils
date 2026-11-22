@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import Icon from './Icon'
 import { hairCheckFor } from '../content/hair-check'
 import { useOpenParam, useScrollToOpened } from '../lib/deep-link'
@@ -36,6 +36,10 @@ export default function QuickHairCheck() {
   const shown =
     requested && groups.some((g) => g.concerns.some((c) => c.id === requested)) ? requested : null
   const [open, setOpen] = useState<string | null>(shown)
+  // Ask's sheet can link here while this screen is already showing.
+  useEffect(() => {
+    if (shown) setOpen(shown)
+  }, [shown])
   useScrollToOpened(shown ? `check-row-${shown}` : null)
 
   return (

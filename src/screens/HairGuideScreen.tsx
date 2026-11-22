@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import HairGuideBlock from '../components/HairGuideBlock'
 import Icon from '../components/Icon'
@@ -38,6 +38,10 @@ export default function HairGuideScreen() {
   const requested = useOpenParam()
   const shown = requested && chapters.some((c) => c.id === requested) ? requested : null
   const [open, setOpen] = useState<string | null>(shown)
+  // Ask's sheet can link here while this screen is already showing.
+  useEffect(() => {
+    if (shown) setOpen(shown)
+  }, [shown])
   useScrollToOpened(shown ? `guide-row-${shown}` : null)
 
   return (
