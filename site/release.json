@@ -11,14 +11,17 @@
   "download": "download/AfroCoils-0.2.0-12.apk",
   "notes": [],
   "bundle": {
-    "code": 19,
+    "code": 20,
     "minVersionCode": 12,
-    "bytes": 4567899,
-    "sha256": "84e1802dec8eb0f9a9dcfde20b7cba094f06eac2b01fc8d328369d19a913af40",
-    "released": "2026-11-20",
-    "url": "https://runhkccoeyxfgsfrzezn.supabase.co/storage/v1/object/public/releases/bundles/19.zip",
+    "bytes": 4572337,
+    "sha256": "29c2b05b6be52b1a0069f0f71d7f91d5382a7281774c3701cbb916b562d2bfd0",
+    "released": "2026-11-22",
+    "url": "https://runhkccoeyxfgsfrzezn.supabase.co/storage/v1/object/public/releases/bundles/20.zip",
     "notes": [
-      "Hair Education: learn what 4C hair is and why it behaves the way it does, one lesson at a time, in Hair Care"
+      "Back takes you to where you were in the style library, and filters stay as you set them",
+      "Styles you share are sent as soon as you submit them",
+      "Care schedules you switch off can be switched back on, and your first length check can be in cm",
+      "Clearer steps for paying, including bank transfer and fixing a failed card"
     ]
   }
 }
