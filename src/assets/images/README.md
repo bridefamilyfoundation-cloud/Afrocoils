@@ -7,6 +7,7 @@ into the APK, so they work offline.
 | Filename (any of `.png .jpg .jpeg .webp .avif`) | Where it appears |
 | --- | --- |
 | `avatar` | User avatar, top app bar and profile |
+| `founder` | The founder's photograph: Meet the Founder on About, and on the landing site. Supplied by the owner (2026-11-22); it carries its photographer's mark, left as it is |
 | `dryness-rescue` | Hero image on the SOS screen, loose hair |
 | `loc-dryness` | Hero image on the SOS screen, locs |
 | `stop-the-snap` | Porosity card, loose hair |

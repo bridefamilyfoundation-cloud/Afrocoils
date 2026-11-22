@@ -9,5 +9,10 @@ import app from '../tailwind.config.js'
 /** @type {import('tailwindcss').Config} */
 export default {
   ...app,
-  content: [fileURLToPath(new URL('./**/*.{html,ts}', import.meta.url))],
+  content: [
+    fileURLToPath(new URL('./**/*.{html,ts}', import.meta.url)),
+    // The About and Meet the Founder markup is written out by the build
+    // (vite.site.config.ts), so its classes have to be seen there.
+    fileURLToPath(new URL('../vite.site.config.ts', import.meta.url)),
+  ],
 }

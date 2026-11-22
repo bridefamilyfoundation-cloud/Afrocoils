@@ -1,8 +1,13 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { version } from '../../package.json'
+import { slot } from '../assets/imagery'
+import FounderCard from '../components/FounderCard'
 import Icon from '../components/Icon'
 import ScreenHeader from '../components/ScreenHeader'
+import { ABOUT_INTRO } from '../content/about'
+import { FOUNDER, founderReady } from '../content/founder'
+import PrototypeImage from '../components/PrototypeImage'
 import { useOpenParam, useScrollToOpened } from '../lib/deep-link'
 import { useHairProfile } from '../lib/profile-store'
 import {
@@ -25,9 +30,12 @@ import { isNative } from '../native/shell'
  * content about the app's point of view rather than a section of it.
  * They sit here, under the page that explains what the app believes.
  *
- * The first three sections of ABOUT are the owner's copy, word for
- * word (2026-10-30): Type 4 hair first, locs supported as one journey
- * within it rather than the focus. The rest say what the app does with
+ * The page opens with the owner's copy, word for word (`ABOUT_INTRO` in
+ * content/about.ts, which the landing site reads too): Type 4 hair
+ * first, locs supported as one journey within it rather than the focus.
+ * Meet the Founder follows it, straight after "Who makes AfroCoils"
+ * (`FounderCard`, `?open=founder`), with a chip under the page heading
+ * that jumps to it, since it sits four sections down. The rest say what the app does with
  * data and content, which the privacy policy and FAQ repeat.
  */
 
@@ -35,34 +43,8 @@ import { isNative } from '../native/shell'
    comes from — a literal here said 0.1.0 for the whole of 0.2.0. */
 const VERSION = version
 
+/** What follows the introduction and the founder: what the app does with data and content. */
 const ABOUT: { heading: string; body: string | string[] }[] = [
-  {
-    heading: 'What is AfroCoils?',
-    body: [
-      'AfroCoils is your everyday hair companion, created specifically for women with Type 4 natural hair.',
-      'We help you understand your hair better, discover hairstyles that suit your hair type and condition, and build a hair-care routine that works for you.',
-      'From personalised hairstyle recommendations to simple hair-care guidance, AfroCoils is designed to make caring for and styling your natural hair easier, more convenient, and less overwhelming.',
-      'Whether you’re looking for a quick hairstyle, trying to address a hair-care concern, or simply learning what works best for your hair, AfroCoils is here to guide you.',
-    ],
-  },
-  {
-    heading: 'Who is AfroCoils for?',
-    body: [
-      'AfroCoils is designed for women with Type 4 natural hair, including 4A, 4B and 4C textures, who want to understand their hair, care for it, and explore suitable styling options.',
-      'Whether you wear your hair loose or in locs, AfroCoils aims to provide guidance and recommendations suited to your hair journey.',
-    ],
-  },
-  {
-    heading: 'Our mission',
-    body: 'Our mission is to make natural hair care simpler, more accessible, and more personalised, helping women feel more confident in understanding, caring for, and styling their hair.',
-  },
-  {
-    heading: 'Who makes AfroCoils',
-    body: [
-      'AfroCoils is a product of Crown Space Limited.',
-      'AfroCoils is an independent product brand under Crown Space Limited, with its own name and its own purpose: caring for Type 4 natural hair.',
-    ],
-  },
   {
     heading: 'Your hair data stays on your device',
     body: 'Your hair profile, your length checks, your calendar and your photos are stored on this phone and nowhere else, and none of it is tied to your membership. Your membership is your email: we hold it, whether it is paid up and the record of your payments, and Paystack holds your card. A bank transfer receipt you send is kept privately for checking and deleted 90 days after the decision. While you are signed in the app checks now and then that the membership is still paid, sending your sign-in token and nothing else. It also asks our update server whether a newer version is out, which carries nothing about you — see Updates below.',
@@ -101,10 +83,59 @@ const TIPS = [
 ]
 
 export default function AboutScreen() {
-  useScrollToOpened(useOpenParam() === 'tips' ? 'about-tips' : null)
+  const opened = useOpenParam()
+  useScrollToOpened(opened === 'tips' ? 'about-tips' : opened === 'founder' ? 'about-founder' : null)
   return (
     <>
       <ScreenHeader title="About" subtitle="What AfroCoils is, and what it does with your data." />
+
+      {/* The founder's card is four sections down, so the top of the
+          page says it is there and takes you to it. */}
+      {founderReady() && (
+        <button
+          type="button"
+          onClick={() =>
+            document.getElementById('about-founder')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+          }
+          className="mb-xl flex w-full items-center gap-md rounded-full bg-inverse-surface py-1.5 pl-1.5 pr-lg text-left text-inverse-on-surface shadow-card transition-all active:scale-[0.98]"
+        >
+          <PrototypeImage
+            slot={slot(FOUNDER.photo, '')}
+            seed="founder"
+            icon="face_3"
+            rounded="rounded-full"
+            className="h-11 w-11 shrink-0 object-cover object-top"
+          />
+          <span className="min-w-0 flex-1">
+            <span className="block font-label-md text-label-md font-bold">Meet the Founder</span>
+            <span className="block truncate font-body-md text-caption text-inverse-on-surface/80">
+              {FOUNDER.name}
+            </span>
+          </span>
+          <Icon name="expand_more" className="shrink-0 text-[22px]" />
+        </button>
+      )}
+
+      {/* What AfroCoils is, who it is for, its mission and who makes it. */}
+      <section className="mb-2xl space-y-lg">
+        {ABOUT_INTRO.map((item) => (
+          <article key={item.id}>
+            <h2 className="mb-xs font-headline-md text-body-lg text-on-surface">{item.heading}</h2>
+            {item.body.map((paragraph) => (
+              <p
+                key={paragraph}
+                className="mb-sm font-body-md text-body-md text-on-surface-variant last:mb-0"
+              >
+                {paragraph}
+              </p>
+            ))}
+          </article>
+        ))}
+      </section>
+
+      {/* Straight after "Who makes AfroCoils". Draws nothing until her
+          biography has been supplied (content/founder.ts). */}
+      <FounderCard />
 
       <section className="mb-2xl space-y-lg">
         {ABOUT.map((item) => (

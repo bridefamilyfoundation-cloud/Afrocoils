@@ -79,6 +79,7 @@
         <nav class="hidden items-center gap-xl md:flex" aria-label="Sections">
           <a href="#how" class="font-label-md text-label-md text-on-surface-variant transition-colors hover:text-primary">How it works</a>
           <a href="#hair" class="font-label-md text-label-md text-on-surface-variant transition-colors hover:text-primary">Loose &amp; locs</a>
+          <a href="#about" class="font-label-md text-label-md text-on-surface-variant transition-colors hover:text-primary">About</a>
           <a href="#privacy" class="font-label-md text-label-md text-on-surface-variant transition-colors hover:text-primary">Privacy</a>
           <a href="#faq" class="font-label-md text-label-md text-on-surface-variant transition-colors hover:text-primary">FAQ</a>
         </nav>
@@ -335,6 +336,41 @@
             <span class="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-surface-container-highest text-primary"><svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><use href="#i-heart" /></svg></span>
             <p class="font-body-md text-body-md text-on-surface-variant"><strong class="font-semibold text-on-surface">No loc styles in the library yet</strong> &mdash; nobody has contributed one, and the app won&rsquo;t pad the shelf with loose-hair technique to hide the gap. Loc wearers get the care guides written for them. The first loc style could be yours.</p>
           </div>
+        </div>
+      </section>
+
+      <!-- ============================== ABOUT ============================== -->
+      <!-- The owner's introduction and mission, read from src/content/about.ts (the app's About screen reads the
+           same file), then Meet the Founder, written in by the build from src/content/founder.ts once her
+           biography has been supplied. -->
+      <section id="about" class="relative py-24">
+        <div class="mx-auto max-w-6xl px-container-padding">
+          <div data-reveal class="mx-auto mb-xl max-w-2xl text-center">
+            <p class="mb-sm font-label-md text-label-md uppercase tracking-[0.18em] text-secondary">About AfroCoils</p>
+            <h2 class="font-headline-lg text-[34px] font-semibold leading-tight tracking-tight text-primary sm:text-[44px]">Your everyday hair companion.</h2>
+          </div>
+
+          <div class="mx-auto grid max-w-5xl gap-lg md:grid-cols-[1.4fr_1fr]">
+            <div data-reveal class="space-y-md rounded-[32px] bg-surface-container-lowest p-lg shadow-sm ring-1 ring-outline-variant/40 sm:p-xl">%about.what%</div>
+            <div class="grid gap-lg">
+              <div data-reveal style="--d: 120ms" class="rounded-[32px] bg-brand-espresso p-lg text-inverse-on-surface sm:p-xl">
+                <h3 class="mb-sm font-label-md text-label-md uppercase tracking-[0.18em] text-primary-fixed-dim">Our mission</h3>
+                <p class="font-body-lg text-body-lg">%about.mission%</p>
+              </div>
+              <div data-reveal style="--d: 200ms" class="space-y-sm rounded-[32px] bg-surface-container p-lg sm:p-xl">
+                <h3 class="font-label-md text-label-md uppercase tracking-[0.18em] text-secondary">Who it is for</h3>
+                %about.who%
+              </div>
+            </div>
+          </div>
+
+          <!-- The last thing before Meet the Founder, as in the app. -->
+          <div data-reveal class="mx-auto mt-lg max-w-5xl space-y-sm rounded-[32px] bg-surface-container-lowest p-lg text-center shadow-sm ring-1 ring-outline-variant/40 sm:p-xl">
+            <h3 class="font-label-md text-label-md uppercase tracking-[0.18em] text-secondary">Who makes AfroCoils</h3>
+            %about.makers%
+          </div>
+
+          %founder.section%
         </div>
       </section>
 

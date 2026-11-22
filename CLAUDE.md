@@ -386,6 +386,22 @@ picture; this file is the short version of what to keep in mind when editing.
   `membership` — and `/quiz?step=<id>` asks one question and returns
   to whichever screen opened it: the profile, a Hair Care trait card, a
   lesson, the recommendations list).
+- **Meet the Founder is one file, shown twice.** `src/content/founder.ts`
+  holds her name, title, biography and the two groups of social links
+  (Founder & Business, Personal & Lifestyle); About draws it with
+  `FounderCard`, straight after "Who makes AfroCoils" (`?open=founder`,
+  and a chip under the page heading jumps to it), and the landing site
+  writes the same block into its About section at build time, in the
+  same place. Its head is espresso with cream type on purpose: the
+  owner asked for it to be easy to notice, and it is the one dark block
+  on the page. The biography is hers, as supplied —
+  never drafted for her — and until it is there neither surface draws
+  the section. A link is shown only when it is an `https` address on its
+  own platform; her photograph is `src/assets/images/founder.<ext>`.
+  The Instagram, TikTok and YouTube marks are inline SVG in the palette's
+  colour, because the icon font has no brand glyphs and nothing loads
+  from another origin. The introduction itself is `content/about.ts`,
+  shared with the site for the same reason.
 - Screens live in `src/screens/`, shared UI in `src/components/`.
 - **Hair type is the fork above everything.** `identity.hairType` is
   `'Loose Natural' | 'Locs'`, and styles, guides, products, the calendar's
