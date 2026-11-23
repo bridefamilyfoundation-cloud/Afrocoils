@@ -1,10 +1,11 @@
 import { useState } from 'react'
 import type { PageProps } from '../App'
 import { when, type SubmissionRow } from '../api'
-import { Button, Card, Pill, Problem, input } from '../ui'
+import { Button, Card, Facts, Field, ListState, PageHeader, Pill, Problem, Segmented, input } from '../ui'
 import { useLoad } from './useLoad'
 
 const REVIEWS = ['Pending', 'Approved', 'Rejected'] as const
+const REVIEW_OPTIONS = REVIEWS.map((r) => ({ value: r, label: r }))
 
 /**
  * The community style queue. Approving here records the decision; it
@@ -12,31 +13,27 @@ const REVIEWS = ['Pending', 'Approved', 'Rejected'] as const
  * hand in src/content/styles.ts, with steps, and shipped as an update.
  * Photos are signed links that last an hour; the bucket stays private.
  */
-export default function Submissions({ api }: PageProps) {
+export default function Submissions({ api, recount }: PageProps) {
   const [review, setReview] = useState<(typeof REVIEWS)[number]>('Pending')
   const list = useLoad(() => api.get<SubmissionRow[]>('submissions', { review }), `submissions:${review}`)
+  const changed = () => {
+    list.reload()
+    recount()
+  }
 
   return (
     <>
-      <div className="mb-lg flex flex-wrap items-center justify-between gap-sm">
-        <h1 className="text-2xl font-bold text-primary">Style submissions</h1>
-        <div className="flex gap-xs">
-          {REVIEWS.map((r) => (
-            <Button key={r} kind={r === review ? 'primary' : 'quiet'} onClick={() => setReview(r)}>
-              {r}
-            </Button>
-          ))}
-        </div>
-      </div>
-      <p className="mb-md text-sm text-on-surface-variant">
-        Approving records the decision only. A style reaches the app when it is written up, with
-        steps, in the style library and shipped in an update.
-      </p>
+      <PageHeader
+        title="Style submissions"
+        lede="Approving records the decision only. A style reaches the app when it is written up, with steps, in the style library and shipped in an update."
+      >
+        <Segmented label="Review status" options={REVIEW_OPTIONS} value={review} onChange={setReview} />
+      </PageHeader>
       <Problem error={list.error} />
-      <div className="space-y-md">
-        {list.data?.length === 0 && <p className="text-sm text-on-surface-variant">Nothing {review.toLowerCase()}.</p>}
+      <ListState data={list.data} error={list.error} empty={`Nothing ${review.toLowerCase()}.`} />
+      <div className="space-y-lg">
         {list.data?.map((s) => (
-          <Submission key={s.id} api={api} row={s} onChange={list.reload} />
+          <Submission key={s.id} api={api} row={s} onChange={changed} />
         ))}
       </div>
     </>
@@ -71,40 +68,55 @@ function Submission({ api, row, onChange }: { api: PageProps['api']; row: Submis
   }
 
   return (
-    <Card>
-      <div className="mb-sm flex flex-wrap items-center justify-between gap-sm">
-        <h2 className="text-lg font-bold">{field(b, 'name') ?? '(no name)'}</h2>
-        <span className="text-xs text-on-surface-variant">
-          {when(row.received_at)} · <Pill>{row.review}</Pill>
+    <Card className="overflow-hidden !p-0">
+      <div className="flex flex-wrap items-center justify-between gap-sm px-lg pt-lg">
+        <h2 className="min-w-0 break-words text-lg font-bold text-on-surface">{field(b, 'name') ?? '(no name)'}</h2>
+        <span className="flex items-center gap-sm text-xs text-on-surface-variant">
+          Received {when(row.received_at)}
+          <Pill tone={row.review === 'Approved' ? 'good' : row.review === 'Rejected' ? 'bad' : 'warn'}>{row.review}</Pill>
         </span>
       </div>
-      <Problem error={error} />
-      <dl className="mb-md grid gap-xs text-sm md:grid-cols-[10rem_1fr]">
-        {Object.keys(b)
-          .filter((k) => k !== 'name')
-          .map((k) => (
-            <div key={k} className="contents">
-              <dt className="font-semibold text-on-surface-variant">{k}</dt>
-              <dd className="whitespace-pre-wrap">{field(b, k)}</dd>
-            </div>
-          ))}
-      </dl>
-      {row.photos.length > 0 && (
-        <div className="mb-md grid grid-cols-2 gap-sm md:grid-cols-4">
-          {row.photos.map((url, i) =>
-            url ? (
-              <a key={i} href={url} target="_blank" rel="noopener noreferrer">
-                <img src={url} alt={`Photo ${i + 1}`} className="aspect-[4/5] w-full rounded-xl object-cover" />
-              </a>
-            ) : (
-              <div key={i} className="aspect-[4/5] rounded-xl bg-surface-container-high" />
-            ),
-          )}
-        </div>
-      )}
-      {row.reviewer_note && <p className="mb-sm text-xs text-on-surface-variant">Note: {row.reviewer_note}</p>}
-      <div className="flex flex-wrap items-center gap-xs">
-        <input value={note} onChange={(e) => setNote(e.target.value)} placeholder="Note (optional)" className={`${input} flex-1`} />
+
+      <div className="px-lg py-md">
+        <Problem error={error} />
+        {row.photos.length > 0 && (
+          <div className="mb-md grid grid-cols-2 gap-sm sm:grid-cols-4">
+            {row.photos.map((url, i) =>
+              url ? (
+                <a key={i} href={url} target="_blank" rel="noopener noreferrer" className="block rounded-xl">
+                  <img
+                    src={url}
+                    alt={`Photo ${i + 1} of ${row.photos.length}, opens full size`}
+                    className="aspect-[4/5] w-full rounded-xl bg-surface-container-high object-cover"
+                  />
+                </a>
+              ) : (
+                <div
+                  key={i}
+                  className="flex aspect-[4/5] items-center justify-center rounded-xl bg-surface-container-high p-sm text-center text-xs text-on-surface-variant"
+                >
+                  Photo not available
+                </div>
+              ),
+            )}
+          </div>
+        )}
+        <Facts
+          rows={Object.keys(b)
+            .filter((k) => k !== 'name')
+            .map((k) => [k, field(b, k)] as const)}
+        />
+        {row.reviewer_note && (
+          <p className="mt-md rounded-xl bg-surface-container-low px-md py-sm text-sm text-on-surface-variant">
+            Reviewer note: {row.reviewer_note}
+          </p>
+        )}
+      </div>
+
+      <div className="flex flex-wrap items-end gap-sm border-t border-outline-variant/40 bg-surface-container-low px-lg py-md">
+        <Field label="Note (optional)" className="flex-1 basis-64">
+          <input value={note} onChange={(e) => setNote(e.target.value)} className={input} />
+        </Field>
         <Button disabled={busy} onClick={() => void decide('Approved')}>
           Approve
         </Button>

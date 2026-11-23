@@ -7,8 +7,39 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    color-scheme: light;
+    /* The parts of the page the browser draws, in the palette. */
+    scrollbar-color: theme('colors.outline-variant') transparent;
+    scrollbar-width: thin;
+  }
+
   body {
     font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;
+    /* Amounts, counts and dates line up down a column. */
+    font-variant-numeric: tabular-nums;
+  }
+
+  ::selection {
+    background: theme('colors.secondary-fixed');
+    color: theme('colors.tertiary');
+  }
+
+  :focus-visible {
+    outline: 2px solid theme('colors.secondary');
+    outline-offset: 2px;
+  }
+
+  /* Fields carry their own ring (see `input` in ui.tsx). */
+  input:focus-visible,
+  select:focus-visible,
+  textarea:focus-visible {
+    outline: none;
+  }
+
+  input,
+  textarea {
+    caret-color: theme('colors.secondary');
   }
 }

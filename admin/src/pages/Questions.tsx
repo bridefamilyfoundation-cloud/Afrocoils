@@ -2,8 +2,14 @@ import { useState } from 'react'
 import { ASK_OUTCOMES } from '../../../src/lib/types'
 import type { PageProps } from '../App'
 import { when, type QuestionRow } from '../api'
-import { Button, Card, Pill, Problem, input } from '../ui'
+import { Button, Icon, ListState, PageHeader, Panel, Pill, Problem, Segmented, input } from '../ui'
 import { useLoad } from './useLoad'
+
+const REVIEWED = [
+  { value: 'false', label: 'To review' },
+  { value: 'true', label: 'Reviewed' },
+  { value: '', label: 'Both' },
+] as const
 
 /**
  * The anonymous Ask log: the words typed, what Ask did with them, the
@@ -12,9 +18,9 @@ import { useLoad } from './useLoad'
  * entries. `npm run ask:study` is still the full report; this is for
  * reading and ticking off.
  */
-export default function Questions({ api }: PageProps) {
+export default function Questions({ api, recount }: PageProps) {
   const [outcome, setOutcome] = useState('none')
-  const [reviewed, setReviewed] = useState('false')
+  const [reviewed, setReviewed] = useState<(typeof REVIEWED)[number]['value']>('false')
   const list = useLoad(
     () => api.get<QuestionRow[]>('questions', { outcome, reviewed }),
     `questions:${outcome}:${reviewed}`,
@@ -27,6 +33,7 @@ export default function Questions({ api }: PageProps) {
     try {
       await api.post('questions', { ids, reviewed: value })
       list.reload()
+      recount()
     } catch (e) {
       list.setError(e instanceof Error ? e.message : 'Failed')
     } finally {
@@ -34,11 +41,21 @@ export default function Questions({ api }: PageProps) {
     }
   }
 
+  const unreviewed = (list.data ?? []).filter((q) => !q.reviewed)
+
   return (
     <>
-      <h1 className="mb-lg text-2xl font-bold text-primary">Ask questions</h1>
-      <div className="mb-md flex flex-wrap gap-sm">
-        <select value={outcome} onChange={(e) => setOutcome(e.target.value)} className={input}>
+      <PageHeader
+        title="Ask questions"
+        lede="The words people typed into Ask, with nothing about who typed them. An unanswered one is a missing written answer."
+      >
+        <Segmented label="Reviewed or not" options={REVIEWED} value={reviewed} onChange={setReviewed} />
+        <select
+          value={outcome}
+          onChange={(e) => setOutcome(e.target.value)}
+          aria-label="Outcome"
+          className={`${input} !rounded-full !pr-10`}
+        >
           <option value="">Every outcome</option>
           {ASK_OUTCOMES.map((o) => (
             <option key={o} value={o}>
@@ -46,38 +63,46 @@ export default function Questions({ api }: PageProps) {
             </option>
           ))}
         </select>
-        <select value={reviewed} onChange={(e) => setReviewed(e.target.value)} className={input}>
-          <option value="false">Not reviewed</option>
-          <option value="true">Reviewed</option>
-          <option value="">Both</option>
-        </select>
-        <Button
-          kind="quiet"
-          disabled={busy || !list.data?.some((q) => !q.reviewed)}
-          onClick={() => void mark((list.data ?? []).filter((q) => !q.reviewed).map((q) => q.id), true)}
-        >
-          Mark all shown as reviewed
-        </Button>
-      </div>
+      </PageHeader>
       <Problem error={list.error} />
-      <p className="mb-md text-sm text-on-surface-variant">{list.data?.length ?? '…'} questions (latest 500)</p>
-      <div className="space-y-xs">
-        {list.data?.map((q) => (
-          <Card key={q.id} className="flex items-center justify-between gap-md !p-md">
-            <div className="min-w-0">
-              <p className="text-sm">{q.question}</p>
-              <p className="text-xs text-on-surface-variant">
-                {when(q.asked_at)} · <Pill tone={q.outcome === 'none' ? 'warn' : 'plain'}>{q.outcome}</Pill>
-                {q.matched && ` · ${q.matched}`}
-                {q.bundle !== null && ` · update ${q.bundle}`}
-              </p>
-            </div>
-            <Button kind="quiet" disabled={busy} onClick={() => void mark([q.id], !q.reviewed)}>
-              {q.reviewed ? 'Unmark' : 'Reviewed'}
-            </Button>
-          </Card>
-        ))}
+
+      <div className="mb-sm flex min-h-8 flex-wrap items-center justify-between gap-sm">
+        <p className="text-sm text-on-surface-variant">
+          {list.data ? `${list.data.length} ${list.data.length === 1 ? 'question' : 'questions'} (latest 500)` : ''}
+        </p>
+        {unreviewed.length > 0 && (
+          <Button kind="quiet" size="sm" disabled={busy} onClick={() => void mark(unreviewed.map((q) => q.id), true)}>
+            <Icon name="check" className="h-3.5 w-3.5" />
+            Mark all {unreviewed.length} as reviewed
+          </Button>
+        )}
       </div>
+
+      <ListState data={list.data} error={list.error} empty="No questions here." />
+      {list.data && list.data.length > 0 && (
+        <Panel>
+          {list.data.map((q) => (
+            <div key={q.id} className="flex items-center justify-between gap-md px-lg py-sm">
+              <div className="min-w-0">
+                <p className={`break-words text-sm ${q.reviewed ? 'text-on-surface-variant' : 'font-semibold text-on-surface'}`}>
+                  {q.question}
+                </p>
+                <p className="mt-0.5 flex flex-wrap items-center gap-x-sm gap-y-xs text-xs text-on-surface-variant">
+                  <Pill tone={q.outcome === 'none' ? 'warn' : 'plain'}>{q.outcome}</Pill>
+                  <span>
+                    {when(q.asked_at)}
+                    {q.matched && ` · ${q.matched}`}
+                    {q.bundle !== null && ` · update ${q.bundle}`}
+                  </span>
+                </p>
+              </div>
+              <Button kind="quiet" size="sm" disabled={busy} onClick={() => void mark([q.id], !q.reviewed)}>
+                {q.reviewed ? 'Unmark' : 'Reviewed'}
+              </Button>
+            </div>
+          ))}
+        </Panel>
+      )}
     </>
   )
 }

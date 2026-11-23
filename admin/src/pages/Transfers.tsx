@@ -2,8 +2,10 @@ import { useEffect, useState } from 'react'
 import type { PageProps } from '../App'
 import { day, when, type TransferRow, type TransferSettings } from '../api'
 import { PLANS, PLAN_IDS, TRANSFER_STATUSES, formatAmount, type PlanId, type TransferStatus } from '../../../src/lib/types'
-import { Button, Card, Pill, Problem, input } from '../ui'
+import { Button, Card, Facts, Field, ListState, PageHeader, Pill, Problem, SectionTitle, Segmented, checkbox, input } from '../ui'
 import { useLoad } from './useLoad'
+
+const STATUS_OPTIONS = TRANSFER_STATUSES.map((s) => ({ value: s, label: s }))
 
 /**
  * Bank transfers waiting for a person.
@@ -16,31 +18,27 @@ import { useLoad } from './useLoad'
  * them. Receipts are signed links that last ten minutes; reload the list
  * if one has expired. Images are deleted 90 days after the decision.
  */
-export default function Transfers({ api }: PageProps) {
+export default function Transfers({ api, recount }: PageProps) {
   const [status, setStatus] = useState<TransferStatus>('Pending')
   const list = useLoad(() => api.get<TransferRow[]>('transfers', { status }), `transfers:${status}`)
+  const changed = () => {
+    list.reload()
+    recount()
+  }
 
   return (
     <>
-      <div className="mb-lg flex flex-wrap items-center justify-between gap-sm">
-        <h1 className="text-2xl font-bold text-primary">Bank transfers</h1>
-        <div className="flex gap-xs">
-          {TRANSFER_STATUSES.map((s) => (
-            <Button key={s} kind={s === status ? 'primary' : 'quiet'} onClick={() => setStatus(s)}>
-              {s}
-            </Button>
-          ))}
-        </div>
-      </div>
-      <p className="mb-md text-sm text-on-surface-variant">
-        Match every receipt to a credit on the bank statement before approving: a screenshot can be
-        edited. Approving opens the plan and emails the member; rejecting emails them your reason.
-      </p>
+      <PageHeader
+        title="Bank transfers"
+        lede="Match every receipt to a credit on the bank statement before approving: a screenshot can be edited. Approving opens the plan and emails the member; rejecting emails them your reason."
+      >
+        <Segmented label="Transfer status" options={STATUS_OPTIONS} value={status} onChange={setStatus} />
+      </PageHeader>
       <Problem error={list.error} />
-      <div className="mb-xl space-y-md">
-        {list.data?.length === 0 && <p className="text-sm text-on-surface-variant">Nothing {status.toLowerCase()}.</p>}
+      <ListState data={list.data} error={list.error} empty={`Nothing ${status.toLowerCase()}.`} />
+      <div className="space-y-lg">
         {list.data?.map((t) => (
-          <Transfer key={t.id} api={api} row={t} onChange={list.reload} />
+          <Transfer key={t.id} api={api} row={t} onChange={changed} />
         ))}
       </div>
       <Settings api={api} />
@@ -85,45 +83,39 @@ function Transfer({ api, row, onChange }: { api: PageProps['api']; row: Transfer
     ['Paid up until now', day(row.member_paid_until)],
     ['Receipt fingerprint', row.receipt_sha256.slice(0, 16)],
   ]
+  if (!pending) {
+    facts.push([
+      'Decided',
+      `${when(row.reviewed_at)} by ${row.reviewed_by}${row.reviewer_note ? ` — ${row.reviewer_note}` : ''}`,
+    ])
+  }
+  const reasonId = `reason-${row.id}`
 
   return (
-    <Card>
-      <div className="mb-sm flex flex-wrap items-center justify-between gap-sm">
-        <h2 className="text-lg font-bold">
-          {formatAmount(row.amount, row.currency)} · {row.sender_name}
+    <Card className="overflow-hidden !p-0">
+      <div className="flex flex-wrap items-center justify-between gap-sm px-lg pt-lg">
+        <h2 className="min-w-0 break-words text-lg font-bold text-on-surface">
+          {formatAmount(row.amount, row.currency)} <span className="font-semibold text-on-surface-variant">from</span>{' '}
+          {row.sender_name}
         </h2>
-        <span className="text-xs text-on-surface-variant">
-          sent {when(row.submitted_at)} ·{' '}
+        <span className="flex items-center gap-sm text-xs text-on-surface-variant">
+          Sent {when(row.submitted_at)}
           <Pill tone={row.status === 'Approved' ? 'good' : row.status === 'Rejected' ? 'bad' : 'warn'}>{row.status}</Pill>
         </span>
       </div>
-      <Problem error={error} />
-      <div className="grid gap-md md:grid-cols-[1fr_16rem]">
-        <dl className="grid content-start gap-xs text-sm md:grid-cols-[12rem_1fr]">
-          {facts.map(([k, v]) => (
-            <div key={k} className="contents">
-              <dt className="font-semibold text-on-surface-variant">{k}</dt>
-              <dd className="break-words">{v}</dd>
-            </div>
-          ))}
-          {!pending && (
-            <div className="contents">
-              <dt className="font-semibold text-on-surface-variant">Decided</dt>
-              <dd>
-                {when(row.reviewed_at)} by {row.reviewed_by}
-                {row.reviewer_note ? ` — ${row.reviewer_note}` : ''}
-              </dd>
-            </div>
-          )}
-        </dl>
+
+      <div className="grid gap-lg px-lg py-md md:grid-cols-[minmax(0,1fr)_16rem]">
+        <Facts rows={facts} />
         {row.receipt_url ? (
-          <a href={row.receipt_url} target="_blank" rel="noopener noreferrer" className="block">
+          <a href={row.receipt_url} target="_blank" rel="noopener noreferrer" className="block rounded-xl">
             <img
               src={row.receipt_url}
               alt={`Receipt from ${row.sender_name}`}
               className="max-h-96 w-full rounded-xl bg-surface-container-high object-contain"
             />
-            <span className="mt-xs block text-xs text-on-surface-variant">Open full size (link lasts ten minutes)</span>
+            <span className="mt-xs block text-xs text-on-surface-variant underline underline-offset-4">
+              Open full size (link lasts ten minutes)
+            </span>
           </a>
         ) : (
           <div className="flex h-40 items-center justify-center rounded-xl bg-surface-container-high p-md text-center text-xs text-on-surface-variant">
@@ -131,20 +123,28 @@ function Transfer({ api, row, onChange }: { api: PageProps['api']; row: Transfer
           </div>
         )}
       </div>
+
       {pending && (
-        <div className="mt-md flex flex-wrap items-center gap-xs">
-          <input
-            value={note}
-            onChange={(e) => setNote(e.target.value.slice(0, 500))}
-            placeholder="Reason (required to reject; the member is emailed it)"
-            className={`${input} min-w-64 flex-1`}
-          />
-          <Button disabled={busy} onClick={() => void decide('approve')}>
-            Approve
-          </Button>
-          <Button kind="danger" disabled={busy} onClick={() => void decide('reject')}>
-            Reject
-          </Button>
+        <div className="border-t border-outline-variant/40 bg-surface-container-low px-lg py-md">
+          <Problem error={error} />
+          <div className="flex flex-wrap items-end gap-sm">
+            <label htmlFor={reasonId} className="flex min-w-0 flex-1 basis-64 flex-col gap-xs text-sm font-semibold text-on-surface">
+              Reason, if rejecting
+              <input
+                id={reasonId}
+                value={note}
+                onChange={(e) => setNote(e.target.value.slice(0, 500))}
+                placeholder="The member is emailed these words"
+                className={input}
+              />
+            </label>
+            <Button disabled={busy} onClick={() => void decide('approve')}>
+              Approve
+            </Button>
+            <Button kind="danger" disabled={busy} onClick={() => void decide('reject')}>
+              Reject
+            </Button>
+          </div>
         </div>
       )}
     </Card>
@@ -194,55 +194,61 @@ function Settings({ api }: { api: PageProps['api'] }) {
   }
 
   return (
-    <Card>
-      <h2 className="mb-xs text-lg font-bold">Account and prices</h2>
-      <p className="mb-md text-sm text-on-surface-variant">
-        What members see on the Pay by bank transfer form. Prices are in naira; leave one empty to
-        not offer that plan by transfer. A change applies to receipts sent after it.
-        {loaded.data?.updated_by ? ` Last changed ${when(loaded.data.updated_at)} by ${loaded.data.updated_by}.` : ''}
-      </p>
-      <Problem error={error} />
-      <div className="grid gap-sm md:grid-cols-3">
-        <label className="flex flex-col gap-xs text-sm">
-          Bank
-          <input value={form.bankName} maxLength={80} onChange={(e) => set({ bankName: e.target.value })} className={input} />
-        </label>
-        <label className="flex flex-col gap-xs text-sm">
-          Account name
-          <input value={form.accountName} maxLength={120} onChange={(e) => set({ accountName: e.target.value })} className={input} />
-        </label>
-        <label className="flex flex-col gap-xs text-sm">
-          Account number
-          <input
-            value={form.accountNumber}
-            inputMode="numeric"
-            maxLength={20}
-            onChange={(e) => set({ accountNumber: e.target.value.replace(/\D/g, '') })}
-            className={input}
-          />
-        </label>
-        {PLAN_IDS.map((id) => (
-          <label key={id} className="flex flex-col gap-xs text-sm">
-            {PLANS[id].label} price (₦)
+    <>
+      <SectionTitle
+        note={`What members see on the Pay by bank transfer form. A change applies to receipts sent after it.${
+          loaded.data?.updated_by ? ` Last changed ${when(loaded.data.updated_at)} by ${loaded.data.updated_by}.` : ''
+        }`}
+      >
+        Account and prices
+      </SectionTitle>
+      <Card>
+        <Problem error={error} />
+        <div className="grid gap-md md:grid-cols-3">
+          <Field label="Bank">
+            <input value={form.bankName} maxLength={80} onChange={(e) => set({ bankName: e.target.value })} className={input} />
+          </Field>
+          <Field label="Account name">
+            <input value={form.accountName} maxLength={120} onChange={(e) => set({ accountName: e.target.value })} className={input} />
+          </Field>
+          <Field label="Account number">
             <input
-              value={form[id]}
-              inputMode="decimal"
-              onChange={(e) => set({ [id]: e.target.value.replace(/[^\d.]/g, '') } as Partial<Form>)}
+              value={form.accountNumber}
+              inputMode="numeric"
+              maxLength={20}
+              onChange={(e) => set({ accountNumber: e.target.value.replace(/\D/g, '') })}
               className={input}
             />
+          </Field>
+          {PLAN_IDS.map((id) => (
+            <Field key={id} label={`${PLANS[id].label} price (₦)`}>
+              <input
+                value={form[id]}
+                inputMode="decimal"
+                onChange={(e) => set({ [id]: e.target.value.replace(/[^\d.]/g, '') } as Partial<Form>)}
+                className={input}
+              />
+            </Field>
+          ))}
+        </div>
+        <p className="mt-sm text-xs text-on-surface-variant">
+          Prices are in naira. Leave one empty to not offer that plan by transfer.
+        </p>
+        <div className="mt-lg flex flex-wrap items-center justify-between gap-md border-t border-outline-variant/40 pt-md">
+          <label className="flex items-center gap-sm text-sm font-semibold">
+            <input type="checkbox" checked={form.enabled} onChange={(e) => set({ enabled: e.target.checked })} className={checkbox} />
+            Offer bank transfer in the app
           </label>
-        ))}
-      </div>
-      <label className="mt-md flex items-center gap-sm text-sm font-semibold">
-        <input type="checkbox" checked={form.enabled} onChange={(e) => set({ enabled: e.target.checked })} />
-        Offer bank transfer in the app
-      </label>
-      <div className="mt-md flex items-center gap-sm">
-        <Button disabled={busy} onClick={() => void save()}>
-          {busy ? 'Saving…' : 'Save'}
-        </Button>
-        {saved && <span className="text-sm text-on-surface-variant">Saved.</span>}
-      </div>
-    </Card>
+          <div className="flex items-center gap-sm">
+            <span role="status" className="text-sm text-on-surface-variant">
+              {saved ? 'Saved.' : ''}
+            </span>
+            <Button disabled={busy} onClick={() => void save()}>
+              {busy ? 'Saving…' : 'Save'}
+            </Button>
+          </div>
+        </div>
+      </Card>
+    </>
   )
 }

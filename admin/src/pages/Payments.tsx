@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import type { PageProps } from '../App'
 import { when, type PaymentRow } from '../api'
-import { Button, Card, Problem, input } from '../ui'
+import { Button, Icon, ListState, PageHeader, Panel, Pill, Problem, input } from '../ui'
 import { useLoad } from './useLoad'
 
 const money = (amount: number, currency: string) =>
@@ -20,66 +20,87 @@ export default function Payments({ api }: PageProps) {
 
   return (
     <>
-      <h1 className="mb-lg text-2xl font-bold text-primary">Payments</h1>
-      <Problem error={error} />
-      <form
-        className="mb-md flex gap-sm"
-        onSubmit={(e) => {
-          e.preventDefault()
-          setFilter(email.trim())
-        }}
+      <PageHeader
+        title="Payments"
+        lede={
+          data
+            ? `${data.length} ${data.length === 1 ? 'payment' : 'payments'}${[...totals]
+                .map(([currency, amount]) => ` · ${money(amount, currency)}`)
+                .join('')} (latest 500).`
+            : undefined
+        }
       >
-        <input
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="Filter by email"
-          className={`${input} flex-1`}
-        />
-        <Button type="submit" kind="quiet">
-          Filter
-        </Button>
-      </form>
-      <p className="mb-md text-sm text-on-surface-variant">
-        {data?.length ?? '…'} payments
-        {[...totals].map(([currency, amount]) => ` · ${money(amount, currency)}`)} (latest 500).
-        Bank transfers appear here once approved under Bank transfers. Card refunds and disputes are made in the Paystack dashboard. A full refund or a lost
-        chargeback on a member&rsquo;s latest payment ends their access; anything else leaves a
-        note on the member.
-      </p>
-      <Card className="overflow-x-auto !p-0">
-        <table className="w-full text-left text-sm">
-          <thead className="bg-surface-container-high text-xs uppercase text-on-surface-variant">
-            <tr>
-              <th className="p-sm">Paid</th>
-              <th className="p-sm">Email</th>
-              <th className="p-sm">Amount</th>
-              <th className="p-sm">How</th>
-              <th className="p-sm">Reference</th>
-            </tr>
-          </thead>
-          <tbody>
-            {data?.map((p) => (
-              <tr key={p.reference} className="border-t border-outline-variant/40">
-                <td className="whitespace-nowrap p-sm">{when(p.paid_at)}</td>
-                <td className="p-sm">{p.email}</td>
-                <td className="whitespace-nowrap p-sm">
-                  {money(p.amount, p.currency)}
-                  {p.reversal && (
-                    <span className="ml-xs text-xs font-bold text-error">
-                      {p.reversal === 'refund' ? 'Refunded' : 'Charged back'}
-                      {p.reversed_amount != null && p.reversed_amount < p.amount
-                        ? ` ${money(p.reversed_amount, p.currency)}`
-                        : ''}
-                    </span>
-                  )}
-                </td>
-                <td className="p-sm text-xs">{p.method === 'transfer' ? 'Bank transfer' : 'Card'}</td>
-                <td className="p-sm font-mono text-xs">{p.reference}</td>
+        <form
+          role="search"
+          className="flex items-center gap-sm"
+          onSubmit={(e) => {
+            e.preventDefault()
+            setFilter(email.trim())
+          }}
+        >
+          <span className="relative block">
+            <Icon name="search" className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-on-surface-variant" />
+            <input
+              type="search"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              aria-label="Filter payments by email"
+              placeholder="Filter by email"
+              className={`${input} w-56 !pl-9 sm:w-64`}
+            />
+          </span>
+          <Button type="submit" kind="quiet">
+            Filter
+          </Button>
+        </form>
+      </PageHeader>
+      <Problem error={error} />
+
+      <ListState data={data} error={error} empty={filter ? 'No payments from that address.' : 'No payments yet.'} />
+      {data && data.length > 0 && (
+        <Panel className="!overflow-x-auto">
+          <table className="w-full text-left text-sm">
+            <thead className="text-xs text-on-surface-variant">
+              <tr>
+                <th scope="col" className="px-lg py-sm font-semibold">Paid</th>
+                <th scope="col" className="px-md py-sm font-semibold">Email</th>
+                <th scope="col" className="px-md py-sm text-right font-semibold">Amount</th>
+                <th scope="col" className="px-md py-sm font-semibold">How</th>
+                <th scope="col" className="px-lg py-sm font-semibold">Reference</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </Card>
+            </thead>
+            <tbody className="divide-y divide-outline-variant/40 border-t border-outline-variant/40">
+              {data.map((p) => (
+                <tr key={p.reference} className="hover:bg-surface-container-low">
+                  <td className="whitespace-nowrap px-lg py-sm text-on-surface-variant">{when(p.paid_at)}</td>
+                  <td className="px-md py-sm font-semibold">{p.email}</td>
+                  <td className="whitespace-nowrap px-md py-sm text-right font-bold">
+                    {p.reversal && (
+                      <span className="mr-sm">
+                        <Pill tone="bad">
+                          {p.reversal === 'refund' ? 'Refunded' : 'Charged back'}
+                          {p.reversed_amount != null && p.reversed_amount < p.amount
+                            ? ` ${money(p.reversed_amount, p.currency)}`
+                            : ''}
+                        </Pill>
+                      </span>
+                    )}
+                    {money(p.amount, p.currency)}
+                  </td>
+                  <td className="whitespace-nowrap px-md py-sm">{p.method === 'transfer' ? 'Bank transfer' : 'Card'}</td>
+                  <td className="px-lg py-sm font-mono text-xs text-on-surface-variant">{p.reference}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </Panel>
+      )}
+
+      <p className="mt-lg max-w-2xl text-sm text-on-surface-variant [text-wrap:pretty]">
+        Bank transfers appear here once approved under Bank transfers. Card refunds and disputes are
+        made in the Paystack dashboard. A full refund or a lost chargeback on a member&rsquo;s latest
+        payment ends their access; anything else leaves a note on the member.
+      </p>
     </>
   )
 }
