@@ -32,7 +32,10 @@ import { scanJpeg } from '../_shared/image-scan.ts'
 import { checkKeyLimit, checkLimits, limitResponse } from '../_shared/limits.ts'
 import {
   accountOf,
+  activePromo,
   latestTransfer,
+  promoForReceipt,
+  promoLabel,
   pruneReceipts,
   readSettings,
   toSummary,
@@ -210,10 +213,12 @@ async function transferInfo(req: Request, origin?: string): Promise<Response> {
   const session = await bearer(req, 'member')
   if (!session) return jsonResponse({ error: 'Sign in with your email first.' }, 401, origin)
   const [settings, latest] = await Promise.all([readSettings(), latestTransfer(session.sub)])
+  const promo = activePromo(settings)
   return jsonResponse(
     {
       account: accountOf(settings),
-      plans: transferPlans(settings),
+      plans: transferPlans(settings, promo),
+      promo,
       latest: latest ? toSummary(latest) : null,
     } satisfies TransferInfoResponse,
     200,
@@ -328,7 +333,9 @@ async function transfer(req: Request, origin?: string): Promise<Response> {
   }
 
   const settings = await readSettings()
-  const offer = transferPlans(settings).find((p) => p.id === input.plan)
+  // Priced by the promotion running on the day the money was sent, if any.
+  const promo = promoForReceipt(settings, input.paidOn)
+  const offer = transferPlans(settings, promo).find((p) => p.id === input.plan)
   if (!offer) {
     return jsonResponse({ error: `The ${PLANS[input.plan].label} plan can’t be paid by transfer just now. Choose another.` }, 409, origin)
   }
@@ -375,6 +382,7 @@ async function transfer(req: Request, origin?: string): Promise<Response> {
       bank_reference: input.bankReference,
       receipt_key: key,
       receipt_sha256: verdict.sha256,
+      promo: promo && offer.fullAmount ? promoLabel(promo) : null,
     })
     console.log(`[billing] transfer ${id} waiting for review (${verdict.width}x${verdict.height}, ${verdict.stripped} bytes stripped)`)
     return jsonResponse(toSummary(row!) satisfies TransferSummary, 201, origin)

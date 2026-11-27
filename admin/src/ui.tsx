@@ -74,6 +74,13 @@ const ICONS = {
     </>
   ),
   plus: <path d="M12 5v14M5 12h14" />,
+  send: <path d="M4 12 20 4l-4 16-4-6.5L4 12Zm8 1.5L20 4" />,
+  broadcast: (
+    <>
+      <path d="M4 10v4a1 1 0 0 0 1 1h3l6 4V5L8 9H5a1 1 0 0 0-1 1Z" />
+      <path d="M17.5 9a4 4 0 0 1 0 6" />
+    </>
+  ),
   signout: (
     <>
       <path d="M14 4h4a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-4" />

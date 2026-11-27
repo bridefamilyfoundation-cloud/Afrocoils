@@ -120,9 +120,12 @@ first Play upload.
 **Data safety form.** Declare:
 
 - **Personal info → Email address**: collected, required (it is the
-  membership), processed for *Account management* and *App functionality*,
-  shared with Paystack and Resend as processors only, linked to the user,
-  deletable on request to support@afrocoils.app. Encrypted in transit.
+  membership), processed for *Account management*, *App functionality* and
+  *Developer communications* (the mailing list, added 2026-11-27: news and
+  offers to members and people who asked, each with an unsubscribe link —
+  if Play reads a discount as marketing, tick *Advertising or marketing*
+  too), shared with Paystack and Resend as processors only, linked to the
+  user, deletable on request to support@afrocoils.app. Encrypted in transit.
 - **Financial info → Purchase history**: the Paystack payment record (amount,
   date, reference). No card data — Paystack holds it. For a bank transfer:
   the name on the paying account, the day, the bank reference and the plan,

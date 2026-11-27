@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex" />
+    <title>Unsubscribed · AfroCoils</title>
+    <!--
+      Where the unsubscribe link at the foot of a mailing-list email ends
+      up: the `inbound/unsubscribe` function takes the address off the
+      list, then sends the browser here. Static on purpose, with no
+      script: it trusts nothing in its query string. `?error=1` means the
+      link was not recognised, which the second paragraph covers.
+    -->
+    <style>
+      body { margin: 0; min-height: 100vh; display: grid; place-items: center; background: #E8D5C0; color: #5A2108; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; }
+      main { max-width: 26rem; margin: 1.5rem; padding: 2rem; background: #fff; border-radius: 1.25rem; box-shadow: 0 10px 30px rgba(63, 23, 8, 0.12); }
+      h1 { margin: 0 0 0.75rem; font-size: 1.6rem; color: #3F1708; }
+      p { margin: 0 0 1rem; line-height: 1.55; }
+      a { color: #E2583E; font-weight: 700; }
+      .small { font-size: 0.9rem; opacity: 0.85; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>You&rsquo;re unsubscribed.</h1>
+      <p>We won&rsquo;t send news or offers to this address again. If you are a member, you will still get the emails about your membership: sign-in codes, and the reminders before a plan renews or ends.</p>
+      <p class="small">Still getting them, or reached this page from an old link? Reply to any of our emails with &ldquo;unsubscribe&rdquo;, or write to <a href="mailto:hello@afrocoils.app">hello@afrocoils.app</a>, and we&rsquo;ll take you off by hand.</p>
+    </main>
+  </body>
+</html>

@@ -16,6 +16,9 @@ const API = 'https://api.resend.com'
 /** Who the app's own mail comes from. */
 export const FROM_NOREPLY = 'AfroCoils <no-reply@afrocoils.app>'
 
+/** Who a broadcast to the mailing list comes from: replies land in the hello inbox. */
+export const FROM_HELLO = 'AfroCoils <hello@afrocoils.app>'
+
 export const MAIL_DOMAIN = 'afrocoils.app'
 
 /**
@@ -73,27 +76,49 @@ export interface OutgoingMail {
   replyTo?: string
   /** Threading headers, for a reply. */
   inReplyTo?: string
+  /** Any other headers (a broadcast's List-Unsubscribe). */
+  headers?: Record<string, string>
 }
 
-/** Send one message; resolves to Resend's id for it. */
-export async function sendMail(mail: OutgoingMail): Promise<string> {
-  const headers: Record<string, string> = {}
+/** One message as Resend's API takes it. */
+function resendBody(mail: OutgoingMail) {
+  const headers: Record<string, string> = { ...(mail.headers ?? {}) }
   if (mail.inReplyTo) {
     headers['In-Reply-To'] = mail.inReplyTo
     headers.References = mail.inReplyTo
   }
+  return {
+    from: mail.from,
+    to: [mail.to],
+    subject: mail.subject,
+    text: mail.text,
+    html: mail.html,
+    reply_to: mail.replyTo,
+    headers: Object.keys(headers).length ? headers : undefined,
+  }
+}
+
+/** Send up to 100 messages in one call (a broadcast). Throws if Resend refuses the batch. */
+export async function sendBatch(mails: OutgoingMail[]): Promise<void> {
+  if (mails.length === 0) return
+  if (mails.length > 100) throw new Error('Resend batches hold at most 100 messages')
+  const response = await fetch(`${API}/emails/batch`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${apiKey()}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify(mails.map(resendBody)),
+  })
+  if (!response.ok) {
+    const detail = (await response.text().catch(() => '')).slice(0, 300)
+    throw new Error(`Resend batch failed (${response.status}): ${detail}`)
+  }
+}
+
+/** Send one message; resolves to Resend's id for it. */
+export async function sendMail(mail: OutgoingMail): Promise<string> {
   const response = await fetch(`${API}/emails`, {
     method: 'POST',
     headers: { Authorization: `Bearer ${apiKey()}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      from: mail.from,
-      to: [mail.to],
-      subject: mail.subject,
-      text: mail.text,
-      html: mail.html,
-      reply_to: mail.replyTo,
-      headers: Object.keys(headers).length ? headers : undefined,
-    }),
+    body: JSON.stringify(resendBody(mail)),
   })
   if (!response.ok) {
     const detail = (await response.text().catch(() => '')).slice(0, 300)
@@ -103,8 +128,9 @@ export async function sendMail(mail: OutgoingMail): Promise<string> {
   return body.id ?? ''
 }
 
-const escape = (text: string) =>
+export const escapeHtml = (text: string) =>
   text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
+const escape = escapeHtml
 
 /** The sign-in code email. Short, and the code is the first thing in it. */
 export function codeMail(to: string, code: string, purpose: 'member' | 'admin'): OutgoingMail {
@@ -147,8 +173,9 @@ export function codeMail(to: string, code: string, purpose: 'member' | 'admin'):
  * - `renewing`: a plan renews within three days, and for how much.
  * - `ended`: access has just closed.
  *
- * Service mail about the membership, nothing else: no offers, no
- * newsletter. The privacy policy names exactly these.
+ * Service mail about the membership, nothing else: no offers. News and
+ * offers go only to the mailing list (`mailing.ts`), which anyone can
+ * leave. The privacy policy names exactly these.
  */
 export type NoticeKind = 'trial-ending' | 'ending' | 'renewing' | 'ended'
 

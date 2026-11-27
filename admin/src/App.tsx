@@ -4,6 +4,7 @@ import type { AdminSessionResponse } from '../../src/lib/types'
 import { adminApi, loadSession, saveSession, sendCode, verify, type AdminApi, type Overview } from './api'
 import Dashboard from './pages/Dashboard'
 import Inbox from './pages/Inbox'
+import Mailing from './pages/Mailing'
 import Members from './pages/Members'
 import Payments from './pages/Payments'
 import Questions from './pages/Questions'
@@ -22,6 +23,7 @@ const PAGES = {
   transfers: { label: 'Bank transfers', icon: 'transfers', Page: Transfers, waiting: (o: Overview) => o.transfers },
   payments: { label: 'Payments', icon: 'payments', Page: Payments },
   inbox: { label: 'Mail', icon: 'mail', Page: Inbox, waiting: (o: Overview) => o.unread },
+  mailing: { label: 'Mailing list', icon: 'broadcast', Page: Mailing },
   submissions: { label: 'Style submissions', icon: 'submissions', Page: Submissions, waiting: (o: Overview) => o.pending },
   questions: { label: 'Ask questions', icon: 'questions', Page: Questions, waiting: (o: Overview) => o.unanswered },
 } as const satisfies Record<
@@ -34,7 +36,7 @@ export type PageName = keyof typeof PAGES
 const NAV: readonly { label?: string; pages: readonly PageName[] }[] = [
   { pages: ['dashboard'] },
   { label: 'Membership', pages: ['members', 'transfers', 'payments'] },
-  { label: 'Support', pages: ['inbox'] },
+  { label: 'Support', pages: ['inbox', 'mailing'] },
   { label: 'Content', pages: ['submissions', 'questions'] },
 ]
 

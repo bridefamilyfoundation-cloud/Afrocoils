@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { Link, Navigate, useNavigate } from 'react-router-dom'
 import BankTransfer from '../components/BankTransfer'
 import Icon from '../components/Icon'
+import PromoBanner from '../components/PromoBanner'
 import { MEMBER_SECTIONS } from '../content/membership'
 import {
   MembershipError,
@@ -31,6 +32,7 @@ import {
   formatAmount,
   type PlanId,
   type PlanOffer,
+  type Promo,
 } from '../lib/types'
 
 /**
@@ -84,6 +86,8 @@ export default function JoinScreen() {
   // undefined: not asked yet; null: could not be read.
   const [offers, setOffers] = useState<PlanOffer[] | null | undefined>(undefined)
   const [trialAvailable, setTrialAvailable] = useState(false)
+  // A promotion on bank-transfer prices, from the same status answer as the plans.
+  const [promo, setPromo] = useState<Promo | null>(null)
   const [chosen, setChosen] = useState<PlanId>('monthly')
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -102,6 +106,7 @@ export default function JoinScreen() {
   function take(response: Awaited<ReturnType<typeof checkStatus>>) {
     update({ membership: toMembership(response) })
     setOffers(response.plans ?? null)
+    setPromo(response.promo ?? null)
     setTrialAvailable(response.trialAvailable === true)
     // Keep the choice if it is still on offer; otherwise the first plan.
     const ids = (response.plans ?? []).map((p) => p.id)
@@ -222,6 +227,7 @@ export default function JoinScreen() {
     setStep('email')
     setCode('')
     setOffers(undefined)
+    setPromo(null)
     setTrialAvailable(false)
     setError(null)
     setNote(null)
@@ -541,6 +547,12 @@ export default function JoinScreen() {
             <Icon name="account_balance" className="text-[22px]" />
             Pay by bank transfer
           </h2>
+          {/* The form shows it itself once it is open. */}
+          {promo && !(byTransfer || tooEarly || offers === null || offers?.length === 0) && (
+            <div className="mt-sm">
+              <PromoBanner promo={promo} />
+            </div>
+          )}
           {byTransfer || tooEarly || offers === null || offers?.length === 0 ? (
             <div className="mt-md">
               <BankTransfer token={membership.token} email={membership.email} onRecheck={recheck} busyOutside={busy} />

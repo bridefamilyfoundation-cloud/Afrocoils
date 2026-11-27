@@ -21,10 +21,20 @@ import type {
   BankAccount,
   PlanId,
   PlanOffer,
+  Promo,
   TransferStatus,
   TransferSummary,
 } from '../../../src/lib/types.ts'
-import { PLANS, PLAN_IDS, RECEIPT_KEEP_DAYS, formatAmount } from '../../../src/lib/types.ts'
+import {
+  PLANS,
+  PLAN_IDS,
+  PROMO_MAX_PERCENT,
+  RECEIPT_KEEP_DAYS,
+  formatAmount,
+  isDayKey,
+  isPlanId,
+  promoPrice,
+} from '../../../src/lib/types.ts'
 import { sendMail, transferMail } from './email.ts'
 import { appendNote } from './membership.ts'
 import { db, getMember, laterOf, monthsAfter, saveMember } from './members.ts'
@@ -43,6 +53,11 @@ export interface TransferSettingsRow {
   price_monthly: number | null
   price_biannual: number | null
   price_annual: number | null
+  promo_name: string | null
+  promo_percent: number | null
+  promo_plans: PlanId[] | null
+  promo_starts_at: string | null
+  promo_ends_at: string | null
   updated_at: string
   updated_by: string | null
 }
@@ -65,6 +80,7 @@ export interface TransferRow {
   reviewed_by: string | null
   reviewer_note: string | null
   receipt_deleted_at: string | null
+  promo: string | null
 }
 
 export class TransferRefusal extends Error {
@@ -102,13 +118,118 @@ export function accountOf(settings: TransferSettingsRow | undefined): BankAccoun
   }
 }
 
-/** The plans that can be paid by transfer: those with a price, while transfers are on. */
-export function transferPlans(settings: TransferSettingsRow | undefined): PlanOffer[] {
+/** The promotion set on the admin site, whether or not it is running. */
+function promoOf(settings: TransferSettingsRow | undefined): (Promo & { startsISO: string }) | null {
+  if (!settings?.promo_percent || !settings.promo_name || !settings.promo_starts_at || !settings.promo_ends_at) return null
+  return {
+    name: settings.promo_name,
+    percentOff: Number(settings.promo_percent),
+    plans: (settings.promo_plans ?? []).filter(isPlanId),
+    startsISO: new Date(settings.promo_starts_at).toISOString(),
+    endsISO: new Date(settings.promo_ends_at).toISOString(),
+  }
+}
+
+/** The promotion running at `now`, as the phone is told it. Null: none. */
+export function activePromo(settings: TransferSettingsRow | undefined, now: Date = new Date()): Promo | null {
+  const promo = promoOf(settings)
+  if (!promo || !accountOf(settings)) return null
+  const t = now.getTime()
+  if (t < Date.parse(promo.startsISO) || t >= Date.parse(promo.endsISO)) return null
+  return { name: promo.name, percentOff: promo.percentOff, plans: promo.plans, endsISO: promo.endsISO }
+}
+
+/** Days after a promotion ends in which a receipt for a transfer made during it still gets its price. */
+const PROMO_RECEIPT_GRACE_DAYS = 3
+
+/**
+ * The promotion that prices a receipt: the one running when the money
+ * was sent (`paidOn`, a day in Lagos), so a member who paid the promo
+ * price on its last evening and sends the receipt the next morning is
+ * not suddenly short. The reviewer still checks the day against the
+ * bank statement.
+ */
+export function promoForReceipt(
+  settings: TransferSettingsRow | undefined,
+  paidOn: string,
+  now: Date = new Date(),
+): Promo | null {
+  const promo = promoOf(settings)
+  if (!promo || !accountOf(settings) || !isDayKey(paidOn)) return null
+  // The whole of that day in Lagos (UTC+1).
+  const dayStart = Date.parse(`${paidOn}T00:00:00+01:00`)
+  const dayEnd = dayStart + DAY
+  const starts = Date.parse(promo.startsISO)
+  const ends = Date.parse(promo.endsISO)
+  if (dayEnd <= starts || dayStart >= ends) return null
+  if (now.getTime() < starts || now.getTime() >= ends + PROMO_RECEIPT_GRACE_DAYS * DAY) return null
+  return { name: promo.name, percentOff: promo.percentOff, plans: promo.plans, endsISO: promo.endsISO }
+}
+
+/** "Black Friday, 20% off": what a transfer row records about its discount. */
+export const promoLabel = (promo: Promo) => `${promo.name}, ${promo.percentOff}% off`
+
+/**
+ * The plans that can be paid by transfer: those with a price, while
+ * transfers are on. With a promotion, `amount` is the discounted price
+ * and `fullAmount` the list price.
+ */
+export function transferPlans(settings: TransferSettingsRow | undefined, promo: Promo | null = null): PlanOffer[] {
   if (!accountOf(settings)) return []
   return PLAN_IDS.flatMap((id) => {
-    const amount = settings![PRICE_COLUMN[id]]
-    return amount ? [{ id, amount: Number(amount), currency: settings!.currency }] : []
+    const listed = settings![PRICE_COLUMN[id]]
+    if (!listed) return []
+    const amount = Number(listed)
+    const offer: PlanOffer = { id, amount, currency: settings!.currency }
+    if (promo?.plans.includes(id)) {
+      const discounted = promoPrice(amount, promo.percentOff)
+      if (discounted < amount) return [{ ...offer, amount: discounted, fullAmount: amount }]
+    }
+    return [offer]
   })
+}
+
+/**
+ * Set or clear the promotion. `{ clear: true }` ends it now; otherwise a
+ * name, a whole percentage (1–90), at least one plan, and a start and
+ * end (ISO times, the end after the start and not already past).
+ */
+export async function savePromo(body: Record<string, unknown>, by: string): Promise<TransferSettingsRow> {
+  let values: Record<string, unknown>
+  if (body.clear === true) {
+    values = { promo_name: null, promo_percent: null, promo_starts_at: null, promo_ends_at: null }
+  } else {
+    const name = typeof body.name === 'string' ? body.name.replace(/\s+/g, ' ').trim() : ''
+    if (name.length < 1 || name.length > 60 || /[<>]/.test(name)) {
+      throw new TransferRefusal(400, 'Give the promotion a name of up to 60 characters (no < or >)')
+    }
+    const percent = Number(body.percent)
+    if (!Number.isInteger(percent) || percent < 1 || percent > PROMO_MAX_PERCENT) {
+      throw new TransferRefusal(400, `The discount must be a whole number from 1 to ${PROMO_MAX_PERCENT} percent`)
+    }
+    const plans = Array.isArray(body.plans) ? [...new Set(body.plans.filter(isPlanId))] : []
+    if (plans.length === 0) throw new TransferRefusal(400, 'Choose at least one plan for the promotion')
+    const starts = typeof body.startsISO === 'string' ? Date.parse(body.startsISO) : NaN
+    const ends = typeof body.endsISO === 'string' ? Date.parse(body.endsISO) : NaN
+    if (Number.isNaN(starts) || Number.isNaN(ends)) throw new TransferRefusal(400, 'Set when the promotion starts and ends')
+    if (ends <= starts) throw new TransferRefusal(400, 'The promotion has to end after it starts')
+    if (ends <= Date.now()) throw new TransferRefusal(400, 'That end time has already passed')
+    if (ends - starts > 366 * DAY) throw new TransferRefusal(400, 'A promotion can run for a year at most')
+    values = {
+      promo_name: name,
+      promo_percent: percent,
+      promo_plans: plans,
+      promo_starts_at: new Date(starts).toISOString(),
+      promo_ends_at: new Date(ends).toISOString(),
+    }
+  }
+  const [row] = await patch<TransferSettingsRow>(db(), 'transfer_settings', 'id=eq.1', {
+    ...values,
+    updated_at: new Date().toISOString(),
+    updated_by: by,
+  })
+  if (!row) throw new Error('transfer_settings has no row: run migration 0009')
+  return row
 }
 
 /** Validate and save what the admin site sends. Throws a TransferRefusal on bad input. */

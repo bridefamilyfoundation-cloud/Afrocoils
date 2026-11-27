@@ -79,6 +79,7 @@ export interface Overview {
   unread: number
   unanswered: number
   transfers: number
+  subscribers: number
 }
 
 export interface MemberRow {
@@ -130,6 +131,8 @@ export interface TransferRow {
   reviewer_note: string | null
   receipt_deleted_at: string | null
   member_paid_until: string | null
+  /** "Black Friday, 20% off" when a promotion lowered the amount. */
+  promo: string | null
 }
 
 /** The bank account and transfer prices (kobo). */
@@ -142,8 +145,35 @@ export interface TransferSettings {
   price_monthly: number | null
   price_biannual: number | null
   price_annual: number | null
+  /** The promotion on transfer prices: set when all of these are. */
+  promo_name: string | null
+  promo_percent: number | null
+  promo_plans: PlanId[] | null
+  promo_starts_at: string | null
+  promo_ends_at: string | null
   updated_at: string
   updated_by: string | null
+}
+
+/** Someone on the mailing list. `member`: the address also has a membership row. */
+export interface ContactRow {
+  email: string
+  name: string | null
+  source: 'admin' | 'member'
+  added_at: string
+  added_by: string | null
+  unsubscribed_at: string | null
+  member: boolean
+}
+
+export interface BroadcastRow {
+  id: number
+  subject: string
+  body: string
+  sent_by: string
+  sent_at: string
+  recipients: number
+  failed: number
 }
 
 /** One @afrocoils.app address and its conversations. */

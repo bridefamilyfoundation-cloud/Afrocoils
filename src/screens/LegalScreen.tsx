@@ -150,6 +150,18 @@ function PrivacyPolicy() {
           gets one twice. These are about your membership and nothing else.
         </p>
         <p>
+          <strong>News and offers by email.</strong> We keep a mailing list for occasional
+          news and offers, such as a discount on membership. It holds the addresses of people
+          who asked us to write to them and of our members, with, for some, a name we noted;
+          when each was added; and, if they unsubscribed, when. Each message comes from
+          hello@afrocoils.app and ends with an unsubscribe link of its own. Once you use it,
+          or ask us by email, we never send you news or offers again; we keep your address
+          on the list, marked unsubscribed, only so that it cannot be added back by mistake.
+          Unsubscribing does not stop the sign-in codes or the membership reminders above. We
+          keep a copy of each message we send and how many people it went to, not who opened
+          it: the messages carry no tracking.
+        </p>
+        <p>
           <strong>Staying signed in.</strong> While you are signed in, the app asks our server
           when it opens and at most twice a day whether your membership is still paid up. That
           request carries your sign-in token and nothing else: not your hair profile, not your
@@ -158,7 +170,8 @@ function PrivacyPolicy() {
         </p>
         <p>
           We use your email only to sign you in, to run your membership (the reminders above
-          included) and to answer you when you write to us. No newsletters, no marketing, and we never sell or share it except
+          included), to answer you when you write to us and, until you unsubscribe, to send
+          the news and offers above. We never sell or share it except
           with Paystack and Resend, to do exactly those jobs. To have it removed, cancel your
           membership and write to{' '}
           <a href="mailto:support@afrocoils.app" className="text-primary underline">
@@ -233,8 +246,8 @@ function PrivacyPolicy() {
           </li>
           <li>No crash or telemetry reporting.</li>
           <li>
-            No newsletters or marketing email. Your email is for signing in, your membership
-            and replies to you, and nothing about your hair is stored with it.
+            No email you cannot leave. News and offers go only to the mailing list, every one
+            carries an unsubscribe link, and nothing about your hair is stored with your email.
           </li>
           <li>
             No third-party SDKs that observe your use of the app. Paying by card happens on
@@ -277,7 +290,7 @@ function PrivacyPolicy() {
         <p>
           <strong>Paystack</strong> takes your card payment and runs the subscription, under its
           own privacy policy. <strong>Resend</strong> sends the sign-in codes, the reminder
-          emails and our replies, and receives mail you send to any @afrocoils.app address (support@, hello@ or another); we keep that
+          emails, our replies and messages to the mailing list, and receives mail you send to any @afrocoils.app address (support@, hello@ or another); we keep that
           correspondence as text so we can answer it.
         </p>
       </Article>

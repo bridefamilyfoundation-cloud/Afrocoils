@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react'
 import Icon from './Icon'
+import PromoBanner from './PromoBanner'
 import { addDays, dateKey } from '../lib/calendar'
 import { MembershipError, longDate, sendTransfer, transferInfo } from '../lib/membership'
 import { PhotoError, photosAvailable, pickReceipt, type PhotoSource } from '../lib/photos'
@@ -189,6 +190,8 @@ export default function BankTransfer({ token, email, onRecheck, busyOutside }: P
         </div>
       )}
 
+      {info.promo && <PromoBanner promo={info.promo} />}
+
       <p className="mb-sm font-label-md text-label-md text-on-surface">1. Choose a plan</p>
       <div role="radiogroup" aria-label="Plans paid by transfer" className="mb-md space-y-xs">
         {info.plans.map((p) => {
@@ -206,7 +209,15 @@ export default function BankTransfer({ token, email, onRecheck, busyOutside }: P
             >
               <Icon name={selected ? 'check_circle' : 'radio_button_unchecked'} className="shrink-0 text-[22px]" />
               <span className="flex-1 font-label-md text-body-md font-bold">{PLANS[p.id].label}</span>
-              <span className="font-headline-md text-body-lg font-bold">{formatAmount(p.amount, p.currency)}</span>
+              <span className="text-right">
+                {p.fullAmount && (
+                  <s className="mr-xs font-body-md text-caption opacity-75">
+                    <span className="sr-only">was </span>
+                    {formatAmount(p.fullAmount, p.currency)}
+                  </s>
+                )}
+                <span className="font-headline-md text-body-lg font-bold">{formatAmount(p.amount, p.currency)}</span>
+              </span>
             </button>
           )
         })}

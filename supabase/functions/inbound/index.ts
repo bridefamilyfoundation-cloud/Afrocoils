@@ -9,6 +9,7 @@ import {
   type Mailbox,
 } from '../_shared/email.ts'
 import { serve } from '../_shared/env.ts'
+import { unsubscribe } from '../_shared/mailing.ts'
 import { db } from '../_shared/members.ts'
 import { insertReturning, patch, select } from '../_shared/supabase.ts'
 
@@ -26,7 +27,32 @@ import { insertReturning, patch, select } from '../_shared/supabase.ts'
  *
  * Believed only when the Svix signature matches RESEND_WEBHOOK_SECRET.
  * Webhook URL: `https://<ref>.supabase.co/functions/v1/inbound`.
+ *
+ * `inbound/unsubscribe?t=<token>` is the one public route: the link at
+ * the foot of every broadcast (`_shared/mailing.ts`). A GET — someone
+ * clicking it — takes the address off the list and sends the browser to
+ * the site's static `unsubscribed.html` (Supabase serves a function's
+ * HTML as plain text, so the page cannot live here). A POST is a mail
+ * provider's one-click unsubscribe (RFC 8058) and is answered 200. The
+ * token is random and names nobody; nothing else is read.
  */
+
+const UNSUBSCRIBED_PAGE = 'https://afrocoils.app/unsubscribed.html'
+
+async function unsubscribeRoute(req: Request, url: URL): Promise<Response> {
+  if (req.method !== 'GET' && req.method !== 'POST') return new Response(null, { status: 405 })
+  let found = false
+  try {
+    found = await unsubscribe(url.searchParams.get('t'))
+  } catch (error) {
+    console.error('[inbound] unsubscribe failed', error)
+    return req.method === 'POST'
+      ? new Response(null, { status: 500 })
+      : Response.redirect(`${UNSUBSCRIBED_PAGE}?error=1`, 303)
+  }
+  if (req.method === 'POST') return new Response(null, { status: found ? 200 : 404 })
+  return Response.redirect(found ? UNSUBSCRIBED_PAGE : `${UNSUBSCRIBED_PAGE}?error=1`, 303)
+}
 
 interface ReceivedEvent {
   type: string
@@ -90,6 +116,8 @@ async function findThread(
 }
 
 serve(async (req) => {
+  const url = new URL(req.url)
+  if (url.pathname.endsWith('/unsubscribe')) return unsubscribeRoute(req, url)
   if (req.method !== 'POST') return new Response(null, { status: 405 })
 
   let raw: string

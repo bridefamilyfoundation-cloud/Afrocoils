@@ -5,7 +5,7 @@
  * `auth/verify`, `auth/status` and `billing/trial` all answer with
  * `membershipFor()`, so the three cannot disagree about who has access.
  */
-import type { MembershipResponse, PlanOffer } from '../../../src/lib/types.ts'
+import type { MembershipResponse, PlanOffer, Promo } from '../../../src/lib/types.ts'
 import { MEMBERSHIP_GRACE_DAYS, accessOpen, membershipOpen } from '../../../src/lib/types.ts'
 import { getMember, laterOf, recordCharge, saveMember, trialKey, db, type MemberRow } from './members.ts'
 import {
@@ -19,6 +19,7 @@ import {
 } from './paystack.ts'
 import { releaseFloor } from './releases.ts'
 import { patch, select } from './supabase.ts'
+import { activePromo, readSettings } from './transfers.ts'
 import { signToken } from './token.ts'
 
 const DAY = 86_400_000
@@ -230,7 +231,16 @@ export async function membershipFor(email: string): Promise<MembershipResponse> 
   const choosing = !autoRenewing(member)
 
   let plans: PlanOffer[] | null = null
-  if (choosing) plans = await planOffers().catch(() => null)
+  let promo: Promo | null = null
+  if (choosing) {
+    ;[plans, promo] = await Promise.all([
+      planOffers().catch(() => null),
+      // The banner on /join: a promotion on bank-transfer prices.
+      readSettings()
+        .then((settings) => activePromo(settings))
+        .catch(() => null),
+    ])
+  }
   const monthly = plans?.find((p) => p.id === 'monthly')
 
   const floor = await releaseFloor()
@@ -249,5 +259,6 @@ export async function membershipFor(email: string): Promise<MembershipResponse> 
     trialAvailable: open ? false : await trialAvailable(email, member),
     price: !open && monthly ? { amount: monthly.amount, currency: monthly.currency, interval: 'monthly' } : undefined,
     plans,
+    promo,
   }
 }

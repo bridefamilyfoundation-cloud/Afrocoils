@@ -12,6 +12,15 @@ import {
 } from '../_shared/email.ts'
 import { env, serve } from '../_shared/env.ts'
 import { checkLimits, limitResponse } from '../_shared/limits.ts'
+import {
+  MailingRefusal,
+  addContacts,
+  importMembers,
+  listBroadcasts,
+  listContacts,
+  removeContacts,
+  sendBroadcast,
+} from '../_shared/mailing.ts'
 import { db, getMember, laterOf, saveMember } from '../_shared/members.ts'
 import { appendNote, closeAccess } from '../_shared/membership.ts'
 import { insert, insertReturning, patch, select, signedPhotoUrl } from '../_shared/supabase.ts'
@@ -22,6 +31,7 @@ import {
   listTransfers,
   readSettings,
   rejectTransfer,
+  savePromo,
   saveSettings,
 } from '../_shared/transfers.ts'
 
@@ -47,6 +57,12 @@ import {
  * POST transfer {id, action, note}     approve | reject (note required, emailed)
  * GET  transfer-settings               the bank account and transfer prices
  * POST transfer-settings {...}         change them
+ * POST promo {name, percent, plans, startsISO, endsISO} | {clear}
+ *                                     the promotion on transfer prices
+ * GET  contacts?q=                    the mailing list, newest first
+ * POST contacts {action, ...}         add {text, name} | import-members | remove {emails}
+ * GET  broadcasts                     messages sent to the list
+ * POST broadcast {subject, text, to}  send to 'all' or a list of addresses
  * GET  submissions?review=            the style queue, photos signed for an hour
  * POST submission {id, review, note}
  * GET  questions?outcome=&reviewed=   the Ask log
@@ -74,7 +90,8 @@ class Refusal extends Error {
 }
 
 async function input(req: Request): Promise<Record<string, unknown>> {
-  const raw = await readJson(req, 64 * 1024).catch((error) => {
+  // 512 KB: a pasted mailing list, or a broadcast to thousands of ticked addresses.
+  const raw = await readJson(req, 512 * 1024).catch((error) => {
     if (error instanceof BodyTooLarge) throw new Refusal(413, 'Too large')
     throw error
   })
@@ -101,7 +118,7 @@ async function count(table: string, filter: string): Promise<number> {
 
 async function overview() {
   const openFrom = new Date(Date.now() - MEMBERSHIP_GRACE_DAYS * 86_400_000).toISOString()
-  const [members, paying, pending, open, unread, unanswered, transfers] = await Promise.all([
+  const [members, paying, pending, open, unread, unanswered, transfers, subscribers] = await Promise.all([
     count('members', 'select=email'),
     count('members', `select=email&paid_until=gt.${openFrom}`),
     count('submissions', 'select=id&review=eq.Pending'),
@@ -109,8 +126,9 @@ async function overview() {
     count('support_messages', 'select=id&direction=eq.in&read=eq.false'),
     count('ask_questions', 'select=id&outcome=eq.none&reviewed=eq.false'),
     count('transfers', 'select=id&status=eq.Pending'),
+    count('mailing_list', 'select=email&unsubscribed_at=is.null'),
   ])
-  return { members, paying, pending, open, unread, unanswered, transfers }
+  return { members, paying, pending, open, unread, unanswered, transfers, subscribers }
 }
 
 /* ------------------------------------------------------------------ *
@@ -358,6 +376,20 @@ async function decideTransfer(body: Record<string, unknown>, by: string) {
 }
 
 /* ------------------------------------------------------------------ *
+ * The mailing list
+ * ------------------------------------------------------------------ */
+
+function changeContacts(body: Record<string, unknown>, by: string) {
+  if (body.action === 'add') {
+    // A pasted list can be long: up to MAX_BROADCAST addresses.
+    return addContacts(typeof body.text === 'string' ? body.text.slice(0, 600_000) : '', text(body.name, 80), by)
+  }
+  if (body.action === 'import-members') return importMembers(by)
+  if (body.action === 'remove') return removeContacts(body.emails)
+  throw new Refusal(400, 'Unknown action')
+}
+
+/* ------------------------------------------------------------------ *
  * Style submissions
  * ------------------------------------------------------------------ */
 
@@ -448,6 +480,8 @@ serve(async (req) => {
       else if (route === 'questions') result = await listQuestions(url)
       else if (route === 'transfers') result = await listTransfers(url.searchParams.get('status') ?? 'Pending')
       else if (route === 'transfer-settings') result = await readSettings()
+      else if (route === 'contacts') result = await listContacts(url.searchParams.get('q') ?? '')
+      else if (route === 'broadcasts') result = await listBroadcasts()
       else throw new Refusal(404, 'Not found')
     } else if (req.method === 'POST') {
       const body = await input(req)
@@ -459,13 +493,16 @@ serve(async (req) => {
       else if (route === 'questions') result = await markQuestions(body)
       else if (route === 'transfer') result = await decideTransfer(body, by)
       else if (route === 'transfer-settings') result = await saveSettings(body, by)
+      else if (route === 'promo') result = await savePromo(body, by)
+      else if (route === 'contacts') result = await changeContacts(body, by)
+      else if (route === 'broadcast') result = await sendBroadcast(body, by)
       else throw new Refusal(404, 'Not found')
     } else {
       throw new Refusal(405, 'Method not allowed')
     }
     return jsonResponse(result, 200, origin)
   } catch (error) {
-    if (error instanceof Refusal || error instanceof TransferRefusal) {
+    if (error instanceof Refusal || error instanceof TransferRefusal || error instanceof MailingRefusal) {
       return jsonResponse({ error: error.message }, error.status, origin)
     }
     console.error(`[admin] ${route} failed`, error)

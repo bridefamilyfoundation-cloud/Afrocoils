@@ -908,6 +908,33 @@ export interface PlanOffer {
   id: PlanId
   amount: number
   currency: string
+  /** The price before a promotion, when one lowered `amount`. Absent: no promotion on this plan. */
+  fullAmount?: number
+}
+
+/**
+ * A promotion: a percentage off the bank-transfer prices, set on the
+ * admin site (`transfer_settings`, migration 0011) and running between
+ * two times. Card plans are priced by Paystack and are not discounted,
+ * so everything that shows a promotion says it is for bank transfer.
+ */
+export interface Promo {
+  name: string
+  percentOff: number
+  /** The plans it applies to. */
+  plans: PlanId[]
+  endsISO: string
+}
+
+export const PROMO_MAX_PERCENT = 90
+
+/**
+ * A price with `percentOff` taken off, rounded to a whole naira (people
+ * type a transfer amount by hand) and never below one. The server
+ * decides what is owed with this; the phone only shows it.
+ */
+export function promoPrice(amount: number, percentOff: number): number {
+  return Math.max(100, Math.round((amount * (100 - percentOff)) / 10_000) * 100)
 }
 
 /** The longest style name and credit the submissions route keeps; the form holds to the same. */
@@ -984,6 +1011,8 @@ export interface MembershipResponse {
   price?: PlanPrice | null
   /** Present when a plan can be chosen: the plans on offer, cheapest period first. */
   plans?: PlanOffer[] | null
+  /** A promotion running on bank-transfer prices, when a plan can be chosen. */
+  promo?: Promo | null
   /** The kill switch, as latest.json has it. Absent when the server could not read it: keep the last one. */
   floor?: ReleaseFloor
 }
@@ -1092,8 +1121,10 @@ export interface TransferSummary {
 export interface TransferInfoResponse {
   /** Null: paying by transfer is switched off, or no account is set. */
   account: BankAccount | null
-  /** The plans that can be paid by transfer, at their transfer price. */
+  /** The plans that can be paid by transfer, at their transfer price (a promotion already taken off). */
   plans: PlanOffer[]
+  /** The promotion running, if any. */
+  promo?: Promo | null
   /** This member's most recent transfer, if any. */
   latest: TransferSummary | null
 }

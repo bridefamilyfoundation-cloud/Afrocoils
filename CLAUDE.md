@@ -115,7 +115,18 @@ picture; this file is the short version of what to keep in mind when editing.
   `payment-receipts` bucket; the `transfers` row holds the path and the
   SHA-256, and the image is deleted `RECEIPT_KEEP_DAYS` (90) after the
   decision by the daily run. Every field is validated on both sides from
-  the patterns in `types.ts`, and the amount is always the server's. A
+  the patterns in `types.ts`, and the amount is always the server's.
+  **A promotion (added 2026-11-27)** is a percentage off the *transfer*
+  prices only, set on the admin site's Bank transfers page (`promo_*`
+  on `transfer_settings`, migration 0011; `savePromo`, `activePromo`,
+  `promoForReceipt` in `_shared/transfers.ts`; `promoPrice()` in
+  `types.ts`, rounded to whole naira). A receipt is priced by the promo
+  running on the day it was paid (three days' grace after the end), and
+  the row records it in `transfers.promo`. Card prices are Paystack's
+  and are not discounted: `PromoBanner` always says "by bank transfer",
+  and must keep saying so until card checkout itself discounts — a
+  one-off first charge plus a subscription starting later, built and
+  tried in Paystack test mode first, as for the card add-on above. A
   person approves on the admin site (`_shared/transfers.ts`, a
   compare-and-set on `Pending`), which extends `paid_until` from the
   later of now and the current end, writes a `payments` row with
@@ -123,7 +134,21 @@ picture; this file is the short version of what to keep in mind when editing.
   reason. A transfer plan never renews by itself. Reminders are service mail
   only, sent once each by the daily `billing/reminders` run (pg_cron)
   and mirrored by `MembershipNotice` in the app; adding a kind of email
-  is a privacy-policy sentence first. An earlier one-off "AfroCoils Plus" with
+  is a privacy-policy sentence first. **The mailing list (added
+  2026-11-27)** is the one exception to "service mail only", and the
+  policy, FAQ, landing site and Play note say so: the admin site's
+  Mailing list page (`_shared/mailing.ts`, `mailing_list` and
+  `broadcasts`, migration 0011) holds addresses added by hand or
+  imported from members, and sends one message to all or the ticked
+  ones from hello@, in Resend batches of 100. Every message carries its
+  own unsubscribe link and the one-click `List-Unsubscribe` headers,
+  both to `inbound/unsubscribe` (a GET unsubscribes and redirects to
+  the site's static `unsubscribed.html`; a POST is RFC 8058). An
+  unsubscribed row is kept as the do-not-email record: never delete
+  it, never re-subscribe it from the admin side, and never send a
+  broadcast to an address not on the list. Keep open and click
+  tracking off for the domain in Resend — the policy says the messages
+  carry none. An earlier one-off "AfroCoils Plus" with
   per-feature locks shipped in test mode in pushed update 8 and was
   removed: `plus` is a legacy key, dropped on load. Don't reintroduce
   per-feature locks — the whole app is the product. A Play build cannot
