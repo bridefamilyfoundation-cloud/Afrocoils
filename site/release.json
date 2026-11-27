@@ -13,14 +13,14 @@
     "After paying by card, your browser brings you straight back to the app"
   ],
   "bundle": {
-    "code": 22,
+    "code": 24,
     "minVersionCode": 14,
-    "bytes": 4689879,
-    "sha256": "c13b22560921ce6695781c374bb11d94cc2df15816d3f77e4170efe7d50a63ab",
-    "released": "2026-11-22",
-    "url": "https://runhkccoeyxfgsfrzezn.supabase.co/storage/v1/object/public/releases/bundles/22.zip",
+    "bytes": 4690202,
+    "sha256": "5a9b2f1782aa8aa98f7bac9aa8161eb98f1b7e842f35e3ac38ac154784c417b9",
+    "released": "2026-11-27",
+    "url": "https://runhkccoeyxfgsfrzezn.supabase.co/storage/v1/object/public/releases/bundles/24.zip",
     "notes": [
-      "Meet the Founder: Rachel Ehigocho Majerison's story, on the About page"
+      "Promotions on bank transfer prices show on Become a member"
     ]
   }
 }
