@@ -52,3 +52,10 @@ ask-study/
 
 # Admin site build output (admin/, its own Vercel project)
 admin/dist/
+
+# Rendered promo media: re-made by the capture and render scripts beside it.
+/motion/**/*.png
+/motion/**/*.mp4
+/marketing/**/out/
+# Coloured generated sheets, held back from the app (black hair only).
+/Non-black hair images/

@@ -1,0 +1,80 @@
+{
+  "sos": {
+    "height": 1597,
+    "getStarted": {
+      "x": 52,
+      "y": 715,
+      "w": 181,
+      "h": 56
+    },
+    "quickLink": {
+      "x": 251,
+      "y": 735,
+      "w": 109,
+      "h": 16
+    },
+    "twoWays": {
+      "x": 20,
+      "y": 851,
+      "w": 372,
+      "h": 38
+    },
+    "doorQuick": {
+      "x": 20,
+      "y": 977,
+      "w": 372,
+      "h": 96
+    },
+    "doorCare": {
+      "x": 20,
+      "y": 1089,
+      "w": 372,
+      "h": 112
+    },
+    "doorsScroll": 682
+  },
+  "tabSos": {
+    "x": 22,
+    "y": 849,
+    "w": 109,
+    "h": 48
+  },
+  "quick": {
+    "height0": 2290,
+    "bands": [
+      "5–10 min",
+      "15–20 min",
+      "20–45 min"
+    ],
+    "band": {
+      "x": 137,
+      "y": 266,
+      "w": 117,
+      "h": 36
+    },
+    "count0": "12 styles fit 5–10 min",
+    "height1": 1810,
+    "picked": "15–20 min",
+    "count1": "8 styles fit 15–20 min",
+    "url": "http://localhost:5199/#/sos/quick?t=1"
+  },
+  "tabSosInQuick": {
+    "x": 22,
+    "y": 849,
+    "w": 109,
+    "h": 48
+  },
+  "tabLitInQuick": "page",
+  "backUrl": "http://localhost:5199/#/sos",
+  "care": {
+    "url": "http://localhost:5199/#/care",
+    "height": 2298,
+    "heading": "Hair Care",
+    "wrong": {
+      "x": 20,
+      "y": 1762,
+      "w": 372,
+      "h": 140
+    }
+  }
+}

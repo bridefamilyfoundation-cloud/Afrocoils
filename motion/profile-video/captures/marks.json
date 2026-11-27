@@ -1,0 +1,358 @@
+{
+  "full": {
+    "height": 2052,
+    "My Hair Profile": {
+      "y": 96,
+      "h": 34
+    },
+    "Ama": {
+      "y": 154,
+      "h": 150
+    },
+    "Your hair at a glance": {
+      "y": 328,
+      "h": 216
+    },
+    "Your hair": {
+      "y": 592,
+      "h": 308
+    },
+    "profile-hairType": {
+      "y": 616,
+      "h": 56
+    },
+    "profile-curlPattern": {
+      "y": 672,
+      "h": 57
+    },
+    "profile-porosity": {
+      "y": 729,
+      "h": 57
+    },
+    "profile-density": {
+      "y": 786,
+      "h": 57
+    },
+    "profile-texture": {
+      "y": 843,
+      "h": 57
+    },
+    "Scalp & surroundings": {
+      "y": 932,
+      "h": 250
+    },
+    "profile-scalpCondition": {
+      "y": 980,
+      "h": 56
+    },
+    "profile-climate": {
+      "y": 1036,
+      "h": 57
+    },
+    "profile-hardWater": {
+      "y": 1093,
+      "h": 89
+    },
+    "How your hair is doing": {
+      "y": 1214,
+      "h": 104
+    },
+    "profile-hairCondition": {
+      "y": 1262,
+      "h": 56
+    },
+    "Your rules": {
+      "y": 1350,
+      "h": 137
+    },
+    "profile-rules": {
+      "y": 1374,
+      "h": 56
+    },
+    "profile-preferences": {
+      "y": 1430,
+      "h": 57
+    },
+    "Products & membership": {
+      "y": 1519,
+      "h": 137
+    },
+    "profile-shelf": {
+      "y": 1543,
+      "h": 56
+    },
+    "profile-membership": {
+      "y": 1599,
+      "h": 57
+    }
+  },
+  "climate": {
+    "height": 2188,
+    "My Hair Profile": {
+      "y": 96,
+      "h": 34
+    },
+    "Ama": {
+      "y": 154,
+      "h": 150
+    },
+    "Your hair at a glance": {
+      "y": 328,
+      "h": 216
+    },
+    "Your hair": {
+      "y": 592,
+      "h": 308
+    },
+    "profile-hairType": {
+      "y": 616,
+      "h": 56
+    },
+    "profile-curlPattern": {
+      "y": 672,
+      "h": 57
+    },
+    "profile-porosity": {
+      "y": 729,
+      "h": 57
+    },
+    "profile-density": {
+      "y": 786,
+      "h": 57
+    },
+    "profile-texture": {
+      "y": 843,
+      "h": 57
+    },
+    "Scalp & surroundings": {
+      "y": 932,
+      "h": 386
+    },
+    "profile-scalpCondition": {
+      "y": 980,
+      "h": 56
+    },
+    "profile-climate": {
+      "y": 1036,
+      "h": 193
+    },
+    "profile-climate-panel": {
+      "y": 1093,
+      "h": 136
+    },
+    "profile-hardWater": {
+      "y": 1229,
+      "h": 89
+    },
+    "How your hair is doing": {
+      "y": 1350,
+      "h": 104
+    },
+    "profile-hairCondition": {
+      "y": 1398,
+      "h": 56
+    },
+    "Your rules": {
+      "y": 1486,
+      "h": 137
+    },
+    "profile-rules": {
+      "y": 1510,
+      "h": 56
+    },
+    "profile-preferences": {
+      "y": 1566,
+      "h": 57
+    },
+    "Products & membership": {
+      "y": 1655,
+      "h": 137
+    },
+    "profile-shelf": {
+      "y": 1679,
+      "h": 56
+    },
+    "profile-membership": {
+      "y": 1735,
+      "h": 57
+    }
+  },
+  "rules": {
+    "height": 2248,
+    "My Hair Profile": {
+      "y": 96,
+      "h": 34
+    },
+    "Ama": {
+      "y": 154,
+      "h": 150
+    },
+    "Your hair at a glance": {
+      "y": 328,
+      "h": 216
+    },
+    "Your hair": {
+      "y": 592,
+      "h": 308
+    },
+    "profile-hairType": {
+      "y": 616,
+      "h": 56
+    },
+    "profile-curlPattern": {
+      "y": 672,
+      "h": 57
+    },
+    "profile-porosity": {
+      "y": 729,
+      "h": 57
+    },
+    "profile-density": {
+      "y": 786,
+      "h": 57
+    },
+    "profile-texture": {
+      "y": 843,
+      "h": 57
+    },
+    "Scalp & surroundings": {
+      "y": 932,
+      "h": 250
+    },
+    "profile-scalpCondition": {
+      "y": 980,
+      "h": 56
+    },
+    "profile-climate": {
+      "y": 1036,
+      "h": 57
+    },
+    "profile-hardWater": {
+      "y": 1093,
+      "h": 89
+    },
+    "How your hair is doing": {
+      "y": 1214,
+      "h": 104
+    },
+    "profile-hairCondition": {
+      "y": 1262,
+      "h": 56
+    },
+    "Your rules": {
+      "y": 1350,
+      "h": 333
+    },
+    "profile-rules": {
+      "y": 1374,
+      "h": 252
+    },
+    "profile-rules-panel": {
+      "y": 1430,
+      "h": 196
+    },
+    "profile-preferences": {
+      "y": 1626,
+      "h": 57
+    },
+    "Products & membership": {
+      "y": 1715,
+      "h": 137
+    },
+    "profile-shelf": {
+      "y": 1739,
+      "h": 56
+    },
+    "profile-membership": {
+      "y": 1795,
+      "h": 57
+    }
+  },
+  "partial": {
+    "height": 2134,
+    "My Hair Profile": {
+      "y": 96,
+      "h": 34
+    },
+    "Ama": {
+      "y": 154,
+      "h": 150
+    },
+    "Your hair at a glance": {
+      "y": 328,
+      "h": 298
+    },
+    "Your hair": {
+      "y": 674,
+      "h": 308
+    },
+    "profile-hairType": {
+      "y": 698,
+      "h": 56
+    },
+    "profile-curlPattern": {
+      "y": 754,
+      "h": 57
+    },
+    "profile-porosity": {
+      "y": 811,
+      "h": 57
+    },
+    "profile-density": {
+      "y": 868,
+      "h": 57
+    },
+    "profile-texture": {
+      "y": 925,
+      "h": 57
+    },
+    "Scalp & surroundings": {
+      "y": 1014,
+      "h": 250
+    },
+    "profile-scalpCondition": {
+      "y": 1062,
+      "h": 56
+    },
+    "profile-climate": {
+      "y": 1118,
+      "h": 57
+    },
+    "profile-hardWater": {
+      "y": 1175,
+      "h": 89
+    },
+    "How your hair is doing": {
+      "y": 1296,
+      "h": 104
+    },
+    "profile-hairCondition": {
+      "y": 1344,
+      "h": 56
+    },
+    "Your rules": {
+      "y": 1432,
+      "h": 137
+    },
+    "profile-rules": {
+      "y": 1456,
+      "h": 56
+    },
+    "profile-preferences": {
+      "y": 1512,
+      "h": 57
+    },
+    "Products & membership": {
+      "y": 1601,
+      "h": 137
+    },
+    "profile-shelf": {
+      "y": 1625,
+      "h": 56
+    },
+    "profile-membership": {
+      "y": 1681,
+      "h": 57
+    }
+  }
+}

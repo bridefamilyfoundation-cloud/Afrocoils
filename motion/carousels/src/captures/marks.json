@@ -1,0 +1,1996 @@
+{
+  "sos": {
+    "url": "#/sos",
+    "height": 1597,
+    "marks": [
+      {
+        "tag": "button",
+        "tour": "menu-button",
+        "text": "",
+        "y": 12,
+        "h": 40
+      },
+      {
+        "tag": "section",
+        "text": "SOS HAIR SOS What’s your emergency? Quick styles and real care, for the moment your hair c",
+        "y": 96,
+        "h": 707
+      },
+      {
+        "tag": "h1",
+        "text": "What’s your emergency?",
+        "y": 479,
+        "h": 92
+      },
+      {
+        "tag": "section",
+        "text": "Two ways in Everything behind them is written down and on this phone, so it works with no ",
+        "y": 851,
+        "h": 94
+      },
+      {
+        "tag": "h2",
+        "text": "Two ways in",
+        "y": 851,
+        "h": 38
+      },
+      {
+        "tag": "section",
+        "tour": "sos-doors",
+        "text": " Quick Hairstyle You have somewhere to be. Pick the time you have and see what fits it. ",
+        "y": 977,
+        "h": 224
+      },
+      {
+        "tag": "nav",
+        "tour": "tab-bar",
+        "text": "",
+        "y": 843,
+        "h": 72
+      },
+      {
+        "tag": "button",
+        "tour": "ask-button",
+        "text": "",
+        "y": 787,
+        "h": 48
+      }
+    ]
+  },
+  "quick": {
+    "url": "#/sos/quick",
+    "height": 2290,
+    "marks": [
+      {
+        "tag": "button",
+        "tour": "menu-button",
+        "text": "",
+        "y": 12,
+        "h": 40
+      },
+      {
+        "tag": "section",
+        "text": "Quick Hairstyle How long have you got? The list is ranked against your hair profile, short",
+        "y": 140,
+        "h": 94
+      },
+      {
+        "tag": "h2",
+        "text": "Quick Hairstyle",
+        "y": 140,
+        "h": 38
+      },
+      {
+        "tag": "section",
+        "text": "5–10 min 15–20 min 20–45 min",
+        "y": 266,
+        "h": 36
+      },
+      {
+        "tag": "section",
+        "text": "12 styles fit 5–10 min  Two-Side Flat Twist 5 min · Beginner · Protective suits medium ha",
+        "y": 326,
+        "h": 1488
+      },
+      {
+        "tag": "h3",
+        "text": "Two-Side Flat Twist",
+        "y": 382,
+        "h": 28
+      },
+      {
+        "tag": "h3",
+        "text": "Front Twists into Afro Bun",
+        "y": 494,
+        "h": 56
+      },
+      {
+        "tag": "h3",
+        "text": "Flat Twist Front Afro",
+        "y": 634,
+        "h": 28
+      },
+      {
+        "tag": "h3",
+        "text": "Square Front Weave Afro",
+        "y": 746,
+        "h": 56
+      },
+      {
+        "tag": "h3",
+        "text": "Pinned Afro Updo",
+        "y": 886,
+        "h": 28
+      },
+      {
+        "tag": "h3",
+        "text": "Threaded Ponytail",
+        "y": 1006,
+        "h": 28
+      },
+      {
+        "tag": "h3",
+        "text": "Curved Weave Bun",
+        "y": 1126,
+        "h": 28
+      },
+      {
+        "tag": "h3",
+        "text": "Curved Part Afro Bun",
+        "y": 1246,
+        "h": 28
+      },
+      {
+        "tag": "h3",
+        "text": "Side Plait Bun",
+        "y": 1366,
+        "h": 28
+      },
+      {
+        "tag": "h3",
+        "text": "Gelled Section Pack",
+        "y": 1486,
+        "h": 28
+      },
+      {
+        "tag": "h3",
+        "text": "Afro Donut Bun",
+        "y": 1614,
+        "h": 28
+      },
+      {
+        "tag": "h3",
+        "text": "Donut Bun with Twisted Front",
+        "y": 1720,
+        "h": 56
+      },
+      {
+        "tag": "nav",
+        "tour": "tab-bar",
+        "text": "",
+        "y": 843,
+        "h": 72
+      },
+      {
+        "tag": "button",
+        "tour": "ask-button",
+        "text": "",
+        "y": 787,
+        "h": 48
+      }
+    ]
+  },
+  "styles": {
+    "url": "#/styles",
+    "height": 7308,
+    "marks": [
+      {
+        "tag": "button",
+        "tour": "menu-button",
+        "text": "",
+        "y": 12,
+        "h": 40
+      },
+      {
+        "tag": "section",
+        "text": "Hair Styles The full technique library — every contributed look, browsable by category and",
+        "y": 172,
+        "h": 86
+      },
+      {
+        "tag": "h2",
+        "text": "Hair Styles",
+        "y": 172,
+        "h": 34
+      },
+      {
+        "tag": "a",
+        "tour": "styles-recommended",
+        "text": "Recommended for your hair Ranked from your profile, with the criteria it used See them ",
+        "y": 282,
+        "h": 188
+      },
+      {
+        "tag": "section",
+        "text": "All styles 31 of 31 All Protective Wash Day Quick Stretched Defined  Casual Day  Work/Pr",
+        "y": 518,
+        "h": 164
+      },
+      {
+        "tag": "h3",
+        "text": "All styles",
+        "y": 518,
+        "h": 28
+      },
+      {
+        "tag": "section",
+        "text": " Two-Side Flat Twist One curved parting, one flat twist each side, tips met and pinned at",
+        "y": 706,
+        "h": 5792
+      },
+      {
+        "tag": "h3",
+        "text": "Two-Side Flat Twist",
+        "y": 925,
+        "h": 20
+      },
+      {
+        "tag": "h3",
+        "text": "Sectioned Twist Buns",
+        "y": 925,
+        "h": 20
+      },
+      {
+        "tag": "h3",
+        "text": "Double Flat Twist Buns",
+        "y": 1275,
+        "h": 40
+      },
+      {
+        "tag": "h3",
+        "text": "Crossed Twist Crown",
+        "y": 1275,
+        "h": 20
+      },
+      {
+        "tag": "h3",
+        "text": "Linked Weave Pack",
+        "y": 1646,
+        "h": 20
+      },
+      {
+        "tag": "h3",
+        "text": "Five-Line Curved Cornrows",
+        "y": 1646,
+        "h": 40
+      },
+      {
+        "tag": "h3",
+        "text": "Wool-Threaded Ponytail",
+        "y": 2016,
+        "h": 40
+      },
+      {
+        "tag": "h3",
+        "text": "Front Twists into Afro Bun",
+        "y": 2016,
+        "h": 40
+      },
+      {
+        "tag": "h3",
+        "text": "Flat Twist Front Afro",
+        "y": 2387,
+        "h": 20
+      },
+      {
+        "tag": "h3",
+        "text": "Square Front Weave Afro",
+        "y": 2387,
+        "h": 40
+      },
+      {
+        "tag": "h3",
+        "text": "Two Ponytail Weave Front",
+        "y": 2757,
+        "h": 40
+      },
+      {
+        "tag": "h3",
+        "text": "Twisted Front Roll Bun",
+        "y": 2757,
+        "h": 20
+      },
+      {
+        "tag": "h3",
+        "text": "Twin Bun Weave-Back",
+        "y": 3128,
+        "h": 40
+      },
+      {
+        "tag": "h3",
+        "text": "Flat Twist Bun with Extension",
+        "y": 3128,
+        "h": 40
+      },
+      {
+        "tag": "h3",
+        "text": "Curved Weave-Back Bun",
+        "y": 3498,
+        "h": 40
+      },
+      {
+        "tag": "h3",
+        "text": "Pinned Afro Updo",
+        "y": 3498,
+        "h": 20
+      },
+      {
+        "tag": "h3",
+        "text": "Threaded Ponytail",
+        "y": 3869,
+        "h": 20
+      },
+      {
+        "tag": "h3",
+        "text": "Curved Weave Bun",
+        "y": 3869,
+        "h": 20
+      },
+      {
+        "tag": "h3",
+        "text": "Curved Part Afro Bun",
+        "y": 4219,
+        "h": 20
+      },
+      {
+        "tag": "h3",
+        "text": "Side Plait Bun",
+        "y": 4219,
+        "h": 20
+      },
+      {
+        "tag": "h3",
+        "text": "Rolled Section Updo",
+        "y": 4570,
+        "h": 20
+      },
+      {
+        "tag": "h3",
+        "text": "Banded Link Afro",
+        "y": 4570,
+        "h": 20
+      },
+      {
+        "tag": "h3",
+        "text": "Beaded Bun",
+        "y": 4920,
+        "h": 20
+      },
+      {
+        "tag": "h3",
+        "text": "Shuku with Flat Twist Front",
+        "y": 4920,
+        "h": 40
+      },
+      {
+        "tag": "h3",
+        "text": "Woven Roll with Attachment",
+        "y": 5291,
+        "h": 40
+      },
+      {
+        "tag": "h3",
+        "text": "Moisturise Twist by Twist",
+        "y": 5291,
+        "h": 40
+      },
+      {
+        "tag": "h3",
+        "text": "Gelled Section Pack",
+        "y": 5661,
+        "h": 20
+      },
+      {
+        "tag": "h3",
+        "text": "Bantu Coil Front Bun",
+        "y": 5661,
+        "h": 20
+      },
+      {
+        "tag": "h3",
+        "text": "High Gel Bun with Puff",
+        "y": 6012,
+        "h": 20
+      },
+      {
+        "tag": "h3",
+        "text": "Afro Donut Bun",
+        "y": 6012,
+        "h": 20
+      },
+      {
+        "tag": "h3",
+        "text": "Donut Bun with Twisted Front",
+        "y": 6362,
+        "h": 40
+      },
+      {
+        "tag": "section",
+        "text": " Every style here came from someone The whole library is contributed — written up by the ",
+        "y": 6546,
+        "h": 366
+      },
+      {
+        "tag": "h3",
+        "text": "Every style here came from someone",
+        "y": 6623,
+        "h": 60
+      },
+      {
+        "tag": "nav",
+        "tour": "tab-bar",
+        "text": "",
+        "y": 843,
+        "h": 72
+      },
+      {
+        "tag": "button",
+        "tour": "ask-button",
+        "text": "",
+        "y": 787,
+        "h": 48
+      }
+    ]
+  },
+  "recommended": {
+    "url": "#/styles/recommended",
+    "height": 7612,
+    "marks": [
+      {
+        "tag": "button",
+        "tour": "menu-button",
+        "text": "",
+        "y": 12,
+        "h": 40
+      },
+      {
+        "tag": "section",
+        "text": "Hairstyle Recommendations Built from your hair profile. Every criterion below is something",
+        "y": 140,
+        "h": 90
+      },
+      {
+        "tag": "h2",
+        "text": "Hairstyle Recommendations",
+        "y": 140,
+        "h": 34
+      },
+      {
+        "tag": "section",
+        "text": "What this is based on Hair type Loose Natural A hard filter, not a preference. Loose-hair ",
+        "y": 262,
+        "h": 616
+      },
+      {
+        "tag": "h3",
+        "text": "What this is based on",
+        "y": 286,
+        "h": 28
+      },
+      {
+        "tag": "section",
+        "text": "Matched your profile 29 of 31  Two-Side Flat Twist One curved parting, one flat twist eac",
+        "y": 926,
+        "h": 6198
+      },
+      {
+        "tag": "h3",
+        "text": "Matched your profile",
+        "y": 926,
+        "h": 28
+      },
+      {
+        "tag": "h3",
+        "text": "Two-Side Flat Twist",
+        "y": 1189,
+        "h": 20
+      },
+      {
+        "tag": "h3",
+        "text": "Sectioned Twist Buns",
+        "y": 1189,
+        "h": 20
+      },
+      {
+        "tag": "h3",
+        "text": "Double Flat Twist Buns",
+        "y": 1591,
+        "h": 40
+      },
+      {
+        "tag": "h3",
+        "text": "Crossed Twist Crown",
+        "y": 1591,
+        "h": 20
+      },
+      {
+        "tag": "h3",
+        "text": "Linked Weave Pack",
+        "y": 2014,
+        "h": 20
+      },
+      {
+        "tag": "h3",
+        "text": "Five-Line Curved Cornrows",
+        "y": 2014,
+        "h": 40
+      },
+      {
+        "tag": "h3",
+        "text": "Wool-Threaded Ponytail",
+        "y": 2436,
+        "h": 40
+      },
+      {
+        "tag": "h3",
+        "text": "Front Twists into Afro Bun",
+        "y": 2436,
+        "h": 40
+      },
+      {
+        "tag": "h3",
+        "text": "Flat Twist Front Afro",
+        "y": 2859,
+        "h": 20
+      },
+      {
+        "tag": "h3",
+        "text": "Square Front Weave Afro",
+        "y": 2859,
+        "h": 40
+      },
+      {
+        "tag": "h3",
+        "text": "Two Ponytail Weave Front",
+        "y": 3281,
+        "h": 40
+      },
+      {
+        "tag": "h3",
+        "text": "Twisted Front Roll Bun",
+        "y": 3281,
+        "h": 20
+      },
+      {
+        "tag": "h3",
+        "text": "Twin Bun Weave-Back",
+        "y": 3704,
+        "h": 40
+      },
+      {
+        "tag": "h3",
+        "text": "Flat Twist Bun with Extension",
+        "y": 3704,
+        "h": 40
+      },
+      {
+        "tag": "h3",
+        "text": "Curved Weave-Back Bun",
+        "y": 4126,
+        "h": 40
+      },
+      {
+        "tag": "h3",
+        "text": "Pinned Afro Updo",
+        "y": 4126,
+        "h": 20
+      },
+      {
+        "tag": "h3",
+        "text": "Threaded Ponytail",
+        "y": 4549,
+        "h": 20
+      },
+      {
+        "tag": "h3",
+        "text": "Curved Weave Bun",
+        "y": 4549,
+        "h": 20
+      },
+      {
+        "tag": "h3",
+        "text": "Curved Part Afro Bun",
+        "y": 4951,
+        "h": 20
+      },
+      {
+        "tag": "h3",
+        "text": "Side Plait Bun",
+        "y": 4951,
+        "h": 20
+      },
+      {
+        "tag": "h3",
+        "text": "Rolled Section Updo",
+        "y": 5354,
+        "h": 20
+      },
+      {
+        "tag": "h3",
+        "text": "Banded Link Afro",
+        "y": 5354,
+        "h": 20
+      },
+      {
+        "tag": "h3",
+        "text": "Beaded Bun",
+        "y": 5756,
+        "h": 20
+      },
+      {
+        "tag": "h3",
+        "text": "Shuku with Flat Twist Front",
+        "y": 5756,
+        "h": 40
+      },
+      {
+        "tag": "h3",
+        "text": "Woven Roll with Attachment",
+        "y": 6179,
+        "h": 40
+      },
+      {
+        "tag": "h3",
+        "text": "Moisturise Twist by Twist",
+        "y": 6179,
+        "h": 40
+      },
+      {
+        "tag": "h3",
+        "text": "Gelled Section Pack",
+        "y": 6601,
+        "h": 20
+      },
+      {
+        "tag": "h3",
+        "text": "Bantu Coil Front Bun",
+        "y": 6601,
+        "h": 20
+      },
+      {
+        "tag": "h3",
+        "text": "High Gel Bun with Puff",
+        "y": 6980,
+        "h": 20
+      },
+      {
+        "tag": "nav",
+        "tour": "tab-bar",
+        "text": "",
+        "y": 843,
+        "h": 72
+      },
+      {
+        "tag": "button",
+        "tour": "ask-button",
+        "text": "",
+        "y": 787,
+        "h": 48
+      }
+    ]
+  },
+  "care": {
+    "url": "#/care",
+    "height": 2298,
+    "marks": [
+      {
+        "tag": "button",
+        "tour": "menu-button",
+        "text": "",
+        "y": 12,
+        "h": 40
+      },
+      {
+        "tag": "section",
+        "tour": "care-heading",
+        "text": "Hair Care What your hair is, what it needs on a schedule, and what to put on it.",
+        "y": 96,
+        "h": 90
+      },
+      {
+        "tag": "h2",
+        "text": "Hair Care",
+        "y": 96,
+        "h": 34
+      },
+      {
+        "tag": "a",
+        "tour": "care-guide",
+        "text": " The AfroCoils Hair Guide Understand your hair. Care for your hair. Style your hair. The ",
+        "y": 218,
+        "h": 140
+      },
+      {
+        "tag": "h3",
+        "text": "The AfroCoils Hair Guide",
+        "y": 242,
+        "h": 28
+      },
+      {
+        "tag": "a",
+        "tour": "care-learn",
+        "text": " Hair Education What 4C hair is and why it behaves the way it does, in short lessons, one",
+        "y": 366,
+        "h": 124
+      },
+      {
+        "tag": "h3",
+        "text": "Hair Education",
+        "y": 390,
+        "h": 28
+      },
+      {
+        "tag": "section",
+        "text": "A · Know your hair Hair porosity High How readily your hair takes water in and lets it go.",
+        "y": 538,
+        "h": 724
+      },
+      {
+        "tag": "h3",
+        "text": "A · Know your hair",
+        "y": 538,
+        "h": 28
+      },
+      {
+        "tag": "h4",
+        "text": "Hair porosity",
+        "y": 606,
+        "h": 28
+      },
+      {
+        "tag": "h4",
+        "text": "Hair density",
+        "y": 750,
+        "h": 28
+      },
+      {
+        "tag": "h4",
+        "text": "Coil pattern",
+        "y": 894,
+        "h": 28
+      },
+      {
+        "tag": "h4",
+        "text": "Hair texture",
+        "y": 1038,
+        "h": 28
+      },
+      {
+        "tag": "section",
+        "text": " B · Hair routine Wash days, deep conditioning, protein, retwists. Set a cadence and the ",
+        "y": 1310,
+        "h": 592
+      },
+      {
+        "tag": "h4",
+        "text": "B · Hair routine",
+        "y": 1334,
+        "h": 28
+      },
+      {
+        "tag": "h4",
+        "text": "C · Product recommendations",
+        "y": 1466,
+        "h": 56
+      },
+      {
+        "tag": "h4",
+        "text": "D · Hairstyle recommendations",
+        "y": 1626,
+        "h": 56
+      },
+      {
+        "tag": "h4",
+        "text": "E · Something is wrong",
+        "y": 1786,
+        "h": 28
+      },
+      {
+        "tag": "nav",
+        "tour": "tab-bar",
+        "text": "",
+        "y": 843,
+        "h": 72
+      },
+      {
+        "tag": "button",
+        "tour": "ask-button",
+        "text": "",
+        "y": 787,
+        "h": 48
+      }
+    ]
+  },
+  "guide": {
+    "url": "#/care/guide",
+    "height": 2604,
+    "marks": [
+      {
+        "tag": "button",
+        "tour": "menu-button",
+        "text": "",
+        "y": 12,
+        "h": 40
+      },
+      {
+        "tag": "section",
+        "text": "THE AFROCOILS HAIR GUIDE Understand your hair. Care for your hair. Style your hair. A prac",
+        "y": 140,
+        "h": 364
+      },
+      {
+        "tag": "h2",
+        "text": "Understand your hair. Care for your hair. Style your hair.",
+        "y": 160,
+        "h": 68
+      },
+      {
+        "tag": "section",
+        "text": " How to use this guide  01 Understand your hair  02 Learn the characteristics that affe",
+        "y": 536,
+        "h": 1672
+      },
+      {
+        "tag": "h3",
+        "text": " How to use this guide ",
+        "y": 536,
+        "h": 76
+      },
+      {
+        "tag": "h3",
+        "text": "01 Understand your hair ",
+        "y": 620,
+        "h": 76
+      },
+      {
+        "tag": "h3",
+        "text": "02 Learn the characteristics that affect your routine ",
+        "y": 704,
+        "h": 104
+      },
+      {
+        "tag": "h3",
+        "text": "03 Shrinkage, shedding, and breakage ",
+        "y": 816,
+        "h": 104
+      },
+      {
+        "tag": "h3",
+        "text": "04 Cleanse and condition well ",
+        "y": 928,
+        "h": 76
+      },
+      {
+        "tag": "h3",
+        "text": "05 Moisture, hydration, and product layering ",
+        "y": 1012,
+        "h": 104
+      },
+      {
+        "tag": "h3",
+        "text": "06 Oils: what they can and cannot do ",
+        "y": 1124,
+        "h": 104
+      },
+      {
+        "tag": "h3",
+        "text": "07 Protect your hair between wash days ",
+        "y": 1236,
+        "h": 104
+      },
+      {
+        "tag": "h3",
+        "text": "08 Styling 4C hair with less stress ",
+        "y": 1348,
+        "h": 104
+      },
+      {
+        "tag": "h3",
+        "text": "09 Build a routine you can actually keep ",
+        "y": 1460,
+        "h": 104
+      },
+      {
+        "tag": "h3",
+        "text": "10 Choose products without getting overwhelmed ",
+        "y": 1572,
+        "h": 104
+      },
+      {
+        "tag": "h3",
+        "text": "11 The AfroCoils beginner starter kit ",
+        "y": 1684,
+        "h": 104
+      },
+      {
+        "tag": "h3",
+        "text": "12 Your first wash day: a beginner walkthrough ",
+        "y": 1796,
+        "h": 104
+      },
+      {
+        "tag": "h3",
+        "text": "13 Troubleshooting common experiences ",
+        "y": 1908,
+        "h": 104
+      },
+      {
+        "tag": "h3",
+        "text": "14 Quick glossary ",
+        "y": 2020,
+        "h": 76
+      },
+      {
+        "tag": "h3",
+        "text": "15 Research notes and references ",
+        "y": 2104,
+        "h": 104
+      },
+      {
+        "tag": "nav",
+        "tour": "tab-bar",
+        "text": "",
+        "y": 843,
+        "h": 72
+      },
+      {
+        "tag": "button",
+        "tour": "ask-button",
+        "text": "",
+        "y": 787,
+        "h": 48
+      }
+    ]
+  },
+  "learn": {
+    "url": "#/care/learn",
+    "height": 1994,
+    "marks": [
+      {
+        "tag": "button",
+        "tour": "menu-button",
+        "text": "",
+        "y": 12,
+        "h": 40
+      },
+      {
+        "tag": "section",
+        "text": " Hair Education What 4C hair is and why it behaves the way it does, in short lessons from",
+        "y": 140,
+        "h": 210
+      },
+      {
+        "tag": "h2",
+        "text": "Hair Education",
+        "y": 212,
+        "h": 34
+      },
+      {
+        "tag": "h3",
+        "text": "How to use this guide",
+        "y": 422,
+        "h": 28
+      },
+      {
+        "tag": "nav",
+        "tour": "tab-bar",
+        "text": "",
+        "y": 843,
+        "h": 72
+      },
+      {
+        "tag": "button",
+        "tour": "ask-button",
+        "text": "",
+        "y": 787,
+        "h": 48
+      }
+    ]
+  },
+  "calendar": {
+    "url": "#/calendar",
+    "height": 1951,
+    "marks": [
+      {
+        "tag": "button",
+        "tour": "menu-button",
+        "text": "",
+        "y": 12,
+        "h": 40
+      },
+      {
+        "tag": "section",
+        "text": " Part of Hair Care Hair Calendar What you did, and what is coming up. Nothing here is due",
+        "y": 96,
+        "h": 158
+      },
+      {
+        "tag": "h2",
+        "text": "Hair Calendar",
+        "y": 140,
+        "h": 34
+      },
+      {
+        "tag": "section",
+        "text": "Coming up  Adjust  Wash day Log it once to start tracking · every 7 days Done  Deep con",
+        "y": 286,
+        "h": 330
+      },
+      {
+        "tag": "h3",
+        "text": "Coming up",
+        "y": 286,
+        "h": 28
+      },
+      {
+        "tag": "section",
+        "text": " November 2026  S M T W T F S 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 2",
+        "y": 664,
+        "h": 431
+      },
+      {
+        "tag": "h3",
+        "text": "November 2026",
+        "y": 686,
+        "h": 28
+      },
+      {
+        "tag": "section",
+        "text": "Today Today Nothing logged today.  Log something",
+        "y": 1143,
+        "h": 178
+      },
+      {
+        "tag": "h3",
+        "text": "Today",
+        "y": 1143,
+        "h": 28
+      },
+      {
+        "tag": "section",
+        "text": " Seeing the payoff A calendar tells you what you did. The growth tracker tells you whethe",
+        "y": 1369,
+        "h": 186
+      },
+      {
+        "tag": "h3",
+        "text": "Seeing the payoff",
+        "y": 1393,
+        "h": 30
+      },
+      {
+        "tag": "nav",
+        "tour": "tab-bar",
+        "text": "",
+        "y": 843,
+        "h": 72
+      },
+      {
+        "tag": "button",
+        "tour": "ask-button",
+        "text": "",
+        "y": 787,
+        "h": 48
+      }
+    ]
+  },
+  "products": {
+    "url": "#/products",
+    "height": 10193,
+    "marks": [
+      {
+        "tag": "button",
+        "tour": "menu-button",
+        "text": "",
+        "y": 12,
+        "h": 40
+      },
+      {
+        "tag": "section",
+        "text": " Part of Hair Care Products A short, opinionated shelf for coily hair and locs — filtered",
+        "y": 96,
+        "h": 158
+      },
+      {
+        "tag": "h2",
+        "text": "Products",
+        "y": 140,
+        "h": 34
+      },
+      {
+        "tag": "section",
+        "text": " Brands reformulate without renaming the bottle. Treat the silicone and protein notes her",
+        "y": 286,
+        "h": 80
+      },
+      {
+        "tag": "section",
+        "text": "For your hair Ranked against your profile · 8 products hidden by your hair type and care p",
+        "y": 414,
+        "h": 1106
+      },
+      {
+        "tag": "h3",
+        "text": "For your hair",
+        "y": 414,
+        "h": 28
+      },
+      {
+        "tag": "h3",
+        "text": "Manuka Honey & Mafura Oil Intensive Hydration Masque",
+        "y": 526,
+        "h": 45
+      },
+      {
+        "tag": "h3",
+        "text": "Honey Miracle Hair Mask",
+        "y": 801,
+        "h": 23
+      },
+      {
+        "tag": "h3",
+        "text": "Almond Jai Twisting Butter",
+        "y": 1047,
+        "h": 23
+      },
+      {
+        "tag": "h3",
+        "text": "Coconut & Hibiscus Curl Enhancing Smoothie",
+        "y": 1309,
+        "h": 45
+      },
+      {
+        "tag": "section",
+        "text": "All Cleanser Conditioner Deep Treatment Leave-In Cream & Butter Gel & Definer Oil Scalp To",
+        "y": 1568,
+        "h": 168
+      },
+      {
+        "tag": "section",
+        "text": " SHEAMOISTURE Manuka Honey & Mafura Oil Intensive Hydration Masque  Thick enough to feel",
+        "y": 1760,
+        "h": 7267
+      },
+      {
+        "tag": "h3",
+        "text": "Manuka Honey & Mafura Oil Intensive Hydration Masque",
+        "y": 1792,
+        "h": 45
+      },
+      {
+        "tag": "h3",
+        "text": "Honey Miracle Hair Mask",
+        "y": 2039,
+        "h": 23
+      },
+      {
+        "tag": "h3",
+        "text": "Almond Jai Twisting Butter",
+        "y": 2257,
+        "h": 23
+      },
+      {
+        "tag": "h3",
+        "text": "Coconut & Hibiscus Curl Enhancing Smoothie",
+        "y": 2491,
+        "h": 45
+      },
+      {
+        "tag": "h3",
+        "text": "Pomegranate & Honey Leave-In Conditioner",
+        "y": 2722,
+        "h": 45
+      },
+      {
+        "tag": "h3",
+        "text": "Hydration Elation Intensive Conditioner",
+        "y": 2953,
+        "h": 45
+      },
+      {
+        "tag": "h3",
+        "text": "Twist-Elongating Style Cream",
+        "y": 3200,
+        "h": 45
+      },
+      {
+        "tag": "h3",
+        "text": "Coconut & Hibiscus Curl & Shine Shampoo",
+        "y": 3431,
+        "h": 45
+      },
+      {
+        "tag": "h3",
+        "text": "Knot Today Leave-In / Detangler",
+        "y": 3662,
+        "h": 45
+      },
+      {
+        "tag": "h3",
+        "text": "Curl Love Moisture Milk",
+        "y": 3893,
+        "h": 23
+      },
+      {
+        "tag": "h3",
+        "text": "Leave-In Conditioner",
+        "y": 4127,
+        "h": 23
+      },
+      {
+        "tag": "h3",
+        "text": "Curl Maker",
+        "y": 4345,
+        "h": 23
+      },
+      {
+        "tag": "h3",
+        "text": "Jamaican Black Castor Oil",
+        "y": 4563,
+        "h": 23
+      },
+      {
+        "tag": "h3",
+        "text": "Rosemary Mint Scalp & Hair Strengthening Oil",
+        "y": 4781,
+        "h": 45
+      },
+      {
+        "tag": "h3",
+        "text": "Tropical Moringa Scalp Nourishing Serum",
+        "y": 5028,
+        "h": 45
+      },
+      {
+        "tag": "h3",
+        "text": "Coconut CoWash Cleansing Conditioner",
+        "y": 5259,
+        "h": 45
+      },
+      {
+        "tag": "h3",
+        "text": "African Black Soap Deep Cleansing Shampoo",
+        "y": 5506,
+        "h": 45
+      },
+      {
+        "tag": "h3",
+        "text": "Butter Cream Daily Moisturizer",
+        "y": 5769,
+        "h": 45
+      },
+      {
+        "tag": "h3",
+        "text": "Royal Oils Scalp Care Shampoo",
+        "y": 6000,
+        "h": 45
+      },
+      {
+        "tag": "h3",
+        "text": "Botanique Nourish & Replenish Conditioner",
+        "y": 6247,
+        "h": 45
+      },
+      {
+        "tag": "h3",
+        "text": "Come Clean Moisturizing Shampoo",
+        "y": 6494,
+        "h": 45
+      },
+      {
+        "tag": "h3",
+        "text": "Black Castor & Flaxseed Oil Gel",
+        "y": 6725,
+        "h": 45
+      },
+      {
+        "tag": "h3",
+        "text": "Curling Custard",
+        "y": 6972,
+        "h": 23
+      },
+      {
+        "tag": "h3",
+        "text": "Jojoba Oil",
+        "y": 7206,
+        "h": 23
+      },
+      {
+        "tag": "h3",
+        "text": "Grapeseed Oil",
+        "y": 7440,
+        "h": 23
+      },
+      {
+        "tag": "h3",
+        "text": "Satin-Lined Bonnet",
+        "y": 7658,
+        "h": 23
+      },
+      {
+        "tag": "h3",
+        "text": "Satin or Silk Pillowcase",
+        "y": 7876,
+        "h": 23
+      },
+      {
+        "tag": "h3",
+        "text": "Seamless Wide-Tooth Comb",
+        "y": 8122,
+        "h": 45
+      },
+      {
+        "tag": "h3",
+        "text": "Microfibre Towel",
+        "y": 8385,
+        "h": 23
+      },
+      {
+        "tag": "h3",
+        "text": "Continuous Mist Spray Bottle",
+        "y": 8594,
+        "h": 45
+      },
+      {
+        "tag": "h3",
+        "text": "D3 Classic Styling Brush",
+        "y": 8841,
+        "h": 23
+      },
+      {
+        "tag": "section",
+        "text": " WHAT TO LEAVE ON THE SHELF Petroleum jelly and petrolatum-based grease Coats the scalp a",
+        "y": 9075,
+        "h": 370
+      },
+      {
+        "tag": "h3",
+        "text": "WHAT TO LEAVE ON THE SHELF",
+        "y": 9075,
+        "h": 20
+      },
+      {
+        "tag": "section",
+        "text": "Working with what you already own Anything you mark as owned lands on your product shelf, ",
+        "y": 9493,
+        "h": 304
+      },
+      {
+        "tag": "h3",
+        "text": "Working with what you already own",
+        "y": 9525,
+        "h": 60
+      },
+      {
+        "tag": "nav",
+        "tour": "tab-bar",
+        "text": "",
+        "y": 843,
+        "h": 72
+      },
+      {
+        "tag": "button",
+        "tour": "ask-button",
+        "text": "",
+        "y": 787,
+        "h": 48
+      }
+    ]
+  },
+  "growth": {
+    "url": "#/growth",
+    "height": 3045,
+    "marks": [
+      {
+        "tag": "button",
+        "tour": "menu-button",
+        "text": "",
+        "y": 12,
+        "h": 40
+      },
+      {
+        "tag": "section",
+        "tour": "growth-heading",
+        "text": "Hair Growth What is in your hair, what is due, and what you are actually keeping. Retentio",
+        "y": 96,
+        "h": 138
+      },
+      {
+        "tag": "h2",
+        "text": "Hair Growth",
+        "y": 96,
+        "h": 34
+      },
+      {
+        "tag": "section",
+        "text": "Underway  Open the calendar Nothing logged yet. The calendar tracks wash days, treatments",
+        "y": 266,
+        "h": 218
+      },
+      {
+        "tag": "h3",
+        "text": "Underway",
+        "y": 266,
+        "h": 28
+      },
+      {
+        "tag": "section",
+        "text": " 8.2\" Current length Nov 2026  +0.4\" Since last check 29 days  100% Retention likely 10",
+        "y": 532,
+        "h": 134
+      },
+      {
+        "tag": "section",
+        "text": "Length over time in cm 5.5 7.3 9.0 8.2\" Jun 26 Nov 26 Tap the chart to read a check.",
+        "y": 714,
+        "h": 290
+      },
+      {
+        "tag": "h3",
+        "text": "Length over time",
+        "y": 738,
+        "h": 28
+      },
+      {
+        "tag": "section",
+        "text": "Across 149 days your trend is +0.45\" a month. Afro-textured hair grows about 0.3″ a month ",
+        "y": 1052,
+        "h": 192
+      },
+      {
+        "tag": "section",
+        "text": "Milestones Landmarks are approximate — where “shoulder length” falls depends on your torso",
+        "y": 1292,
+        "h": 456
+      },
+      {
+        "tag": "h3",
+        "text": "Milestones",
+        "y": 1292,
+        "h": 28
+      },
+      {
+        "tag": "section",
+        "text": "Check-in History Nov 22, 2026 8.2\"  Remove Oct 24, 2026 7.8\"  Remove Sep 24, 2026 7.3\" ",
+        "y": 1796,
+        "h": 529
+      },
+      {
+        "tag": "h3",
+        "text": "Check-in History",
+        "y": 1796,
+        "h": 28
+      },
+      {
+        "tag": "section",
+        "text": "My Styles  Add Your own looks and photos. They stay on this device — sharing one with the",
+        "y": 2473,
+        "h": 176
+      },
+      {
+        "tag": "h3",
+        "text": "My Styles",
+        "y": 2473,
+        "h": 28
+      },
+      {
+        "tag": "nav",
+        "tour": "tab-bar",
+        "text": "",
+        "y": 843,
+        "h": 72
+      },
+      {
+        "tag": "button",
+        "tour": "ask-button",
+        "text": "",
+        "y": 787,
+        "h": 48
+      }
+    ]
+  },
+  "profile": {
+    "url": "#/profile",
+    "height": 2052,
+    "marks": [
+      {
+        "tag": "button",
+        "tour": "menu-button",
+        "text": "",
+        "y": 12,
+        "h": 40
+      },
+      {
+        "tag": "section",
+        "tour": "profile-heading",
+        "text": "My Hair Profile",
+        "y": 96,
+        "h": 34
+      },
+      {
+        "tag": "h2",
+        "text": "My Hair Profile",
+        "y": 96,
+        "h": 34
+      },
+      {
+        "tag": "section",
+        "text": "  Ama ",
+        "y": 154,
+        "h": 150
+      },
+      {
+        "tag": "h2",
+        "text": "Ama",
+        "y": 266,
+        "h": 34
+      },
+      {
+        "tag": "section",
+        "text": "Loose Natural 4C High porosity High density Fine strands Dry scalp Hair feeling dry  Some",
+        "y": 328,
+        "h": 216
+      },
+      {
+        "tag": "section",
+        "text": "Your hair  Hair type Loose Natural   Coil pattern 4C + 4B   Porosity High   Density",
+        "y": 592,
+        "h": 308
+      },
+      {
+        "tag": "h3",
+        "text": "Your hair",
+        "y": 592,
+        "h": 20
+      },
+      {
+        "tag": "section",
+        "text": "Scalp & surroundings These change which products work. None of it leaves the phone.  Scal",
+        "y": 932,
+        "h": 250
+      },
+      {
+        "tag": "h3",
+        "text": "Scalp & surroundings",
+        "y": 932,
+        "h": 20
+      },
+      {
+        "tag": "section",
+        "text": "How your hair is doing This one is meant to change. Update it whenever your hair does.  H",
+        "y": 1214,
+        "h": 104
+      },
+      {
+        "tag": "h3",
+        "text": "How your hair is doing",
+        "y": 1214,
+        "h": 20
+      },
+      {
+        "tag": "section",
+        "text": "Your rules  Strict rules Heatless methods only · Protein-sensitive   Preferences Prefer",
+        "y": 1350,
+        "h": 137
+      },
+      {
+        "tag": "h3",
+        "text": "Your rules",
+        "y": 1350,
+        "h": 20
+      },
+      {
+        "tag": "section",
+        "text": "Products & membership  My product shelf Empty   Membership Annual ",
+        "y": 1519,
+        "h": 137
+      },
+      {
+        "tag": "h3",
+        "text": "Products & membership",
+        "y": 1519,
+        "h": 20
+      },
+      {
+        "tag": "nav",
+        "tour": "tab-bar",
+        "text": "",
+        "y": 843,
+        "h": 72
+      },
+      {
+        "tag": "button",
+        "tour": "ask-button",
+        "text": "",
+        "y": 787,
+        "h": 48
+      }
+    ]
+  },
+  "quiz": {
+    "url": "#/quiz",
+    "height": 1452,
+    "marks": [
+      {
+        "tag": "button",
+        "tour": "menu-button",
+        "text": "",
+        "y": 12,
+        "h": 40
+      },
+      {
+        "tag": "h1",
+        "text": "Let’s Get to Know Your Hair!",
+        "y": 184,
+        "h": 34
+      },
+      {
+        "tag": "section",
+        "text": "Coil pattern Porosity Density thread Strand thickness Scalp Hair condition",
+        "y": 342,
+        "h": 238
+      },
+      {
+        "tag": "nav",
+        "tour": "tab-bar",
+        "text": "",
+        "y": 843,
+        "h": 72
+      },
+      {
+        "tag": "button",
+        "tour": "ask-button",
+        "text": "",
+        "y": 787,
+        "h": 48
+      }
+    ]
+  },
+  "locs": {
+    "url": "#/locs",
+    "height": 3499,
+    "marks": [
+      {
+        "tag": "button",
+        "tour": "menu-button",
+        "text": "",
+        "y": 12,
+        "h": 40
+      },
+      {
+        "tag": "section",
+        "tour": "locs-heading",
+        "text": "THE FIRST QUESTION Loose or Loc’d? Your journey, your care. Different journeys, different ",
+        "y": 96,
+        "h": 586
+      },
+      {
+        "tag": "h2",
+        "text": "Loose or Loc’d?",
+        "y": 140,
+        "h": 34
+      },
+      {
+        "tag": "section",
+        "text": "THE CHAPTERS 01 Loc basics 4 sections  02 Starting your locs 3 sections  03 Washing and ",
+        "y": 1099,
+        "h": 1780
+      },
+      {
+        "tag": "h3",
+        "text": "THE CHAPTERS",
+        "y": 1099,
+        "h": 16
+      },
+      {
+        "tag": "h3",
+        "text": "01 Loc basics 4 sections ",
+        "y": 1131,
+        "h": 100
+      },
+      {
+        "tag": "h3",
+        "text": "02 Starting your locs 3 sections ",
+        "y": 1239,
+        "h": 100
+      },
+      {
+        "tag": "h3",
+        "text": "03 Washing and cleansing 4 sections ",
+        "y": 1347,
+        "h": 100
+      },
+      {
+        "tag": "h3",
+        "text": "04 Scalp care 2 sections ",
+        "y": 1455,
+        "h": 100
+      },
+      {
+        "tag": "h3",
+        "text": "05 Moisture and hydration 3 sections ",
+        "y": 1563,
+        "h": 100
+      },
+      {
+        "tag": "h3",
+        "text": "06 Retwisting and maintenance 3 sections ",
+        "y": 1671,
+        "h": 128
+      },
+      {
+        "tag": "h3",
+        "text": "07 Loc and root health 5 sections ",
+        "y": 1807,
+        "h": 100
+      },
+      {
+        "tag": "h3",
+        "text": "08 Length and growth 3 sections ",
+        "y": 1915,
+        "h": 100
+      },
+      {
+        "tag": "h3",
+        "text": "09 Loc styling 3 sections ",
+        "y": 2023,
+        "h": 100
+      },
+      {
+        "tag": "h3",
+        "text": "10 Loc accessories 2 sections ",
+        "y": 2131,
+        "h": 100
+      },
+      {
+        "tag": "h3",
+        "text": "11 Loc problems 7 sections ",
+        "y": 2239,
+        "h": 100
+      },
+      {
+        "tag": "h3",
+        "text": "12 Products and ingredients 5 sections ",
+        "y": 2347,
+        "h": 100
+      },
+      {
+        "tag": "h3",
+        "text": "13 Loc routines 4 sections ",
+        "y": 2455,
+        "h": 100
+      },
+      {
+        "tag": "h3",
+        "text": "14 Loc myths 1 section ",
+        "y": 2563,
+        "h": 100
+      },
+      {
+        "tag": "h3",
+        "text": "15 Loc lifestyle 5 sections ",
+        "y": 2671,
+        "h": 100
+      },
+      {
+        "tag": "h3",
+        "text": "16 Professional help 2 sections ",
+        "y": 2779,
+        "h": 100
+      },
+      {
+        "tag": "section",
+        "text": " Put your retwist and wash days on a schedule   Something is wrong right now ",
+        "y": 2927,
+        "h": 176
+      },
+      {
+        "tag": "nav",
+        "tour": "tab-bar",
+        "text": "",
+        "y": 843,
+        "h": 72
+      },
+      {
+        "tag": "button",
+        "tour": "ask-button",
+        "text": "",
+        "y": 787,
+        "h": 48
+      }
+    ]
+  },
+  "locstyles": {
+    "url": "#/locs/styles",
+    "height": 14521,
+    "marks": [
+      {
+        "tag": "button",
+        "tour": "menu-button",
+        "text": "",
+        "y": 12,
+        "h": 40
+      },
+      {
+        "tag": "section",
+        "text": " Part of Locs World LOCS WORLD · LOOKBOOK The Loc Lookbook 18 looks, from the first coils",
+        "y": 96,
+        "h": 379
+      },
+      {
+        "tag": "h2",
+        "text": "The Loc Lookbook",
+        "y": 184,
+        "h": 34
+      },
+      {
+        "tag": "section",
+        "text": "I Starting locs Ways to begin. You choose one of these once, at the start of the journey. ",
+        "y": 507,
+        "h": 3940
+      },
+      {
+        "tag": "h3",
+        "text": "Starting locs",
+        "y": 507,
+        "h": 30
+      },
+      {
+        "tag": "h4",
+        "text": "Starter Locs",
+        "y": 630,
+        "h": 28
+      },
+      {
+        "tag": "h4",
+        "text": "Comb Coil Starter Locs",
+        "y": 1347,
+        "h": 28
+      },
+      {
+        "tag": "h4",
+        "text": "Two-Strand Twist Starter Locs",
+        "y": 2160,
+        "h": 56
+      },
+      {
+        "tag": "h4",
+        "text": "Braided Starter Locs",
+        "y": 2881,
+        "h": 28
+      },
+      {
+        "tag": "h4",
+        "text": "Interlocked Locs",
+        "y": 3694,
+        "h": 28
+      },
+      {
+        "tag": "section",
+        "text": "II Loc styles Ways to wear locs once they have formed. 06 LOC STYLE High Loc Bun Look 1 Lo",
+        "y": 4495,
+        "h": 9172
+      },
+      {
+        "tag": "h3",
+        "text": "Loc styles",
+        "y": 4495,
+        "h": 30
+      },
+      {
+        "tag": "h4",
+        "text": "High Loc Bun",
+        "y": 4602,
+        "h": 28
+      },
+      {
+        "tag": "h4",
+        "text": "Low Loc Bun",
+        "y": 5329,
+        "h": 28
+      },
+      {
+        "tag": "h4",
+        "text": "Half-Up Half-Down Locs",
+        "y": 5998,
+        "h": 28
+      },
+      {
+        "tag": "h4",
+        "text": "High Loc Ponytail",
+        "y": 6725,
+        "h": 28
+      },
+      {
+        "tag": "h4",
+        "text": "Low Loc Ponytail",
+        "y": 7394,
+        "h": 28
+      },
+      {
+        "tag": "h4",
+        "text": "Side-Swept Locs",
+        "y": 8063,
+        "h": 28
+      },
+      {
+        "tag": "h4",
+        "text": "Loc Petals",
+        "y": 8732,
+        "h": 28
+      },
+      {
+        "tag": "h4",
+        "text": "Barrel Twists",
+        "y": 9401,
+        "h": 28
+      },
+      {
+        "tag": "h4",
+        "text": "Barrel Twist Bun",
+        "y": 10094,
+        "h": 28
+      },
+      {
+        "tag": "h4",
+        "text": "Loc Mohawk",
+        "y": 10763,
+        "h": 28
+      },
+      {
+        "tag": "h4",
+        "text": "Loc Crown",
+        "y": 11576,
+        "h": 28
+      },
+      {
+        "tag": "h4",
+        "text": "Double Bun Locs",
+        "y": 12365,
+        "h": 28
+      },
+      {
+        "tag": "h4",
+        "text": "Loc Updo",
+        "y": 13034,
+        "h": 28
+      },
+      {
+        "tag": "section",
+        "text": "Help finish the lookbook 5 styles have no pictures yet. If you wear one, contribute it — y",
+        "y": 13715,
+        "h": 330
+      },
+      {
+        "tag": "h3",
+        "text": "Help finish the lookbook",
+        "y": 13739,
+        "h": 30
+      },
+      {
+        "tag": "nav",
+        "tour": "tab-bar",
+        "text": "",
+        "y": 3128,
+        "h": 72
+      },
+      {
+        "tag": "button",
+        "tour": "ask-button",
+        "text": "",
+        "y": 3072,
+        "h": 48
+      }
+    ]
+  }
+}

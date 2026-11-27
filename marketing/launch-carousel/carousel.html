@@ -1,0 +1,427 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>AfroCoils Launch Carousel</title>
+<!--
+  Launch carousel: eight 1080x1350 Instagram slides drawn as one 8640px strip
+  so the coil thread runs across the seams. render.mjs screenshots the strip
+  with headless Edge and slices it. Every claim here is one the app makes:
+  counts come from src/content (31 styles, 18 loc looks, 3-day trial).
+-->
+<style>
+  @font-face { font-family: Jakarta; font-weight: 400; src: url(../../node_modules/@fontsource/plus-jakarta-sans/files/plus-jakarta-sans-latin-400-normal.woff2); }
+  @font-face { font-family: Jakarta; font-weight: 500; src: url(../../node_modules/@fontsource/plus-jakarta-sans/files/plus-jakarta-sans-latin-500-normal.woff2); }
+  @font-face { font-family: Jakarta; font-weight: 500; font-style: italic; src: url(../../node_modules/@fontsource/plus-jakarta-sans/files/plus-jakarta-sans-latin-500-italic.woff2); }
+  @font-face { font-family: Jakarta; font-weight: 600; src: url(../../node_modules/@fontsource/plus-jakarta-sans/files/plus-jakarta-sans-latin-600-normal.woff2); }
+  @font-face { font-family: Jakarta; font-weight: 700; src: url(../../node_modules/@fontsource/plus-jakarta-sans/files/plus-jakarta-sans-latin-700-normal.woff2); }
+  @font-face { font-family: Jakarta; font-weight: 800; src: url(../../node_modules/@fontsource/plus-jakarta-sans/files/plus-jakarta-sans-latin-800-normal.woff2); }
+  @font-face { font-family: Jakarta; font-weight: 800; font-style: italic; src: url(../../node_modules/@fontsource/plus-jakarta-sans/files/plus-jakarta-sans-latin-800-italic.woff2); }
+
+  :root {
+    --cream: #E8D5C0; --orange: #E2583E; --choc: #5A2108; --esp: #3F1708;
+    --cream-hi: #F6EBDF; --peach: #F2C8B4; --white: #FFFFFF;
+    --muted: rgba(90, 33, 8, .68);
+    --shadow: 0 30px 60px -24px rgba(63, 23, 8, .35), 0 8px 18px -8px rgba(63, 23, 8, .18);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 8640px; height: 1350px; overflow: hidden; background: var(--cream); }
+  body { font-family: Jakarta, sans-serif; color: var(--choc); -webkit-font-smoothing: antialiased; position: relative; }
+
+  /* One wash under the whole strip, so seams never show a colour step. */
+  .wash { position: absolute; inset: 0; background:
+      radial-gradient(900px 700px at 300px 200px, var(--cream-hi), transparent 70%),
+      radial-gradient(800px 800px at 2000px 1200px, var(--peach), transparent 70%),
+      radial-gradient(900px 700px at 3500px 150px, var(--cream-hi), transparent 70%),
+      radial-gradient(900px 900px at 6600px 1250px, var(--peach), transparent 70%),
+      radial-gradient(900px 800px at 8100px 300px, var(--peach), transparent 70%),
+      linear-gradient(180deg, var(--cream-hi), var(--cream) 55%, #EDCDB6); }
+  .grain { position: absolute; inset: 0; opacity: .22; mix-blend-mode: multiply;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .35 0 0 0 0 .2 0 0 0 0 .1 0 0 0 .35 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
+
+  .slide { position: absolute; top: 0; width: 1080px; height: 1350px; overflow: visible; }
+  .s1 { left: 0 } .s2 { left: 1080px } .s3 { left: 2160px } .s4 { left: 3240px }
+  .s5 { left: 4320px } .s6 { left: 5400px } .s7 { left: 6480px } .s8 { left: 7560px }
+
+  #thread { position: absolute; left: 0; top: 0; z-index: 1; pointer-events: none; }
+  .slide > * { z-index: 2; }
+
+  /* Chrome on every slide */
+  .brand { position: absolute; left: 72px; top: 64px; display: flex; align-items: center; gap: 14px; }
+  .brand img.mark { width: 64px; height: 64px; }
+  .brand img.word { height: 40px; }
+  .count { position: absolute; right: 72px; top: 82px; font-weight: 700; font-size: 22px; letter-spacing: .18em; color: var(--muted); }
+  .dots { position: absolute; left: 72px; bottom: 64px; display: flex; gap: 10px; align-items: center; }
+  .dots i { width: 12px; height: 12px; border-radius: 99px; background: rgba(90,33,8,.22); display: block; }
+  .dots i.on { width: 44px; background: var(--orange); }
+  .swipe { position: absolute; right: 72px; bottom: 52px; display: flex; align-items: center; gap: 14px; font-weight: 700; font-size: 24px; color: var(--choc); }
+  .swipe span.c { width: 52px; height: 52px; border-radius: 99px; background: var(--orange); color: #fff; display: grid; place-items: center; }
+  svg.i { fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+
+  .eyebrow { display: inline-flex; align-items: center; gap: 12px; padding: 12px 22px; border-radius: 99px; background: rgba(255,255,255,.7);
+    font-weight: 700; font-size: 20px; letter-spacing: .16em; text-transform: uppercase; color: var(--choc); box-shadow: 0 6px 18px -10px rgba(63,23,8,.4); }
+  .eyebrow b { width: 12px; height: 12px; border-radius: 99px; background: var(--orange); display: block; }
+  h1, h2 { font-weight: 800; letter-spacing: -.035em; line-height: .98; color: var(--choc); }
+  h2 { font-size: 92px; }
+  h2 em, h1 em { font-style: italic; font-weight: 500; color: var(--esp); opacity: .82; }
+  .lead { font-size: 32px; line-height: 1.38; color: var(--muted); font-weight: 500; }
+  .photo { background-size: cover; background-position: center 30%; border-radius: 40px; box-shadow: var(--shadow); }
+  .star { position: absolute; color: var(--esp); }
+
+  /* ---------- 1 cover ---------- */
+  .s1 .p1 { position: absolute; left: 72px; top: 170px; width: 560px; height: 690px; }
+  .s1 .p2 { position: absolute; left: 662px; top: 170px; width: 346px; height: 330px; }
+  .s1 .p3 { position: absolute; left: 662px; top: 530px; width: 346px; height: 330px; }
+  .s1 h1 { position: absolute; left: 72px; top: 900px; font-size: 128px; }
+  .s1 .sub { position: absolute; left: 76px; top: 1170px; font-size: 30px; color: var(--muted); font-weight: 600; }
+  .tag { position: absolute; padding: 12px 22px; border-radius: 99px; background: rgba(255,255,255,.78); backdrop-filter: blur(12px);
+    font-weight: 700; font-size: 22px; color: var(--choc); box-shadow: 0 10px 24px -12px rgba(63,23,8,.5); }
+
+  /* ---------- 2 SOS ---------- */
+  .s2 .bg { position: absolute; inset: 150px 56px 210px; border-radius: 56px; overflow: hidden; box-shadow: var(--shadow); }
+  .s2 .bg .tiles { position: absolute; inset: -20px; display: grid; grid-template-columns: 1.3fr 1fr; grid-template-rows: 1fr 1fr; gap: 10px; filter: blur(5px) saturate(.9); opacity: .75; }
+  .s2 .bg .tiles div { background-size: cover; background-position: center 25%; }
+  .s2 .bg .tiles div:first-child { grid-row: span 2; }
+  .s2 .bg .veil { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(246,235,223,.25), rgba(246,235,223,.55) 45%, rgba(246,235,223,.92)); }
+  .s2 .panel { position: absolute; left: 28px; right: 28px; bottom: 28px; padding: 52px 52px 48px; border-radius: 44px;
+    background: rgba(255,255,255,.5); backdrop-filter: blur(26px); box-shadow: inset 0 0 0 2px rgba(255,255,255,.75); }
+  .sosrow { display: flex; align-items: center; gap: 18px; }
+  .sosbadge { position: relative; width: 76px; height: 76px; }
+  .sosbadge .ring { position: absolute; inset: -14px; border-radius: 99px; background: rgba(226,88,62,.25); }
+  .sosbadge .core { position: absolute; inset: 0; border-radius: 99px; background: var(--orange); color: #fff; font-weight: 800; font-size: 22px; letter-spacing: .08em; display: grid; place-items: center; }
+  .sosrow span { font-size: 22px; font-weight: 700; letter-spacing: .24em; text-transform: uppercase; }
+  .s2 .panel h2 { font-size: 104px; margin-top: 30px; color: var(--esp); }
+  .s2 .trace { width: 100%; height: 70px; margin: 18px 0 10px; color: var(--orange); }
+  .bands { position: absolute; left: 72px; right: 72px; bottom: 120px; display: flex; gap: 16px; align-items: center; }
+  .bands p { font-size: 26px; font-weight: 700; margin-right: 8px; }
+  .chip { padding: 16px 28px; border-radius: 99px; background: #fff; font-weight: 700; font-size: 26px; box-shadow: 0 8px 20px -12px rgba(63,23,8,.45); }
+  .chip.on { background: var(--esp); color: var(--cream-hi); }
+
+  /* ---------- 3 styles ---------- */
+  .s3 h2 { position: absolute; left: 72px; top: 180px; font-size: 96px; }
+  .s3 .tri { position: absolute; left: 72px; right: 72px; top: 520px; height: 560px; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 18px; }
+  .s3 .tri div { position: relative; }
+  .s3 .tri div span { position: absolute; left: 18px; bottom: 18px; }
+  .s3 .tri div:nth-child(2) { transform: translateY(-30px); }
+  .s3 .name { position: absolute; left: 72px; top: 1110px; font-size: 30px; font-weight: 800; }
+  .s3 .name small { display: block; font-size: 22px; font-weight: 600; color: var(--muted); margin-top: 6px; }
+  .note { position: absolute; font-size: 18px; font-weight: 500; color: var(--muted); }
+
+  /* ---------- phones ---------- */
+  .phone { position: absolute; width: 430px; height: 900px; border-radius: 68px; background: #1E0B04; padding: 14px;
+    box-shadow: 0 60px 90px -40px rgba(63,23,8,.6), 0 20px 30px -16px rgba(63,23,8,.35), inset 0 0 0 2px #4a2414; }
+  .phone .scr { position: relative; width: 100%; height: 100%; border-radius: 56px; overflow: hidden;
+    background: radial-gradient(400px 300px at 20% 0%, var(--cream-hi), transparent 70%), linear-gradient(180deg, #F3E6D8, var(--cream)); }
+  .phone .island { position: absolute; top: 16px; left: 50%; transform: translateX(-50%); width: 120px; height: 34px; border-radius: 99px; background: #1E0B04; z-index: 5; }
+  .phone .bar { display: flex; align-items: center; justify-content: space-between; padding: 70px 24px 10px; }
+  .phone .bar .lock { display: flex; align-items: center; gap: 8px; }
+  .phone .bar .lock img.m { width: 30px; height: 30px; } .phone .bar .lock img.w { height: 22px; }
+  .phone .bar .av { width: 32px; height: 32px; border-radius: 99px; background: #fff; display: grid; place-items: center; box-shadow: 0 4px 10px -6px rgba(63,23,8,.5); }
+  .phone .body { padding: 6px 22px; }
+  .phone .t { font-size: 30px; font-weight: 800; letter-spacing: -.02em; }
+  .card { background: #fff; border-radius: 18px; box-shadow: 0 8px 18px -12px rgba(63,23,8,.35); }
+  .phone .nav { position: absolute; left: 16px; right: 16px; bottom: 22px; height: 58px; border-radius: 99px; background: var(--esp); display: flex; align-items: center; justify-content: space-between; padding: 5px; color: var(--cream); }
+  .phone .nav span { height: 48px; min-width: 60px; border-radius: 99px; display: grid; place-items: center; }
+  .phone .nav span.on { background: var(--orange); color: #fff; display: flex; gap: 6px; padding: 0 16px; font-size: 14px; font-weight: 800; }
+  .phone .ask { position: absolute; right: 22px; bottom: 96px; padding: 10px 18px; border-radius: 99px; background: var(--orange); color: #fff; font-size: 14px; font-weight: 800; }
+
+  /* ---------- 4 care ---------- */
+  .s4 h2 { position: absolute; left: 72px; top: 180px; font-size: 92px; }
+  .s4 .copy { position: absolute; left: 72px; top: 440px; width: 540px; }
+  .list { display: grid; gap: 26px; }
+  .li { display: flex; gap: 18px; align-items: flex-start; }
+  .li .ic { flex: none; width: 56px; height: 56px; border-radius: 18px; background: #fff; color: var(--orange); display: grid; place-items: center; box-shadow: 0 8px 18px -12px rgba(63,23,8,.45); }
+  .li b { display: block; font-size: 27px; font-weight: 800; line-height: 1.2; }
+  .li span { display: block; font-size: 22px; color: var(--muted); font-weight: 500; line-height: 1.35; margin-top: 2px; }
+  .s4 .phone { left: 620px; top: 440px; transform: rotate(6deg); height: 860px; }
+
+  /* ---------- 5 locs ---------- */
+  .s5 .dark { position: absolute; inset: 0; background: radial-gradient(800px 700px at 85% 10%, #5A2108, transparent 70%), var(--esp); }
+  .s5 .strands { position: absolute; right: -40px; top: 0; width: 620px; height: 520px; color: rgba(232,213,192,.12); }
+  .s5 h2 { color: var(--cream); position: absolute; left: 72px; top: 200px; font-size: 120px; }
+  .s5 h2 em { color: var(--peach); opacity: 1; }
+  .s5 .lead { position: absolute; left: 72px; top: 470px; width: 840px; color: rgba(232,213,192,.82); }
+  .plates { position: absolute; left: 72px; right: 72px; top: 650px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  .plate { position: relative; height: 420px; border-radius: 32px; background-size: cover; background-position: center 25%; box-shadow: 0 30px 60px -30px rgba(0,0,0,.6); }
+  .plate .n { position: absolute; left: 18px; top: 18px; width: 58px; height: 58px; border-radius: 99px; background: var(--esp); color: var(--cream); font-weight: 800; font-size: 22px; display: grid; place-items: center; }
+  .plate p { position: absolute; left: 0; right: 0; bottom: -58px; color: var(--cream); font-weight: 700; font-size: 24px; }
+  .s5 .count, .s5 .note { color: rgba(232,213,192,.6); }
+  .s5 .dots i { background: rgba(232,213,192,.25); } .s5 .dots i.on { background: var(--orange); }
+  .s5 .swipe { color: var(--cream); }
+
+  /* ---------- 6 growth ---------- */
+  .s6 h2 { position: absolute; left: 72px; top: 180px; font-size: 92px; }
+  .s6 .lead { position: absolute; left: 72px; top: 390px; width: 900px; }
+  .s6 .ph1 { left: 90px; top: 520px; transform: rotate(-5deg); height: 760px; }
+  .s6 .ph2 { left: 560px; top: 560px; transform: rotate(5deg); height: 760px; }
+
+  /* ---------- 7 trust ---------- */
+  .s7 h2 { position: absolute; left: 72px; top: 180px; font-size: 98px; }
+  .s7 .grid { position: absolute; left: 72px; right: 72px; top: 460px; display: grid; gap: 22px; }
+  .s7 .row { display: flex; gap: 28px; align-items: center; padding: 34px 38px; border-radius: 34px; background: #fff; box-shadow: var(--shadow); }
+  .s7 .row .ic { flex: none; width: 92px; height: 92px; border-radius: 28px; background: var(--cream-hi); color: var(--orange); display: grid; place-items: center; }
+  .s7 .row.hot { background: var(--esp); color: var(--cream); }
+  .s7 .row.hot .ic { background: var(--orange); color: #fff; }
+  .s7 .row b { display: block; font-size: 36px; font-weight: 800; letter-spacing: -.01em; }
+  .s7 .row span { display: block; font-size: 25px; font-weight: 500; opacity: .75; margin-top: 4px; line-height: 1.35; }
+
+  /* ---------- 8 cta ---------- */
+  .s8 .orb { position: absolute; left: 540px; top: 490px; width: 820px; height: 820px; transform: translate(-50%, -50%); border-radius: 50%;
+    background: radial-gradient(circle, rgba(226,88,62,.45), rgba(226,88,62,0) 68%); }
+  .s8 .hero { position: absolute; left: 540px; top: 490px; width: 620px; height: 620px; transform: translate(-50%, -50%) rotate(-3deg); border-radius: 84px; overflow: hidden;
+    border: 14px solid #fff; box-shadow: 0 50px 90px -30px rgba(63,23,8,.5), 0 0 0 2px rgba(226,88,62,.35); background: #F7EDE2; }
+  .s8 .hero img { width: 100%; height: 100%; object-fit: contain; }
+  .s8 .cta { position: absolute; left: 0; right: 0; top: 900px; text-align: center; }
+  .s8 h2 { font-size: 104px; }
+  .s8 .cta .lead { margin-top: 18px; }
+  .s8 .btn { display: inline-flex; align-items: center; gap: 22px; margin-top: 40px; padding: 12px 12px 12px 44px; border-radius: 99px; background: var(--esp); color: var(--cream-hi); font-weight: 800; font-size: 34px; box-shadow: var(--shadow); }
+  .s8 .btn span { width: 76px; height: 76px; border-radius: 99px; background: var(--orange); color: #fff; display: grid; place-items: center; }
+  .s8 .motto { position: absolute; left: 0; right: 0; bottom: 64px; text-align: center; font-size: 22px; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; color: var(--muted); }
+</style>
+</head>
+<body>
+<div class="wash"></div>
+<div class="grain"></div>
+<svg id="thread" width="8640" height="1350" viewBox="0 0 8640 1350"></svg>
+
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6" /></symbol>
+    <symbol id="i-leaf" viewBox="0 0 24 24"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.5 19 2c1 2 2 4.2 2 8 0 5.5-4.8 10-10 10Z" /><path d="M2 21c0-3 1.9-5.4 5.1-6 2.4-.5 4.9-2 5.9-3" /></symbol>
+    <symbol id="i-spark" viewBox="0 0 24 24"><path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5 18 18M6 18l2.5-2.5M15.5 8.5 18 6" /></symbol>
+    <symbol id="i-sos" viewBox="0 0 24 24"><path d="M12 3 2.5 20h19L12 3Z" /><path d="M12 10v4M12 17h.01" /></symbol>
+    <symbol id="i-styles" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="5" rx="1.5" /><path d="M5.5 9v10M9 9v8M12.5 9v10M16 9v8M19.5 9v10" /></symbol>
+    <symbol id="i-chart" viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 8-8" /><path d="M15 7h6v6" /></symbol>
+    <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4.5" /><path d="M20 21a8 8 0 0 0-16 0" /></symbol>
+    <symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="17" rx="2" /><path d="M16 2v4M8 2v4M3 10h18" /></symbol>
+    <symbol id="i-bag" viewBox="0 0 24 24"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z" /><path d="M3 6h18M16 10a4 4 0 0 1-8 0" /></symbol>
+    <symbol id="i-steth" viewBox="0 0 24 24"><path d="M5 3v5a5 5 0 0 0 10 0V3" /><path d="M10 13v2a5 5 0 0 0 10 0v-2" /><circle cx="20" cy="11" r="2" /></symbol>
+    <symbol id="i-book" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V3H6.5A2.5 2.5 0 0 0 4 5.5Z" /><path d="M4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5" /></symbol>
+    <symbol id="i-wifi-off" viewBox="0 0 24 24"><path d="M2 2l20 20M8.5 16.5a5 5 0 0 1 7 0M5 12.9a10 10 0 0 1 5.2-2.7M16.9 11.3a10 10 0 0 1 2.2 1.6M2 8.8a15 15 0 0 1 4.2-2.6M10.7 5c4-.4 8.1.9 11.3 3.8M12 20h.01" /></symbol>
+    <symbol id="i-pen" viewBox="0 0 24 24"><path d="M12 20h9" /><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" /></symbol>
+    <symbol id="i-lock" viewBox="0 0 24 24"><rect x="4" y="11" width="16" height="10" rx="2" /><path d="M8 11V7a4 4 0 0 1 8 0v4" /></symbol>
+    <symbol id="i-quote" viewBox="0 0 24 24"><path d="M3 21c3 0 7-1 7-8V5H3v7h4c0 4-2 6-4 6M14 21c3 0 7-1 7-8V5h-7v7h4c0 4-2 6-4 6" /></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5" /></symbol>
+    <symbol id="i-star4" viewBox="0 0 24 24"><path d="M12 0c.6 6.4 5.6 11.4 12 12-6.4.6-11.4 5.6-12 12-.6-6.4-5.6-11.4-12-12C6.4 11.4 11.4 6.4 12 0Z" /></symbol>
+  </defs>
+</svg>
+
+<!-- ============ 1 · COVER ============ -->
+<section class="slide s1">
+  <div class="brand"><img class="mark" src="../../src/assets/brand/afro-mark.webp" alt="" /><img class="word" src="../../src/assets/brand/afro-wordmark.webp" alt="AfroCoils" /></div>
+  <div class="count">NOW ON ANDROID</div>
+  <div class="photo p1" style="background-image:url(../../src/assets/images/style-afro-donut-bun-front.webp)"></div>
+  <div class="photo p2" style="background-image:url(../../src/assets/images/style-crossed-twist-crown-front.webp)"></div>
+  <div class="photo p3" style="background-image:url(../../src/assets/images/loc-style-loc-petals-front.webp)"></div>
+  <span class="tag" style="left:104px;top:780px">4A · 4B · 4C</span>
+  <span class="tag" style="left:690px;top:800px">Loose or loc'd</span>
+  <svg class="star" style="left:596px;top:128px;width:84px;height:84px" fill="currentColor"><use href="#i-star4" /></svg>
+  <svg class="star" style="left:940px;top:880px;width:56px;height:56px;color:var(--orange)" fill="currentColor"><use href="#i-star4" /></svg>
+  <h1>Hair SOS<br /><em>for your coils.</em></h1>
+  <p class="sub">The app made for Type 4 natural hair.</p>
+  <div class="dots"><i class="on"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  <div class="swipe" style="bottom:auto;top:1158px">Swipe <span class="c"><svg class="i" width="26" height="26"><use href="#i-arrow" /></svg></span></div>
+</section>
+
+<!-- ============ 2 · SOS ============ -->
+<section class="slide s2">
+  <div class="brand"><img class="mark" src="../../src/assets/brand/afro-mark.webp" alt="" /><img class="word" src="../../src/assets/brand/afro-wordmark.webp" alt="AfroCoils" /></div>
+  <div class="count">02 / 08</div>
+  <div class="bg">
+    <div class="tiles">
+      <div style="background-image:url(../../src/assets/images/style-pinned-afro-updo-front.webp)"></div>
+      <div style="background-image:url(../../src/assets/images/style-sectioned-twist-buns-front.webp)"></div>
+      <div style="background-image:url(../../src/assets/images/style-five-line-cornrows-front.webp)"></div>
+    </div>
+    <div class="veil"></div>
+    <svg class="star" style="left:40px;top:40px;width:54px;height:54px;color:var(--esp)" fill="currentColor"><use href="#i-star4" /></svg>
+    <div class="panel">
+      <div class="sosrow"><div class="sosbadge"><div class="ring"></div><div class="core">SOS</div></div><span>Hair SOS</span></div>
+      <h2>What&rsquo;s your emergency?</h2>
+      <svg class="trace" viewBox="0 0 300 40" preserveAspectRatio="none"><path d="M0 22 H96 L108 22 L116 8 L126 36 L138 2 L150 30 L158 22 H300" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke" style="stroke-width:6px" /></svg>
+      <p class="lead" style="color:var(--choc)">Late for work. Wash day gone wrong. Open AfroCoils, say how long you&rsquo;ve got, and see the styles that fit it.</p>
+    </div>
+  </div>
+  <div class="bands"><p>How long have you got?</p><span class="chip on">5–10 min</span><span class="chip">15–20 min</span><span class="chip">20–45 min</span></div>
+  <div class="dots"><i></i><i class="on"></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+</section>
+
+<!-- ============ 3 · STYLES ============ -->
+<section class="slide s3">
+  <div class="brand"><img class="mark" src="../../src/assets/brand/afro-mark.webp" alt="" /><img class="word" src="../../src/assets/brand/afro-wordmark.webp" alt="AfroCoils" /></div>
+  <div class="count">03 / 08</div>
+  <h2>31 styles,<br /><em>step by step.</em></h2>
+  <p class="lead" style="position:absolute;left:72px;top:400px;width:900px">Every one written out by hand, and shown from three angles.</p>
+  <div class="tri">
+    <div class="photo" style="background-image:url(../../src/assets/images/style-crossed-twist-crown-front.webp)"><span class="tag" style="position:absolute">Front</span></div>
+    <div class="photo" style="background-image:url(../../src/assets/images/style-crossed-twist-crown-back.webp)"><span class="tag" style="position:absolute">Back</span></div>
+    <div class="photo" style="background-image:url(../../src/assets/images/style-crossed-twist-crown-side.webp)"><span class="tag" style="position:absolute">Side</span></div>
+  </div>
+  <p class="name">Crossed Twist Crown<small>Filter by time, occasion and what suits your hair</small></p>
+  <p class="note" style="left:72px;bottom:110px">Style photos are generated illustrations. Every method is written by a person.</p>
+  <div class="dots"><i></i><i></i><i class="on"></i><i></i><i></i><i></i><i></i><i></i></div>
+</section>
+
+<!-- ============ 4 · HAIR CARE ============ -->
+<section class="slide s4">
+  <div class="brand"><img class="mark" src="../../src/assets/brand/afro-mark.webp" alt="" /><img class="word" src="../../src/assets/brand/afro-wordmark.webp" alt="AfroCoils" /></div>
+  <div class="count">04 / 08</div>
+  <h2>Know your hair.<br /><em>Then care for it.</em></h2>
+  <div class="copy">
+    <div class="list">
+      <div class="li"><span class="ic"><svg class="i" width="28" height="28"><use href="#i-book" /></svg></span><div><b>The AfroCoils Hair Guide</b><span>A full 4C guide and starter kit</span></div></div>
+      <div class="li"><span class="ic"><svg class="i" width="28" height="28"><use href="#i-spark" /></svg></span><div><b>Hair Education</b><span>One lesson a screen</span></div></div>
+      <div class="li"><span class="ic"><svg class="i" width="28" height="28"><use href="#i-steth" /></svg></span><div><b>Quick Hair Check</b><span>&ldquo;My hair is&hellip;&rdquo; and what helps</span></div></div>
+      <div class="li"><span class="ic"><svg class="i" width="28" height="28"><use href="#i-calendar" /></svg></span><div><b>Routine &amp; reminders</b><span>Wash day, deep condition, trims</span></div></div>
+      <div class="li"><span class="ic"><svg class="i" width="28" height="28"><use href="#i-bag" /></svg></span><div><b>Products for your hair</b><span>Ranked by your porosity and needs</span></div></div>
+    </div>
+  </div>
+  <div class="phone"><div class="scr"><div class="island"></div>
+    <div class="bar"><svg class="i" width="24" height="24"><path d="M4 7h16M4 12h16M4 17h16" /></svg><span class="lock"><img class="m" src="../../src/assets/brand/afro-mark.webp" alt="" /><img class="w" src="../../src/assets/brand/afro-wordmark.webp" alt="" /></span><span class="av"><svg class="i" width="18" height="18"><use href="#i-user" /></svg></span></div>
+    <div class="body">
+      <p class="t">Hair Care</p>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px">
+        <div style="display:flex;align-items:center;gap:8px;padding:10px;border-radius:14px;background:var(--esp);color:var(--cream)"><span style="width:28px;height:28px;border-radius:99px;background:var(--orange);color:#fff;display:grid;place-items:center"><svg class="i" width="16" height="16"><use href="#i-leaf" /></svg></span><b style="font-size:14px">Hair Guide</b></div>
+        <div class="card" style="display:flex;align-items:center;gap:8px;padding:10px;border-radius:14px"><span style="width:28px;height:28px;border-radius:99px;background:var(--peach);color:var(--choc);display:grid;place-items:center"><svg class="i" width="16" height="16"><use href="#i-spark" /></svg></span><b style="font-size:13px">Hair Education</b></div>
+      </div>
+      <p style="margin-top:18px;font-size:12px;font-weight:800;letter-spacing:.16em">A · KNOW YOUR HAIR</p>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:8px">
+        <div class="card" style="padding:8px;border-radius:12px"><p style="font-size:10px;opacity:.7">Porosity</p><b style="font-size:14px">Low</b></div>
+        <div class="card" style="padding:8px;border-radius:12px"><p style="font-size:10px;opacity:.7">Density</p><b style="font-size:14px">Medium</b></div>
+        <div class="card" style="padding:8px;border-radius:12px"><p style="font-size:10px;opacity:.7">Coil</p><b style="font-size:14px">4C</b></div>
+        <div class="card" style="padding:8px;border-radius:12px"><p style="font-size:10px;opacity:.7">Texture</p><b style="font-size:14px">Fine</b></div>
+      </div>
+      <div style="display:grid;gap:8px;margin-top:12px;font-size:14px;font-weight:700">
+        <div class="card" style="display:flex;align-items:center;gap:10px;padding:10px;border-radius:14px"><span style="width:28px;height:28px;border-radius:9px;background:var(--peach);display:grid;place-items:center;font-weight:800">B</span>Hair routine</div>
+        <div class="card" style="display:flex;align-items:center;gap:10px;padding:10px;border-radius:14px"><span style="width:28px;height:28px;border-radius:9px;background:var(--peach);display:grid;place-items:center;font-weight:800">C</span>Product recommendations</div>
+        <div class="card" style="display:flex;align-items:center;gap:10px;padding:10px;border-radius:14px"><span style="width:28px;height:28px;border-radius:9px;background:var(--peach);display:grid;place-items:center;font-weight:800">D</span>Hairstyle recommendations</div>
+        <div style="display:flex;align-items:center;gap:10px;padding:10px;border-radius:14px;background:var(--orange);color:#fff"><span style="width:28px;height:28px;border-radius:9px;background:rgba(255,255,255,.25);display:grid;place-items:center;font-weight:800">E</span>Something is wrong</div>
+      </div>
+    </div>
+    <span class="ask">Ask</span>
+    <div class="nav"><span><svg class="i" width="22" height="22"><use href="#i-sos" /></svg></span><span><svg class="i" width="22" height="22"><use href="#i-styles" /></svg></span><span><svg class="i" width="22" height="22"><use href="#i-chart" /></svg></span><span><svg class="i" width="22" height="22"><use href="#i-user" /></svg></span></div>
+  </div></div>
+  <div class="dots"><i></i><i></i><i></i><i class="on"></i><i></i><i></i><i></i><i></i></div>
+</section>
+
+<!-- ============ 5 · LOCS WORLD ============ -->
+<section class="slide s5">
+  <div class="dark"></div>
+  <svg class="strands" viewBox="0 0 620 520" fill="none" stroke="currentColor" stroke-width="14" stroke-linecap="round">
+    <path d="M60 0c20 120-30 200 0 320s-10 160 10 200" /><path d="M150 0c-25 110 30 210 0 320s20 140 0 200" /><path d="M240 0c20 120-25 200 5 320s-10 160 10 200" />
+    <path d="M330 0c-25 110 30 210 0 320s20 140 0 200" /><path d="M420 0c20 120-25 200 5 320s-10 160 10 200" /><path d="M510 0c-25 110 30 210 0 320s20 140 0 200" /><path d="M600 0c20 120-25 200 5 320" />
+  </svg>
+  <div class="brand"><img class="mark" src="../../src/assets/brand/afro-mark.webp" alt="" /><img class="word" src="../../src/assets/brand/afro-wordmark.webp" alt="AfroCoils" style="filter:brightness(0) invert(.9) sepia(.3)" /></div>
+  <div class="count">05 / 08</div>
+  <h2>Locs World.<br /><em>A place of its own.</em></h2>
+  <p class="lead">Locs aren&rsquo;t a chapter of loose-hair care. Loc care, your loc stage, and a lookbook of 18 loc styles.</p>
+  <div class="plates">
+    <div class="plate" style="background-image:url(../../src/assets/images/loc-style-high-loc-bun-front.webp)"><span class="n">01</span><p>High Loc Bun</p></div>
+    <div class="plate" style="background-image:url(../../src/assets/images/loc-style-side-swept-locs-front.webp)"><span class="n">02</span><p>Side-Swept Locs</p></div>
+    <div class="plate" style="background-image:url(../../src/assets/images/loc-style-barrel-twists-front.webp)"><span class="n">03</span><p>Barrel Twists</p></div>
+  </div>
+  <div class="dots"><i></i><i></i><i></i><i></i><i class="on"></i><i></i><i></i><i></i></div>
+</section>
+
+<!-- ============ 6 · GROWTH + PROFILE ============ -->
+<section class="slide s6">
+  <div class="brand"><img class="mark" src="../../src/assets/brand/afro-mark.webp" alt="" /><img class="word" src="../../src/assets/brand/afro-wordmark.webp" alt="AfroCoils" /></div>
+  <div class="count">06 / 08</div>
+  <h2>Watch your length<br /><em>add up.</em></h2>
+  <p class="lead">Log a length check, see what you&rsquo;re keeping, and know when shoulder length is coming.</p>
+  <div class="phone ph1"><div class="scr"><div class="island"></div>
+    <div class="bar"><svg class="i" width="24" height="24"><path d="M4 7h16M4 12h16M4 17h16" /></svg><span class="lock"><img class="m" src="../../src/assets/brand/afro-mark.webp" alt="" /><img class="w" src="../../src/assets/brand/afro-wordmark.webp" alt="" /></span><span class="av"><svg class="i" width="18" height="18"><use href="#i-user" /></svg></span></div>
+    <div class="body" style="text-align:center">
+      <p class="t">Hair Growth</p>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px">
+        <div class="card" style="padding:12px 4px"><b style="font-size:22px">11.5″</b><p style="font-size:11px;opacity:.7">Current length</p></div>
+        <div class="card" style="padding:12px 4px"><b style="font-size:22px">82%</b><p style="font-size:11px;opacity:.7">Retention</p></div>
+        <div class="card" style="padding:12px 4px"><b style="font-size:22px">0.4″</b><p style="font-size:11px;opacity:.7">Per month</p></div>
+      </div>
+      <div class="card" style="margin-top:12px;padding:14px">
+        <svg viewBox="0 0 260 110" style="width:100%"><path d="M0 95 H260 M0 65 H260 M0 35 H260" stroke="rgba(90,33,8,.25)" stroke-width=".8" stroke-dasharray="3 4" /><path d="M8 92 L52 84 L96 78 L140 66 L184 58 L228 44 L252 38" fill="none" stroke="#E2583E" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" /><g fill="#5A2108"><circle cx="8" cy="92" r="3.5" /><circle cx="52" cy="84" r="3.5" /><circle cx="96" cy="78" r="3.5" /><circle cx="140" cy="66" r="3.5" /><circle cx="184" cy="58" r="3.5" /><circle cx="228" cy="44" r="3.5" /><circle cx="252" cy="38" r="4.5" /></g></svg>
+      </div>
+      <div style="display:grid;gap:8px;margin-top:12px;text-align:left;font-size:14px">
+        <div class="card" style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:12px"><span style="width:22px;height:22px;border-radius:99px;background:var(--choc);color:#fff;display:grid;place-items:center"><svg class="i" width="13" height="13" style="stroke-width:3"><use href="#i-check" /></svg></span><b style="flex:1">Neck length</b><span>8″</span></div>
+        <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:12px;background:var(--peach)"><span style="width:22px;height:22px;border-radius:99px;border:3px solid var(--orange)"></span><b style="flex:1">Shoulder length</b><span>12″ · est.</span></div>
+      </div>
+    </div>
+    <div class="nav"><span><svg class="i" width="22" height="22"><use href="#i-sos" /></svg></span><span><svg class="i" width="22" height="22"><use href="#i-styles" /></svg></span><span class="on"><svg class="i" width="20" height="20"><use href="#i-chart" /></svg>Growth</span><span><svg class="i" width="22" height="22"><use href="#i-user" /></svg></span></div>
+  </div></div>
+  <div class="phone ph2"><div class="scr"><div class="island"></div>
+    <div class="bar"><svg class="i" width="24" height="24"><path d="M4 7h16M4 12h16M4 17h16" /></svg><span class="lock"><img class="m" src="../../src/assets/brand/afro-mark.webp" alt="" /><img class="w" src="../../src/assets/brand/afro-wordmark.webp" alt="" /></span><span class="av"><svg class="i" width="18" height="18"><use href="#i-user" /></svg></span></div>
+    <div class="body">
+      <p class="t">My Hair Profile</p>
+      <div class="card" style="margin-top:14px;padding:14px"><div style="display:flex;justify-content:space-between;font-size:13px;font-weight:800"><span>Profile</span><span>80%</span></div><div style="margin-top:8px;height:10px;border-radius:99px;background:#F1E2D3"><div style="width:80%;height:100%;border-radius:99px;background:var(--orange)"></div></div></div>
+      <p style="margin-top:14px;font-size:13px;font-weight:800">Your hair</p>
+      <div class="card" style="margin-top:8px;font-size:14px">
+        <div style="display:flex;justify-content:space-between;padding:11px 14px;border-bottom:1px solid #F1E2D3"><span style="opacity:.7">Hair type</span><b>Loose Natural</b></div>
+        <div style="display:flex;justify-content:space-between;padding:11px 14px;border-bottom:1px solid #F1E2D3"><span style="opacity:.7">Coil pattern</span><b>4C</b></div>
+        <div style="display:flex;justify-content:space-between;padding:11px 14px;border-bottom:1px solid #F1E2D3"><span style="opacity:.7">Porosity</span><b>Low</b></div>
+        <div style="display:flex;justify-content:space-between;padding:11px 14px;border-bottom:1px solid #F1E2D3"><span style="opacity:.7">Density</span><b>Medium</b></div>
+        <div style="display:flex;justify-content:space-between;padding:11px 14px"><span style="opacity:.7">Strand texture</span><b>Medium</b></div>
+      </div>
+      <div style="margin-top:16px;padding:14px;border-radius:99px;background:var(--choc);color:#fff;text-align:center;font-size:15px;font-weight:800">Start Hair Discovery</div>
+    </div>
+    <div class="nav"><span><svg class="i" width="22" height="22"><use href="#i-sos" /></svg></span><span><svg class="i" width="22" height="22"><use href="#i-styles" /></svg></span><span><svg class="i" width="22" height="22"><use href="#i-chart" /></svg></span><span class="on"><svg class="i" width="20" height="20"><use href="#i-user" /></svg>Profile</span></div>
+  </div></div>
+  <span class="tag" style="left:620px;top:470px;background:var(--esp);color:var(--cream-hi);z-index:4;display:none"></span>
+  <p class="note" style="right:72px;bottom:70px">Sample figures</p>
+  <div class="dots"><i></i><i></i><i></i><i></i><i></i><i class="on"></i><i></i><i></i></div>
+</section>
+
+<!-- ============ 7 · TRUST ============ -->
+<section class="slide s7">
+  <div class="brand"><img class="mark" src="../../src/assets/brand/afro-mark.webp" alt="" /><img class="word" src="../../src/assets/brand/afro-wordmark.webp" alt="AfroCoils" /></div>
+  <div class="count">07 / 08</div>
+  <h2>Written by people.<br /><em>Works with no signal.</em></h2>
+  <div class="grid">
+    <div class="row hot"><span class="ic"><svg class="i" width="44" height="44"><use href="#i-pen" /></svg></span><div><b>No AI advice</b><span>Every guide, style and step was written by a person.</span></div></div>
+    <div class="row"><span class="ic"><svg class="i" width="44" height="44"><use href="#i-wifi-off" /></svg></span><div><b>Works offline</b><span>Everything is on your phone, ready mid-emergency.</span></div></div>
+    <div class="row"><span class="ic"><svg class="i" width="44" height="44"><use href="#i-quote" /></svg></span><div><b>Ask, and it quotes</b><span>Answers come word for word from the guides, never made up.</span></div></div>
+    <div class="row"><span class="ic"><svg class="i" width="44" height="44"><use href="#i-lock" /></svg></span><div><b>Your hair profile stays yours</b><span>It lives on your phone and never leaves it.</span></div></div>
+  </div>
+  <div class="dots"><i></i><i></i><i></i><i></i><i></i><i></i><i class="on"></i><i></i></div>
+</section>
+
+<!-- ============ 8 · LAUNCH CTA ============ -->
+<section class="slide s8">
+  <div class="count" style="left:72px;right:auto">AFROCOILS.APP</div>
+  <div class="count">08 / 08</div>
+  <div class="orb"></div>
+  <div class="hero"><img src="../../src/assets/brand/afrocoils-logo.png" alt="AfroCoils" /></div>
+  <svg class="star" style="left:150px;top:220px;width:70px;height:70px" fill="currentColor"><use href="#i-star4" /></svg>
+  <svg class="star" style="left:880px;top:700px;width:48px;height:48px" fill="currentColor"><use href="#i-star4" /></svg>
+  <div class="cta">
+    <h2>Now on Android.</h2>
+    <p class="lead">Try every feature free for 3 days. No card needed.</p>
+    <div class="btn">Download at afrocoils.app <span><svg class="i" width="34" height="34"><use href="#i-arrow" /></svg></span></div>
+  </div>
+  <p class="motto">Celebrating every coil</p>
+</section>
+
+<script>
+  /* The coil thread: a prolate cycloid (it loops back on itself when the
+     radius beats the roll), riding a baseline that wanders between slides
+     and crossing every seam, so the carousel reads as one strip. */
+  const keys = [[0, 1318], [8640, 1318]]
+  const base = (x) => { for (let i = 1; i < keys.length; i++) if (x <= keys[i][0]) {
+      const [x0, y0] = keys[i - 1], [x1, y1] = keys[i], t = (x - x0) / (x1 - x0), s = t * t * (3 - 2 * t); return y0 + (y1 - y0) * s }
+    return keys[keys.length - 1][1] }
+  // loops only where the thread has room; elsewhere a gentle wave
+  const zones = [1080, 2160, 3240, 4320, 5400, 6480, 7560].map((s) => [s - 150, s + 50])
+  const loopy = (x) => {
+    for (const [a, b] of zones) if (x > a && x < b) return Math.sin(Math.PI * (x - a) / (b - a)); return 0 }
+  let d = '', a = 16
+  for (let t = 0; t <= 8640 / a + 40; t += 0.05) {
+    const k = loopy(a * t), r = 10 + 22 * k
+    const x = a * t - (k > 0.02 ? r * 1.35 * Math.sin(t) : 0)
+    const y = base(a * t) - 12 * k + (k > 0.02 ? -r * Math.cos(t) : 5 * Math.sin(t / 6))
+    if (x > 8660) break
+    d += (d ? 'L' : 'M') + x.toFixed(1) + ' ' + y.toFixed(1)
+  }
+  const svg = document.getElementById('thread')
+  svg.innerHTML = `<path d="${d}" fill="none" stroke="#E2583E" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" opacity=".9"/>`
+</script>
+</body>
+</html>

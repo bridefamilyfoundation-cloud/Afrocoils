@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>My Hair Profile — motion</title>
+<!--
+  My Hair Profile, 33 seconds at 1080 x 1920.
+
+  Every frame is worked out from the time alone: window.seek(seconds)
+  draws that exact moment. Opened normally it loops; with ?render in the
+  address it waits for seek (render.cjs steps it frame by frame).
+
+  The phone screen is the real screen: captures/ holds the page content
+  and the fixed chrome, shot from the running app by capture.cjs. The
+  captions are the screen's own words. Four colours, one face, nothing
+  loaded from another origin.
+-->
+<style>
+  @font-face { font-family: 'Plus Jakarta Sans'; font-weight: 500; src: url('assets/plus-jakarta-sans-latin-500-normal.woff2') format('woff2'); }
+  @font-face { font-family: 'Plus Jakarta Sans'; font-weight: 600; src: url('assets/plus-jakarta-sans-latin-600-normal.woff2') format('woff2'); }
+  @font-face { font-family: 'Plus Jakarta Sans'; font-weight: 700; src: url('assets/plus-jakarta-sans-latin-700-normal.woff2') format('woff2'); }
+  @font-face { font-family: 'Plus Jakarta Sans'; font-weight: 800; src: url('assets/plus-jakarta-sans-latin-800-normal.woff2') format('woff2'); }
+
+  :root {
+    --cream: #E8D5C0;
+    --orange: #E2583E;
+    --chocolate: #5A2108;
+    --espresso: #3F1708;
+  }
+  * { box-sizing: border-box; margin: 0; }
+  html, body { background: var(--espresso); }
+  body { overflow: hidden; }
+
+  #stage {
+    position: absolute; left: 0; top: 0;
+    width: 1080px; height: 1920px; overflow: hidden;
+    transform-origin: 0 0;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    color: var(--chocolate);
+    background: var(--cream);
+  }
+  .bg { position: absolute; inset: 0; }
+  /* Cream to peach: the orange at low strength over the cream. */
+  #bg-wash { background: linear-gradient(180deg, rgb(255 255 255 / 0.42) 0%, rgb(255 255 255 / 0.12) 45%, rgb(226 88 62 / 0.26) 100%); }
+  #bg-espresso { background: var(--espresso); }
+  #bg-orange { background: var(--orange); }
+  .disc { position: absolute; border-radius: 50%; background: rgb(226 88 62 / 0.10); }
+
+  /* ---- The phone ---- */
+  #phone {
+    position: absolute; left: 0; top: 0;
+    width: 412px; height: 915px;
+    transform-origin: 0 0;
+    border-radius: 46px;
+    box-shadow: 0 0 0 5px var(--espresso), 0 30px 60px -18px rgb(63 23 8 / 0.45);
+    background: var(--cream);
+  }
+  #screen { position: absolute; inset: 0; border-radius: 46px; overflow: hidden; }
+  /* The app's own page wash, drawn here because the captures are transparent. */
+  #wash { position: absolute; inset: 0; background: linear-gradient(180deg, #F6EBDF 0%, #F1E3D4 45%, #F6C9C1 100%); }
+  .page { position: absolute; left: 0; top: 0; width: 412px; transform-origin: 0 0; }
+  /* The app bar blurs what scrolls under it; the capture alone cannot. */
+  #bar { position: absolute; left: 0; top: 0; width: 412px; height: 64px; background: rgb(246 235 223 / 0.55); backdrop-filter: blur(12px); }
+  #chrome { position: absolute; left: 0; top: 0; width: 412px; height: 915px; }
+
+  /* ---- Captions ---- */
+  .cap { position: absolute; left: 0; width: 1080px; padding: 0 72px; }
+  .cap h1, .cap h2, .cap p { letter-spacing: -0.025em; text-wrap: balance; }
+
+  #c1 { top: 250px; text-align: center; }
+  #c1 img { height: 250px; width: auto; }
+  #c1 h1 { margin-top: 70px; font-size: 128px; line-height: 1.02; font-weight: 800; letter-spacing: -0.035em; color: var(--espresso); }
+  #c1 p { margin-top: 36px; font-size: 46px; line-height: 1.25; font-weight: 600; letter-spacing: -0.01em; }
+
+  #c2 { top: 96px; text-align: center; }
+  #c2 h2 { font-size: 74px; line-height: 1.08; font-weight: 800; color: var(--espresso); }
+
+  #c3 { top: 1462px; padding: 0 56px; }
+  #c3 .panel { border-radius: 56px; background: var(--espresso); color: var(--cream); padding: 64px 64px 68px; box-shadow: 0 30px 60px -18px rgb(63 23 8 / 0.5); }
+  #c3 h2 { font-size: 92px; line-height: 1.04; font-weight: 800; }
+
+  #c4 { top: 108px; color: var(--cream); }
+  #c4 li { list-style: none; font-size: 92px; line-height: 1.16; font-weight: 800; letter-spacing: -0.03em; }
+
+  #c5 { top: 104px; }
+  #c5 h2 { font-size: 78px; line-height: 1.08; font-weight: 800; color: var(--espresso); }
+  #c5b { top: 1690px; text-align: center; }
+  #c5b span { display: inline-block; border-radius: 999px; background: var(--espresso); color: var(--cream); padding: 30px 56px 34px; font-size: 50px; font-weight: 700; letter-spacing: -0.015em; box-shadow: 0 24px 48px -14px rgb(63 23 8 / 0.55); }
+
+  #c6 { top: 1668px; text-align: center; color: #fff; }
+  #c6 h2 { font-size: 88px; line-height: 1.06; font-weight: 800; }
+
+  #c7 { top: 560px; text-align: center; }
+  #c7 img { height: 470px; width: auto; }
+  #c7 p { margin-top: 64px; font-size: 54px; line-height: 1.25; font-weight: 700; letter-spacing: -0.015em; color: var(--espresso); }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div class="bg" id="bg-wash"></div>
+  <div class="disc" id="d1" style="width:900px;height:900px;left:-380px;top:-260px"></div>
+  <div class="disc" id="d2" style="width:760px;height:760px;left:620px;top:1320px"></div>
+  <div class="bg" id="bg-espresso"></div>
+  <div class="bg" id="bg-orange"></div>
+
+  <div id="phone">
+    <div id="screen">
+      <div id="wash"></div>
+      <img class="page" id="p-partial" src="captures/partial.png" alt="" />
+      <img class="page" id="p-full" src="captures/full.png" alt="" />
+      <img class="page" id="p-climate" src="captures/climate.png" alt="" />
+      <img class="page" id="p-rules" src="captures/rules.png" alt="" />
+      <div id="bar"></div>
+      <img id="chrome" src="captures/chrome.png" alt="" />
+    </div>
+  </div>
+
+  <div class="cap" id="c1">
+    <img src="assets/afro-hero.webp" alt="AfroCoils" />
+    <h1>My Hair Profile</h1>
+    <p>What the app knows about your hair.</p>
+  </div>
+  <div class="cap" id="c2"><h2>Every answer comes from Hair&nbsp;Discovery.</h2></div>
+  <div class="cap" id="c3"><div class="panel"><h2>Your hair, at&nbsp;a&nbsp;glance.</h2></div></div>
+  <ul class="cap" id="c4">
+    <li>Coil pattern</li>
+    <li>Porosity</li>
+    <li>Density</li>
+    <li>Strand thickness</li>
+  </ul>
+  <div class="cap" id="c5"><h2>Climate and water change which products&nbsp;work.</h2></div>
+  <div class="cap" id="c5b"><span>None of it leaves the phone.</span></div>
+  <div class="cap" id="c6"><h2>Strict rules: always&nbsp;followed.</h2></div>
+  <div class="cap" id="c7">
+    <img src="assets/afro-hero.webp" alt="AfroCoils" />
+    <p>AfroCoils — Celebrating Every Coil.</p>
+  </div>
+</div>
+
+<script>
+const DURATION = 33
+const $ = (id) => document.getElementById(id)
+
+/* ---- Time helpers: everything is a pure function of t ---- */
+const clamp = (x) => Math.max(0, Math.min(1, x))
+const span = (t, a, b) => clamp((t - a) / (b - a))
+const inOut = (x) => (x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2)
+const out = (x) => 1 - Math.pow(1 - x, 4)
+const lerp = (a, b, x) => a + (b - a) * x
+/** 0 → 1 over [a, a+d], held, then 1 → 0 over [b-d2, b]. */
+const window01 = (t, a, b, d = 0.6, d2 = 0.4) => Math.min(span(t, a, a + d), 1 - span(t, b - d2, b))
+
+/*
+ * The camera. Each key says where the phone is at a moment: its scale,
+ * the canvas x of its centre, the canvas y of its top edge, and how far
+ * the page inside it has scrolled (CSS px of the 412-wide screen).
+ * Between two keys the move is eased; a pair of keys inside one beat is
+ * that beat's slow push-in.
+ */
+const CAM = [
+  // 1. Title: the phone rises and peeks from the foot.
+  { t: 0.0, s: 1.75, x: 540, y: 1960, scroll: 0 },
+  { t: 0.5, s: 1.75, x: 540, y: 1960, scroll: 0 },
+  { t: 1.9, s: 1.75, x: 540, y: 1330, scroll: 0, ease: out },
+  { t: 3.3, s: 1.78, x: 540, y: 1310, scroll: 0, ease: null },
+  // 2. Whole phone under the caption (half-answered profile).
+  { t: 4.3, s: 1.68, x: 540, y: 330, scroll: 0 },
+  { t: 8.3, s: 1.72, x: 540, y: 322, scroll: 0, ease: null },
+  // 3. Push in on the glance card (answered).
+  { t: 9.4, s: 2.36, x: 540, y: -236, scroll: 0 },
+  { t: 13.2, s: 2.44, x: 540, y: -262, scroll: 0, ease: null },
+  // 4. The hair rows, on espresso.
+  { t: 14.3, s: 2.0, x: 600, y: 610, scroll: 480 },
+  { t: 18.0, s: 2.04, x: 600, y: 600, scroll: 492, ease: null },
+  // 5. Scalp & surroundings; climate opens.
+  { t: 19.1, s: 2.3, x: 540, y: 470, scroll: 850 },
+  { t: 23.4, s: 2.36, x: 540, y: 452, scroll: 858, ease: null },
+  // 6. Your rules, on orange.
+  { t: 24.6, s: 2.2, x: 540, y: -400, scroll: 1000 },
+  { t: 28.4, s: 2.25, x: 540, y: -416, scroll: 1006, ease: null },
+  // 7. The phone leaves; the logo stays.
+  { t: 29.5, s: 2.0, x: 540, y: 1990, scroll: 1006 },
+  { t: 33.0, s: 2.0, x: 540, y: 1990, scroll: 1006 },
+]
+
+function camera(t) {
+  let i = 0
+  while (i < CAM.length - 2 && t >= CAM[i + 1].t) i++
+  const a = CAM[i], b = CAM[i + 1]
+  const ease = b.ease === null ? (x) => x : b.ease || inOut
+  const k = ease(span(t, a.t, b.t))
+  return { s: lerp(a.s, b.s, k), x: lerp(a.x, b.x, k), y: lerp(a.y, b.y, k), scroll: lerp(a.scroll, b.scroll, k) }
+}
+
+/** A caption: fades and settles in, fades out. `dy` is the settle distance. */
+function caption(el, t, a, b, dy = 36) {
+  const v = window01(t, a, b)
+  const settle = out(span(t, a, a + 0.9))
+  el.style.opacity = v
+  el.style.transform = `translateY(${(1 - settle) * dy}px)`
+  el.style.filter = v < 1 && t < a + 0.6 ? `blur(${(1 - v) * 8}px)` : 'none'
+}
+
+function seek(t) {
+  t = Math.max(0, Math.min(DURATION, t))
+
+  /* Backgrounds */
+  $('bg-espresso').style.opacity = window01(t, 13.3, 19.0, 0.9, 0.9)
+  $('bg-orange').style.opacity = Math.min(span(t, 23.5, 24.5), 1 - span(t, 28.4, 29.4))
+  $('d1').style.transform = `translate(${t * 5}px, ${t * 7}px)`
+  $('d2').style.transform = `translate(${-t * 6}px, ${-t * 9}px)`
+
+  /* Phone */
+  const c = camera(t)
+  $('phone').style.transform = `translate(${c.x - 206 * c.s}px, ${c.y}px) scale(${c.s})`
+  for (const id of ['p-partial', 'p-full', 'p-climate', 'p-rules']) $(id).style.transform = `translateY(${-c.scroll}px)`
+
+  /* Which state of the screen is showing. Each swap happens while the
+     page is still, at a point where the two captures agree above it. */
+  /* The captures are transparent, so a swap is a true crossfade: the
+     outgoing one leaves as the incoming one arrives. */
+  const full = inOut(span(t, 8.7, 9.15))
+  const climate = Math.min(inOut(span(t, 20.0, 20.5)), 1 - inOut(span(t, 23.0, 23.4)))
+  const rules = inOut(span(t, 25.4, 25.9))
+  $('p-partial').style.opacity = 1 - full
+  $('p-full').style.opacity = full * (1 - climate) * (1 - rules)
+  $('p-climate').style.opacity = climate
+  $('p-rules').style.opacity = rules
+
+  /* Captions */
+  caption($('c1'), t, 0.2, 3.6)
+  caption($('c2'), t, 4.2, 8.6)
+  caption($('c3'), t, 9.6, 13.4, 60)
+  caption($('c5'), t, 19.0, 23.6)
+  caption($('c5b'), t, 21.0, 23.6, 40)
+  caption($('c6'), t, 24.6, 28.6, 40)
+  caption($('c7'), t, 29.3, 34, 30)
+
+  /* 4: the four traits, each coming up to full as its turn arrives. */
+  const list = $('c4')
+  list.style.opacity = window01(t, 13.9, 18.4, 0.5, 0.4)
+  ;[...list.children].forEach((li, i) => {
+    const on = out(span(t, 14.2 + i * 0.75, 14.9 + i * 0.75))
+    li.style.opacity = lerp(0.32, 1, on)
+    li.style.transform = `translateX(${(1 - on) * -18}px)`
+  })
+}
+window.seek = seek
+window.DURATION = DURATION
+
+/* Fit the stage to the window when watched; 1:1 when rendered. */
+const rendering = location.search.includes('render')
+function fit() {
+  const k = rendering ? 1 : Math.min(innerWidth / 1080, innerHeight / 1920)
+  $('stage').style.transform = `scale(${k})`
+  $('stage').style.left = rendering ? '0' : `${(innerWidth - 1080 * k) / 2}px`
+}
+fit()
+addEventListener('resize', fit)
+
+seek(0)
+if (!rendering) {
+  const start = performance.now()
+  const tick = (now) => {
+    seek(((now - start) / 1000) % DURATION)
+    requestAnimationFrame(tick)
+  }
+  requestAnimationFrame(tick)
+}
+</script>
+</body>
+</html>
