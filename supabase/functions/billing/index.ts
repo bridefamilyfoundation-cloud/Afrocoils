@@ -63,7 +63,7 @@ import {
   verifyPaystackSignature,
 } from '../_shared/paystack.ts'
 import { RECEIPT_BUCKET, insertReturning, removeObjects, select, uploadObject, upsert } from '../_shared/supabase.ts'
-import { bearer } from '../_shared/token.ts'
+import { bearer, pruneSessions } from '../_shared/token.ts'
 
 /**
  * Paying for membership, through Paystack.
@@ -185,7 +185,7 @@ async function trial(req: Request, origin?: string): Promise<Response> {
   }
 
   await saveMember(email, { trial_ends_at: endsAt })
-  return jsonResponse((await membershipFor(email)) satisfies MembershipResponse, 200, origin)
+  return jsonResponse((await membershipFor(email, { token: session.token })) satisfies MembershipResponse, 200, origin)
 }
 
 async function manage(req: Request, origin?: string): Promise<Response> {
@@ -631,6 +631,8 @@ async function reminders(req: Request): Promise<Response> {
     }
   }
   // Receipt images 90 days past their decision go too (the row stays).
+  // Sessions ended or expired a month ago.
+  await pruneSessions().catch((error) => console.error('[billing] session pruning failed', error))
   const pruned = await pruneReceipts().catch((error) => {
     console.error('[billing] receipt pruning failed', error)
     return 0

@@ -121,13 +121,6 @@ export function retwistWeeks(
   return base
 }
 
-/** Human label for the loc setup, e.g. "Interlocking · Microlocs". */
-export function describeLocs(identity: HairIdentity): string {
-  const { locType, locMethod } = identity
-  if (!locMethod) return locType ? `${locType} locs` : 'Locs'
-  return `${locMethod} · ${locType ?? 'Locs'}`
-}
-
 export function isLocs(identity: HairIdentity | undefined): boolean {
   return identity?.hairType === 'Locs'
 }

@@ -6,6 +6,8 @@
  * every section visible, the download link in the HTML — and
  * what is lost is motion and the mockups, which are decorative.
  */
+import Lenis from 'lenis'
+import 'lenis/dist/lenis.css'
 import QRCode from 'qrcode'
 import heroUrl from '../src/assets/brand/afro-hero.webp'
 import markUrl from '../src/assets/brand/afro-mark.webp'
@@ -15,6 +17,17 @@ import { askDemo, bands } from 'virtual:site-facts'
 const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches
 const $ = <T extends Element = HTMLElement>(selector: string, root: ParentNode = document) =>
   root.querySelector<T & Element>(selector) as T
+
+/* ------------------------------------------------------------------ *
+ * Smooth scroll (Lenis, from npm and bundled with the page, so the
+ * footer's "loads nothing from anywhere else" stays true). It rides the
+ * browser's own scroll, so the sticky phone, the observers below and
+ * keyboard scrolling are untouched, and touch scrolling stays native.
+ * In-page links glide to their section, landing under the fixed nav by
+ * the `scroll-padding-top` in site.css. Lenis switches itself off for
+ * anyone who asks for reduced motion.
+ * ------------------------------------------------------------------ */
+const lenis = new Lenis({ autoRaf: true, anchors: true })
 
 /* ------------------------------------------------------------------ *
  * Nav: gains a surface once the page has moved.
@@ -197,6 +210,99 @@ const revealObserver = new IntersectionObserver(
   { threshold: 0.18 },
 )
 document.querySelectorAll('[data-reveal], [data-step]').forEach((el) => revealObserver.observe(el))
+
+/* ------------------------------------------------------------------ *
+ * Three effects after React Bits (reactbits.dev), rewritten without
+ * React because this page has none: ScrollVelocity, ScrollReveal and
+ * SpotlightCard. All three are decoration over a page that is complete
+ * without them, and none runs under reduced motion.
+ * ------------------------------------------------------------------ */
+
+/* The promise strip moves with the page: it drifts by itself, runs
+   faster the faster you scroll, and turns round when you scroll back up.
+   Driven here rather than by the CSS keyframes so the speed can change
+   without the track jumping. */
+const track = document.querySelector<HTMLElement>('.marquee-track')
+if (track && !reduceMotion) {
+  const strip = track.parentElement!
+  const half = track.children.length / 2
+  // One copy's width, gap included: where the second copy starts.
+  const period = () => (track.children[half] as HTMLElement).offsetLeft - (track.children[0] as HTMLElement).offsetLeft
+  let width = period()
+  let x = 0
+  let direction = 1
+  let boost = 0
+  let last = 0
+  let onScreen = false
+  let frame = 0
+  track.classList.add('is-driven')
+
+  const step = (now: number) => {
+    const dt = Math.min(48, now - last) / 1000
+    last = now
+    // Lenis reports pixels moved this frame; ease towards it so a flick decays.
+    boost += (Math.min(60, Math.abs(lenis.velocity)) - boost) * 0.12
+    if (Math.abs(lenis.velocity) > 0.5) direction = lenis.velocity > 0 ? 1 : -1
+    if (!strip.matches(':hover')) x -= direction * (48 + boost * 22) * dt
+    x = ((x % width) - width) % width
+    track.style.transform = `translate3d(${x}px,0,0)`
+    frame = requestAnimationFrame(step)
+  }
+  const run = () => {
+    cancelAnimationFrame(frame)
+    if (!onScreen || document.hidden) return
+    last = performance.now()
+    frame = requestAnimationFrame(step)
+  }
+  new IntersectionObserver(([entry]) => {
+    onScreen = entry.isIntersecting
+    run()
+  }).observe(strip)
+  document.addEventListener('visibilitychange', run)
+  addEventListener('resize', () => (width = period()))
+  document.fonts?.ready.then(() => (width = period()))
+}
+
+/* The closing line comes into focus a word at a time as it climbs the
+   screen, and fades back if you scroll away. The words stay ordinary text
+   with their spaces between them, so it reads aloud as one sentence. */
+const closing = document.querySelector<HTMLElement>('[data-scroll-words]')
+if (closing && !reduceMotion) {
+  const words = (closing.textContent ?? '').trim().split(/\s+/)
+  closing.textContent = ''
+  const spans = words.map((word, i) => {
+    const span = document.createElement('span')
+    span.className = 'scroll-word'
+    span.textContent = word
+    closing.append(span, i < words.length - 1 ? ' ' : '')
+    return span
+  })
+  const paint = () => {
+    const rect = closing.getBoundingClientRect()
+    // 0 as the line enters at the bottom, 1 by the time it is mid-screen.
+    const p = Math.max(0, Math.min(1, (innerHeight * 0.92 - rect.top) / (innerHeight * 0.45)))
+    spans.forEach((span, i) => {
+      const t = Math.max(0, Math.min(1, p * (spans.length + 2) - i))
+      span.style.opacity = String(0.28 + 0.72 * t)
+      span.style.filter = t < 1 ? `blur(${((1 - t) * 5).toFixed(2)}px)` : ''
+    })
+  }
+  lenis.on('scroll', paint)
+  addEventListener('resize', paint)
+  paint()
+}
+
+/* A soft light follows the pointer across the two hair cards. Mouse
+   only: on a touch screen there is no pointer to follow. */
+if (matchMedia('(hover: hover) and (pointer: fine)').matches && !reduceMotion) {
+  document.querySelectorAll<HTMLElement>('.spotlight').forEach((card) => {
+    card.addEventListener('pointermove', (event) => {
+      const rect = card.getBoundingClientRect()
+      card.style.setProperty('--mx', `${event.clientX - rect.left}px`)
+      card.style.setProperty('--my', `${event.clientY - rect.top}px`)
+    })
+  })
+}
 
 /* ------------------------------------------------------------------ *
  * Ask, replayed: the question is typed, sent, and answered with the

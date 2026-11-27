@@ -160,9 +160,6 @@ export const LOC_CONCEPTS = ['locs', 'retwist', 'startLocs']
 /** Ideas that make loc content more likely without deciding the hair type. */
 export const LOC_LEANING = ['locStages', 'unravel', 'locMaintenance']
 
-/** Ideas that make a question about a style rather than a problem. */
-export const STYLE_CONCEPTS = ['style', 'protective', 'quick']
-
 /** Ideas that make a question about buying or using a product. */
 export const PRODUCT_CONCEPTS = ['products', 'oils', 'butters', 'gel', 'ingredients', 'tools']
 

@@ -169,6 +169,14 @@ function PrivacyPolicy() {
           you did in the app.
         </p>
         <p>
+          <strong>Your sign-in session.</strong> Each sign-in is recorded on our server as a
+          session: your email, when it started and when it ends, and the sign-in token in a
+          form that cannot be turned back into it. The token the app holds lasts fifteen
+          minutes and is renewed while you use the app; the session ends after 180 days
+          without being renewed, or at once when you sign out, which ends it on our server
+          too. Ended sessions are deleted a month later.
+        </p>
+        <p>
           We use your email only to sign you in, to run your membership (the reminders above
           included), to answer you when you write to us and, until you unsubscribe, to send
           the news and offers above. We never sell or share it except

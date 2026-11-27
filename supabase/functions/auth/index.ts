@@ -11,7 +11,18 @@ import { checkKeyLimit, checkLimits, limitResponse } from '../_shared/limits.ts'
 import { membershipFor } from '../_shared/membership.ts'
 import { db } from '../_shared/members.ts'
 import { remove, rpc, select, upsert } from '../_shared/supabase.ts'
-import { bearer, hashCode, newCode, normalEmail, sameBytes, signToken } from '../_shared/token.ts'
+import {
+  bearer,
+  createSession,
+  hashCode,
+  newCode,
+  normalEmail,
+  refreshSession,
+  revokeSession,
+  sameBytes,
+  sessionIdOf,
+  upgradeLegacy,
+} from '../_shared/token.ts'
 
 /**
  * Signing in by email.
@@ -20,12 +31,17 @@ import { bearer, hashCode, newCode, normalEmail, sameBytes, signToken } from '..
  *   from no-reply@afrocoils.app. Always 204 — whether or not the address
  *   is a member, or an admin — so the route cannot be used to find out
  *   who is.
- * - `POST auth/verify` `{ email, code, purpose }` checks it. A member
- *   gets a token and their membership; an admin gets a twelve-hour
- *   session. Ten minutes and five tries per code.
- * - `POST auth/status` with `Authorization: Bearer <member token>`
- *   answers how long that address is paid up to, with a fresh token.
- *   The phone asks on sign-in and at most twice a day after that.
+ * - `POST auth/verify` `{ email, code, purpose }` checks it and opens a
+ *   server session: a fifteen-minute access token and a refresh token
+ *   (`_shared/token.ts`). A member also gets their membership. Ten
+ *   minutes and five tries per code.
+ * - `POST auth/refresh` `{ refresh, purpose }` swaps a refresh token for
+ *   a new pair; the old one stops working.
+ * - `POST auth/logout` `{ refresh }` ends the session on the server, so
+ *   every token it issued stops working at once.
+ * - `POST auth/status` with `Authorization: Bearer <access token>`
+ *   answers how long that address is paid up to. The phone asks on
+ *   sign-in and at most twice a day after that.
  *
  * Confirming an address is not paying for it: anyone can sign in, and
  * the answer says `none` until the billing webhook has recorded a
@@ -141,12 +157,44 @@ async function verify(req: Request, origin?: string): Promise<Response> {
 
   if (purpose === 'admin') {
     if (!adminEmails().has(email)) return jsonResponse({ error: 'Not an admin address.' }, 403, origin)
-    const { token, exp } = await signToken(email, 'admin')
-    const session: AdminSessionResponse = { email, token, expiresISO: new Date(exp * 1000).toISOString() }
-    return jsonResponse(session, 200, origin)
+    return jsonResponse((await createSession(email, 'admin')) satisfies AdminSessionResponse, 200, origin)
   }
 
-  return jsonResponse(await membership(email), 200, origin)
+  return jsonResponse(await membershipFor(email, await createSession(email, 'member')), 200, origin)
+}
+
+/* ------------------------------------------------------------------ */
+
+const signedOut = (origin?: string) => jsonResponse({ error: 'Signed out. Sign in again with your email.' }, 401, origin)
+
+async function refresh(req: Request, origin?: string): Promise<Response> {
+  const limit = await checkLimits(req, 'auth-status')
+  if (!limit.allowed) return limitResponse(limit, origin)
+
+  const input = await body(req)
+  if (input === undefined) return jsonResponse({ error: 'Too large' }, 413, origin)
+  const purpose = purposeOf(input?.purpose) ?? 'member'
+  const tokens =
+    typeof input?.refresh === 'string'
+      ? await refreshSession(input.refresh, purpose)
+      : purpose === 'member' && typeof input?.legacy === 'string'
+        ? await upgradeLegacy(input.legacy)
+        : null
+  if (!tokens) return signedOut(origin)
+  // An admin taken off ADMIN_EMAILS cannot refresh their way back in.
+  if (purpose === 'admin' && !adminEmails().has(tokens.email)) {
+    await revokeSession(sessionIdOf(tokens.refresh))
+    return signedOut(origin)
+  }
+  return jsonResponse(tokens satisfies AdminSessionResponse, 200, origin)
+}
+
+async function logout(req: Request, origin?: string): Promise<Response> {
+  const limit = await checkLimits(req, 'auth-status')
+  if (!limit.allowed) return limitResponse(limit, origin)
+  const input = await body(req)
+  if (typeof input?.refresh === 'string') await revokeSession(sessionIdOf(input.refresh))
+  return new Response(null, { status: 204, headers: corsHeaders(origin) })
 }
 
 /* ------------------------------------------------------------------ */
@@ -156,17 +204,12 @@ async function status(req: Request, origin?: string): Promise<Response> {
   if (!limit.allowed) return limitResponse(limit, origin)
 
   const session = await bearer(req, 'member')
-  if (!session) return jsonResponse({ error: 'Signed out. Sign in again with your email.' }, 401, origin)
-  return jsonResponse(await membership(session.sub), 200, origin)
+  if (!session) return signedOut(origin)
+  // Before answering, membershipFor checks with Paystack — a checkout not
+  // yet seen paid, a subscription that looks lapsed — so a webhook that
+  // never arrived costs a member nothing (`_shared/membership.ts`).
+  return jsonResponse((await membershipFor(session.sub, { token: session.token })) satisfies MembershipResponse, 200, origin)
 }
-
-/**
- * What the phone is told about an address, with a fresh token. Before
- * answering it checks with Paystack — a checkout not yet seen paid, a
- * subscription that looks lapsed — so a webhook that never arrived
- * costs a member nothing (`_shared/membership.ts`).
- */
-const membership = (email: string): Promise<MembershipResponse> => membershipFor(email)
 
 /* ------------------------------------------------------------------ */
 
@@ -180,6 +223,8 @@ serve(async (req) => {
     if (route === 'request-code') return await requestCode(req, origin)
     if (route === 'verify') return await verify(req, origin)
     if (route === 'status') return await status(req, origin)
+    if (route === 'refresh') return await refresh(req, origin)
+    if (route === 'logout') return await logout(req, origin)
     return jsonResponse({ error: 'Not found' }, 404, origin)
   } catch (error) {
     console.error(`[auth] ${route} failed`, error)

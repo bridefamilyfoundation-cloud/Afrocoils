@@ -1,0 +1,13 @@
+# AfroCoils
+#
+# The landing page and the Android download. Everything here may be crawled
+# except the pages a browser lands on after paying or unsubscribing, which say
+# nothing on their own.
+# The admin site is a separate host and is never listed here.
+
+User-agent: *
+Allow: /
+Disallow: /joined.html
+Disallow: /unsubscribed.html
+
+Sitemap: https://afrocoils.app/sitemap.xml

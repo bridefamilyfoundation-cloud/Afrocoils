@@ -1,11 +1,14 @@
-import type { AdminSessionResponse, MemberStatus, PlanId, TransferStatus } from '../../src/lib/types'
+import type { AdminSessionResponse, MemberStatus, PlanId, RefreshRequest, TransferStatus } from '../../src/lib/types'
 
 /**
  * The admin site's only connection: the `auth` and `admin` Edge
- * Functions. The session is an admin token from `auth/verify`, kept in
- * sessionStorage so closing the tab signs out; it runs out after twelve
- * hours, and the function also checks the address is still on
- * ADMIN_EMAILS on every request.
+ * Functions. The session is a server session from `auth/verify`: a
+ * fifteen-minute access token and a refresh token, swapped for a new
+ * pair (`auth/refresh`) before the access token runs out. It is kept in
+ * sessionStorage so closing the tab forgets it, ends on the server twelve
+ * hours after signing in, and Sign out ends it there at once
+ * (`auth/logout`). The function also checks the address is still on
+ * ADMIN_EMAILS on every request and every refresh.
  */
 const BASE =
   import.meta.env.VITE_API_BASE_URL || 'https://runhkccoeyxfgsfrzezn.supabase.co/functions/v1'
@@ -15,7 +18,7 @@ const KEY = 'afrocoils-admin-session'
 export function loadSession(): AdminSessionResponse | null {
   try {
     const session = JSON.parse(sessionStorage.getItem(KEY) ?? 'null') as AdminSessionResponse | null
-    return session && Date.parse(session.expiresISO) > Date.now() ? session : null
+    return session?.refresh && Date.parse(session.sessionExpISO) > Date.now() ? session : null
   } catch {
     return null
   }
@@ -28,6 +31,37 @@ export function saveSession(session: AdminSessionResponse | null): void {
 
 export class SignedOut extends Error {}
 
+let renewing: Promise<AdminSessionResponse> | null = null
+
+/** The stored session with an access token good for at least another minute, refreshed if need be. */
+function current(): Promise<AdminSessionResponse> {
+  const session = loadSession()
+  if (!session) return Promise.reject(new SignedOut('Signed out'))
+  if (Date.parse(session.tokenExpISO) - Date.now() > 60_000) return Promise.resolve(session)
+  renewing ??= request<AdminSessionResponse>('auth/refresh', {
+    method: 'POST',
+    body: JSON.stringify({ refresh: session.refresh, purpose: 'admin' } satisfies RefreshRequest),
+  })
+    .then((next) => (saveSession(next), next))
+    .catch((error: unknown) => {
+      if (error instanceof SignedOut) saveSession(null)
+      throw error
+    })
+    .finally(() => (renewing = null))
+  return renewing
+}
+
+/** Sign out here and on the server, so neither token works again. */
+export async function endSession(): Promise<void> {
+  const session = loadSession()
+  saveSession(null)
+  if (session) {
+    await request<void>('auth/logout', { method: 'POST', body: JSON.stringify({ refresh: session.refresh }) }).catch(
+      () => undefined,
+    )
+  }
+}
+
 async function request<T>(path: string, init: RequestInit = {}, token?: string): Promise<T> {
   const response = await fetch(`${BASE}/${path}`, {
     ...init,
@@ -36,7 +70,7 @@ async function request<T>(path: string, init: RequestInit = {}, token?: string):
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
     },
   })
-  if (response.status === 401 && token) throw new SignedOut('Signed out')
+  if (response.status === 401 && (token || path === 'auth/refresh')) throw new SignedOut('Signed out')
   if (response.status === 204) return undefined as T
   const body = (await response.json().catch(() => null)) as (T & { error?: string }) | null
   if (!response.ok) throw new Error(body?.error ?? `Request failed (${response.status})`)
@@ -52,19 +86,20 @@ export const verify = (email: string, code: string) =>
     body: JSON.stringify({ email, code, purpose: 'admin' }),
   })
 
-export function adminApi(token: string, onSignedOut: () => void) {
-  const guard = <T,>(promise: Promise<T>): Promise<T> =>
-    promise.catch((error: unknown) => {
-      if (error instanceof SignedOut) onSignedOut()
-      throw error
-    })
+export function adminApi(onSignedOut: () => void) {
+  const send = <T,>(path: string, init: RequestInit): Promise<T> =>
+    current()
+      .then((session) => request<T>(path, init, session.token))
+      .catch((error: unknown) => {
+        if (error instanceof SignedOut) onSignedOut()
+        throw error
+      })
   return {
     get: <T,>(route: string, query: Record<string, string> = {}) => {
       const qs = new URLSearchParams(Object.entries(query).filter(([, v]) => v !== '')).toString()
-      return guard(request<T>(`admin/${route}${qs ? `?${qs}` : ''}`, { method: 'GET' }, token))
+      return send<T>(`admin/${route}${qs ? `?${qs}` : ''}`, { method: 'GET' })
     },
-    post: <T,>(route: string, body: unknown) =>
-      guard(request<T>(`admin/${route}`, { method: 'POST', body: JSON.stringify(body) }, token)),
+    post: <T,>(route: string, body: unknown) => send<T>(`admin/${route}`, { method: 'POST', body: JSON.stringify(body) }),
   }
 }
 export type AdminApi = ReturnType<typeof adminApi>

@@ -944,8 +944,16 @@ export const SUBMISSION_CREDIT_MAX = 60
 /** What the phone remembers about its member. Absent: signed out. */
 export interface Membership {
   email: string
-  /** Signed by the `auth` function. Proves the address was confirmed; carries no payment state. */
+  /** Fifteen-minute access token from the `auth` function. Proves the address was confirmed; carries no payment state. */
   token: string
+  /**
+   * Swapped for a new pair by `auth/refresh`, and replaced each time.
+   * Absent on a profile from before server sessions: the token is then a
+   * legacy one, exchanged for a session the next time the phone is online.
+   */
+  refresh?: string
+  /** When `token` runs out. */
+  tokenExpISO?: string
   status: MemberStatus
   /** The end of the paid period, from the server. Null: never paid. */
   paidUntilISO: string | null
@@ -982,6 +990,32 @@ export interface VerifyCodeRequest {
   purpose: CodePurpose
 }
 
+/**
+ * A server session's tokens (`supabase/functions/_shared/token.ts`):
+ * a fifteen-minute access token, and the refresh token that replaces it,
+ * itself replaced on every use. Signing out (`auth/logout`) ends the
+ * session on the server.
+ */
+export interface SessionTokens {
+  token: string
+  refresh: string
+  tokenExpISO: string
+  /** When the session itself ends: 180 idle days for a member, twelve hours for an admin. */
+  sessionExpISO: string
+}
+
+/** POST auth/refresh: a refresh token, or (members, until early 2027) a token from before sessions. */
+export interface RefreshRequest {
+  refresh?: string
+  legacy?: string
+  purpose: CodePurpose
+}
+
+/** POST auth/logout. The refresh token names the session to end. */
+export interface LogoutRequest {
+  refresh: string
+}
+
 /** A plan as Paystack holds it. `amount` is in the currency's minor unit (kobo). */
 export interface PlanPrice {
   amount: number
@@ -989,8 +1023,12 @@ export interface PlanPrice {
   interval: string
 }
 
-/** auth/verify and auth/status (Bearer token) for a member. */
-export interface MembershipResponse {
+/**
+ * auth/verify, auth/status and billing/trial for a member. `auth/verify`
+ * carries a new session's tokens; the others echo the access token they
+ * were sent and leave `refresh` out.
+ */
+export interface MembershipResponse extends Partial<Omit<SessionTokens, 'token'>> {
   email: string
   token: string
   status: MemberStatus
@@ -1022,11 +1060,9 @@ export interface CheckoutRequest {
   plan?: PlanId
 }
 
-/** auth/verify for an admin. */
-export interface AdminSessionResponse {
+/** auth/verify for an admin, and auth/refresh for either. */
+export interface AdminSessionResponse extends SessionTokens {
   email: string
-  token: string
-  expiresISO: string
 }
 
 /**

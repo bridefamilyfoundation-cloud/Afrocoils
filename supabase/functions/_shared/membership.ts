@@ -5,7 +5,7 @@
  * `auth/verify`, `auth/status` and `billing/trial` all answer with
  * `membershipFor()`, so the three cannot disagree about who has access.
  */
-import type { MembershipResponse, PlanOffer, Promo } from '../../../src/lib/types.ts'
+import type { MembershipResponse, PlanOffer, Promo, SessionTokens } from '../../../src/lib/types.ts'
 import { MEMBERSHIP_GRACE_DAYS, accessOpen, membershipOpen } from '../../../src/lib/types.ts'
 import { getMember, laterOf, recordCharge, saveMember, trialKey, db, type MemberRow } from './members.ts'
 import {
@@ -20,7 +20,6 @@ import {
 import { releaseFloor } from './releases.ts'
 import { patch, select } from './supabase.ts'
 import { activePromo, readSettings } from './transfers.ts'
-import { signToken } from './token.ts'
 
 const DAY = 86_400_000
 
@@ -216,8 +215,14 @@ export async function trialAvailable(email: string, member: MemberRow | undefine
   return taken.length === 0
 }
 
-/** The answer for one address, with a fresh token. */
-export async function membershipFor(email: string): Promise<MembershipResponse> {
+/**
+ * The answer for one address. `tokens` rides along unchanged: a new
+ * session's on sign-in, otherwise the access token the request came with.
+ */
+export async function membershipFor(
+  email: string,
+  tokens: Pick<MembershipResponse, 'token'> & Partial<SessionTokens>,
+): Promise<MembershipResponse> {
   let member = await getMember(email)
   if (member) {
     member = await refreshMember(member)
@@ -244,11 +249,10 @@ export async function membershipFor(email: string): Promise<MembershipResponse> 
   const monthly = plans?.find((p) => p.id === 'monthly')
 
   const floor = await releaseFloor()
-  const { token } = await signToken(email, 'member')
   return {
     ...(floor ? { floor } : {}),
+    ...tokens,
     email,
-    token,
     status: member?.status ?? 'none',
     paidUntilISO,
     plan: member?.plan ?? null,

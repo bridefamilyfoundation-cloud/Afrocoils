@@ -158,6 +158,8 @@ function validMembership(value: unknown): Membership | undefined {
   return {
     email: m.email,
     token: m.token,
+    ...(typeof m.refresh === 'string' ? { refresh: m.refresh } : {}),
+    ...(typeof m.tokenExpISO === 'string' ? { tokenExpISO: m.tokenExpISO } : {}),
     status: (MEMBER_STATUSES as readonly string[]).includes(m.status as string)
       ? (m.status as MemberStatus)
       : 'none',

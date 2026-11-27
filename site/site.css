@@ -22,6 +22,31 @@
   body {
     -webkit-font-smoothing: antialiased;
   }
+  /* Lenis does the gliding once it is running; two smoothers fight. */
+  html.lenis {
+    scroll-behavior: auto;
+  }
+
+  /* The parts the browser draws, in the palette. */
+  ::selection {
+    background: theme('colors.brand-espresso');
+    color: theme('colors.inverse-on-surface');
+  }
+  :focus-visible {
+    outline: 2px solid theme('colors.primary');
+    outline-offset: 3px;
+  }
+  .bg-brand-chocolate :focus-visible,
+  .bg-brand-espresso :focus-visible,
+  .bg-secondary :focus-visible {
+    outline-color: theme('colors.inverse-on-surface');
+  }
+  .bg-brand-chocolate ::selection,
+  .bg-brand-espresso ::selection,
+  .bg-secondary ::selection {
+    background: theme('colors.inverse-on-surface');
+    color: theme('colors.brand-espresso');
+  }
 }
 
 @layer components {
@@ -113,6 +138,43 @@
   }
   .marquee:hover .marquee-track {
     animation-play-state: paused;
+  }
+  /* main.ts has taken the strip over, to tie its speed to the scroll. */
+  .marquee-track.is-driven {
+    animation: none;
+    will-change: transform;
+  }
+
+  /* The closing line's words, brought into focus by main.ts as it scrolls in. */
+  .scroll-word {
+    display: inline-block;
+    will-change: opacity, filter;
+  }
+
+  /*
+   * A soft light under the pointer (main.ts sets --mx / --my). It sits
+   * below the card's content, and only where there is a pointer to follow.
+   */
+  .spotlight::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0;
+    background: radial-gradient(
+      380px circle at var(--mx, 50%) var(--my, 50%),
+      var(--spot, theme('colors.secondary / 16%')),
+      transparent 65%
+    );
+    transition: opacity 0.4s ease;
+  }
+  .spotlight-dark {
+    --spot: theme('colors.primary-fixed-dim / 22%');
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .spotlight:hover::before {
+      opacity: 1;
+    }
   }
 
   /* Phone screens cross-fade and lift as the story advances. */

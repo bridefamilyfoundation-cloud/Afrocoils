@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState, type FormEvent } from 'react'
 import BrandLockup from '../../src/components/BrandMark'
 import type { AdminSessionResponse } from '../../src/lib/types'
-import { adminApi, loadSession, saveSession, sendCode, verify, type AdminApi, type Overview } from './api'
+import { adminApi, endSession, loadSession, saveSession, sendCode, verify, type AdminApi, type Overview } from './api'
 import Dashboard from './pages/Dashboard'
 import Inbox from './pages/Inbox'
 import Mailing from './pages/Mailing'
@@ -61,7 +61,7 @@ export function waitingOn(page: PageName, overview: Overview | undefined): numbe
 export default function App() {
   const [session, setSession] = useState<AdminSessionResponse | null>(loadSession)
   const signOut = useCallback(() => {
-    saveSession(null)
+    void endSession()
     setSession(null)
   }, [])
 
@@ -83,7 +83,7 @@ function Shell({ session, signOut }: { session: AdminSessionResponse; signOut: (
     document.querySelector('nav [aria-current="page"]')?.scrollIntoView({ block: 'nearest', inline: 'center' })
   }, [page])
 
-  const api = adminApi(session.token, signOut)
+  const api = adminApi(signOut)
   const go = (name: PageName) => (location.hash = `/${name}`)
   // Counted again on every page change, so a queue cleared on one page
   // is cleared in the sidebar by the time you look back at it.

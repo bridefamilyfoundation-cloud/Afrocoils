@@ -8,6 +8,7 @@ import {
   dueForCheck,
   hasAccess,
   markCheckoutOpened,
+  onSessionRenewed,
   toMembership,
 } from '../lib/membership'
 import { useHairProfile } from '../lib/profile-store'
@@ -47,13 +48,19 @@ export default function MembershipSync() {
       if (!open && !onResume && !dueForCheck(current)) return
       busy.current = true
       try {
-        update({ membership: toMembership(await checkStatus(current.token)) })
+        update({ membership: toMembership(await checkStatus(current)) })
       } catch (error) {
         if (error instanceof MembershipError && error.status === 401) update({ membership: undefined })
       } finally {
         busy.current = false
       }
     }
+
+    // Every refreshed pair goes onto the profile at once: the refresh
+    // token it replaced is already spent.
+    const stopListening = onSessionRenewed((session) =>
+      update((now) => (now.membership?.email === session.email ? { membership: { ...now.membership, ...session } } : {})),
+    )
 
     void check(true)
     const onVisible = () => document.visibilityState === 'visible' && void check(true)
@@ -76,6 +83,7 @@ export default function MembershipSync() {
     const listener = native ? App.addListener('appUrlOpen', ({ url }) => returned(url)) : undefined
 
     return () => {
+      stopListening()
       document.removeEventListener('visibilitychange', onVisible)
       void listener?.then((handle) => handle.remove())
     }

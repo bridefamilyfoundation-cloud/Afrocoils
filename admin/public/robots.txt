@@ -1,0 +1,3 @@
+# The AfroCoils admin site. Nothing here is for search engines.
+User-agent: *
+Disallow: /

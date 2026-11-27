@@ -618,7 +618,9 @@ picture; this file is the short version of what to keep in mind when editing.
   `docs/play-release.md`'s data-safety note.
 - **The landing site states nothing by hand.** `site/` is the public page
   and the APK download, built separately (`npm run site:build` →
-  `dist-site/`) so it never ends up inside the APK. Its counts, the Locs
+  `dist-site/`) so it never ends up inside the APK. Its `sitemap.xml` and
+  JSON-LD are generated there too (`PAGES`, `structuredData()`) and list
+  only this site — never the admin host. Its counts, the Locs
   World chapter list and the Quick Hairstyle examples are read from
   `src/content/` by `vite.site.config.ts`; version, size, SHA-256 and
   minimum Android come from `site/release.json`, which
@@ -759,7 +761,14 @@ any @afrocoils.app address as text, one mailbox per address (the
 admin Inbox lists each; no-reply@ is answered from support@); `admin/` serves admin.afrocoils.app behind
 an admin token *and* the `ADMIN_EMAILS` list. That is all the server
 code — there is no model client, no prompt and no `ANTHROPIC_API_KEY`.
-Tokens are our own HMAC (`_shared/token.ts`, `AUTH_SECRET`); codes are
+Tokens are our own HMAC (`_shared/token.ts`, `AUTH_SECRET`), and every
+sign-in is a row in `sessions` (migration 0010, added 2026-11-25): a
+fifteen-minute access token naming the row, and a refresh token stored
+hashed and rotated on every use (`auth/refresh`; replaying a spent one
+after two minutes revokes the session). `bearer()` checks the row on
+every request, so `auth/logout` ends a session on the server at once.
+Pre-session member tokens (update 22 and earlier) are accepted until
+2027-02-01, then delete that branch. Codes are
 stored only as an HMAC, ten minutes, five tries. `auth/request-code`
 answers 204 whoever asks, so it cannot be used to find members or
 admins. Under

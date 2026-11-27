@@ -19,6 +19,7 @@ import {
   openExternal,
   planValue,
   requestCode,
+  signOutSession,
   startTrial,
   toMembership,
   verifyCode,
@@ -116,7 +117,7 @@ export default function JoinScreen() {
   // Signed in: fetch the plans and the trial for the plan step.
   useEffect(() => {
     if (step !== 'pay' || !membership || offers !== undefined) return
-    void checkStatus(membership.token)
+    void checkStatus(membership)
       .then(take)
       .catch(() => setOffers(null))
     // `take` only calls stable setters.
@@ -166,7 +167,7 @@ export default function JoinScreen() {
   const trial = () =>
     void run(async () => {
       if (!membership) return
-      const response = await startTrial(membership.token)
+      const response = await startTrial(membership)
       take(response)
       navigate('/sos', { replace: true })
     })
@@ -176,7 +177,7 @@ export default function JoinScreen() {
       if (!membership) return
       let url: string
       try {
-        url = await checkoutUrl(membership.token, chosen)
+        url = await checkoutUrl(membership, chosen)
       } catch (e) {
         if (e instanceof MembershipError && e.status === 409) setNeedsManage(true)
         throw e
@@ -189,7 +190,7 @@ export default function JoinScreen() {
   const manage = () =>
     void run(async () => {
       if (!membership) return
-      const url = await manageUrl(membership.token)
+      const url = await manageUrl(membership)
       markCheckoutOpened()
       openExternal(url)
       setNote('Update the card or cancel on the Paystack page, then come back here and tap “I’ve paid — check again”.')
@@ -200,7 +201,7 @@ export default function JoinScreen() {
       if (!membership) return
       let response: Awaited<ReturnType<typeof checkStatus>>
       try {
-        response = await checkStatus(membership.token)
+        response = await checkStatus(membership)
       } catch (e) {
         // The token is no good any more: back to the email step rather
         // than an error over a screen that cannot act on it.
@@ -221,6 +222,7 @@ export default function JoinScreen() {
     })
 
   function signOut() {
+    void signOutSession(membership)
     update({ membership: undefined })
     codeSentTo = ''
     setNeedsManage(false)
@@ -555,7 +557,7 @@ export default function JoinScreen() {
           )}
           {byTransfer || tooEarly || offers === null || offers?.length === 0 ? (
             <div className="mt-md">
-              <BankTransfer token={membership.token} email={membership.email} onRecheck={recheck} busyOutside={busy} />
+              <BankTransfer session={membership} email={membership.email} onRecheck={recheck} busyOutside={busy} />
             </div>
           ) : (
             <>

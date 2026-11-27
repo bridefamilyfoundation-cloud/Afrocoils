@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, type FormEvent } from 'react'
 import Icon from './Icon'
 import PromoBanner from './PromoBanner'
 import { addDays, dateKey } from '../lib/calendar'
-import { MembershipError, longDate, sendTransfer, transferInfo } from '../lib/membership'
+import { MembershipError, longDate, sendTransfer, transferInfo, type Session } from '../lib/membership'
 import { PhotoError, photosAvailable, pickReceipt, type PhotoSource } from '../lib/photos'
 import {
   BANK_REFERENCE_PATTERN,
@@ -37,7 +37,7 @@ import {
  */
 
 interface Props {
-  token: string
+  session: Session
   email: string
   /** Ask the server for the membership again: an approval opens the app from there. */
   onRecheck: () => void
@@ -48,7 +48,7 @@ type Info = TransferInfoResponse | null | undefined
 
 const newClientId = () => `trf-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`
 
-export default function BankTransfer({ token, email, onRecheck, busyOutside }: Props) {
+export default function BankTransfer({ session, email, onRecheck, busyOutside }: Props) {
   const [info, setInfo] = useState<Info>(undefined)
   const [plan, setPlan] = useState<PlanId | null>(null)
   const [senderName, setSenderName] = useState('')
@@ -63,7 +63,7 @@ export default function BankTransfer({ token, email, onRecheck, busyOutside }: P
 
   const load = () => {
     setError(null)
-    void transferInfo(token)
+    void transferInfo(session)
       .then((next) => {
         setInfo(next)
         setPlan((current) => (current && next.plans.some((p) => p.id === current) ? current : (next.plans[0]?.id ?? null)))
@@ -74,7 +74,7 @@ export default function BankTransfer({ token, email, onRecheck, busyOutside }: P
       })
   }
 
-  useEffect(load, [token])
+  useEffect(load, [session.email])
 
   if (info === undefined) {
     return <p className="font-body-md text-caption text-on-surface-variant">Loading the bank details…</p>
@@ -149,7 +149,7 @@ export default function BankTransfer({ token, email, onRecheck, busyOutside }: P
     setBusy(true)
     setError(null)
     try {
-      const sent = await sendTransfer(token, {
+      const sent = await sendTransfer(session, {
         clientId: clientId.current,
         plan: offer.id,
         senderName: name,

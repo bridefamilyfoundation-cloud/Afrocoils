@@ -12,6 +12,8 @@ import { HAIR_CHECK } from './src/content/hair-check'
 import { LOC_CARE } from './src/content/loc-care'
 import { STYLES } from './src/content/styles'
 import { TIME_BANDS, type UpdateManifest } from './src/lib/types'
+// @ts-expect-error: a plain .mjs module, shared with the release scripts.
+import { SITE_URL as SITE_ROOT } from './scripts/lib/release-manifest.mjs'
 
 /**
  * The landing site: the public page that describes the app and serves the
@@ -35,6 +37,15 @@ import { TIME_BANDS, type UpdateManifest } from './src/lib/types'
  * Change the content and the page follows on the next build.
  */
 const site = (path: string) => fileURLToPath(new URL(`./site/${path}`, import.meta.url))
+
+/** The public address, without the trailing slash: canonical links, the sitemap and the structured data. */
+const SITE_URL = (SITE_ROOT as string).replace(/\/$/, '')
+
+/** Every page the site serves, as the sitemap lists them. The admin site is a separate project and is never here. */
+const PAGES = [
+  { path: '/', file: 'index.html' },
+  { path: '/download/', file: 'download/index.html' },
+]
 
 /**
  * site/release.json: the manifest's fields, less the page link, plus the
@@ -150,6 +161,63 @@ function founderSection(): string {
   )
 }
 
+/**
+ * Structured data for search: the site, the publisher and the app, with
+ * its download. Built from release.json like every other number on the
+ * page, and written into each page as a JSON-LD block (a data block, not
+ * a script, so the CSP's hash list does not apply to it).
+ */
+function structuredData(release: Release): string {
+  const download = `${SITE_URL}/${release.download ?? release.url}`
+  const graph = [
+    {
+      '@type': 'Organization',
+      '@id': `${SITE_URL}/#org`,
+      name: 'AfroCoils',
+      url: `${SITE_URL}/`,
+      logo: `${SITE_URL}/og-image.png`,
+      email: 'hello@afrocoils.app',
+      parentOrganization: { '@type': 'Organization', name: 'Crown Space Limited' },
+    },
+    {
+      '@type': 'WebSite',
+      '@id': `${SITE_URL}/#site`,
+      name: 'AfroCoils',
+      url: `${SITE_URL}/`,
+      inLanguage: 'en',
+      publisher: { '@id': `${SITE_URL}/#org` },
+    },
+    {
+      '@type': 'MobileApplication',
+      '@id': `${SITE_URL}/#app`,
+      name: 'AfroCoils',
+      description:
+        'The hair app for Type 4 natural hair, 4A, 4B and 4C, loose or loc\u2019d: quick hairstyles, hair care guides, growth tracking and a hair SOS that works offline.',
+      operatingSystem: `Android ${release.minAndroid}+`,
+      applicationCategory: 'LifestyleApplication',
+      softwareVersion: release.version,
+      datePublished: release.released,
+      downloadUrl: download,
+      installUrl: `${SITE_URL}/download/`,
+      image: `${SITE_URL}/og-image.png`,
+      url: `${SITE_URL}/`,
+      publisher: { '@id': `${SITE_URL}/#org` },
+      // The download is free; membership is priced in Paystack, not here.
+      offers: { '@type': 'Offer', price: '0', priceCurrency: 'NGN', url: `${SITE_URL}/download/` },
+    },
+  ]
+  const json = JSON.stringify({ '@context': 'https://schema.org', '@graph': graph }).replace(/</g, '\\u003c')
+  return `<script type="application/ld+json">${json}</script>`
+}
+
+/** sitemap.xml: the site's own pages, dated by the release they describe. */
+function sitemapXml(release: Release): string {
+  const urls = PAGES.map(
+    (page) => `  <url>\n    <loc>${SITE_URL}${page.path}</loc>\n    <lastmod>${release.released}</lastmod>\n  </url>`,
+  ).join('\n')
+  return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls}\n</urlset>\n`
+}
+
 function facts() {
   const release = readRelease()
 
@@ -189,6 +257,10 @@ function facts() {
     'release.releasedKey': release.released,
     // The site's own copy (see `serveApk`), never the bucket URL.
     'release.url': release.download ?? release.url,
+    // The same, from the site root, for pages below it.
+    'release.path': `/${release.download ?? release.url}`,
+    'site.url': SITE_URL,
+    'seo.jsonld': structuredData(release),
     'count.styles': String(STYLES.length),
     'count.guides': String(GUIDES.length),
     'count.concerns': String(HAIR_CHECK.reduce((n, group) => n + group.concerns.length, 0)),
@@ -219,6 +291,9 @@ function siteFacts(): Plugin {
   const VIRTUAL = 'virtual:site-facts'
   return {
     name: 'afrocoils:site-facts',
+    generateBundle() {
+      this.emitFile({ type: 'asset', fileName: 'sitemap.xml', source: sitemapXml(readRelease()) })
+    },
     resolveId: (id) => (id === VIRTUAL ? `\0${VIRTUAL}` : undefined),
     load(id) {
       if (id !== `\0${VIRTUAL}`) return
@@ -367,6 +442,7 @@ export default defineConfig({
   build: {
     outDir: OUT_DIR,
     emptyOutDir: true,
+    rollupOptions: { input: PAGES.map((page) => site(page.file)) },
   },
   server: {
     port: 5174,

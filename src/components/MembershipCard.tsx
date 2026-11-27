@@ -13,6 +13,7 @@ import {
   markCheckoutOpened,
   onTrial,
   openExternal,
+  signOutSession,
 } from '../lib/membership'
 import { useHairProfile } from '../lib/profile-store'
 import { PLANS, TRIAL_DAYS, type Membership } from '../lib/types'
@@ -88,7 +89,7 @@ export default function MembershipCard({ embedded = false }: { embedded?: boolea
     setBusy(true)
     setError(null)
     try {
-      const url = await manageUrl(membership.token)
+      const url = await manageUrl(membership)
       // Coming back from Paystack's page asks the server straight away,
       // so a cancellation shows without waiting for the next check.
       markCheckoutOpened()
@@ -166,7 +167,10 @@ export default function MembershipCard({ embedded = false }: { embedded?: boolea
         {confirmOut ? (
           <button
             type="button"
-            onClick={() => update({ membership: undefined })}
+            onClick={() => {
+              void signOutSession(membership)
+              update({ membership: undefined })
+            }}
             className="flex items-center gap-xs rounded-full bg-error-container px-lg py-3 font-label-md text-label-md font-bold text-on-error-container transition-all active:scale-95"
           >
             <Icon name="logout" className="text-[18px]" />

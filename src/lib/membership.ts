@@ -2,12 +2,14 @@ import { Capacitor } from '@capacitor/core'
 import type {
   BillingLinkResponse,
   CheckoutRequest,
+  LogoutRequest,
   Membership,
   MembershipResponse,
   PlanId,
   PlanOffer,
-  PlanPrice,
+  RefreshRequest,
   RequestCodeRequest,
+  SessionTokens,
   TransferInfoResponse,
   TransferRequest,
   TransferSummary,
@@ -36,9 +38,15 @@ import { reportFloor } from './updates'
  * most every twelve hours and whenever the app comes back to the front,
  * which is how a renewal, a cancellation or a revoke reaches the phone.
  *
- * What crosses the wire is the email, the code and the token. Nothing
+ * Signing in opens a session on the server: a fifteen-minute access
+ * token and a refresh token, swapped for a new pair (`auth/refresh`)
+ * whenever the access token is about to run out. Signing out ends the
+ * session on the server too (`auth/logout`), so a copy of either token
+ * stops working.
+ *
+ * What crosses the wire is the email, the code and the tokens. Nothing
  * else on the profile does, and Ask questions stay anonymous: they are
- * never sent with the token.
+ * never sent with a token.
  */
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL ?? ''
@@ -98,22 +106,98 @@ export function verifyCode(email: string, code: string): Promise<MembershipRespo
   }).then(heard)
 }
 
-export function checkStatus(token: string): Promise<MembershipResponse> {
-  return call<MembershipResponse>('auth/status', { token }).then(heard)
+/* ------------------------------------------------------------------ *
+ * The session
+ * ------------------------------------------------------------------ */
+
+/** What a signed-in call needs from the profile's membership. */
+export type Session = Pick<Membership, 'email' | 'token' | 'refresh' | 'tokenExpISO'>
+
+/**
+ * The newest tokens this run has seen. The profile keeps them across
+ * launches, but a screen can hold a copy from before the last refresh,
+ * and a refresh token is good once: this is what every call uses.
+ */
+let live: Session | undefined
+let renewing: Promise<Session> | undefined
+let renewed: ((session: Session) => void) | undefined
+
+/** Told about every new pair, so the profile can keep it. MembershipSync listens. */
+export function onSessionRenewed(listener: (session: Session) => void): () => void {
+  renewed = listener
+  return () => {
+    if (renewed === listener) renewed = undefined
+  }
 }
 
-export async function checkoutUrl(token: string, plan: PlanId): Promise<string> {
+function adopt(session: Session): Session {
+  const newer = !live || live.email !== session.email || (session.tokenExpISO ?? '') > (live.tokenExpISO ?? '')
+  if (newer) live = session
+  return live!
+}
+
+const fresh = (s: Session) => !!s.refresh && !!s.tokenExpISO && Date.parse(s.tokenExpISO) - Date.now() > 60_000
+
+/** A new pair for this session. One at a time, so parallel calls share it rather than racing the rotation. */
+function renew(session: Session): Promise<Session> {
+  renewing ??= (async () => {
+    const body: RefreshRequest = session.refresh
+      ? { refresh: session.refresh, purpose: 'member' }
+      : // A profile from before server sessions: swap the old token for one.
+        { legacy: session.token, purpose: 'member' }
+    const tokens = await call<SessionTokens>('auth/refresh', { body })
+    live = { email: session.email, token: tokens.token, refresh: tokens.refresh, tokenExpISO: tokens.tokenExpISO }
+    renewed?.(live)
+    return live
+  })().finally(() => {
+    renewing = undefined
+  })
+  return renewing
+}
+
+/** A signed-in call, refreshing the access token first if it is about to run out, and once more on a 401. */
+async function authed<T>(path: string, session: Session, body?: unknown): Promise<T> {
+  let current = adopt(session)
+  const wasFresh = fresh(current)
+  if (!wasFresh) current = await renew(current)
+  try {
+    return await call<T>(path, { token: current.token, body })
+  } catch (error) {
+    if (!(wasFresh && error instanceof MembershipError && error.status === 401)) throw error
+    current = await renew(current)
+    return call<T>(path, { token: current.token, body })
+  }
+}
+
+/**
+ * Sign this phone out, on the server as well: the session is ended, so
+ * neither token works again. Best effort: with no signal the phone
+ * still forgets them, and the session runs out on its own.
+ */
+export async function signOutSession(session: Session | undefined): Promise<void> {
+  const current = session ? adopt(session) : undefined
+  live = undefined
+  if (current?.refresh) {
+    await call<void>('auth/logout', { body: { refresh: current.refresh } satisfies LogoutRequest }).catch(() => undefined)
+  }
+}
+
+export function checkStatus(session: Session): Promise<MembershipResponse> {
+  return authed<MembershipResponse>('auth/status', session).then(heard)
+}
+
+export async function checkoutUrl(session: Session, plan: PlanId): Promise<string> {
   const body: CheckoutRequest = { plan }
-  return (await call<BillingLinkResponse>('billing/checkout', { token, body })).url
+  return (await authed<BillingLinkResponse>('billing/checkout', session, body)).url
 }
 
-export function startTrial(token: string): Promise<MembershipResponse> {
-  return call<MembershipResponse>('billing/trial', { token }).then(heard)
+export function startTrial(session: Session): Promise<MembershipResponse> {
+  return authed<MembershipResponse>('billing/trial', session).then(heard)
 }
 
 /** The account to pay into, the transfer prices, and this member's latest transfer. */
-export function transferInfo(token: string): Promise<TransferInfoResponse> {
-  return call<TransferInfoResponse>('billing/transfer-info', { token })
+export function transferInfo(session: Session): Promise<TransferInfoResponse> {
+  return authed<TransferInfoResponse>('billing/transfer-info', session)
 }
 
 /**
@@ -121,19 +205,29 @@ export function transferInfo(token: string): Promise<TransferInfoResponse> {
  * re-checks every field and the image itself; a retry with the same
  * `clientId` answers with the first one rather than sending it twice.
  */
-export function sendTransfer(token: string, body: TransferRequest): Promise<TransferSummary> {
-  return call<TransferSummary>('billing/transfer', { token, body })
+export function sendTransfer(session: Session, body: TransferRequest): Promise<TransferSummary> {
+  return authed<TransferSummary>('billing/transfer', session, body)
 }
 
-export async function manageUrl(token: string): Promise<string> {
-  return (await call<BillingLinkResponse>('billing/manage', { token })).url
+export async function manageUrl(session: Session): Promise<string> {
+  return (await authed<BillingLinkResponse>('billing/manage', session)).url
 }
 
-/** The server's answer, as the profile keeps it. */
+/**
+ * The server's answer, as the profile keeps it. A sign-in carries a new
+ * session's tokens; other answers echo the access token, and the tokens
+ * kept are the newest this run has seen.
+ */
 export function toMembership(response: MembershipResponse): Membership {
+  const tokens: Session = response.refresh
+    ? adopt({ email: response.email, token: response.token, refresh: response.refresh, tokenExpISO: response.tokenExpISO })
+    : live?.email === response.email
+      ? live
+      : { email: response.email, token: response.token }
   return {
     email: response.email,
-    token: response.token,
+    token: tokens.token,
+    ...(tokens.refresh ? { refresh: tokens.refresh, tokenExpISO: tokens.tokenExpISO } : {}),
     status: response.status,
     paidUntilISO: response.paidUntilISO,
     plan: response.plan ?? null,
@@ -294,21 +388,6 @@ export function dueForCheck(membership: Membership, now: Date = new Date()): boo
   // A clock behind the last answer is a clock that was moved: ask again.
   const since = now.getTime() - checked
   return since < 0 || since > RECHECK_HOURS * 3_600_000
-}
-
-/** "₦2,500 a month", from the plan Paystack holds. */
-export function formatPrice(price: PlanPrice | null | undefined): string | null {
-  if (!price) return null
-  const amount = formatAmount(price.amount, price.currency)
-  const per: Record<string, string> = {
-    monthly: 'a month',
-    annually: 'a year',
-    quarterly: 'every three months',
-    biannually: 'every six months',
-    weekly: 'a week',
-    daily: 'a day',
-  }
-  return `${amount} ${per[price.interval] ?? price.interval}`
 }
 
 /** "5 December 2026". */

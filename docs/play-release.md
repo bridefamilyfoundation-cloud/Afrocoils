@@ -99,7 +99,8 @@ Most rejections happen here, not in the build.
 **Privacy policy URL — mandatory, must be live before the listing is.** The
 hair profile, photos, growth history and calendar stay on the device. What
 leaves it: the member's email (signing in, `auth`), a status check carrying
-only the sign-in token, payment on Paystack's page or a bank transfer receipt
+only the sign-in token (each sign-in is a server session: the email, its
+start and end, and the token hashed; ended at sign-out, deleted a month later), payment on Paystack's page or a bank transfer receipt
 (a picture, with the payer's name, the day and the bank reference, kept until
 90 days after a person checks it), the questions typed into
 Ask, sent anonymously while sharing is on (on by default, off under About), and
