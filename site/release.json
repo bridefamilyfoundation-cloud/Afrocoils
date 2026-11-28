@@ -23,5 +23,9 @@
       "The founder's social links now sit at the foot of every screen",
       "Promotions can now apply to a first card payment"
     ]
+  },
+  "floor": {
+    "bundle": 0,
+    "versionCode": 14
   }
 }
