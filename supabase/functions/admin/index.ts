@@ -12,6 +12,7 @@ import {
 } from '../_shared/email.ts'
 import { env, serve } from '../_shared/env.ts'
 import { checkLimits, limitResponse } from '../_shared/limits.ts'
+import { cardPromoAllowed } from '../_shared/paystack.ts'
 import {
   MailingRefusal,
   addContacts,
@@ -57,7 +58,7 @@ import {
  * POST transfer {id, action, note}     approve | reject (note required, emailed)
  * GET  transfer-settings               the bank account and transfer prices
  * POST transfer-settings {...}         change them
- * POST promo {name, percent, plans, startsISO, endsISO} | {clear}
+ * POST promo {name, percent, plans, startsISO, endsISO, card} | {clear}
  *                                     the promotion on transfer prices
  * GET  contacts?q=                    the mailing list, newest first
  * POST contacts {action, ...}         add {text, name} | import-members | remove {emails}
@@ -479,7 +480,8 @@ serve(async (req) => {
       else if (route === 'submissions') result = await listSubmissions(url)
       else if (route === 'questions') result = await listQuestions(url)
       else if (route === 'transfers') result = await listTransfers(url.searchParams.get('status') ?? 'Pending')
-      else if (route === 'transfer-settings') result = await readSettings()
+      // With whether this server lets a promotion discount card checkout.
+      else if (route === 'transfer-settings') result = { ...(await readSettings()), card_promo_allowed: cardPromoAllowed() }
       else if (route === 'contacts') result = await listContacts(url.searchParams.get('q') ?? '')
       else if (route === 'broadcasts') result = await listBroadcasts()
       else throw new Refusal(404, 'Not found')

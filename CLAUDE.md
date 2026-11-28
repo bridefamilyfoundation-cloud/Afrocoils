@@ -116,17 +116,29 @@ picture; this file is the short version of what to keep in mind when editing.
   SHA-256, and the image is deleted `RECEIPT_KEEP_DAYS` (90) after the
   decision by the daily run. Every field is validated on both sides from
   the patterns in `types.ts`, and the amount is always the server's.
-  **A promotion (added 2026-11-27)** is a percentage off the *transfer*
-  prices only, set on the admin site's Bank transfers page (`promo_*`
-  on `transfer_settings`, migration 0011; `savePromo`, `activePromo`,
+  **A promotion (added 2026-11-27)** is a percentage off, set on the
+  admin site's Bank transfers page (`promo_*` on `transfer_settings`,
+  migrations 0011 and 0012; `savePromo`, `activePromo`,
   `promoForReceipt` in `_shared/transfers.ts`; `promoPrice()` in
-  `types.ts`, rounded to whole naira). A receipt is priced by the promo
-  running on the day it was paid (three days' grace after the end), and
-  the row records it in `transfers.promo`. Card prices are Paystack's
-  and are not discounted: `PromoBanner` always says "by bank transfer",
-  and must keep saying so until card checkout itself discounts — a
-  one-off first charge plus a subscription starting later, built and
-  tried in Paystack test mode first, as for the card add-on above. A
+  `types.ts`, rounded to whole naira). It always discounts transfers:
+  a receipt is priced by the promo running on the day it was paid
+  (three days' grace after the end), recorded in `transfers.promo`.
+  With `promo_card` it also discounts the **first card payment**:
+  checkout is then a one-off payment with no plan, recorded in
+  `card_checkouts` before the link is handed out, and
+  `recordCardPayment()` (`_shared/membership.ts`) opens a plan from a
+  planless payment *only* when it matches that row — Paystack's public
+  key lets anyone start a one-off payment on our account. It then
+  starts the subscription on the same card from the end of the paid
+  period (`startRenewal`), once per payment by a compare-and-set on
+  `payments.renewal_claimed_at`, and never retries (a lost answer would
+  mean two subscriptions). Card discounts run only under an `sk_test_`
+  key or with `PAYSTACK_CARD_PROMO=on` (`cardPromoAllowed()`), which is
+  set only after the test-mode run in `docs/membership-setup.md`. Card
+  offers keep `amount` at the renewal price and carry the discount in
+  `firstAmount`, so a phone that predates it shows more, never less,
+  than it charges. `PromoBanner` says where it applies, and that a card
+  plan renews at its usual price. A
   person approves on the admin site (`_shared/transfers.ts`, a
   compare-and-set on `Pending`), which extends `paid_until` from the
   later of now and the current end, writes a `payments` row with
@@ -421,10 +433,12 @@ picture; this file is the short version of what to keep in mind when editing.
   owner asked for it to be easy to notice, and it is the one dark block
   on the page. The biography is hers, as supplied —
   never drafted for her — and until it is there neither surface draws
-  the section. A link is shown only when it is an `https` address on its
+  the section. Her links are also in the app footer (`AppFooter`), on
+  every screen and while locked, because About is members-only and the
+  links were otherwise out of sight for anyone not yet paying. A link is shown only when it is an `https` address on its
   own platform; her photograph is `src/assets/images/founder.<ext>`.
   The Instagram, TikTok and YouTube marks are inline SVG in the palette's
-  colour, because the icon font has no brand glyphs and nothing loads
+  colour (`SocialIcon`), because the icon font has no brand glyphs and nothing loads
   from another origin. The introduction itself is `content/about.ts`,
   shared with the site for the same reason.
 - Screens live in `src/screens/`, shared UI in `src/components/`.

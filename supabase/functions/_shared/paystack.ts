@@ -14,8 +14,8 @@
  * the amount and Paystack's references.
  */
 import { env } from './env.ts'
-import type { MemberStatus, PlanId, PlanOffer, PlanPrice } from '../../../src/lib/types.ts'
-import { PLAN_IDS } from '../../../src/lib/types.ts'
+import type { MemberStatus, PlanId, PlanOffer, PlanPrice, Promo } from '../../../src/lib/types.ts'
+import { PLAN_IDS, promoPrice } from '../../../src/lib/types.ts'
 
 const API = 'https://api.paystack.co'
 
@@ -23,6 +23,27 @@ function secretKey(): string {
   const key = env('PAYSTACK_SECRET_KEY')
   if (!key) throw new Error('PAYSTACK_SECRET_KEY is missing from the function environment')
   return key
+}
+
+/**
+ * Whether a promotion may discount card checkout on this server.
+ *
+ * A promotional card payment is a one-off charge followed by a
+ * subscription the server starts itself (`startRenewal`), a flow that
+ * has to be tried end to end in Paystack test mode before it touches a
+ * real card. So it is on by itself under a test key (`sk_test_`), and
+ * under a live key only once PAYSTACK_CARD_PROMO is set to `on` — the
+ * step that says the test-mode run was done.
+ */
+export function cardPromoAllowed(): boolean {
+  const key = env('PAYSTACK_SECRET_KEY') ?? ''
+  if (!key) return false
+  return key.startsWith('sk_test_') || env('PAYSTACK_CARD_PROMO')?.trim() === 'on'
+}
+
+/** Whether `promo` takes money off card checkout for `plan`. */
+export function cardPromoFor(promo: Promo | null | undefined, plan: PlanId): promo is Promo {
+  return !!promo?.card && promo.plans.includes(plan) && cardPromoAllowed()
 }
 
 const PLAN_ENV: Record<PlanId, string[]> = {
@@ -87,12 +108,22 @@ export async function planPrice(plan: PlanId = 'monthly'): Promise<PlanPrice | n
   }
 }
 
-/** Every plan that is set up and reachable, in PLAN_IDS order. */
-export async function planOffers(): Promise<PlanOffer[]> {
+/**
+ * Every plan that is set up and reachable, in PLAN_IDS order. Under a
+ * promotion on card, `firstAmount` is the first payment; `amount` stays
+ * what it renews at.
+ */
+export async function planOffers(promo: Promo | null = null): Promise<PlanOffer[]> {
   const prices = await Promise.all(PLAN_IDS.map((id) => planPrice(id)))
   return PLAN_IDS.flatMap((id, i) => {
     const price = prices[i]
-    return price ? [{ id, amount: price.amount, currency: price.currency }] : []
+    if (!price) return []
+    const offer: PlanOffer = { id, amount: price.amount, currency: price.currency }
+    if (cardPromoFor(promo, id)) {
+      const first = promoPrice(price.amount, promo.percentOff)
+      if (first < price.amount) return [{ ...offer, firstAmount: first }]
+    }
+    return [offer]
   })
 }
 
@@ -115,28 +146,62 @@ function returnUrl(): string {
   return base ? `${base.replace(/\/$/, '')}/functions/v1/billing/return` : returnFallback()
 }
 
+export interface Checkout {
+  url: string
+  reference: string
+  /** Set when a promotion priced this checkout: a one-off first payment, no plan on it. */
+  promo?: { amount: number; currency: string; label: string }
+}
+
 /**
- * A Paystack checkout page that subscribes `email` to `plan`. The
- * amount is required by the API and overridden by the plan's own. The
- * reference comes back too, so the payment can be verified without
- * waiting on the webhook.
+ * A Paystack checkout page for `plan`.
+ *
+ * Normally it subscribes `email` to the plan: the amount is required by
+ * the API and overridden by the plan's own. Under a promotion on card it
+ * is a one-off payment of the discounted price with *no* plan on it; the
+ * subscription is started once that payment is believed (`startRenewal`),
+ * on the same card, first charging the full price when the paid period
+ * ends. The caller records that checkout (`card_checkouts`), which is
+ * what lets the planless payment open a plan at all.
+ *
+ * The reference comes back either way, so the payment can be verified
+ * without waiting on the webhook.
  */
-export async function startCheckout(email: string, plan: PlanId): Promise<{ url: string; reference: string }> {
+export async function startCheckout(email: string, plan: PlanId, promo: Promo | null = null): Promise<Checkout> {
   const code = planCodeFor(plan)
   if (!code) throw new Error(`No Paystack plan is set up for ${plan}`)
   const price = await planPrice(plan)
+  const discounted = price && cardPromoFor(promo, plan) ? promoPrice(price.amount, promo.percentOff) : null
+  const promotional = price && discounted !== null && discounted < price.amount && promo
   const data = await call<{ authorization_url: string; reference: string }>('/transaction/initialize', {
     method: 'POST',
-    body: JSON.stringify({
-      email,
-      amount: price?.amount ?? 100,
-      plan: code,
-      callback_url: returnUrl(),
-      channels: ['card'],
-      metadata: { source: 'afrocoils-app', plan },
-    }),
+    body: JSON.stringify(
+      promotional
+        ? {
+            email,
+            amount: discounted,
+            currency: price.currency,
+            callback_url: returnUrl(),
+            channels: ['card'],
+            metadata: { source: 'afrocoils-app', plan, promo: `${promo.name}, ${promo.percentOff}% off` },
+          }
+        : {
+            email,
+            amount: price?.amount ?? 100,
+            plan: code,
+            callback_url: returnUrl(),
+            channels: ['card'],
+            metadata: { source: 'afrocoils-app', plan },
+          },
+    ),
   })
-  return { url: data.authorization_url, reference: data.reference }
+  return {
+    url: data.authorization_url,
+    reference: data.reference,
+    ...(promotional
+      ? { promo: { amount: discounted, currency: price.currency, label: `${promo.name}, ${promo.percentOff}% off` } }
+      : {}),
+  }
 }
 
 export interface PaystackTransaction {
@@ -148,6 +213,14 @@ export interface PaystackTransaction {
   customer: { email: string; customer_code: string }
   plan?: string | { plan_code?: string } | null
   plan_object?: { plan_code?: string } | null
+  /** The card, and whether it can be charged again without the member (a subscription needs it to). */
+  authorization?: CardAuthorization | null
+}
+
+export interface CardAuthorization {
+  authorization_code?: string
+  reusable?: boolean
+  channel?: string
 }
 
 /** Paystack's own word on one transaction: `status` is `success` once it is paid. */
@@ -173,6 +246,25 @@ export interface PaystackSubscription {
   next_payment_date: string | null
   customer: { email: string; customer_code: string }
   plan: { plan_code: string }
+}
+
+/**
+ * Subscribe a customer to a plan on a card they have already paid with,
+ * its first charge at `startDate` (ISO). Paystack sends
+ * `subscription.create` for it, which the webhook files as usual.
+ */
+export function createSubscription(
+  customer: string,
+  plan: PlanId,
+  authorization: string,
+  startDate: string,
+): Promise<{ subscription_code: string; email_token: string; status: string; next_payment_date?: string | null }> {
+  const code = planCodeFor(plan)
+  if (!code) throw new Error(`No Paystack plan is set up for ${plan}`)
+  return call('/subscription', {
+    method: 'POST',
+    body: JSON.stringify({ customer, plan: code, authorization, start_date: startDate }),
+  })
 }
 
 export function fetchSubscription(code: string): Promise<PaystackSubscription> {

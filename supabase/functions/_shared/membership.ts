@@ -5,17 +5,20 @@
  * `auth/verify`, `auth/status` and `billing/trial` all answer with
  * `membershipFor()`, so the three cannot disagree about who has access.
  */
-import type { MembershipResponse, PlanOffer, Promo, SessionTokens } from '../../../src/lib/types.ts'
-import { MEMBERSHIP_GRACE_DAYS, accessOpen, membershipOpen } from '../../../src/lib/types.ts'
+import type { MembershipResponse, PlanId, PlanOffer, Promo, SessionTokens } from '../../../src/lib/types.ts'
+import { MEMBERSHIP_GRACE_DAYS, PLANS, accessOpen, membershipOpen } from '../../../src/lib/types.ts'
 import { getMember, laterOf, recordCharge, saveMember, trialKey, db, type MemberRow } from './members.ts'
 import {
+  createSubscription,
   disableSubscription,
   fetchSubscription,
   memberStatus,
+  planCodeFor,
   planIdFor,
   planOffers,
   transactionPlanCode,
   verifyTransaction,
+  type CardAuthorization,
 } from './paystack.ts'
 import { releaseFloor } from './releases.ts'
 import { patch, select } from './supabase.ts'
@@ -54,16 +57,15 @@ export async function refreshMember(member: MemberRow): Promise<MemberRow> {
     try {
       const tx = await verifyTransaction(current.pending_reference)
       if (tx.status === 'success') {
-        const code = transactionPlanCode(tx) ?? null
-        await recordCharge({
+        await recordCardPayment({
           reference: tx.reference,
           email: current.email,
           amount: tx.amount,
           currency: tx.currency,
           paidAt: tx.paid_at ?? new Date().toISOString(),
-          planCode: code,
-          plan: planIdFor(code),
+          planCode: transactionPlanCode(tx) ?? null,
           customerCode: tx.customer?.customer_code ?? null,
+          authorization: tx.authorization,
         })
         current = (await getMember(current.email)) ?? current
       } else if (tx.status === 'failed' || tx.status === 'reversed') {
@@ -238,13 +240,11 @@ export async function membershipFor(
   let plans: PlanOffer[] | null = null
   let promo: Promo | null = null
   if (choosing) {
-    ;[plans, promo] = await Promise.all([
-      planOffers().catch(() => null),
-      // The banner on /join: a promotion on bank-transfer prices.
-      readSettings()
-        .then((settings) => activePromo(settings))
-        .catch(() => null),
-    ])
+    // The banner on /join, and (when it covers card) the first-payment prices.
+    promo = await readSettings()
+      .then((settings) => activePromo(settings))
+      .catch(() => null)
+    plans = await planOffers(promo).catch(() => null)
   }
   const monthly = plans?.find((p) => p.id === 'monthly')
 
@@ -264,5 +264,138 @@ export async function membershipFor(
     price: !open && monthly ? { amount: monthly.amount, currency: monthly.currency, interval: 'monthly' } : undefined,
     plans,
     promo,
+  }
+}
+
+/* ------------------------------------------------------------------ *
+ * Card payments, promotional ones included
+ * ------------------------------------------------------------------ */
+
+/** A successful card payment, as the webhook or a verify call reports it. */
+export interface CardPayment {
+  reference: string
+  email: string
+  amount: number
+  currency: string
+  paidAt: string
+  /** The Paystack plan code on the payment; null for a one-off (promotional) payment. */
+  planCode: string | null
+  customerCode: string | null
+  authorization: CardAuthorization | null | undefined
+}
+
+interface CardCheckoutRow {
+  reference: string
+  email: string
+  plan: PlanId
+  amount: number
+  currency: string
+  promo: string
+}
+
+/**
+ * Record a card payment, from the webhook or from verifying a checkout —
+ * whichever comes first; the second changes nothing.
+ *
+ * A payment with a plan code is a plan's own charge (a normal checkout or
+ * a renewal) and opens that plan, as always. A payment with none opens a
+ * plan only when it is a promotional checkout this server started
+ * (`card_checkouts`): the same reference and email, and at least the
+ * amount asked. Anything else is recorded as a payment and opens
+ * nothing, because anyone holding the public key can start a one-off
+ * payment on our account with whatever metadata they like.
+ *
+ * A promotional payment then starts the subscription (`startRenewal`).
+ */
+export async function recordCardPayment(payment: CardPayment): Promise<void> {
+  let plan = planIdFor(payment.planCode)
+  let promo: string | null = null
+  if (!payment.planCode) {
+    const [checkout] = await select<CardCheckoutRow>(
+      db(),
+      'card_checkouts',
+      `reference=eq.${encodeURIComponent(payment.reference)}&limit=1`,
+    )
+    if (
+      checkout &&
+      checkout.email === payment.email &&
+      checkout.currency === payment.currency &&
+      payment.amount >= Number(checkout.amount)
+    ) {
+      plan = checkout.plan
+      promo = checkout.promo
+    } else {
+      console.warn(`[membership] planless payment ${payment.reference} matches no promotional checkout; recorded, opens nothing`)
+    }
+  }
+
+  await recordCharge({
+    reference: payment.reference,
+    email: payment.email,
+    amount: payment.amount,
+    currency: payment.currency,
+    paidAt: payment.paidAt,
+    planCode: payment.planCode ?? (plan ? (planCodeFor(plan) ?? null) : null),
+    plan,
+    customerCode: payment.customerCode,
+  })
+  if (!promo || !plan) return
+  await patch(db(), 'payments', `reference=eq.${encodeURIComponent(payment.reference)}&promo=is.null`, { promo })
+  await startRenewal(payment, plan)
+}
+
+/**
+ * After a promotional first payment: subscribe the member to the plan on
+ * the same card, its first full-price charge on the day the paid period
+ * ends. Once per payment, decided by a compare-and-set on the payment
+ * row, so the webhook and the status check cannot both start one.
+ *
+ * Never retried by itself: a subscription created at Paystack whose
+ * answer was lost would be charged twice by a retry. A failure is left
+ * on the member's note for an admin, and the member simply has a plan
+ * that does not renew — they are reminded before it ends, as anyone
+ * paying by transfer is.
+ */
+async function startRenewal(payment: CardPayment, plan: PlanId): Promise<void> {
+  const claimed = await patch<{ reference: string }>(
+    db(),
+    'payments',
+    `reference=eq.${encodeURIComponent(payment.reference)}&renewal_claimed_at=is.null&reversed_at=is.null`,
+    { renewal_claimed_at: new Date().toISOString() },
+  )
+  if (claimed.length === 0) return
+
+  const member = await getMember(payment.email)
+  if (!member?.paid_until) return
+  const note = (text: string) => saveMember(payment.email, { note: appendNote(member.note, text) })
+
+  if (member.paystack_subscription && (member.status === 'active' || member.status === 'attention')) {
+    await note(`promo payment ${payment.reference}: already subscribed, no second subscription started`)
+    return
+  }
+  const auth = payment.authorization
+  if (!auth?.reusable || !auth.authorization_code || !payment.customerCode) {
+    await note(`promo payment ${payment.reference}: the card cannot be charged again, so the plan will not renew`)
+    return
+  }
+
+  try {
+    const sub = await createSubscription(payment.customerCode, plan, auth.authorization_code, member.paid_until)
+    await saveMember(payment.email, {
+      status: 'active',
+      source: 'paystack',
+      plan,
+      paystack_customer: payment.customerCode,
+      paystack_subscription: sub.subscription_code,
+      paystack_email_token: sub.email_token,
+    })
+    await patch(db(), 'payments', `reference=eq.${encodeURIComponent(payment.reference)}`, {
+      renewal_subscription: sub.subscription_code,
+    })
+  } catch (error) {
+    console.error('[membership] could not start the subscription after a promotional payment', error)
+    await note(
+      `promo payment ${payment.reference}: starting the ${PLANS[plan].label} subscription failed — check Paystack before starting one by hand`,
+    )
   }
 }

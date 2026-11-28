@@ -127,7 +127,9 @@ function PrivacyPolicy() {
           us your email, the plan, the amount, the date and its own reference numbers for the
           payment and the subscription, and whether a payment was later refunded or disputed,
           and we keep those so we know you are paid up and can help if something goes wrong. When you start a payment we keep its reference
-          number, so our server can ask Paystack whether it went through.
+          number, so our server can ask Paystack whether it went through; during a promotion we
+          also keep the plan and the discounted price we offered, so the payment can be matched
+          to it.
         </p>
         <p>
           <strong>Paying by bank transfer.</strong> You can instead pay into our bank account
@@ -406,7 +408,10 @@ function Terms() {
         </p>
         <p>
           A plan renews at the end of each period — every month, every six months or every
-          year, from the date you paid — at the plan&rsquo;s price, until you cancel. We email
+          year, from the date you paid — at the plan&rsquo;s price, until you cancel. During a
+          promotion the first card payment can be lower: it is a single payment at the price
+          shown, and the plan then renews on the same card at its usual price from the end of
+          that period. A promotion on bank transfer lowers the price of that transfer. We email
           you three days before it renews. Cancel any time from My Hair Profile (Manage or
           cancel opens Paystack&rsquo;s page for your subscription). Cancelling stops the next
           charge; the app stays open to the end of the period you have already paid for, and

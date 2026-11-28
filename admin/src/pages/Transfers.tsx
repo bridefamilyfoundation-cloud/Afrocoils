@@ -274,13 +274,13 @@ function localInput(date: Date): string {
   return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`
 }
 
-type PromoForm = { name: string; percent: string; plans: PlanId[]; starts: string; ends: string }
+type PromoForm = { name: string; percent: string; plans: PlanId[]; starts: string; ends: string; card: boolean }
 
 function blankPromo(): PromoForm {
   const now = new Date()
   const week = new Date(now.getTime() + 7 * 86_400_000)
   week.setHours(23, 59, 0, 0)
-  return { name: '', percent: '', plans: [...PLAN_IDS], starts: localInput(now), ends: localInput(week) }
+  return { name: '', percent: '', plans: [...PLAN_IDS], starts: localInput(now), ends: localInput(week), card: false }
 }
 
 /**
@@ -305,6 +305,7 @@ function PromoSettings({ api }: { api: PageProps['api'] }) {
           plans: s.promo_plans ?? [],
           starts: new Date(s.promo_starts_at),
           ends: new Date(s.promo_ends_at),
+          card: s.promo_card,
         }
       : null
 
@@ -316,6 +317,7 @@ function PromoSettings({ api }: { api: PageProps['api'] }) {
       plans: current.plans,
       starts: localInput(current.starts),
       ends: localInput(current.ends),
+      card: current.card,
     })
     // Fill the form from what is saved, each time it loads.
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -345,6 +347,7 @@ function PromoSettings({ api }: { api: PageProps['api'] }) {
         plans: form.plans,
         startsISO: new Date(form.starts).toISOString(),
         endsISO: new Date(form.ends).toISOString(),
+        card: form.card,
       })
       setNote('Saved. The app shows it from the start time.')
       loaded.reload()
@@ -380,7 +383,7 @@ function PromoSettings({ api }: { api: PageProps['api'] }) {
 
   return (
     <>
-      <SectionTitle note="A percentage off the bank-transfer prices, for a set time. Members see it on Become a member and on the transfer form, with the old price crossed out. Card prices are set in Paystack and stay the same.">
+      <SectionTitle note="A percentage off, for a set time. It always applies to bank transfers. Tick card too and a card payment's first charge is discounted; it then renews at the full Paystack price. Members see it on Become a member, with the old price crossed out.">
         Promotion
       </SectionTitle>
       <Card>
@@ -389,6 +392,7 @@ function PromoSettings({ api }: { api: PageProps['api'] }) {
             <Pill tone={state.tone}>{state.label}</Pill>
             <span className="font-semibold text-on-surface">
               {current.name}: {current.percent}% off {current.plans.map((p) => PLANS[p].label).join(', ')}
+              {current.card ? ', transfer and first card payment' : ', transfer only'}
             </span>
             <span className="text-on-surface-variant">
               {when(current.starts.toISOString())} to {when(current.ends.toISOString())}
@@ -441,6 +445,29 @@ function PromoSettings({ api }: { api: PageProps['api'] }) {
               </label>
             ))}
           </div>
+        </fieldset>
+
+        <fieldset className="mt-md">
+          <legend className="mb-xs text-sm font-semibold text-on-surface">Card payments</legend>
+          <label className="flex items-start gap-sm text-sm">
+            <input
+              type="checkbox"
+              className={`${checkbox} mt-0.5`}
+              checked={form.card}
+              onChange={(e) => set({ card: e.target.checked })}
+            />
+            <span>
+              Also take it off the first card payment. The card then renews at the full price at the end of that
+              period.
+              {s && !s.card_promo_allowed && (
+                <span className="mt-xs block text-xs font-semibold text-on-error-container">
+                  Not switched on for this server yet, so card prices stay full even if ticked. It switches on by itself
+                  with a Paystack test key; with a live key, set PAYSTACK_CARD_PROMO=on once a test-mode payment has
+                  worked end to end.
+                </span>
+              )}
+            </span>
+          </label>
         </fieldset>
 
         {validPercent && priced.length > 0 && s && (

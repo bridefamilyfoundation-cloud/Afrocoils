@@ -36,6 +36,7 @@ import {
   promoPrice,
 } from '../../../src/lib/types.ts'
 import { sendMail, transferMail } from './email.ts'
+import { cardPromoAllowed } from './paystack.ts'
 import { appendNote } from './membership.ts'
 import { db, getMember, laterOf, monthsAfter, saveMember } from './members.ts'
 import { RECEIPT_BUCKET, patch, removeObjects, select, signedPhotoUrl, upsert } from './supabase.ts'
@@ -58,6 +59,8 @@ export interface TransferSettingsRow {
   promo_plans: PlanId[] | null
   promo_starts_at: string | null
   promo_ends_at: string | null
+  /** Card checkout takes the promotion off the first payment too (migration 0012). */
+  promo_card: boolean
   updated_at: string
   updated_by: string | null
 }
@@ -127,17 +130,32 @@ function promoOf(settings: TransferSettingsRow | undefined): (Promo & { startsIS
     plans: (settings.promo_plans ?? []).filter(isPlanId),
     startsISO: new Date(settings.promo_starts_at).toISOString(),
     endsISO: new Date(settings.promo_ends_at).toISOString(),
+    // On card only where the admin asked for it *and* card promotions are
+    // allowed on this server (a Paystack test key, or PAYSTACK_CARD_PROMO
+    // switched on after a test-mode run).
+    card: !!settings.promo_card && cardPromoAllowed(),
+    transfer: !!accountOf(settings),
   }
 }
 
 /** The promotion running at `now`, as the phone is told it. Null: none. */
 export function activePromo(settings: TransferSettingsRow | undefined, now: Date = new Date()): Promo | null {
   const promo = promoOf(settings)
-  if (!promo || !accountOf(settings)) return null
+  // Nothing to take it: transfers off and card not in it.
+  if (!promo || (!promo.transfer && !promo.card)) return null
   const t = now.getTime()
   if (t < Date.parse(promo.startsISO) || t >= Date.parse(promo.endsISO)) return null
-  return { name: promo.name, percentOff: promo.percentOff, plans: promo.plans, endsISO: promo.endsISO }
+  return shown(promo)
 }
+
+const shown = (promo: Promo): Promo => ({
+  name: promo.name,
+  percentOff: promo.percentOff,
+  plans: promo.plans,
+  endsISO: promo.endsISO,
+  card: promo.card,
+  transfer: promo.transfer,
+})
 
 /** Days after a promotion ends in which a receipt for a transfer made during it still gets its price. */
 const PROMO_RECEIPT_GRACE_DAYS = 3
@@ -163,7 +181,7 @@ export function promoForReceipt(
   const ends = Date.parse(promo.endsISO)
   if (dayEnd <= starts || dayStart >= ends) return null
   if (now.getTime() < starts || now.getTime() >= ends + PROMO_RECEIPT_GRACE_DAYS * DAY) return null
-  return { name: promo.name, percentOff: promo.percentOff, plans: promo.plans, endsISO: promo.endsISO }
+  return shown(promo)
 }
 
 /** "Black Friday, 20% off": what a transfer row records about its discount. */
@@ -197,7 +215,7 @@ export function transferPlans(settings: TransferSettingsRow | undefined, promo: 
 export async function savePromo(body: Record<string, unknown>, by: string): Promise<TransferSettingsRow> {
   let values: Record<string, unknown>
   if (body.clear === true) {
-    values = { promo_name: null, promo_percent: null, promo_starts_at: null, promo_ends_at: null }
+    values = { promo_name: null, promo_percent: null, promo_starts_at: null, promo_ends_at: null, promo_card: false }
   } else {
     const name = typeof body.name === 'string' ? body.name.replace(/\s+/g, ' ').trim() : ''
     if (name.length < 1 || name.length > 60 || /[<>]/.test(name)) {
@@ -221,6 +239,7 @@ export async function savePromo(body: Record<string, unknown>, by: string): Prom
       promo_plans: plans,
       promo_starts_at: new Date(starts).toISOString(),
       promo_ends_at: new Date(ends).toISOString(),
+      promo_card: body.card === true,
     }
   }
   const [row] = await patch<TransferSettingsRow>(db(), 'transfer_settings', 'id=eq.1', {

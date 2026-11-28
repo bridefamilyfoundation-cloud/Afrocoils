@@ -374,6 +374,9 @@ export default function JoinScreen() {
               {trialAvailable ? 'Or subscribe now' : 'Choose a plan'}
             </h2>
 
+            {/* A promotion that covers card shows here, once, above the prices it changes. */}
+            {promo?.card && <PromoBanner promo={promo} />}
+
             {offers === undefined && (
               <p className="mb-md font-body-md text-body-md text-on-surface-variant">Checking the plans…</p>
             )}
@@ -456,10 +459,25 @@ export default function JoinScreen() {
                         </span>
                       </span>
                       <span className="shrink-0 text-right">
-                        <span className="block font-headline-md text-body-lg font-bold">
-                          {formatAmount(o.amount, o.currency)}
-                        </span>
-                        {saving && <span className="block font-label-md text-[12px] font-bold">{saving}</span>}
+                        {o.firstAmount ? (
+                          <>
+                            <s className="block font-body-md text-caption opacity-75">
+                              <span className="sr-only">usually </span>
+                              {formatAmount(o.amount, o.currency)}
+                            </s>
+                            <span className="block font-headline-md text-body-lg font-bold">
+                              {formatAmount(o.firstAmount, o.currency)}
+                            </span>
+                            <span className="block font-label-md text-[12px] font-bold">first payment</span>
+                          </>
+                        ) : (
+                          <>
+                            <span className="block font-headline-md text-body-lg font-bold">
+                              {formatAmount(o.amount, o.currency)}
+                            </span>
+                            {saving && <span className="block font-label-md text-[12px] font-bold">{saving}</span>}
+                          </>
+                        )}
                       </span>
                     </button>
                   )
@@ -470,7 +488,16 @@ export default function JoinScreen() {
             <p className="mb-lg font-body-md text-caption text-on-surface-variant">
               Paid by card on Paystack&rsquo;s secure page, and renewed every{' '}
               {offer ? PLANS[offer.id].duration.replace(/^1 /, '') : 'period'} at the plan&rsquo;s
-              price until you cancel. Cancel any time from My Hair Profile; you keep access to the
+              price until you cancel.
+              {offer?.firstAmount && (
+                <>
+                  {' '}
+                  With {promo?.name ?? 'the promotion'}, your first payment is{' '}
+                  {formatAmount(offer.firstAmount, offer.currency)}; it renews at{' '}
+                  {formatAmount(offer.amount, offer.currency)}.
+                </>
+              )}{' '}
+              Cancel any time from My Hair Profile; you keep access to the
               end of the period you paid for. We email you before a plan renews.
               {endsISO && !tooEarly && (
                 <>
@@ -489,7 +516,7 @@ export default function JoinScreen() {
               {busy
                 ? 'Opening Paystack…'
                 : offer
-                  ? `Subscribe — ${formatAmount(offer.amount, offer.currency)} for ${PLANS[offer.id].duration}`
+                  ? `Subscribe — ${formatAmount(offer.firstAmount ?? offer.amount, offer.currency)} for ${PLANS[offer.id].duration}`
                   : 'Subscribe with Paystack'}
             </button>
             <button
@@ -550,7 +577,7 @@ export default function JoinScreen() {
             Pay by bank transfer
           </h2>
           {/* The form shows it itself once it is open. */}
-          {promo && !(byTransfer || tooEarly || offers === null || offers?.length === 0) && (
+          {promo && !promo.card && !(byTransfer || tooEarly || offers === null || offers?.length === 0) && (
             <div className="mt-sm">
               <PromoBanner promo={promo} />
             </div>

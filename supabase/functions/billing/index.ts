@@ -46,11 +46,12 @@ import {
   appendNote,
   autoRenewing,
   membershipFor,
+  recordCardPayment,
   refreshMember,
   reverseCharge,
   trialAvailable,
 } from '../_shared/membership.ts'
-import { db, getMember, laterOf, recordCharge, saveMember, trialKey, type MemberRow } from '../_shared/members.ts'
+import { db, getMember, laterOf, saveMember, trialKey, type MemberRow } from '../_shared/members.ts'
 import {
   fetchSubscription,
   manageLink,
@@ -61,8 +62,9 @@ import {
   returnFallback,
   startCheckout,
   verifyPaystackSignature,
+  type CardAuthorization,
 } from '../_shared/paystack.ts'
-import { RECEIPT_BUCKET, insertReturning, removeObjects, select, uploadObject, upsert } from '../_shared/supabase.ts'
+import { RECEIPT_BUCKET, insert, insertReturning, removeObjects, select, uploadObject, upsert } from '../_shared/supabase.ts'
 import { bearer, pruneSessions } from '../_shared/token.ts'
 
 /**
@@ -159,7 +161,18 @@ async function checkout(req: Request, origin?: string): Promise<Response> {
       )
     }
   }
-  const { url, reference } = await startCheckout(session.sub, plan)
+  // A promotion on card makes this a one-off first payment at its price.
+  const promo = await readSettings()
+    .then((settings) => activePromo(settings))
+    .catch(() => null)
+  const { url, reference, promo: priced } = await startCheckout(session.sub, plan, promo)
+  if (priced) {
+    // Written before the link is handed out: a planless payment opens a
+    // plan only by matching this row (`recordCardPayment`).
+    await insert(db(), 'card_checkouts', [
+      { reference, email: session.sub, plan, amount: priced.amount, currency: priced.currency, promo: priced.label },
+    ])
+  }
   await saveMember(session.sub, { pending_reference: reference })
   return jsonResponse({ url } satisfies BillingLinkResponse, 200, origin)
 }
@@ -414,6 +427,7 @@ interface PaystackEvent {
     next_payment_date?: string | null
     customer?: { email?: string; customer_code?: string }
     plan?: { plan_code?: string } | null
+    authorization?: CardAuthorization | null
     subscription?: { subscription_code?: string; status?: string; next_payment_date?: string | null } | null
     /** Refund events: the charge refunded. */
     transaction_reference?: string
@@ -448,15 +462,15 @@ async function webhook(req: Request): Promise<Response> {
   switch (event) {
     case 'charge.success': {
       if (!data.reference) break
-      await recordCharge({
+      await recordCardPayment({
         reference: data.reference,
         email,
         amount: data.amount ?? 0,
         currency: data.currency ?? 'NGN',
         paidAt: data.paid_at ?? data.paidAt ?? new Date().toISOString(),
         planCode: planOf ?? null,
-        plan,
         customerCode: data.customer?.customer_code ?? null,
+        authorization: data.authorization,
       })
       break
     }

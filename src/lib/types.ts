@@ -908,15 +908,23 @@ export interface PlanOffer {
   id: PlanId
   amount: number
   currency: string
-  /** The price before a promotion, when one lowered `amount`. Absent: no promotion on this plan. */
+  /** Bank transfer: the price before a promotion, when one lowered `amount`. */
   fullAmount?: number
+  /**
+   * Card: the promotional first payment, when a promotion covers this
+   * plan. `amount` stays the price it renews at, so a phone that predates
+   * this field shows the full price and is charged less, never more.
+   */
+  firstAmount?: number
 }
 
 /**
- * A promotion: a percentage off the bank-transfer prices, set on the
- * admin site (`transfer_settings`, migration 0011) and running between
- * two times. Card plans are priced by Paystack and are not discounted,
- * so everything that shows a promotion says it is for bank transfer.
+ * A promotion: a percentage off, set on the admin site
+ * (`transfer_settings`, migrations 0011 and 0012) and running between
+ * two times. It always takes the percentage off bank-transfer prices.
+ * With `card`, card checkout takes it off the *first* payment too: that
+ * payment is a one-off charge, and the subscription that follows renews
+ * at the plan's full price (`_shared/membership.ts`).
  */
 export interface Promo {
   name: string
@@ -924,6 +932,10 @@ export interface Promo {
   /** The plans it applies to. */
   plans: PlanId[]
   endsISO: string
+  /** Whether card checkout takes it off the first payment. Absent: transfer only (older servers). */
+  card?: boolean
+  /** Whether bank transfer is on to take it. Absent: yes (older servers, which only had that). */
+  transfer?: boolean
 }
 
 export const PROMO_MAX_PERCENT = 90

@@ -186,6 +186,10 @@ export interface TransferSettings {
   promo_plans: PlanId[] | null
   promo_starts_at: string | null
   promo_ends_at: string | null
+  /** The promotion takes the first card payment down too. */
+  promo_card: boolean
+  /** Whether this server lets it: a Paystack test key, or PAYSTACK_CARD_PROMO=on. */
+  card_promo_allowed?: boolean
   updated_at: string
   updated_by: string | null
 }

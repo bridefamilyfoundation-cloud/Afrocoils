@@ -146,6 +146,48 @@ Changing it signs every phone out (their next status check answers 401);
 keep it stable. None of these values belongs in an `.env` file, the repo or
 anything `VITE_`-prefixed.
 
+## Card promotions (added 2026-11-27)
+
+A promotion (admin → Bank transfers → Promotion) always discounts bank
+transfers. Ticking **Also take it off the first card payment** discounts
+card checkout too, like this:
+
+1. Checkout is a one-off Paystack payment of the discounted price, with
+   no plan on it. The billing function writes a `card_checkouts` row
+   (reference, email, plan, amount) *before* handing out the link.
+2. When that payment is believed (webhook or status check), it opens the
+   plan only if it matches that row — a planless payment anyone starts
+   with the public key opens nothing.
+3. The server then subscribes the member to the plan on the same card
+   (`POST /subscription`, `start_date` = the end of the paid period), so
+   the first full-price charge lands when the discounted period ends.
+   Once per payment (`payments.renewal_claimed_at`). If it fails, or the
+   card cannot be charged again, the member's note on Members says so and
+   their plan simply does not renew; they get the usual "ending" email.
+
+**This is off on a live key until it has been tried in test mode.** It
+switches on by itself with an `sk_test_` key. To try it:
+
+1. Set the test key and *test* plan codes (`PAYSTACK_SECRET_KEY=sk_test_…`,
+   `PAYSTACK_PLAN_*` from the test dashboard), point the test webhook at
+   `…/functions/v1/billing/webhook`.
+2. Start a promotion with card ticked. On /join the card plans show the
+   old price crossed out and "first payment".
+3. Subscribe with Paystack's test card. Check: the app opens; Payments
+   shows the discounted amount; Members shows a Paystack subscription; in
+   the Paystack test dashboard the subscription's next payment date is the
+   end of the paid period, at the full price.
+4. Tap *I've paid — check again* a few times and replay the webhook from
+   the Paystack dashboard: still exactly **one** subscription.
+5. Back on live keys, and only then:
+
+```powershell
+npx supabase secrets set --project-ref runhkccoeyxfgsfrzezn PAYSTACK_CARD_PROMO=on
+```
+
+Unset it (`npx supabase secrets unset … PAYSTACK_CARD_PROMO`) to stop card
+promotions at once; transfer promotions carry on.
+
 ## Coming back from Paystack
 
 After a payment Paystack sends the browser to the billing function's

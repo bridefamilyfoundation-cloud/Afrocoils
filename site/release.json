@@ -13,14 +13,15 @@
     "After paying by card, your browser brings you straight back to the app"
   ],
   "bundle": {
-    "code": 24,
+    "code": 25,
     "minVersionCode": 14,
-    "bytes": 4690202,
-    "sha256": "5a9b2f1782aa8aa98f7bac9aa8161eb98f1b7e842f35e3ac38ac154784c417b9",
-    "released": "2026-11-27",
-    "url": "https://runhkccoeyxfgsfrzezn.supabase.co/storage/v1/object/public/releases/bundles/24.zip",
+    "bytes": 4690965,
+    "sha256": "32ce9ca01ac0ff9db00a4ee15185abd4e742c48cd51ad11148f1159dcad39ebf",
+    "released": "2026-11-28",
+    "url": "https://runhkccoeyxfgsfrzezn.supabase.co/storage/v1/object/public/releases/bundles/25.zip",
     "notes": [
-      "Promotions on bank transfer prices show on Become a member"
+      "The founder's social links now sit at the foot of every screen",
+      "Promotions can now apply to a first card payment"
     ]
   }
 }
